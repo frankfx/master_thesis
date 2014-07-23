@@ -1,0 +1,16 @@
+\section{Fehler Injektion}
+
+Die Implementierung der Fehlerinjektionen wurde mittels einer abgewandelten Form des Strategy Patterns realisiert. Die abstrakte Klasse \courier{InjectionStrategy} dient als Oberklasse aller  konkreten Strategien. Sie stellt für ihre Unterklassen die beiden Funktionen aus Listing \ref{lstFaultInjector1} bereit. Die Methode \courier{isInjected} ist f\"ur jede Strategie gleich und wird daher bereits mit Funktionalit\"at an die Unterklassen vererbt. \courier{isInjected} ist f\"ur den Funken Zufall in den einzelnen Injektionen verantwortlich. Anhand der Fehlerrate, die zwischen 0 und 1 liegen muss und einem Zufallswert der ebenfalls zwischen 0 und $<$1 liegt, wird entschieden ob ein Bit bzw. Block injiziert werden soll.\\
+Die zweite Methode ist mit dem Schl\"usselwort \courier{abstract} deklariert. Die Implementierung der eigentlichen Algorithmen finden sich erst in der Methode \courier{runInjection} der jeweiligen Unterklassen wieder.\\
+Verwendet wird dieses Muster in der bereits beschriebenen Klasse \courier{Context} durch die Methode \courier{getInjectionStrategy}. Diese Methode erzeugt eine Member-Variable aus der abstrakten Klasse \courier{InjectionStrategy}, die mit einer Referenz auf die gew\"unschte Logik belegt ist. Somit kann eine konkrete Strategie beliebig eingebunden als auch ausgetauscht werden. Die Implementierung ist dadurch sehr leicht erweiterbar. Insgesamt benötigen neue Strategien folgende Anpassungen/Erweiterungen:
+
+\begin{itemize}
+		\item einen eigenen Typ im \courier{Enum FaultType}
+		\item müssen von der aktrakten Klasse \courier{InjectionStrategy} erben und dessen abstrakte Methode \courier{runInjection} implementieren.
+		\item müssen in die Methode \courier{getStrategy} der Klasse \courier{Context} integriert werden
+	\end{itemize}
+	
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={InjectionStrategy}, label=lstFaultInjector1]{listings/FaultInjector1.java}
+\end{figure}
+

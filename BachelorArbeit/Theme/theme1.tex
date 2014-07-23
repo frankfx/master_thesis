@@ -1,0 +1,136 @@
+%\documentclass[notes=show]{beamer} 
+\documentclass[]{beamer}
+\usetheme{umbc1}  
+\useoutertheme{umbcfootline}
+\setbeamertemplate{navigation symbols}{}  % see Remark below 
+\setfootline{\insertshortauthor \hfill \insertsubtitle
+    \hfill slide \insertframenumber/\inserttotalframenumber} 
+
+
+\title{Bachelorarbeit}
+\subtitle{Indentifikation von fehlerbehafteten Daten zur energiebewu\ss ten Programmierung}
+\author[R. Frank]{Ren\'{e} Frank}
+\institute[Ren\'{e} Frank]{
+  Philipps-Universit\"at Marburg\\ 
+  FB Mathematik \& Informatik\\[1ex]
+  \texttt{frank@mathematik.uni-marburg.de}
+}
+\date{\today}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+
+%% use of boxes
+\usepackage{fancybox}
+\useinnertheme{umbcboxes}
+\setbeamercolor{umbcboxes}{bg=violet!15,fg=black}
+
+%% paste grafics
+\usepackage{graphics}
+
+%% tikz
+\usepackage{tikz}
+\usetikzlibrary{arrows,shadows,patterns} % for pgf-umlsd
+
+%% framed
+\usepackage{framed}
+
+
+%% color package
+\usepackage{color}
+
+%% dashrule
+\usepackage{dashrule}
+
+%% different font family
+\usepackage{helvet} %
+
+%% listing
+\usepackage{listings}
+
+%% uml
+\usepackage{uml}
+
+
+%% set the items after \pause of one slide transparent 
+\setbeamercovered{transparent}
+
+\newcommand{\dashrule}[0]{\hdashrule{\linewidth}{1pt}{3pt}}
+
+\newcommand{\partPage}[1]{
+	{
+	\setbeamertemplate{background canvas}{%
+	\begin{tikzpicture}
+    		\clip (0,0) rectangle (\paperwidth,\paperheight);
+    		\fill[color=tmpBlue] (\paperwidth-10pt,0) rectangle (\paperwidth,\paperheight);
+	\end{tikzpicture}}
+	#1
+	}
+}
+
+\defbeamertemplate*{part page}{borstel}[1][]{ 
+ 
+  \begin{centering}
+    \vskip1em\par
+    \begin{beamercolorbox}[sep=8pt,center,#1]{}
+      	\begin{myblock}
+      		\usebeamerfont{part title}\usebeamercolor*[fg]{part name}\insertpart\par
+      	\end{myblock}
+    \end{beamercolorbox}
+  \end{centering}
+} 
+\setbeamertemplate{part page}[borstel][]
+
+\definecolor{llightGray}{HTML}{C0C0C0}
+\definecolor{Sand}{HTML}{FFFFCC}
+\definecolor{LLightBlue}{HTML}{CCCCFF}
+\definecolor{LLila}{HTML}{870055}
+\definecolor{DarkGrey}{rgb}{0.1,0.1,0.1}
+\definecolor{tmpBlue}{HTML}{9999D9}
+
+\newtheorem{mydef}{Strategien}
+
+\newsavebox\blockbox
+\newenvironment{myblock}{%
+  \begin{lrbox}{\blockbox}%
+    \begin{minipage}{.8\textwidth}
+}{
+    \end{minipage}
+  \end{lrbox}
+  \tikz\node[
+    draw=black,
+    line width=0.5pt,
+    inner sep=10pt,
+    outer sep=0pt,
+  ]{\usebox\blockbox};
+}
+
+\lstdefinestyle{stJava}{basicstyle=\scriptsize\ttfamily,
+	classoffset=0,	
+	numbers=left, 				% show line numbers on the left
+	stepnumber=1, 				% show every  line number
+	numberstyle=\scriptsize, 			% font sitze of line numbers
+	numbersep=5pt, 				% separation to the text
+	language=Java,				% language of source
+	backgroundcolor={\color{Sand}},
+	stringstyle=\color{blue},		% style of strings
+	emphstyle=\color{red},			% sytle of ???
+	commentstyle=\color{gray},		% style of comments
+	keywordstyle=\bfseries,			% style of keywords
+	captionpos=b,
+	tabsize=4,				% indentation
+	showspaces=false,			% show spaces
+	showtabs=false,				% show tabs
+	showstringspaces=false,			% show spaces in strings
+	breaklines=true,			% breaks long lines
+	keywordstyle=\color{LLila},          % keyword style
+	morekeywords={enum},
+  	%stringstyle=\color{mauve},         % string literal style
+  	escapeinside={\%*}{*)},           % if you want to add LaTeX within your code
+  	classoffset=1,
+	morekeywords={RANDOM, LOSS, ZERO, BITFLIP, BITFLIPB, NONE},keywordstyle=\color{blue},
+	classoffset=0
+	%frame=tbl 				% can be: none, single, trbl (or trBL, ...), shadowbox	      		
+%    keywordstyle=\color{blue}\bfseries,
+}

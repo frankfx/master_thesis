@@ -1,0 +1,31 @@
+\chapter{Design}\vspace{1cm}
+Das Kapitel Design beschreibt zunächst die Problemstellung der zugrundeliegenden Arbeit. Zu diesem Zweck wird die bestehende Ausgangssituation aufgezeigt sowie eine kurze Einführung hinsichtlich der Funktionsweise der Anwendung gegeben. Ein Anwendungsfall beschreibt infolge einer dargestellten Benutzerinteraktion die zur Verfügung gestellten Operationen. Im Hauptteil werden die wichtigsten Klassen bezüglich deren Abhängigkeiten und Funktionsweisen vorgestellt. Für die Visualisierung dieser Eigenschaften wurde die graphische Modellierungssprache UML  eingesetzt. Es werden allgemeine Designentscheidungen diskutiert und abschlie\ss end ein Gesamt\"uberblick anhand eines sequentiellen Programmablaufs gegeben.
+%
+\input{chapters/design_Problemstellung}
+
+\input{chapters/design_Benutzerinteraktion}
+
+\section{Klassendesign \& -abhängigkeiten}
+%
+Die Klassenhierarchie der zugrunde liegenden Anwendung st\"utzt sich auf den folgenden vier S\"aulen, welche das Grundgerüst bzw. die Hauptfunktionalität der Applikation bilden. Ein wesentliches Ziel war es, die Anforderungen der Modularit\"at zu erf\"ullen. Die Anwendung sollte für eventuelle Erweiterungen m\"oglichst flexibel und gut strukturiert bleiben.
+%
+	\begin{itemize}
+		\item StreamProcesser : Einlesen und Ausgabe der Daten, Start der Fehlerinjektion
+		\item InjectionStrategy : Oberklasse der Injektionsstrategien
+		\item AddRunTimeAnnotation : Dynamische Modifikation der Annotationen
+		\item Controller : Steurerung aller Funktionen
+	\end{itemize}	 
+%
+\input{chapters/design_FileProcessor}
+%
+\input{chapters/design_FaultInjector}
+%
+\input{chapters/design_AddRuntimeAnnotation}
+%
+\input{chapters/design_Controller}
+%
+\input{chapters/design_Sonstiges}
+%
+\input{chapters/design_Client}
+%
+\input{chapters/design_Sequenz}

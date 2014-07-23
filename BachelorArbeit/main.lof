@@ -1,0 +1,26 @@
+\select@language {ngerman}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces AccuracyAwareness: Software-Architektur}}{5}{figure.caption.7}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces RMI Kommunikations-Architektur}}{6}{figure.caption.8}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces JMX-Architektur}}{7}{figure.caption.9}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Javassist Code-Manipulation}}{9}{figure.caption.10}
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Funktionsweise HotSwapper}}{10}{figure.caption.11}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Anwendungsfalldiagramm}}{17}{figure.caption.12}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces UML StreamProcessor\relax }}{19}{figure.caption.13}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces UML Strategy Pattern}}{21}{figure.caption.15}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces UML Dynamische Konfiguration\relax }}{23}{figure.caption.16}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces UML MBean Interface}}{25}{figure.caption.17}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Sequenzdiagramm}}{28}{figure.caption.18}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Messung dynamische Fehlerregulierung\relax }}{46}{figure.caption.39}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Messung Random Strategie}}{47}{figure.caption.42}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Messung Loss Strategie}}{48}{figure.caption.45}
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Messung Zero Strategie}}{49}{figure.caption.48}
+\contentsline {figure}{\numberline {6.5}{\ignorespaces Messung BitflipB Strategie}}{50}{figure.caption.51}
+\contentsline {figure}{\numberline {6.6}{\ignorespaces Messung Bitflip Strategie}}{51}{figure.caption.54}
+\contentsline {figure}{\numberline {6.7}{\ignorespaces Messung Branch Prediction\relax }}{53}{figure.caption.58}
+\addvspace {10\p@ }

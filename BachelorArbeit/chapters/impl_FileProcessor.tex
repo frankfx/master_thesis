@@ -1,0 +1,20 @@
+\section{Klasse StreamProcessor}
+Der \courier{StreamProcessor} ist das Zentrum der Anwendung. Über diese Klasse werden zu Beginn die Daten aus der Datei oder dem Stream gelesen. Die Daten werden anschlie\ss end als einzelne Bytes an die Klasse \courier{Context} übergeben. Dieses Vorgehen ist durch Listing \ref{lstFaultPro2} umgesetzt worden.
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={StreamProcessor Einlesen der Daten}, label=lstFaultPro2]{listings/FileProcessor2.java}
+\end{figure}
+F\"ur das Einlesen der Daten wurde ein \courier{InputStream} verwendet. Dieser Stream wird von \courier{FileIO}, \courier{Sockets}, etc. unterstützt. Der fehlerbehaftete Stream muss global deklariert sein, damit er annotiert/injiziert werden kann. Die beiden M\"oglichkeiten der Annotierung sind durch Listing \ref{lstFaultPro1} gegeben.\\
+Im n\"achsten Schritt wird der \courier{InputStream} durch die Methode \courier{readStream} in eine Byte-Liste ausgelesen. Aufgerufen wurde \courier{readStream} durch die Methode \courier{loadStream}, welche die erstellte Ergebnisliste bzw. den Datensatz mit einer dazugehörigen ID an das \courier{Context} Objekt übergibt. Im zweiten Schritt werden die Fehlerwerte durch die Methode \courier{setFaultsByIDToContext} unter Verwendung von Java Reflection \footnote{http://docs.oracle.com/javase/tutorial/reflect/index.html - Zugriff am 21. Juli 2012
+} an das \courier{Contex} Objekt übergeben. Die Methode benötigt dafür die Fehler-ID's und die ID des betroffenen Datensatzes.
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={StreamProcessor Fehlermarkierung}, label=lstFaultPro1]{listings/FileProcessor1.java}
+\end{figure}
+Das Laden der Daten wird beim Aufruf der Methode \courier{processData} aus Listing \ref{lstFaultPro3} veranlasst. Nach dem Laden folgt die Methode \courier{injectFaults} der Klasse \courier{Context}. Diese sorgt intern daf\"ur, dass die verwalteten Daten mit den beigef\"ugten Fehlerwerten injiziert werden.\\
+F\"ur das Auslesen der manipulierten Daten aus dem \courier{Context} Objekt, sowie das Schreiben in eine neue Datei wurde die innere Klasse \courier{Reducer} implementiert. Der \courier{Reducer} erstellt zun\"achst den Stream für die Ausgabe und bereitet eine neue Datei vor. Danach wird die Methode \courier{reduce} aufgerufen um durch den jeweiligen Datensatz zu iterieren und die Bytes durch den gewählten Stream in die neue Datei zu schreiben.
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={StreamProcessor Einlesen/Injektion/Ausgabe}, label=lstFaultPro3]{listings/FileProcessor3.java}
+\end{figure}
+Das Auslesen der \courier{FaultValues} ist durch die Implementierung aus Listing \ref{lstFaultPro4} realisiert worden. Diese Methode wird ebenfalls im \courier{Controller/MBeanController} verwendet, um  auf Anfrage des Clients die Fehlerwerte liefern. Die Funktion arbeitet mit der bereits erw\"ahnten Java Reflection Technologie um die injizierten Felder zu ermitteln. Es werden alle globalen Variablen durchgegangen und \"uberpr\"uft, ob die \courier{FaultInjects} Annotation präsent ist. Ist dies der Fall, werden alle \courier{FaultInj} Annotationen heraus gefiltert und deren Fehlerwerte als \courier{FaultValue} verpackt zu einer Liste beigef\"ugt. F\"ur den Fall, dass statt einer \courier{FaultInjects} Annotation nur eine einzelne \courier{FaultInj} Annotation vorhanden ist, wird im \courier{else}-Zweig die Verarbeitung analog f\"ur die einzelne \courier{FaultInj} durchgef\"uhrt.
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={StreamProcessor Fehlerwertrückgabe}, label=lstFaultPro4]{listings/FileProcessor4.java}
+\end{figure}

@@ -1,0 +1,36 @@
+\subsection{StreamProcessor}
+
+Der \courier{StreamProcessor} ist das Herzst\"uck der Anwendung. Alle Daten die es zu manipulieren gilt, werden an diese Klasse übergeben. Die für das Einlesen der Daten notwenigen Streams sind in der Klassendefinition als globale Variablen vorgesehen. Dies bedeutet auch, dass die Fehlermarkierungen durch die \courier{FaultInj} bzw. mehrere Markierungen durch eine \courier{FaultInjects} Annotation, ausschlie\ss lich global vorgenommen werden können.\\ 
+Der \courier{StreamProcessor} zerlegt einen Datenstream in einzelne Bytes, um sie anschlie\ss end der Klasse \courier{Context} zu übergeben. Die Klasse \courier{Context} verwaltet die Daten zusammen mit deren Fehlerwerte, falls jene definiert wurden. Die Implementierung erlaubt es an dieser Stelle auch mehrere Datens\"atze verschiedener Streams durch ein \courier{Context} Objekt verwalten zu lassen. Für jeden Datensatz wird eine eindeutige ID zur Unterscheidung festgelegt. Einzige Prämisse für die Nutzung dieser Datenverwaltung ist die Serialisierbarkeit der Daten, um einen Netzwerktransfer zu erm\"oglichen.\\
+Nach dem Einlesevorgang wird über den \courier{StreamProcessor} die Fehlerinjektion veranlasst. Bereits während des Einlesens wurden für jeden Datensatz, anhand der ID des markierten Streams, die Fehlerwerte registriert. Der \courier{StreamProcessor }startet nun die Fehlerinjektion über seine Instanz der Klasse \courier{Context}. Diese bestimmt anhand des Fehlertyps die notwendige Injektions-Strategie. Ist für einen Datensatz kein Strategie vorhanden bleibt dieser unberührt und eine Fehlermeldung wird ausgegeben. Für die konkrete Fehlerinjektion wurde ein Strategy Pattern in leicht abgewandelter Form verwendet. \\
+Die aktuelle Implementierung sieht nach der Fehlerinjektion die Datenausgabe in eine Datei vor. Zu diesem Zweck wurde eine innere Klasse \courier{Reducer} implementiert. Sie ist f\"ur die Erstellung der neuen Dateien zust\"andig und bietet hierfür zwei verschiedene Ausgabevarianten an. Per Default wird ein \courier{FileChannel} für die Ausgabe verwendet. Durch eine zusätzliche Funktion kann der Ausgabestream vom Client, zu einem \courier{ObjectOutputStream} geändert werden. Dadurch wird eine persistente Objektspeicherung ermöglicht. Nach diesem Schritt wird durch alle Datens\"atze iteriert und die Daten in die neuen Dateien geschrieben. Diese Struktur ist in Abbildung \ref{FileProcessorUML} als UML-Klassendiagramm dargestellt.
+
+\begin{figure}[!htb] 
+\centering
+		\umlDiagram[box=,border,sizeX=12cm,sizeY=10cm,ref=pack]{		
+			\umlClass[pos=\umlTop{pack}, stereotype=Class, posDelta={0, -10},
+				refpoint=t]{StreamProcessor}{}{}
+			\umlClass[pos=\umlTop{pack}, stereotype=Class, posDelta={0, -1},
+				refpoint=t]{Context}{}{}
+			\umlClass[pos=\umlTopRight{pack}, stereotype=Abstract Class, posDelta={-6,-1},
+				refpoint=t]{InjectionStrategy}{}{}	
+			\umlClass[pos=\umlLeft{pack}, stereotype=Class, posDelta={4, 2},
+				refpoint=t]{Reducer}{}{}	
+			\umlClass[pos=\umlRight{pack}, stereotype=Annotation, posDelta={-5, 2},
+				refpoint=t]{FaultInj}{}{}
+			\umlClass[pos=\umlBottom{pack}, stereotype=Annotation, posDelta={0, 6},
+				refpoint=t]{FaultInjects}{}{}																	\umlInner{Reducer}{StreamProcessor}
+			\umlInstance{StreamProcessor}{FaultInj}	
+			\umlInstance{StreamProcessor}{FaultInjects}
+			\umlInstance{StreamProcessor}{Context}
+			\umlInstance{Context}{InjectionStrategy}									
+		}% End of diagram
+%		\captionsetup{list=false}
+	\caption{UML StreamProcessor}
+ 	\label{FileProcessorUML}
+\end{figure}
+
+\subsection*{Exkurs: Klasse Context}
+
+Bisher wurde häufig die Klasse \courier{Context} erwähnt, welche die eingelesenen Daten verwaltet und  Fehler in die enthaltenen Datensätze einbaut. Um diese Aufgabe zu erfüllen, muss die Klasse \courier{Context} zunächst für jeden Datensatz die erforderliche Injektionslogik bestimmen. Die Injektionslogiken wurden durch eine Form des Strategy Patterns \cite{GammaEtAl00} in die Implementierung integriert.\\
+Die Klasse \courier{Context} trifft die Auswahl der konkreten Injektionsstrategie anhand des Fehlertyps des jeweiligen Datensatzes. Eine abstrakte Klasse repräsentiert die allgemeinste Strategie. Sie kann flexibel von den beschriebenen Logiken in den folgenden Abschnitten erweitert/überschrieben werden. Die verschiedenen Strategien sind als einzelne Module definiert, die problemlos durch neue Klassen erg\"anzt werden können. Wenn die richtige Strategie gefunden wurde, kann die Injektion mit den entsprechenden Fehlerwerten gestartet werden.

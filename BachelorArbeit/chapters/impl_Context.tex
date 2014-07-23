@@ -1,0 +1,20 @@
+\section{Context}
+
+Die Klasse \courier{Context} ist f\"ur die Datenverwaltung/-manipulation verantwortlich. In Listing \ref{lstContext1} ist die Methode \courier{write} zu sehen die vom \courier{StreamProcessor} zur \"Ubergabe der Datens\"atze aufgerufen wird. Als Prämisse dafür gilt die Serialisierbarkeit der Daten. Zur Erfassung wurde eine \courier{HashMap} gewählt, über die eine einfache Verwaltung der Datensätze anhand der ID möglich ist.
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Context: Einlesen der Datensätze}, label=lstContext1]{listings/Context1.java}
+\end{figure}
+
+Um die Daten mit Fehlern zu injizieren, wurde die Methode \courier{getStrategy} aus Listing \ref{lstContext2} erstellt. Die Methode bekommt einen Datensatz mit dem dazugehörigen Fehlerwert als Parameter \"ubergeben. Anhand des Fehlertyps wird die zugrundeliegende Strategie ausgewählt. 
+Neue Strategien müssen in diese Methode integriert werden.
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Context: Strategieauswahl}, label=lstContext2]{listings/Context2.java}
+\end{figure}
+
+Die gew\"ahlte Strategie kann nun in der Methode \courier{injectFaults} f\"ur die Dateninjektion verwendet werden (Listing \ref{lstContext3}). Die Variable \courier{registeredFaultInjectors} ist eine Liste, bestehend aus Tupeln von IDs\footnote{Referenz auf Datensätze} und dazugeh\"origen \courier{FaultValues}. Im Gegensatz zu den Datens\"atzen der \courier{HashMap} sind bei dieser Liste die IDs nicht eindeutig, da jeder Datensatz mehrere \courier{FaultValues} haben kann. Die gew\"ahlte Strategie bekommt diese Werte \"ubergeben und ruft ihrerseits die Methode \courier{runInjection} auf. 
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Context: Injektionsausführung}, label=lstContext3]{listings/Context3.java}
+\end{figure}

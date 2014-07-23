@@ -1,0 +1,51 @@
+\section{Klasse AddRuntimeAnnotation}
+
+Für die dynamische Konfiguration der Fehlerwerte wurde die Klasse \courier{AddRuntimeAnnotation} geschrieben. Sie enthält eine statische Methode \courier{addFaultInjAnnotationToMethod} die für die Umsetztung der Modifikation zuständig ist. Bei ihrer Ausführung ver\"andert sie die Class Datei des StreamProcessors und liefert als Resultat eine Instanz des modifizierten Objektes zurück. Die Methode wurde so konzipiert, dass mehrere Annotationen mit einem Aufruf ge\"andert werden k\"onnen. F\"ur die Modifikation nutzt die Methode verschiedene Komponenten aus der Library javassist.\\
+Eine in der Implementierung aus Listing \ref{lstAddRun1} benutzte Komponente ist die Klasse \courier{Javassist.CtClass}\footnote{compile-time class}, welche die Class Datei des StreamProcessors repr\"asentiert. Um eine solche \courier{CtClass} erstellen und sp\"ater modifizieren zu k\"onnen wurde vorher ein \courier{ClassPool} Objekt erstellt. Der \courier{ClassPool} liest mittels des Schl\"usselworts \courier{get} die gew\"unschte Class Datei und konstruiert aus dieser eine \courier{CtClass}. Die \courier{CtClass} kann nun auf Bytecode-Ebene angepasst werden. Um den Bytecode des StreamProcessors updaten zu können, wurde ein Objekt vom Typ \courier{HotSwapper} erstellt. Dieses ben\"otigt lediglich einen Port für das Laden der neuen Class Datei\footnote{inter-thread communication}. Die Umsetzung der Erstellung dieser Komponenten wird in Listing \ref{lstAddRun1} gezeigt.
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Initialisierung HotSwapper \& CtClass}, label=lstAddRun1]{listings/AddRuntime1.java}
+\end{figure}
+
+Als Parameter bekommt die Methode \courier{addFaultInjAnnotationToMethod} die neuen Fehlerwerte anhand eines \courier{FaultValue} Array \"ubergeben. Mittels der ID des jeweiligen FaultValues kann, wie in Listing \ref{lstAddRun2} zu sehen, das dazugeh\"orige Feld in der Klasse \courier{StreamProcessor} bestimmt werden. Die ermittelten Felder bekommen f\"ur den Manipulationsvorgang eine Instanz der Klasse \courier{Javassist.CtField} zugewiesen. 
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Bestimmung injizierter Felder}, label=lstAddRun2]{listings/AddRuntime2.java}
+\end{figure}
+
+Um neue Felder, Methoden, Annotationen etc. hinzuf\"ugen zu k\"onnen wurde ein \courier{ClassFile} Objekt auf den \courier{CtClass} Class-File referenziert. Zus\"atzlich wurde ein \courier{ConstPool}\footnote{constant pool table} Objekt mit Verweis auf diesen Class-File erstellt (Listing \ref{lstAddRun3}). 
+Für die neuen Annotationen wurden zwei \courier{javassist.Annotation} Objekte definiert. Eines f\"ur die \courier{FaultInjects} und das andere Objekt f\"ur die \courier{FaultInj} Annotationen. Ein \courier{AnnotationsAttribute} Objekt ist nach der Erstellung der Annotationen f\"ur die \"Ubergabe an das entsprechende \courier{ctField} notwendig. 
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Neue Annotationen}, label=lstAddRun3]{listings/AddRuntime3.java}
+\end{figure}
+
+F\"ur die Erstellung der neuen Annotationen wurde zun\"achst durch die vorher bestimmten \courier{CtFelder} iteriert. Es wurde die alte Annotation bestimmt und eine neue Annotation dieses Typs (\courier{FaultInjects} oder \courier{FaultInj}) angelegt (Listing \ref{lstAddRun4}). Die erstellten Annotationen wurden gleichzeitig zur Speicherung, der constant-pool-table beigef\"ugt. 
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Zuweisung des Annotationstyps}, label=lstAddRun4]{listings/AddRuntime4.java}
+\end{figure}
+
+Im \courier{if}-Zweig, also falls ein Feld mit einer \courier{FaultInjects}-Annotation pr\"asent ist, wird ein \courier{AnnotationMemberValue} Array f\"ur die Unterannotationen verwendet. Es werden zun\"achst alle Unterannotationen durchlaufen und nach der passenden ID gesucht. Falls die ID gefunden wurde, können die neuen Fehlerwerte aus dem \courier{FaultValue} Array geschrieben werden. F\"ur alle anderen Unterannotationen wurden die alten Werte erneut verwendet. Nach jedem Durchlauf wird die erstellte Unterannotation dem \courier{AnnotationMemberValue} Array \"ubergeben. Dieser repr\"asentiert die \courier{FaultInjects}-Annotation und kann im Anschluss komplett an das \courier{Annotation} Array übergeben werden (Listing \ref{lstAddRun5}).  \\
+Im \courier{else}-Zweig, falls also ein Feld mit einer \courier{FaultInj}-Annotation pr\"asent ist, werden lediglich die neuen Werte in die Annotation aufgenommen. Da im anfangs erstellten \courier{CtField} Array nur Felder enthalten sein k\"onnen die ge\"andert werden sollen, muss hier auch keine weitere \"Uberpr\"ufung durchgef\"uhrt werden.\\
+Zum Schluss kommt das \courier{AnnotationsAttribute} Objekt zum Einsatz. Jede Annotation wird diesem Objekt \"ubergeben und die Sichtbarkeit zur Laufzeit gesetzt. Dann kann dieses dem entsprechenden \courier{CtField} \"ubergeben werden.
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Setzen der Fehlerwerte}, label=lstAddRun5]{listings/AddRuntime5.java}
+\end{figure}
+
+Nachdem die Klasse mit den neuen Annotationen versehen wurde, muss der Bytecode neu geladen werden. Hierf\"ur  wird das \courier{CtClass} Objekt in eine Class Datei transformiert und anschlie\ss end der Bytecode ausgelesen. Die Klasse \courier{javassist.HotSwapper} l\"adt nun anstelle des urspr\"unglichen, den modifizierten Bytecode erneut in die JVM (Listing \ref{lstAddRun6}).
+
+\begin{figure}[!htb]
+	\lstinputlisting[style=stJava,caption={Laden des Bytecodes}, label=lstAddRun6]{listings/AddRuntime6.java}
+\end{figure}
+
+%constant pool table, an array of variable-sized constant pool entries, containing items such as literal numbers, strings, and references to classes or methods. Indexed starting at 1, containing (constant pool count - 1) number of entries in total (see note).
+%
+%The constant pool table is where most of the literal constant values are stored. This includes values such as numbers of all sorts, strings, identifier names, references to classes and methods, and type descriptors. All indexes, or references, to specific constants in the constant pool table are given by 16-bit (type u2) numbers, where index value 1 refers to the first constant in the table (index value 0 is invalid).
+
+
+
+
+
+

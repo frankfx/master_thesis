@@ -1,0 +1,12 @@
+\section{Motivation und Zielsetzung}
+
+Es wurde bereits in den vorherigen Kapiteln erwähnt, dass Energie in der Zukunft eine immer knapper werdende Ressource sein wird. Gerade in der Informatik steigt der Energiekonsum aufgrund neuer Technologien und Online-Services stetig an \cite{Kommey}. Das f\"ur diese Bachelorarbeit entwickelte Programm ist Bestandteil einer Forschung, welche versucht dieses Problem zu l\"osen, indem es mit Hilfe des Paradigmas Accuracy Aware eine energiebewusste Programmierung erm\"oglicht. \\
+Die Zielsetzungen waren:
+\begin{itemize}
+	\item die Fehlerinjektion minimal-invasiv, d.h. mit möglichst wenig Änderungen im Code vornehmen zu müssen.   
+	\item Nur einen minimalen Overhead erzeugen, um die Verwendung für große verteilte Systeme (z.B. Hadoop), bei denen neben der Fehlerinjektion zugleich Energiemessungen vorgenommen werden können, zu ermöglichen.
+	\item Alle Arten von Datenströmen, wie FileIO oder Network, sollten berücksichtigt werden, weil für ``Accuracy Awareness'' sowohl modifizierte Disk- als auch Network-Hardware simuliert werden soll.
+	\item Eine dynamische Regulierung der Fehlerwerte zur Laufzeit. Dem Client sollte es somit m\"oglich sein Fehlerwerte, welche vorher im Programmcode festgelegt wurden, im laufenden Programm modifizieren zu k\"onnen.
+\end{itemize}
+
+Das Programm verwendet zun\"achst gew\"ohnliche Streams um Daten einzulesen. Diese werden anschlie\ss end ``verpackt'' und \"uber verschiedene Logiken mit Fehlerwerten injiziert. Danach werden die injizierten Daten für die weitere Verwendung ausgegeben. Die Fehlerinjektion wird über eine Markierung der betroffenen Streams durch Java Annotations\footnote{Metadaten} im Quelltext eingeleitet. Jeder markierte Stream wird somit als fehlerbehaftet gekennzeichnet und bekommt von Beginn an Fehlerwerte zugewiesen. Für die Markierungen wurde eine selbstdefinierte Annotation mit dem Namen \courier{FaultInj} verwendet. Die Fehlerwerte sind durch die vier Parameter ID, Fehlerrate, Fehlertyp und die Gr\"o\ss e eines fehlerbehafteten Datenblocks definiert. Ziel der Fehlerinjektion ist es, die eingelesen Daten mittels diesen konkreten Fehlerwerten und diversen Injektionsstrategien manipulieren zu k\"onnen. F\"ur die Fehlerinjektion war es zusätzlich notwendig, auch mehrere Markierungen/Annotationen mit verschiedenen Werten f\"ur einen Stream definieren zu k\"onnen. 

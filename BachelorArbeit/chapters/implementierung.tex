@@ -1,0 +1,26 @@
+\label{Implementierung}
+\chapter{Implementierung}\vspace{1cm}
+Das folgende Kapitel zeigt die Implementierungsdetails der im Design-Kapitel erläuterten Komponenten. Es werden hierfür die wichtigsten Funktionen beschrieben und zum besseren Verständnis der Code anhand von kurzen Ausschnitten aufgezeigt.\\
+Die einzelnen Klassen wurden nach ihrem Aufgabengebiet in verschiedene Java-Pakete eingeteilt. Zunächst wird das Paket \courier{faults} betrachtet. Dessen Inhalte sind alle Klassen die Fehlerwerte repr\"asentieren und daher von den folgenden Klassen verwendet werden.\\
+Das Paket \courier{processor} bildet den Hauptteil des Kapites. Es beinhaltet die Klassen  \courier{Context}, \courier{StreamProcessor}, also auch die Klasse \courier{AddRuntimeAnnotation}. Alle drei Klassen sind eng aneinander gekoppelt und für die Hauptfunktionalität der Anwendung zuständig. \\
+Die einzelnen Injektions-Logiken wurden in das Paket \courier{strategies} gepackt. In diesem Abschitt steht das verwendete Pattern, welches für die Implementierung der Injektion verwendet wurde, im Fokus. Die vorhandenen Strategien werden nur kurz, anhand einer ausgewählten Strategie exemplarisch vorgestellt.\\
+Die Implementierungen des \courier{Controllers} und des \courier{MainServers} sind Bestandteil des Paketes \courier{jmx}. In diesem Abschnitt wird die verwendete JMX-Technologie detailliert beschrieben und anschlie\ss end dessen Verwendung anhand verschiedener JMX-Client Implementierungen aufgezeigt.
+
+
+\input{chapters/impl_Fehlerwerte}
+%%
+\input{chapters/impl_FileProcessor}
+%%
+\input{chapters/impl_AddRuntimeAnnotation}
+%
+\input{chapters/impl_Context}
+%
+\input{chapters/impl_FaultInjector}
+
+\input{chapters/impl_JMX}
+%
+%
+%
+%
+%
+%

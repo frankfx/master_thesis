@@ -1,0 +1,112 @@
+\begin{table}[!htb]
+
+\begin{tabular}{rrrrrrr}
+\hline\\
+\multicolumn{0}{c}{\colorbox{myblue}{\textbf{RANDOM}}} &  
+\multicolumn{0}{c}{\colorbox{myblue}{\textbf{Block}}} &  
+\multicolumn{0}{c}{\colorbox{myblue}{\textbf{Rate: 0.01}}} &  
+\multicolumn{0}{c}{\colorbox{myblue}{\textbf{Rate: 0.05}}} & 
+\multicolumn{0}{c}{\colorbox{myblue}{\textbf{Rate: 0.1}}} &
+\multicolumn{0}{c}{\colorbox{myblue}{\textbf{Rate: 0.5}}} & 
+\multicolumn{0}{c}{\colorbox{myblue}{\textbf{Rate: 1.0}}}\\
+ & 1 & 2.93 & 3.89 & 5.05 & 13.26 & 22.87 \\
+ & 8 & 0.77 & 0.88 & 1.03 & 2.55 & 4.18 \\
+ & 128 & 0.48 & 0.51 & 0.55 & 0.87 & 1.33 \\ 
+ & 1024 & 0.44 & 0.48 & 0.52 & 0.83 & 1.22 \\
+ & 2048 & 0.44 & 0.48 & 0.51 & 0.82 & 1.20 \\
+\hline
+\end{tabular}
+\caption{Messwerte Random Strategie}
+\label{tblRandom}
+\end{table}
+
+
+\begin{figure}[!htb]
+
+\begin{tikzpicture}
+	\begin{scriptsize}
+	\path[line width=2pt,-,dashed,draw=myblue] 
+			(0.2,4.6) -- (0.7,4.6) node[above,pos=0.5,text=black] {1};
+	\path[line width=2pt,-,dashed,draw=bleu] 
+	        (1.2,4.6) -- (1.7,4.6) node[above,pos=0.5,text=black] {8};
+	\path[line width=2pt,-,dashed,draw=vert] 
+	        (2.2,4.6) -- (2.7,4.6) node[above,pos=0.5,text=black] {128};
+	\path[line width=2pt,-,dashed,draw=violet] 
+			(0.2,4.1) -- (0.7,4.1) node[above,pos=0.5,text=black] {1024};
+	\path[line width=2pt,-,dashed,draw=orange] 
+			(1.2,4.1) -- (1.7,4.1) node[above,pos=0.5,text=black] {2048};		
+	\end{scriptsize}		
+ 
+  \draw (0cm,0cm) -- (13.5cm,0cm);  %Abzisse
+  \draw (0cm,0cm) -- (0cm,-0.1cm);  %linkes Ende der Abzisse
+  \draw (13.5cm,0cm) -- (13.5cm,-0.1cm) node [right] {Rate}; %rechtes Ende der Abzisse
+  
+  \draw (-0.1cm,0cm) -- (-0.1cm,5.5cm);  %Ordinate
+  \draw (-0.1cm,0cm) -- (-0.2cm,0cm);  %unteres Ende der Ordinate
+  \draw (-0.1cm,5.5cm) -- (-0.2cm,5.5cm) node [left] {$t$};  %oberes Ende der Ordinate
+
+  \foreach \x in {1,...,5}  %Hilfslinien
+    \draw[gray!50, text=black] (-0.2 cm,\x cm) -- (13.5 cm,\x cm) 
+      node at (-0.5 cm,\x cm) {\x};  %Beschriftung der Hilfslinien
+
+    \node at (7.5cm,6cm) {Injektionsstrategie Random};  %Überschrift
+
+  \foreach \x/\y/\country in {0.5/2.93/Rate 0.01,  %\x ist Anfang der Säulen
+                             % 2/3.7/Rate 0.05,  %\y ist Höhe der Säulen
+                              3.0/3.89/Rate 0.05,
+                             % 5/33.89/Rate 0.5,
+                              5.5/5.05/Rate 0.1,
+                             % 8/1.5/Niederlande,
+                              8.0/5.05/Rate 0.5 ,
+                             % 11/0.9/Deutschland,
+                              10.5/5.05/Rate 1.0}%,
+                             % 14/0.1/Italien}
+    {
+     \draw[fill=myblue] (\x cm,0cm) rectangle (0.4cm+\x cm,\y cm) %die Säulen
+     ;%  node at (0.5cm + \x cm,\y cm + 0.3cm) {\y}; %die Prozente über den Säulen
+     %\node[rotate=45, left] at (0.6 cm +\x cm,-0.1cm) {{\tiny \country}}; %Säulenbeschriftung
+    };
+  
+	\draw node at (8.2cm,5.5cm){$\vdots$};
+	\draw node at (10.7cm,5.5cm){$\vdots$};   
+          
+  \foreach \x/\y/\country in {0.9/0.77/Rate 0.01,  %\x ist Anfang der Säulen
+                              3.4/0.88/Rate 0.05,
+                              5.9/1.03/Rate 0.1,
+                              8.4/2.55/Rate 0.5,
+                              10.9/4.18/Rate 1.0}
+    {
+     \draw[fill=bleu] (\x cm,0cm) rectangle (0.4cm+\x cm,\y cm); %die Säulen
+    };    
+
+  \foreach \x/\y/\country in {1.3/0.48/Rate 0.01,  %\x ist Anfang der Säulen
+                              3.8/0.51/Rate 0.05,
+                              6.3/0.55/Rate 0.1,
+                              8.8/0.87/Rate 0.5,
+                              11.3/1.33/Rate 1.0}
+    {
+     \draw[fill=vert] (\x cm,0cm) rectangle (0.4cm+\x cm,\y cm) %die Säulen
+     ;%  node at (0.5cm + \x cm,\y cm + 0.3cm) {\y}; %die Prozente über den Säulen
+     \node[rotate=45, left] at (0.6 cm +\x cm,-0.1cm) {\country}; %Säulenbeschriftung
+    }; 
+
+  \foreach \x/\y/\country in {1.7/0.44/Rate 0.01,  %\x ist Anfang der Säulen
+                              4.2/0.48/Rate 0.05,
+                              6.7/0.52/Rate 0.1,
+                              9.2/0.83/Rate 0.5,
+                              11.7/1.22/Rate 1.0}
+    {
+     \draw[fill=violet] (\x cm,0cm) rectangle (0.4cm+\x cm,\y cm); %die Säulen
+    }; 
+    
+  \foreach \x/\y/\country in {2.1/0.44/Rate 0.01,  %\x ist Anfang der Säulen
+                              4.6/0.48/Rate 0.05,
+                              7.1/0.51/Rate 0.1,
+                              9.6/0.82/Rate 0.5,
+                              12.1/1.20/Rate 1.0}
+    {
+     \draw[fill=orange] (\x cm,0cm) rectangle (0.4cm+\x cm,\y cm); %die Säulen
+    };     
+\end{tikzpicture}
+
+\end{figure}

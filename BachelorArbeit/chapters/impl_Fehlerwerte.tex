@@ -1,0 +1,27 @@
+\section{Fehlerwerte}
+Die Fehlerwerte der zu injizierenden Streams sind im Paket \courier{faults} erstellt worden. Dieses Paket besteht aus einer Klasse, zwei Annotationen und einer Enumeration. In der weiteren Implementierung werden diese Konstrukte an vielen Stellen verwendet und stehen insbesondere bei der dynamischen Anpassung der Fehlerwerte im Fokus.
+
+\begin{enumerate}
+	\item FaultInj : Die Annotation \courier{FaultInj} wurde eigens definiert, um die zu injizierenden Streams als fehlerbehaftet kennzeichnen zu können. Sie besteht aus den Werten id, type, rate und blocksize. In Listing \ref{lstFaultInj} ist zu erkennen, dass alle Variablen bis auf die id einen Default-Wert besitzen. Eine Fehlermarkierung kann somit wie in Listing \ref{lstannoStream} vorgenommen werden. In diesem Fall ist zwar eine Markierung vorhanden, es werden aber vorerst keine Fehlerwerte eingestreut. Aufgrund der Eindeutigkeit der ID besitzt sie keinen Default-Wert. Der Entwickler wird somit explizit durch den Compiler zur Angabe einer ID gezwungen. \\
+	  
+	\lstinputlisting[style=stJava,caption={Annotation FaultInj}, label=lstFaultInj]{listings/FaultInj.java}
+	
+		  
+\lstinputlisting[style=stJava,caption={Annotation Default-Werte}, label=lstannoStream]{listings/annoStream.java}	  
+	  
+	
+	\item FaultInjects : F\"ur Streams, die mehr als einen Fehlerwert erhalten sollen, wurde eine weitere Annotation definiert. Da mehrere Annotationen für eine Variable nicht zulässig sind, wurde dieses Verhalten über einen Umweg erzielt. Die \courier{FaultInject}-Annotation aus Listing \ref{lstFaultInjects} besitzt einen Array vom Typ der urspr\"unglichen \courier{FaultInj}-Annotation. Der Stream wird nun einfach mit der \courier{FaultInject}-Annotation markiert und die gewünschten \courier{FaultInj}-Annotationen dem Array übergeben.\\
+	
+	\lstinputlisting[style=stJava,caption={Annotation FaultInjects}, label=lstFaultInjects]{listings/FaultInjects.java}
+		
+	\item FaultType : F\"ur die angebotenen Fehlertypen wurde ein Enum mit dem Namen \courier{FaultType} erstellt (Listing \ref{lstFaultType}). Die Fehlertypen beziehen sich, wie im Design Kapitel erl\"autert, auf die Injektions-Strategie. Soll die Anwendung um eine Fehlerstrategie erweitert werden, kann diese \"uber das Enum \courier{FaultType} dem Client zug\"anglich gemacht werden. Ausschlie\ss lich hier definierte Typen werden von der Anwendung akzeptiert.\\
+	
+	\lstinputlisting[style=stJava,caption={Enum FaultType}, label=lstFaultType]{listings/FaultType.java}
+
+	\item FaultValue: Die Klasse \courier{FaultValue} dient als Wrapper-Klasse\footnote{Aufname von Daten in ein Objekt} f\"ur die Parameter einer Annotation. Die Klasse erleichtert somit die Datenübergabe an andere Klassen sowie das Auslesen der jeweiligen Fehlerparameter.
+\end{enumerate}
+
+
+
+
+
