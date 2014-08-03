@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2013.11.17)  23 JUL 2014 19:15
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=latex 2013.11.17)  3 AUG 2014 20:15
 entering extended mode
  %&-line parsing enabled.
 **main.tex
@@ -849,8 +849,8 @@ Package graphics Info: Driver file: dvips.def on input line 91.
 )
 \Gin@req@height=\dimen139
 \Gin@req@width=\dimen140
-)
-(/usr/share/texmf-texlive/tex/latex/subfig/subfig.sty
+) (./Includes/stmaryrd/stmaryrd.sty) (/usr/share/texmf-texlive/tex/latex/subfig
+/subfig.sty
 Package: subfig 2005/06/28 ver: 1.3 subfig package
 \c@KVtest=\count111
 \sf@farskip=\skip63
@@ -1328,27 +1328,1207 @@ File: tikzlibrarypatterns.code.tex 2008/01/15 v2.10 (rcs-revision 1.2)
 (/usr/share/texmf/tex/generic/pgf/libraries/pgflibrarypatterns.code.tex
 File: pgflibrarypatterns.code.tex 2008/03/03 v2.10 (rcs-revision 1.13)
 ))
+(./Includes/pgf-umlsd.sty
 
-! LaTeX Error: File `pgf-umlsd.sty' not found.
+LaTeX Warning: You have requested package `Includes/pgf-umlsd',
+               but the package provides `pgf-umlsd'.
 
-Type X to quit or <RETURN> to proceed,
-or enter new name. (Default extension: sty)
+Package: pgf-umlsd 2009/09/30 v0.5 Some LaTeX macros for UML Sequence Diagrams.
 
-Enter file name: 
-! Emergency stop.
-<read *> 
-         
-l.40 \usepackage
-                {uml}^^M
-*** (cannot \read from terminal in nonstop modes)
+\pgf@layerbox@background=\box45
+\pgf@layerboxsaved@background=\box46
+\pgf@layerbox@threadground=\box47
+\pgf@layerboxsaved@threadground=\box48
+\c@preinst=\count175
+\c@instnum=\count176
+\c@threadnum=\count177
+\c@seqlevel=\count178
+\c@callevel=\count179
+\c@callselflevel=\count180
+\c@blocklevel=\count181
+) (/usr/share/texmf-texlive/tex/latex/uml/uml.sty
+Package: uml 
 
- 
+(/usr/share/texmf-texlive/tex/latex/xkeyval/pst-xkey.sty
+Package: pst-xkey 2005/11/25 v1.6 package wrapper for pst-xkey.tex (HA)
+)
+\umlArmA=\skip70
+\umlArmB=\skip71
+\umlSymbolHeightDefault=\skip72
+\umlSymbolWidthDefault=\skip73
+\umlInnerWidthDefault=\skip74
+\umlInnerRadiusDefault=\skip75
+\umlNodeSep=\skip76
+\umlPlaceNodeX=\skip77
+\umlPlaceNodeY=\skip78
+)
+(/usr/share/texmf-texlive/tex/latex/frankenstein/attrib.sty
+Package: attrib 2001/08/31 v1.3 attribution of block elements (Frankenstein's h
+at)
+
+(/usr/share/texmf-texlive/tex/latex/frankenstein/moredefs.sty
+Package: moredefs 2001/08/31 v1.8 more defining commands (Frankenstein's brain)
+
+\sc@toks@a=\toks52
+\sc@toks@b=\toks53
+)
+\AttribMinSkip=\skip79
+)
+(/usr/share/texmf-texlive/tex/latex/tools/longtable.sty
+Package: longtable 2004/02/01 v4.11 Multi-page Table package (DPC)
+\LTleft=\skip80
+\LTright=\skip81
+\LTpre=\skip82
+\LTpost=\skip83
+\LTchunksize=\count182
+\LTcapwidth=\dimen228
+\LT@head=\box49
+\LT@firsthead=\box50
+\LT@foot=\box51
+\LT@lastfoot=\box52
+\LT@cols=\count183
+\LT@rows=\count184
+\c@LT@tables=\count185
+\c@LT@chunks=\count186
+\LT@p@ftn=\toks54
+)
+Class scrreprt Info: longtable captions redefined on input line 43.
+
+(/usr/share/texmf-texlive/tex/latex/setspace/setspace.sty
+Package: setspace 2000/12/01 6.7 Contributed and Supported LaTeX2e package
+
+Package: `setspace' 6.7 <2000/12/01>
+)
+No file main.bbl.
+
+LaTeX Warning: File `cpuAnno.dat' already exists on the system.
+               Not generating it from this source.
+
+
+LaTeX Warning: File `memoryAnno.dat' already exists on the system.
+               Not generating it from this source.
+
+
+LaTeX Warning: File `misprediction.dat' already exists on the system.
+               Not generating it from this source.
+
+(./main.aux
+No file chapters/titelblatt.aux.
+(./chapters/abstract.aux) (./chapters/danke.aux)
+No file chapters/inhaltsverzeichnis.aux.
+No file chapters/einleitung.aux.
+(./chapters/grundlagen.aux)
+No file chapters/relatedWork.aux.
+No file chapters/design.aux.
+No file chapters/implementierung.aux.
+No file chapters/evaluation.aux.
+No file chapters/fazit.aux.
+No file chapters/abbildungsverzeichnis.aux.
+No file chapters/listing.aux.
+No file chapters/tabellenverzeichnis.aux.
+No file chapters/literatur.aux.
+No file chapters/erklaerung.aux.
+)
+\openout1 = `main.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 244.
+LaTeX Font Info:    ... okay on input line 244.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 244.
+LaTeX Font Info:    ... okay on input line 244.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 244.
+LaTeX Font Info:    ... okay on input line 244.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 244.
+LaTeX Font Info:    ... okay on input line 244.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 244.
+LaTeX Font Info:    ... okay on input line 244.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 244.
+LaTeX Font Info:    ... okay on input line 244.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 244.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 244.
+
+ (/usr/share/texmf-texlive/tex/latex/base/ts1cmr.fd
+File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 244.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 244.
+LaTeX Font Info:    ... okay on input line 244.
+LaTeX Font Info:    Try loading font information for T1+ptm on input line 244.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/t1ptm.fd
+File: t1ptm.fd 2001/06/04 font definitions for T1/ptm.
+)
+\big@size=\dimen229
+Package hyperref Info: Link coloring OFF on input line 244.
+
+(/usr/share/texmf-texlive/tex/latex/hyperref/nameref.sty
+Package: nameref 2007/05/29 v2.31 Cross-referencing by name of section
+
+(/usr/share/texmf-texlive/tex/latex/oberdiek/refcount.sty
+Package: refcount 2008/08/11 v3.1 Data extraction from references (HO)
+)
+\c@section@level=\count187
+)
+LaTeX Info: Redefining \ref on input line 244.
+LaTeX Info: Redefining \pageref on input line 244.
+ (./main.out)
+(./main.out)
+\@outlinefile=\write6
+\openout6 = `main.out'.
+
+\AtBeginShipoutBox=\box53
+\c@lstlisting=\count188
+Package caption Info: Begin \AtBeginDocument code.
+Package caption3 Info: subfig package 1.2 or 1.3 is loaded.
+LaTeX Info: Redefining \subref on input line 244.
+Package caption Info: longtable package is loaded.
+ (/usr/share/texmf-texlive/tex/latex/caption/ltcaption.sty
+Package: ltcaption 2008/03/28 v1.2 longtable captions (AR)
+)
+Package caption Info: End \AtBeginDocument code.
+
+ABD: EveryShipout initializing macros
+\openout2 = `chapters/titelblatt.aux'.
+
+ (./chapters/titelblatt.tex
+File: graphics/siegel-philipp.eps Graphic file (type eps)
+
+<graphics/siegel-philipp.eps>
+Overfull \hbox (166.76477pt too wide) in paragraph at lines 6--7
+[][] 
+ []
+
+LaTeX Font Info:    Try loading font information for OT1+ztmcm on input line 7.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ztmcm.fd
+File: ot1ztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OT1/ztmcm.
+)
+LaTeX Font Info:    Try loading font information for OML+ztmcm on input line 7.
+
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/omlztmcm.fd
+File: omlztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OML/ztmcm.
+)
+LaTeX Font Info:    Try loading font information for OMS+ztmcm on input line 7.
+
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/omsztmcm.fd
+File: omsztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMS/ztmcm.
+)
+LaTeX Font Info:    Try loading font information for OMX+ztmcm on input line 7.
+
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/omxztmcm.fd
+File: omxztmcm.fd 2000/01/03 Fontinst v1.801 font definitions for OMX/ztmcm.
+)
+LaTeX Font Info:    Try loading font information for OT1+ptm on input line 7.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/ot1ptm.fd
+File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
+)
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 7.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <9> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 7.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 7.
+LaTeX Font Info:    Try loading font information for T1+phv on input line 10.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/t1phv.fd
+File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
+)
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <17.28> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 32.
+ [1
+
+
+
+
+])
+\openout2 = `chapters/abstract.aux'.
+
+
+(./chapters/abstract.tex
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 3.
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <24.88> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 3.
+) [1
+
+
+
+]
+\openout2 = `chapters/danke.aux'.
+
+ (./chapters/danke.tex) [2
+
+
+
+] [3
+
+]
+\openout2 = `chapters/inhaltsverzeichnis.aux'.
+
+
+(./chapters/inhaltsverzeichnis.tex (./main.toc
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 2.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 3.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 4.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 5.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 6.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 14.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 19.
+ [4
+
+
+]
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 38.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 49.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 56.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 57.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 58.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 59.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 60.
+Class scrreprt Info: You've told me to use the font selection of the element
+(scrreprt)           `sectioning' that is an alias of element `disposition'
+(scrreprt)            on input line 61.
+)
+\tf@toc=\write7
+\openout7 = `main.toc'.
+
+) [5]
+\openout2 = `chapters/einleitung.aux'.
+
+
+(./chapters/einleitung.tex
+Kapitel 1.
+
+Class scrreprt Warning: \float@addtolists detected!
+(scrreprt)              You should use the features of package `tocbasic'
+(scrreprt)              instead of \float@addtolists.
+(scrreprt)              Support for \float@addtolists may be removed from
+(scrreprt)              `scrreprt' soon .
+
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <79.6673> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 2.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <7.4> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 2.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 2.
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 2.
+
+Package natbib Warning: Citation `Kommey' on page 1 undefined on input line 2.
+
+LaTeX Font Info:    Try loading font information for TS1+ptm on input line 5.
+(/usr/share/texmf-texlive/tex/latex/psnfss/ts1ptm.fd
+File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
+)
+
+Package natbib Warning: Citation `BITKOM' on page 1 undefined on input line 12.
+
+
+)
+Overfull \hbox (22.40837pt too wide) in paragraph at lines 12--261
+\T1/ptm/m/n/12 soll die Funk-tion-sweise verdeut-licht und die Ab-hängigkeit-en
+ der einzel-nen Java-Klassen aufgezeigt
+ []
+
+
+Overfull \hbox (4.84041pt too wide) in paragraph at lines 12--261
+\T1/ptm/m/n/12 schnitt beschrieben. Den Ab-schluss bildet die Eval-u-a-tion, be
+i der an-hand ein-er Rei-he aufgestell-
+ []
+
+[1
+
+
+
+] [2]
+\openout2 = `chapters/grundlagen.aux'.
+
+ (./chapters/grundlagen.tex
+Kapitel 2.
+
+Overfull \hbox (5.0098pt too wide) in paragraph at lines 6--8
+\T1/ptm/m/n/12 In Ab-bil-dung [][][][] ist der Auf-bau ein-er Software-Architek
+tur, unter Ver-wen-dung des Paradigams,
+ []
+
+[3
+
+
+
+]
+Overfull \hbox (5.78691pt too wide) in paragraph at lines 10--11
+[]\T1/ptm/m/n/12 Die Job/Task-Ebene ist beispiel-sweise durch fehler-be-haftete
+ Da-ten-typen, fehler-be-haftetes
+ []
+
+
+Package natbib Warning: Citation `Graubner2012Energy-efficient' on page 4 undef
+ined on input line 17.
+
+
+Overfull \hbox (8.82448pt too wide) in paragraph at lines 17--18
+\T1/ptm/m/n/12 Stromver-brauchs eins-paren und damit zusät-zlich einen wertvoll
+en Beitrag für den Umweltschutz
+ []
+
+File: graphics/AccuracyAwareness.eps Graphic file (type eps)
+<graphics/AccuracyAwareness.eps>
+
+Package natbib Warning: Citation `Graubner2012Energy-efficient' on page 4 undef
+ined on input line 22.
+
+
+Package natbib Warning: Citation `Graubner2012Energy-efficient' on page 4 undef
+ined on input line 22.
+
+LaTeX Font Info:    Try loading font information for T1+courier-ttf on input li
+ne 27.
+LaTeX Font Info:    No file T1courier-ttf.fd. on input line 27.
+
+LaTeX Font Warning: Font shape `T1/courier-ttf/m/n' undefined
+(Font)              using `T1/cmr/m/n' instead on input line 27.
+
+
+Package natbib Warning: Citation `Lange' on page 4 undefined on input line 27.
+
+
+Package natbib Warning: Citation `SBoegel' on page 4 undefined on input line 32
+.
+
+
+Overfull \hbox (6.8884pt too wide) in paragraph at lines 30--33
+\T1/ptm/m/n/12 RMI[] beze-ich-net einen Mech-a-nis-mus zur so-ge-nan-nten verte
+il-ten An-wen-dungspro-gram-mierung.
+ []
+
+
+Overfull \hbox (3.91673pt too wide) in paragraph at lines 30--33
+\T1/ptm/m/n/12 Vere-in-facht aus-ge-drückt er-möglicht es den Zu-griff auf Meth
+-o-d-en eines ent-fer-n-ten Java-Objekts,
+ []
+
+[4] [5]
+
+Package natbib Warning: Citation `SBoegel' on page 6 undefined on input line 62
+.
+
+
+Package natbib Warning: Citation `SBoegel' on page 6 undefined on input line 62
+.
+
+
+Package natbib Warning: Citation `KKoehler' on page 6 undefined on input line 6
+8.
+
+
+Package natbib Warning: Citation `JMXOracale' on page 6 undefined on input line
+ 69.
+
+[6]
+File: graphics/JMX.eps Graphic file (type eps)
+ <graphics/JMX.eps>
+Overfull \hbox (12.7928pt too wide) in paragraph at lines 73--74
+ [][] 
+ []
+
+
+Package natbib Warning: Citation `wikiJMX' on page 7 undefined on input line 74
+.
+
+
+Package natbib Warning: Citation `wikiJMX' on page 7 undefined on input line 74
+.
+
+[7]
+
+Package natbib Warning: Citation `JavaAssi' on page 8 undefined on input line 8
+4.
+
+
+LaTeX Warning: Reference `chp:eval' on page 8 undefined on input line 85.
+
+File: graphics/javassist.eps Graphic file (type eps)
+<graphics/javassist.eps>
+
+Package natbib Warning: Citation `Huang:2011:SBA' on page 8 undefined on input 
+line 90.
+
+
+Package natbib Warning: Citation `Huang:2011:SBA' on page 8 undefined on input 
+line 90.
+
+[8] [9]
+File: graphics/HotSwapper.eps Graphic file (type eps)
+ <graphics/HotSwapper.eps>
+Overfull \hbox (8.77779pt too wide) in paragraph at lines 100--101
+ [][] 
+ []
+
+
+Package natbib Warning: Citation `HotSwapper' on page 10 undefined on input lin
+e 101.
+
+
+Package natbib Warning: Citation `HotSwapper' on page 10 undefined on input lin
+e 101.
+
+) [10]
+\openout2 = `chapters/relatedWork.aux'.
+
+ (./chapters/relatedWork.tex
+Kapitel 3.
+
+Package natbib Warning: Citation `correctness' on page 11 undefined on input li
+ne 2.
+
+
+Package natbib Warning: Citation `EnerJ11' on page 11 undefined on input line 8
+.
+
+
+Package natbib Warning: Citation `checkerframework' on page 11 undefined on inp
+ut line 9.
+
+[11
+
+
+
+]
+
+Package natbib Warning: Citation `green' on page 12 undefined on input line 12.
+
+
+[12]
+
+Package natbib Warning: Citation `Rinard06' on page 13 undefined on input line 
+17.
+
+
+Overfull \hbox (1.69798pt too wide) in paragraph at lines 15--18
+\T1/ptm/m/n/12 Berech-nun-gen mit Daten-fehlern auszuführen und den-noch einen 
+vernün-fti-gen Out-put zu erzeu-
+ []
+
+
+Package natbib Warning: Citation `loopPerforation' on page 13 undefined on inpu
+t line 21.
+
+) [13] [14]
+\openout2 = `chapters/design.aux'.
+
+ (./chapters/design.tex
+Kapitel 4.
+(./chapters/design_Problemstellung.tex
+Overfull \hbox (19.01355pt too wide) in paragraph at lines 2--1
+\T1/ptm/m/n/12 führung hin-sichtlich der Funk-tion-sweise der An-wen-dung gegeb
+en. Ein An-wen-dungs-fall beschreibt
+ []
+
+
+Package natbib Warning: Citation `Kommey' on page 15 undefined on input line 3.
+
+
+[15
+
+
+
+]
+Overfull \hbox (12.19574pt too wide) in paragraph at lines 9--10
+\T1/ptm/m/n/12 möglich sein Fehler-w-erte, welche vorher im Pro-gramm-code fest
+-gelegt wur-den, im laufend-
+ []
+
+) (./chapters/design_Benutzerinteraktion.tex
+
+LaTeX Warning: Reference `controller' on page 16 undefined on input line 2.
+
+
+LaTeX Warning: Reference `AnFallDia' on page 16 undefined on input line 3.
+
+
+LaTeX Warning: Reference `AnFallDia' on page 16 undefined on input line 4.
+
+
+LaTeX Warning: Reference `AnFallDia' on page 16 undefined on input line 5.
+
+[16]
+File: graphics/Anwendungsfalldiagramm.eps Graphic file (type eps)
+ <graphics/Anwendungsfalldiagramm.eps>
+Overfull \hbox (7.32314pt too wide) in paragraph at lines 9--11
+ [][] 
+ []
+
+) [17] (./chapters/design_FileProcessor.tex
+LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 1.
+
+
+LaTeX Warning: Reference `FileProcessorUML' on page 18 undefined on input line 
+6.
+
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 27.
+
+Package natbib Warning: Citation `GammaEtAl00' on page 18 undefined on input li
+ne 35.
+
+) (./chapters/design_FaultInjector.tex [18] [19]
+
+LaTeX Warning: Reference `StrategyUML' on page 20 undefined on input line 14.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 64--65
+
+ []
+
+[20]
+Overfull \hbox (0.18439pt too wide) in paragraph at lines 96--97
+\T1/ptm/m/n/12 ein Block zur In-jek-tion aus-gewählt, wer-den sämtliche Bits de
+r darin en-thal-te-nen Bytes gedreht.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 96--97
+
+ []
+
+[21]
+Overfull \hbox (5.52373pt too wide) in paragraph at lines 114--115
+\T1/ptm/m/n/12 im Daten-satz zur In-jek-tion aus-gewählt, wer-den sämtliche Byt
+es des Blocks ent-fer-nt. Im Beispiel
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 114--115
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 134--135
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 152--153
+
+ []
+
+) (./chapters/design_AddRuntimeAnnotation.tex
+
+LaTeX Warning: Reference `AddRunTimeAnnotationUML' on page 22 undefined on inpu
+t line 4.
+
+[22] [23]) (./chapters/design_Controller.tex
+
+LaTeX Warning: Reference `MBeanInterfaceUML' on page 24 undefined on input line
+ 5.
+
+
+LaTeX Warning: Reference `MBeanInterfaceUML' on page 24 undefined on input line
+ 5.
+
+
+Package natbib Warning: Citation `JMXOracale' on page 24 undefined on input lin
+e 5.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 4--6
+
+ []
+
+) (./chapters/design_Sonstiges.tex [24]
+Overfull \hbox (16.29562pt too wide) in paragraph at lines 6--7
+[]\T1/ptm/m/n/12 unbekannter Typ : Falls die gewählte Fehler-strate-gie nicht e
+x-istiert, wird eine \T1/courier-ttf/m/n/12 No-SuchType-
+ []
+
+) (./chapters/design_Client.tex [25]
+Overfull \hbox (2.19868pt too wide) in paragraph at lines 22--23
+[]\T1/ptm/m/n/12 Shell-Script: Eine an-dere Möglichkeit, um beispiel-sweise ein
+en kon-solen-basierten Client
+ []
+
+
+Overfull \hbox (11.66904pt too wide) in paragraph at lines 24--25
+\T1/ptm/m/n/12 Port übergeben. Mit-tels Web-brows-er kann nun über den Host und
+ den Port eine Verbindung
+ []
+
+
+Overfull \hbox (3.72522pt too wide) in paragraph at lines 33--34
+\T1/ptm/m/n/12 aufge-baut. Ist die Verbindung er-fol-gre-ich kön-nen Vari-ablen
+ über \T1/courier-ttf/m/n/12 Attribut\T1/ptm/m/n/12 -Objekte geset-
+ []
+
+) (./chapters/design_Sequenz.tex
+
+LaTeX Warning: Reference `Sequenzdiagramm' on page 26 undefined on input line 3
+.
+
+
+LaTeX Warning: Reference `Sequenzdiagramm' on page 26 undefined on input line 3
+.
+
+
+LaTeX Warning: Reference `Sequenzdiagramm' on page 26 undefined on input line 4
+.
+
+
+LaTeX Warning: Reference `Sequenzdiagramm' on page 26 undefined on input line 7
+.
+
+
+Overfull \hbox (16.91193pt too wide) in paragraph at lines 3--8
+\T1/ptm/m/n/12 Eine Fehler-in-jek-tion mit Streamwech-sel ist in Ab-bil-dung []
+ unter ``Run-In-jec-tion mit Streamwech-
+ []
+
+
+Overfull \hbox (0.25613pt too wide) in paragraph at lines 3--8
+\T1/ptm/m/n/12 sel'' dargestellt. Zuerst wird ein an-der-er Aus-gabe-stream gew
+ählt. Diese Op-er-a-tion kann zeitlich
+ []
+
+[26]
+
+LaTeX Warning: Float too large for page by 1.70898pt on input line 81.
+
+)) [27] [28]
+\openout2 = `chapters/implementierung.aux'.
+
+ (./chapters/implementierung.tex
+Kapitel 5.
+
+Overfull \hbox (15.12473pt too wide) in paragraph at lines 3--8
+\T1/ptm/m/n/12 Die einzel-nen Klassen wur-den nach ihrem Auf-gabenge-bi-et in v
+er-schiedene Java-Pakete eingeteilt.
+ []
+
+
+Overfull \hbox (28.52873pt too wide) in paragraph at lines 3--8
+\T1/ptm/m/n/12 an-schlieÿend dessen Ver-wen-dung an-hand ver-schieden-er JMX-Cl
+ient Im-ple-men-tierun-gen aufgezeigt. 
+ []
+
+(./chapters/impl_Fehlerwerte.tex
+
+LaTeX Warning: Reference `lstFaultInj' on page 29 undefined on input line 5.
+
+
+LaTeX Warning: Reference `lstannoStream' on page 29 undefined on input line 5.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 5--6
+
+ []
+
+[29
+
+
+
+] (/usr/share/texmf-texlive/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2004/09/05 1.3 listings language file
+)
+Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
+nput line 7.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 7.
+
+(/usr/share/texmf-texlive/tex/latex/psnfss/t1pcr.fd
+File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+) (./listings/FaultInj.java) (./listings/annoStream.java)
+
+LaTeX Warning: Reference `lstFaultInjects' on page 30 undefined on input line 1
+3.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 13--14
+
+ []
+
+(./listings/FaultInjects.java)
+
+LaTeX Warning: Reference `lstFaultType' on page 30 undefined on input line 17.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 17--18
+
+ []
+
+[30] (./listings/FaultType.java
+LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 2.
+)) (./chapters/impl_FileProcessor.tex
+
+LaTeX Warning: Reference `lstFaultPro2' on page 31 undefined on input line 2.
+
+(./listings/FileProcessor2.java)
+
+LaTeX Warning: Reference `lstFaultPro1' on page 31 undefined on input line 6.
+
+(./listings/FileProcessor1.java)
+
+LaTeX Warning: Reference `lstFaultPro3' on page 31 undefined on input line 12.
+
+(./listings/FileProcessor3.java)
+
+LaTeX Warning: Reference `lstFaultPro4' on page 31 undefined on input line 17.
+
+(./listings/FileProcessor4.java)) (./chapters/impl_AddRuntimeAnnotation.tex
+[31] [32]
+
+LaTeX Warning: Reference `lstAddRun1' on page 33 undefined on input line 4.
+
+
+LaTeX Warning: Reference `lstAddRun1' on page 33 undefined on input line 4.
+
+
+Overfull \hbox (26.7034pt too wide) in paragraph at lines 3--5
+\T1/ptm/m/n/12 Eine in der Im-ple-men-tierung aus List-ing [] be-nutzte Kom-po-
+nente ist die Klasse \T1/courier-ttf/m/n/12 Javas-sist.CtClass[]\T1/ptm/m/n/12 
+,
+ []
+
+[33] (./listings/AddRuntime1.java)
+
+LaTeX Warning: Reference `lstAddRun2' on page 34 undefined on input line 10.
+
+(./listings/AddRuntime2.java) [34]
+
+LaTeX Warning: Reference `lstAddRun3' on page 35 undefined on input line 16.
+
+(./listings/AddRuntime3.java)
+
+LaTeX Warning: Reference `lstAddRun4' on page 35 undefined on input line 23.
+
+(./listings/AddRuntime4.java)
+
+LaTeX Warning: Reference `lstAddRun5' on page 35 undefined on input line 29.
+
+[35] (./listings/AddRuntime5.java)
+
+LaTeX Warning: Reference `lstAddRun6' on page 36 undefined on input line 37.
+
+(./listings/AddRuntime6.java)) (./chapters/impl_Context.tex
+
+LaTeX Warning: Reference `lstContext1' on page 36 undefined on input line 3.
+
+
+Overfull \hbox (4.15768pt too wide) in paragraph at lines 3--4
+\T1/ptm/m/n/12 die Meth-ode \T1/courier-ttf/m/n/12 write \T1/ptm/m/n/12 zu se-h
+en die vom \T1/courier-ttf/m/n/12 Stream-Pro-ces-sor \T1/ptm/m/n/12 zur Über-ga
+be der Daten-sätze aufgerufen
+ []
+
+(./listings/Context1.java)
+
+LaTeX Warning: Reference `lstContext2' on page 36 undefined on input line 9.
+
+(./listings/Context2.java)
+
+LaTeX Warning: Reference `lstContext3' on page 36 undefined on input line 16.
+
+[36] (./listings/Context3.java) [37]) (./chapters/impl_FaultInjector.tex
+
+LaTeX Warning: Reference `lstFaultInjector1' on page 38 undefined on input line
+ 3.
+
+
+Overfull \hbox (1.32428pt too wide) in paragraph at lines 3--6
+\T1/ptm/m/n/12 Die Im-ple-men-tierung der Fehler-in-jek-tio-nen wurde mit-tels 
+ein-er abge-wan-del-ten Form des Strat-
+ []
+
+
+Overfull \hbox (18.47008pt too wide) in paragraph at lines 3--6
+\T1/ptm/m/n/12 e-gy Pat-terns re-al-isiert. Die ab-strak-te Klasse \T1/courier-
+ttf/m/n/12 In-jec-tion-Strat-e-gy \T1/ptm/m/n/12 di-ent als Oberk-lasse aller k
+onkreten
+ []
+
+[38] (./listings/FaultInjector1.java)) (./chapters/impl_JMX.tex
+(./chapters/impl_Controller.tex
+
+LaTeX Warning: Reference `lstController2' on page 39 undefined on input line 3.
+
+
+[39] (./listings/Controller2.java)
+
+LaTeX Warning: Reference `lstController3' on page 40 undefined on input line 9.
+
+
+
+LaTeX Warning: Reference `lstController3' on page 40 undefined on input line 9.
+
+
+
+Overfull \hbox (2.54764pt too wide) in paragraph at lines 9--10
+\T1/ptm/m/n/12 Meth-ode \T1/courier-ttf/m/n/12 get-Plat-for-mM-BeanServ-er \T1/
+ptm/m/n/12 der Klasse \T1/courier-ttf/m/n/12 ja-va.lang.management.ManagementFa
+ctory
+ []
+
+
+Overfull \hbox (11.62582pt too wide) in paragraph at lines 9--10
+\T1/ptm/m/n/12 er-stellt wer-den. Danach wird ein \T1/courier-ttf/m/n/12 Ob-jec
+t-Name \T1/ptm/m/n/12 für das zu er-stel-lende \T1/courier-ttf/m/n/12 Con-troll
+er \T1/ptm/m/n/12 MBean definiert.
+ []
+
+(./listings/Controller3.java)
+
+LaTeX Warning: Reference `lstController1' on page 40 undefined on input line 15
+.
+
+(./listings/Controller1.java)) (./chapters/impl_Client.tex
+
+LaTeX Warning: Reference `lstscript' on page 40 undefined on input line 6.
+
+[40] (/usr/share/texmf-texlive/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2004/09/05 1.3 listings language file
+)
+(/usr/share/texmf-texlive/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2004/09/05 1.3 listings language file
+) (./listings/run.sh
+LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
+(Font)              Font shape `T1/ptm/b/n' tried instead on input line 2.
+)
+(./listings/script.txt) [41] [42] [43] (./listings/Client1.java)))) [44]
+\openout2 = `chapters/evaluation.aux'.
+
+
+(./chapters/evaluation.tex
+Kapitel 6.
+
+LaTeX Warning: Reference `tblEinlesen' on page 45 undefined on input line 22.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 22--24
+
+ []
+
+[45
+
+
+
+]
+
+LaTeX Warning: Reference `tblDymFehler' on page 46 undefined on input line 39.
+
+
+LaTeX Warning: Reference `diaRandom' on page 46 undefined on input line 83.
+
+
+LaTeX Warning: Reference `tblRandom' on page 46 undefined on input line 84.
+
+
+Overfull \hbox (16.97336pt too wide) in paragraph at lines 82--85
+\T1/ptm/m/n/12 wer-den müssen und entsprechend häu-fig eine Zu-falls-gener-ieru
+ng ver-langt wird. De-mentsprechend
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 82--85
+
+ []
+
+[46]
+Overfull \hbox (4.44728pt too wide) in paragraph at lines 88--104
+[][] 
+ []
+
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+
+Overfull \hbox (3.40526pt too wide) in paragraph at lines 185--186
+[][] 
+ []
+
+
+LaTeX Warning: Reference `tblLoss' on page 47 undefined on input line 196.
+
+
+LaTeX Warning: Reference `diaLoss' on page 47 undefined on input line 196.
+
+
+LaTeX Warning: Reference `BranchPrediction' on page 47 undefined on input line 
+196.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 195--197
+
+ []
+
+[47] [48]
+Missing character: There is no ) in font nullfont!
+Missing character: There is no ) in font nullfont!
+Missing character: There is no ) in font nullfont!
+Missing character: There is no ) in font nullfont!
+Missing character: There is no ) in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+
+Overfull \hbox (3.40526pt too wide) in paragraph at lines 296--297
+[][] 
+ []
+
+
+LaTeX Warning: Reference `tblZero' on page 49 undefined on input line 307.
+
+
+LaTeX Warning: Reference `BranchPrediction' on page 49 undefined on input line 
+307.
+
+
+Overfull \hbox (0.47316pt too wide) in paragraph at lines 307--308
+\T1/ptm/m/n/12 wieder. Den-noch ist der Un-ter-schied zwis-chen Ran-dom und Ze-
+ro, speziell bei niedri-gen Block-
+ []
+
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+
+Overfull \hbox (3.40526pt too wide) in paragraph at lines 409--411
+[][]
+ []
+
+
+LaTeX Warning: Reference `tblBitflipB' on page 49 undefined on input line 418.
+
+
+LaTeX Warning: Reference `diaBitflipB' on page 49 undefined on input line 418.
+
+[49]
+Overfull \hbox (5.143pt too wide) in paragraph at lines 422--438
+[][] 
+ []
+
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+Missing character: There is no ; in font nullfont!
+
+Overfull \hbox (3.40526pt too wide) in paragraph at lines 521--522
+[][] 
+ []
+
+
+LaTeX Warning: Reference `tblBitflip' on page 50 undefined on input line 530.
+
+
+LaTeX Warning: Reference `diaBitflip' on page 50 undefined on input line 530.
+
+
+Overfull \hbox (16.49495pt too wide) in paragraph at lines 534--546
+[][] 
+ []
+
+[50]
+Missing character: There is no ; in font nullfont!
+
+Overfull \hbox (3.40526pt too wide) in paragraph at lines 586--587
+[][] 
+ []
+
+
+LaTeX Warning: Reference `tblSpeicherLoss' on page 51 undefined on input line 5
+94.
+
+
+Overfull \hbox (2.76587pt too wide) in paragraph at lines 594--595
+\T1/ptm/m/n/12 Die CPU-Auslastung und der Spe-icherver-brauch wur-den bei ein-e
+r Blöck-gröÿe von 1 gemessen,
+ []
+
+
+Overfull \hbox (10.5404pt too wide) in paragraph at lines 594--595
+\T1/ptm/m/n/12 da diese die läng-sten Mes-sun-gen er-möglicht. Bei allen Strate
+-gien kon-nte für die CPU-Auslastung
+ []
+
+
+Overfull \hbox (13.28925pt too wide) in paragraph at lines 594--595
+\T1/ptm/m/n/12 den Anstieg des Spe-icherver-brauchs führt. Die Mess-werte dies-
+bzgl. sind in Tabelle [] angegeben.
+ []
+
+[51]
+
+LaTeX Warning: Reference `tblmisprediction' on page 52 undefined on input line 
+614.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 614--615
+
+ []
+
+[52]) [53] [54]
+\openout2 = `chapters/fazit.aux'.
+
+ (./chapters/fazit.tex
+Kapitel 7.
+)
+Overfull \hbox (8.16531pt too wide) in paragraph at lines 5--267
+\T1/ptm/m/n/12 Fehler-rate von 0% bis 100% bis zu der Möglichkeit ganze Blöcke 
+in die In-jek-tion einzubeziehen. 
+ []
+
+[55
+
+
+
+]
+\openout2 = `chapters/abbildungsverzeichnis.aux'.
+
+ (./chapters/abbildungsverzeichnis.tex (./main.lof)
+\tf@lof=\write8
+\openout8 = `main.lof'.
+
+) [1
+
+
+
+]
+\openout2 = `chapters/listing.aux'.
+
+
+(./chapters/listing.tex
+
+Class scrreprt Warning: Usage of deprecated \float@listhead!
+(scrreprt)              You should use the features of package `tocbasic'
+(scrreprt)              instead of \float@listhead.
+(scrreprt)              Definition of \float@listhead my be removed from
+(scrreprt)              `scrreprt' soon, so it should not be used  on input lin
+e 3.
+
+(./main.lol)
+\tf@lol=\write9
+\openout9 = `main.lol'.
+
+) [2
+
+
+
+]
+\openout2 = `chapters/tabellenverzeichnis.aux'.
+
+ (./chapters/tabellenverzeichnis.tex (./main.lot)
+\tf@lot=\write10
+\openout10 = `main.lot'.
+
+) [3
+
+
+
+]
+\openout2 = `chapters/literatur.aux'.
+
+
+(./chapters/literatur.tex
+No file main.bbl.
+)
+\openout2 = `chapters/erklaerung.aux'.
+
+ (./chapters/erklaerung.tex
+Underfull \hbox (badness 10000) in paragraph at lines 7--8
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 9--10
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 11--12
+
+ []
+
+) [4
+
+
+
+
+
+]
+
+Package natbib Warning: There were undefined citations.
+
+\tf@thm=\write11
+\openout11 = `main.thm'.
+
+(./main.aux (./chapters/titelblatt.aux) (./chapters/abstract.aux)
+(./chapters/danke.aux) (./chapters/inhaltsverzeichnis.aux)
+(./chapters/einleitung.aux) (./chapters/grundlagen.aux)
+(./chapters/relatedWork.aux) (./chapters/design.aux)
+(./chapters/implementierung.aux) (./chapters/evaluation.aux)
+(./chapters/fazit.aux) (./chapters/abbildungsverzeichnis.aux)
+(./chapters/listing.aux) (./chapters/tabellenverzeichnis.aux)
+(./chapters/literatur.aux) (./chapters/erklaerung.aux))
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
 Here is how much of TeX's memory you used:
- 21778 strings out of 495062
- 374314 string characters out of 1182643
- 561333 words of memory out of 3000000
- 24492 multiletter control sequences out of 15000+50000
- 4702 words of font info for 16 fonts, out of 3000000 for 9000
+ 25016 strings out of 495062
+ 426251 string characters out of 1182643
+ 772065 words of memory out of 3000000
+ 27394 multiletter control sequences out of 15000+50000
+ 57448 words of font info for 77 fonts, out of 3000000 for 9000
  28 hyphenation exceptions out of 8191
- 61i,1n,69p,450b,225s stack positions out of 5000i,500n,10000p,200000b,50000s
-No pages of output.
+ 67i,21n,119p,1731b,1455s stack positions out of 5000i,500n,10000p,200000b,50000s
+
+Output written on main.dvi (65 pages, 702076 bytes).

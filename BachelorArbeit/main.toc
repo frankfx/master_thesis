@@ -38,22 +38,22 @@
 \contentsline {chapter}{\numberline {5}Implementierung}{29}{chapter.5}
 \contentsline {section}{\numberline {5.1}Fehlerwerte}{29}{section.5.1}
 \contentsline {section}{\numberline {5.2}Klasse StreamProcessor}{31}{section.5.2}
-\contentsline {section}{\numberline {5.3}Klasse AddRuntimeAnnotation}{33}{section.5.3}
-\contentsline {section}{\numberline {5.4}Context}{37}{section.5.4}
+\contentsline {section}{\numberline {5.3}Klasse AddRuntimeAnnotation}{34}{section.5.3}
+\contentsline {section}{\numberline {5.4}Context}{36}{section.5.4}
 \contentsline {section}{\numberline {5.5}Fehler Injektion}{38}{section.5.5}
 \contentsline {section}{\numberline {5.6}JMX Implementierung}{39}{section.5.6}
 \contentsline {subsection}{\numberline {5.6.1}Controller/MainServer}{39}{subsection.5.6.1}
-\contentsline {subsection}{\numberline {5.6.2}Client Implementierung}{41}{subsection.5.6.2}
+\contentsline {subsection}{\numberline {5.6.2}Client Implementierung}{40}{subsection.5.6.2}
 \contentsline {subsubsection}{\numberline {5.6.2.1}Shell-Skript}{41}{subsubsection.5.6.2.1}
 \contentsline {subsubsection}{\numberline {5.6.2.2}Java Client}{42}{subsubsection.5.6.2.2}
-\contentsline {chapter}{\numberline {6}Evaluation/Messungen}{44}{chapter.6}
-\contentsline {section}{\numberline {6.1}Testaufbau}{44}{section.6.1}
-\contentsline {section}{\numberline {6.2}Lese- und Schreiboperatinen}{45}{section.6.2}
-\contentsline {section}{\numberline {6.3}Dynamische Konfiguration der Fehlerwerte}{45}{section.6.3}
-\contentsline {section}{\numberline {6.4}Injektionsstategien}{46}{section.6.4}
-\contentsline {section}{\numberline {6.5}Branch Prediction}{52}{section.6.5}
-\contentsline {section}{\numberline {6.6}Zusammenfassung}{52}{section.6.6}
-\contentsline {chapter}{\numberline {7}Fazit}{54}{chapter.7}
+\contentsline {chapter}{\numberline {6}Evaluation/Messungen}{45}{chapter.6}
+\contentsline {section}{\numberline {6.1}Testaufbau}{45}{section.6.1}
+\contentsline {section}{\numberline {6.2}Lese- und Schreiboperatinen}{46}{section.6.2}
+\contentsline {section}{\numberline {6.3}Dynamische Konfiguration der Fehlerwerte}{46}{section.6.3}
+\contentsline {section}{\numberline {6.4}Injektionsstategien}{47}{section.6.4}
+\contentsline {section}{\numberline {6.5}Branch Prediction}{53}{section.6.5}
+\contentsline {section}{\numberline {6.6}Zusammenfassung}{53}{section.6.6}
+\contentsline {chapter}{\numberline {7}Fazit}{55}{chapter.7}
 \contentsline {chapter}{ABBILDUNGSVERZEICHNIS}{I}{section*.59}
 \contentsline {chapter}{LISTINGS}{II}{section*.61}
 \contentsline {chapter}{TABELLENVERZEICHNIS}{III}{section*.63}
