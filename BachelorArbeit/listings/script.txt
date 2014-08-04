@@ -1,9 +1,0 @@
-domain de.umr.emu.jmx
-bean de.umr.emu.jmx:type=Controller
-get Annotations
-run runInjection ""
-get PossibleIDs
-run setFaultsByID "OutputBAOS" "ZERO" 0.05 1024
-get Annotations
-run runInjection "/home/.../Tyson.jpg"
-quit
