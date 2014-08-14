@@ -1,0 +1,973 @@
+<cpacs>
+    <header>
+        <name>Init file for the SGG</name>
+        <description>This file contains some standard data for the SGG (Simple Geometry Generator). It is used to initialize profiles and airfoils.</description>
+        <creator>Jonas Jepsen from TU-Hamburg-Harburg</creator>
+        <timestamp>2012-03-21T08:55:23</timestamp>
+        <version>0.1</version>
+        <cpacsVersion>2.0</cpacsVersion>
+    </header>
+    <vehicles>
+        <aircraft>
+            <model uID="Aircraft1">
+                <name>Aircraft1</name>
+                <description>This aircraft was created using the SGG!</description>
+                <fuselages>
+                    <fuselage uID="Aircraft1_Fuselage1">
+                        <name>Fuselage1</name>
+                        <description>This fuselage was created using the SGG!</description>
+                        <transformation uID="Aircraft1_Fuselage1_Transf">
+                            <scaling uID="Aircraft1_Fuselage1_Transf_Sca">
+                                <x>1.0</x>
+                                <y>1.0</y>
+                                <z>1.0<z>
+                            </scaling>
+                            <rotation uID="Aircraft1_Fuselage1_Transf_Rot">
+                                <x>0.0</x>
+                                <y>0.0</y>
+                                <z>0.0</z>
+                            </rotation>
+                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Transf_Transl">
+                                <x>0.0</x>
+                                <y>0.0</y>
+                                <z>0.0</z>
+                            </translation>
+                        </transformation>
+                        <sections>
+                            <section uID="Aircraft1_Fuselage1_Sec1">
+                                <name>Aircraft1_Fuselage1_Sec1</name>
+                                <description>This section was created by the SGG.</description>
+                                <transformation uID="Aircraft1_Fuselage1_Sec1_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec1_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>0.1</y>
+                                        <z>0.1</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec1_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec1_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>-0.7</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec1_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec1_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec1_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>1.0</y>
+                                                <z>1.0</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec1_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec1_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec2">
+                                <name>Aircraft1_Fuselage1_Sec2</name>
+                                <description>This section was created by the SGG.</description>
+                                <transformation uID="Aircraft1_Fuselage1_Sec2_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec2_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec2_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec2_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>-0.7</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec2_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec2_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec2_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>0.450000005419</y>
+                                                <z>0.450000005419</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec2_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec2_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec3">
+                                <name>Aircraft1_Fuselage1_Sec3</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec3_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec3_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec3_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec3_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>-0.7</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec3_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec3_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec3_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>1.0</y>
+                                                <z>1.0</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec3_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec3_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec4">
+                                <name>Aircraft1_Fuselage1_Sec4</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec4_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec4_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.06</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec4_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec4_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>-0.43</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec4_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec4_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec4_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>1.3500000222</y>
+                                                <z>1.3500000222</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec4_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec4_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec5">
+                                <name>Aircraft1_Fuselage1_Sec5</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec5_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec5_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec5_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec5_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>-0.15</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec5_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec5_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec5_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>1.80000000129</y>
+                                                <z>1.80000000129</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec5_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec5_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec6">
+                                <name>Aircraft1_Fuselage1_Sec6</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec6_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec6_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec6_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec6_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec6_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec6_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec6_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>1.97500004707</y>
+                                                <z>1.97500004707</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec6_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec6_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec7">
+                                <name>Aircraft1_Fuselage1_Sec7</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec7_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec7_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec7_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec7_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec7_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec7_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec7_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>1.97500004707</y>
+                                                <z>1.97500004707</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec7_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec7_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec8">
+                                <name>Aircraft1_Fuselage1_Sec8</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec8_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec8_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec8_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec8_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec8_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec8_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec8_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>1.80000004897</y>
+                                                <z>1.80000004897</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec8_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec8_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec9">
+                                <name>Aircraft1_Fuselage1_Sec9</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec9_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec9_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec9_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec9_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec9_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec9_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec9_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>0.950000015621</y>
+                                                <z>0.950000015621</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec9_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec9_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec10">
+                                <name>Aircraft1_Fuselage1_Sec10</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec10_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec10_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec10_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec10_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec10_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec10_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec10_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>0.9</y>
+                                                <z>0.9</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec10_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec10_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec11">
+                                <name>Aircraft1_Fuselage1_Sec11</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec11_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec11_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec11_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec11_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec11_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec11_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec11_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>0.900000012293</y>
+                                                <z>0.900000012293</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec11_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec11_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec12">
+                                <name>Aircraft1_Fuselage1_Sec12</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec12_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec12_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec12_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec12_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec12_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec12_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec12_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>0.75000001213</y>
+                                                <z>0.75000001213</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec12_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec12_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec13">
+                                <name>Aircraft1_Fuselage1_Sec13</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec13_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec13_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec13_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec13_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec13_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec13_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec13_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>0.450000005215</y>
+                                                <z>0.450000005215</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec13_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec13_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec14">
+                                <name>Aircraft1_Fuselage1_Sec14</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec14_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec14_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec14_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec14_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec14_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec14_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec14_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>0.149999997765</y>
+                                                <z>0.149999997765</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec14_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec14_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="Aircraft1_Fuselage1_Sec15">
+                                <name>Aircraft1_Fuselage1_Sec15</name>
+                                <description/>
+                                <transformation uID="Aircraft1_Fuselage1_Sec15_Transf">
+                                    <scaling uID="Aircraft1_Fuselage1_Sec15_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Fuselage1_Sec15_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec15_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="Aircraft1_Fuselage1_Sec15_Elem1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <profileUID isLink="True">CircleProfile</profileUID>
+                                        <transformation uID="Aircraft1_Fuselage1_Sec15_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Fuselage1_Sec15_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>0.05</y>
+                                                <z>0.05</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Fuselage1_Sec15_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Fuselage1_Sec15_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                        </sections>
+                        <positionings>
+                            <positioning uID="Aircraft1_Fuselage1_Pos1">
+                                <name>Aircraft1_Fuselage1_Pos1</name>
+                                <description>This positioning was created by the SGG.</description>
+                                <length>0.0</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec1</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos2">
+                                <name>Aircraft1_Fuselage1_Pos2</name>
+                                <description>This positioning was created by the SGG.</description>
+                                <length>0.2</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec1</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec2</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos3">
+                                <name>Aircraft1_Fuselage1_Pos3</name>
+                                <description>Positioning Description</description>
+                                <length>0.7</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec2</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec3</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos4">
+                                <name>Aircraft1_Fuselage1_Pos4</name>
+                                <description>Positioning Description</description>
+                                <length>1.0</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec3</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec4</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos5">
+                                <name>Aircraft1_Fuselage1_Pos5</name>
+                                <description>Positioning Description</description>
+                                <length>1.5</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec4</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec5</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos6">
+                                <name>Aircraft1_Fuselage1_Pos6</name>
+                                <description>Positioning Description</description>
+                                <length>1.2</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec5</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec6</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos7">
+                                <name>Aircraft1_Fuselage1_Pos7</name>
+                                <description>Positioning Description</description>
+                                <length>22.6</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec6</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec7</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos8">
+                                <name>Aircraft1_Fuselage1_Pos8</name>
+                                <description>Positioning Description</description>
+                                <length>2.0</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec7</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec8</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos9">
+                                <name>Aircraft1_Fuselage1_Pos9</name>
+                                <description>Positioning Description</description>
+                                <length>4.4</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec8</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec9</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos10">
+                                <name>Aircraft1_Fuselage1_Pos10</name>
+                                <description>Positioning Description</description>
+                                <length>0.5</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec9</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec10</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos11">
+                                <name>Aircraft1_Fuselage1_Pos11</name>
+                                <description>Positioning Description</description>
+                                <length>0.5</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec10</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec11</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos12">
+                                <name>Aircraft1_Fuselage1_Pos12</name>
+                                <description>Positioning Description</description>
+                                <length>1.0</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec11</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec12</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos13">
+                                <name>Aircraft1_Fuselage1_Pos13</name>
+                                <description>Positioning Description</description>
+                                <length>1.0</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec12</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec13</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos14">
+                                <name>Aircraft1_Fuselage1_Pos14</name>
+                                <description>Positioning Description</description>
+                                <length>0.9</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec13</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec14</toSectionUID>
+                            </positioning>
+                            <positioning uID="Aircraft1_Fuselage1_Pos15">
+                                <name>Aircraft1_Fuselage1_Pos15</name>
+                                <description>Positioning Description</description>
+                                <length>0.07</length>
+                                <sweepAngle>90.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">Aircraft1_Fuselage1_Sec14</fromSectionUID>
+                                <toSectionUID isLink="True">Aircraft1_Fuselage1_Sec15</toSectionUID>
+                            </positioning>
+                        </positionings>
+                        <segments>
+                            <segment uID="Aircraft1_Fuselage1_Seg1">
+                                <name>Segment Name</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec1_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec2_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg2">
+                                <name>Aircraft1_Fuselage1_Seg2</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec2_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec3_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg3">
+                                <name>Aircraft1_Fuselage1_Seg3</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec3_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec4_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg4">
+                                <name>Aircraft1_Fuselage1_Seg4</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec4_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec5_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg5">
+                                <name>Aircraft1_Fuselage1_Seg5</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec5_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec6_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg6">
+                                <name>Aircraft1_Fuselage1_Seg6</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec6_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec7_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg7">
+                                <name>Aircraft1_Fuselage1_Seg7</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec7_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec8_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg8">
+                                <name>Aircraft1_Fuselage1_Seg8</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec8_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec9_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg9">
+                                <name>Aircraft1_Fuselage1_Seg9</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec9_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec10_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg10">
+                                <name>Aircraft1_Fuselage1_Seg10</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec10_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec11_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg11">
+                                <name>Aircraft1_Fuselage1_Seg11</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec11_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec12_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg12">
+                                <name>Aircraft1_Fuselage1_Seg12</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec12_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec13_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg13">
+                                <name>Aircraft1_Fuselage1_Seg13</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec13_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec14_Elem1</toElementUID>
+                            </segment>
+                            <segment uID="Aircraft1_Fuselage1_Seg14">
+                                <name>Aircraft1_Fuselage1_Seg14</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">Aircraft1_Fuselage1_Sec14_Elem1</fromElementUID>
+                                <toElementUID isLink="True">Aircraft1_Fuselage1_Sec15_Elem1</toElementUID>
+                            </segment>
+                        </segments>
+                    </fuselage>
+                </fuselages>
+            </model>
+        </aircraft>
+        <profiles>
+            <fuselageProfiles>
+                <fuselageProfile uID="CircleProfile">
+                    <name>Circle</name>
+                    <description>Profile build up from set of Points on Circle where may Dimensions are 1..-1</description>
+                    <pointList>
+                        <x mapType="vector">0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0</x>
+                        <y mapType="vector">0.0;0.0774924206719;0.154518792808;0.230615870742;0.305325997695;0.378199858172;0.4487991802;0.516699371152;0.581492071288;0.642787609687;0.700217347767;0.753435896328;0.802123192755;0.84598642592;0.884761797177;0.91821610688;0.946148156876;0.968389960528;0.984807753012;0.995302795793;0.999811970449;0.998308158271;0.990800403365;0.977333858251;0.957989512315;0.932883704732;0.902167424781;0.866025403784;0.824675004109;0.778364911924;0.727373641573;0.672007860556;0.612600545193;0.549508978071;0.483112599297;0.413810724505;0.342020143326;0.268172612761;0.192712260548;0.116092914125;0.0387753712568;-0.0387753712568;-0.116092914125;-0.192712260548;-0.268172612761;-0.342020143326;-0.413810724505;-0.483112599297;-0.549508978071;-0.612600545193;-0.672007860556;-0.727373641573;-0.778364911924;-0.824675004109;-0.866025403784;-0.902167424781;-0.932883704732;-0.957989512315;-0.977333858251;-0.990800403365;-0.998308158271;-0.999811970449;-0.995302795793;-0.984807753012;-0.968389960528;-0.946148156876;-0.91821610688;-0.884761797177;-0.84598642592;-0.802123192755;-0.753435896328;-0.700217347767;-0.642787609687;-0.581492071288;-0.516699371152;-0.4487991802;-0.378199858172;-0.305325997695;-0.230615870742;-0.154518792808;-0.0774924206719;0.0</y>
+                        <z mapType="vector">1.0;0.996992941168;0.987989849477;0.97304487058;0.952247885338;0.925723969269;0.893632640323;0.85616689953;0.813552070263;0.766044443119;0.713929734558;0.657521368569;0.597158591703;0.533204432802;0.466043519703;0.396079766039;0.323733942058;0.249441144058;0.173648177667;0.0968108707032;0.0193913317718;-0.0581448289105;-0.13533129975;-0.211703872229;-0.286803232711;-0.360177724805;-0.431386065681;-0.5;-0.565606875487;-0.627812124672;-0.686241637869;-0.740544013109;-0.790392669519;-0.835487811413;-0.875558231302;-0.910362940966;-0.939692620786;-0.963370878616;-0.981255310627;-0.993238357742;-0.999247952504;-0.999247952504;-0.993238357742;-0.981255310627;-0.963370878616;-0.939692620786;-0.910362940966;-0.875558231302;-0.835487811413;-0.790392669519;-0.740544013109;-0.686241637869;-0.627812124672;-0.565606875487;-0.5;-0.431386065681;-0.360177724805;-0.286803232711;-0.211703872229;-0.13533129975;-0.0581448289105;0.0193913317718;0.0968108707032;0.173648177667;0.249441144058;0.323733942058;0.396079766039;0.466043519703;0.533204432802;0.597158591703;0.657521368569;0.713929734558;0.766044443119;0.813552070263;0.85616689953;0.893632640323;0.925723969269;0.952247885338;0.97304487058;0.987989849477;0.996992941168;1.0</z>
+                    </pointList>
+                </fuselageProfile>
+            </fuselageProfiles>
+            <wingAirfoils>
+                <wingAirfoil uID="NACA0000">
+                    <name>NACA0000 Airfoil</name>
+                    <description/>
+                    <pointList>
+                        <x mapType="vector">1.0;0.95;0.9;0.8;0.7;0.6;0.5;0.4;0.3;0.25;0.2;0.15;0.1;0.075;0.05;0.025;0.0125;0.0;0.0125;0.025;0.05;0.075;0.1;0.15;0.2;0.25;0.3;0.4;0.5;0.6;0.7;0.8;0.9;0.95;1.0</x>
+                        <y mapType="vector">0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0</y>
+                        <z mapType="vector">0.0;0.00672;0.01207;0.02187;0.03053;0.03803;0.04412;0.04837;0.05002;0.04952;0.04782;0.04455;0.03902;0.035;0.02962;0.02178;0.01578;0.0;-0.01578;-0.02178;-0.02962;-0.035;-0.03902;-0.04455;-0.04782;-0.04952;-0.05002;-0.04837;-0.04412;-0.03803;-0.03053;-0.02187;-0.01207;-0.00672;0.0</z>
+                    </pointList>
+                </wingAirfoil>
+                <wingAirfoil uID="NACA0009">
+                    <name>NACA0009 Airfoil</name>
+                    <description>NACA 4-digit symmetrical airfoil with a thickness of 9percent</description>
+                    <pointList>
+                        <x mapType="vector">1.0;0.95;0.9;0.8;0.7;0.6;0.5;0.4;0.3;0.25;0.2;0.15;0.1;0.075;0.05;0.025;0.0125;0.005;0.0;0.005;0.0125;0.025;0.05;0.075;0.1;0.15;0.2;0.25;0.3;0.4;0.5;0.6;0.7;0.8;0.9;0.95;1.0</x>
+                        <y mapType="vector">0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0</y>
+                        <z mapType="vector">0.00095;0.00605;0.01086;0.01967;0.02748;0.03423;0.03971;0.04352;0.04501;0.04456;0.04303;0.04009;0.03512;0.0315;0.02666;0.01961;0.0142;0.0089;0.0;-0.0089;-0.0142;-0.01961;-0.02666;-0.0315;-0.03512;-0.04009;-0.04303;-0.04456;-0.04501;-0.04352;-0.03971;-0.03423;-0.02748;-0.01967;-0.01086;-0.00605;-0.00095</z>
+                    </pointList>
+                </wingAirfoil>
+            </wingAirfoils>
+        </profiles>
+    </vehicles>
+</cpacs>
