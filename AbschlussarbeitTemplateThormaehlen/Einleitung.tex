@@ -1,0 +1,33 @@
+\chapter{Einleitung}
+Diese Diplomarbeit beschäftigt sich mit den Parallel View-Dependent Compressed Progressive Meshes und deren Umsetzung in die vom Grafikkartenhersteller NVIDIA entwickelte parallele Programmiersprache CUDA. Dazu gehört die Entwicklung einer für die parallele Verarbeitung geeignete effiziente Datenstruktur, sowie eine effiziente Datenverwaltung.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Motivation}
+Die aktuelle Entwicklung der Multimediaindustrie versucht zunehmend die Simulation von virtuellen Welten realistisch darzustellen. Die Ansprüche der Anwender werden mit der Zeit immer größer und dementsprechend die generierte virtuelle Realität immer komplexer. So eine Entwicklung ist unweigerlich mit der  Steigerung der erforderlichen Rechenleistung verbunden, da die simulierten Objekte aus  Millionen von Polygonen bestehen können und  in Echtzeit dargestellt werden müssen.
+Im Laufe der Jahre sind viele verschiedene Verfahren entwickelt worden, die das Ziel hatten, die komplexen Objekte mit einem vertretbaren Qualitätsverlust in Echtzeit darzustellen. Der mit Abstand beste Ansatz, um den Kompromiss zwischen Qualität und Geschwindigkeit zu finden, ist die View-Dependent Progressive Meshes. Einer der Vorteile dieser Herangehensweise ist, dass dieses Verfahren hochgradig parallelisierbar ist, so dass sich mit einer geeigneter Programmiersprache und Hardware eine beachtliche Effizienzsteigerung erzielen lässt.\\
+Die von NVIDIA entwickelte parallele Programmiersprache CUDA setzt auf den aktuellen Trend der GPGPUs und  ermöglicht es mit einer kostengünstigen Grafikkarte, die in fast jeden Desktoprechner vorhanden ist, Programme effizient zu parallelisieren. Aus diesem Grund ist CUDA für das Parallelisieren von View-Dependent Progressive Meshing besonders geeignet.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ziele}\label{chp:Ziele}   
+Das Ziel dieser Arbeit ist die Entwicklung einer effizienten parallelen Implementierung  von komprimierten View-Dependent Progressive Meshes in CUDA, welche in der Lage ist, Objekte die aus mehreren Millionen von Polygonen bestehen können, in Echtzeit zu verarbeiten.
+
+%%%%%%%%%%%%%
+\subsubsection{Echtzeit} 
+Das entwickelte Programm soll selbst sehr große Polygonnetze effizient verarbeiten können. Die Eingaben des Benutzers für die Translation und Rotation des Objekts sollen in Echtzeit umgesetzt werden. Die durchschnittliche Laufzeit des Programms pro Frame soll höchstens drei Mal soviel Zeit wie das Rendering des gegebenen Modells benötigen, um eine Echtzeitdarstellung des Modells zu ermöglichen. Dabei können die Modelle aus mehreren Millionen von Dreiecken bestehen.
+
+%%%%%%%%%%%%%
+\subsubsection{Kosten} 
+Das Programm sollte mit der normalen, kostengünstigen Privatanwender-Hardware laufen, sodass für die Ausführung keine Spezialrechner benötigt werden. Die einzige Vorrausetzung an das System ist eine NVIDIA-Grafikkarte die CUDA 1.1 unterstützt. Diese ist aber in den meisten Desktoprechnern vorhanden oder kann kostengünstig nachgerüstet werden. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Aufbau der Arbeit}
+Im ersten Abschnitt des Kapitels~\ref{chp:CUDA} soll zunächst die Bedeutung der Grafikkarte als Berechnungseinheit verdeutlicht werden. Dann soll  im zweiten Abschnitt die Hard- und Softwarearchitektur der Programmiersprache \acs{CUDA} beschrieben werden, sowie einige Vorschläge zu Codeoptimierung diskutiert, bevor im Kapitel~\ref{chp:ProgressiveMeshes} ein Überblick über die wichtigsten Verfahren zur Echtzeitdarstellung komplexer Objekte geben wird. An dieser Stelle werden auch das View-Dependent Progressive Meshing, sowie einige Simplifizierungstechniken genauer erläutern.        Kapitel~\ref{chp:ParallelViewDependentRefinementofComprPM} beschäftigt sich mit der Theorie des im Rahmen dieser Diplomarbeit entwickelten Algorithmus. Dabei sollen die Datenstrukturen, die Kompression, sowie die einzelnen Schritte des Algorithmus genauer erläutert werden. Die Implementierung des Algorithmus in \acs{CUDA} wird im Kapitel 5 besprochen, dabei sollen die benutzten Bibliotheken, sowie die \acs{CUDA}-spezifische Umsetzung des Programms beschrieben werden. Anschließend werden im Kapitel 6 die durchgeführten Tests und deren Ergebnisse dokumentiert und diskutiert, sowie im Kapitel 7 ein Ausblick auf weiterführende Arbeiten gegeben. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Verwandte Arbeiten}
+Im  Themenbereich der Progressive Meshes und View-Dependent Progressive Meshes gab es schon am Ende des letzten Jahrzehnts einige  Veröffentlichungen \cite{bib:hoppePM, bib:hoppeVPM}.  Diese waren zwar eine gute und notwendige Weiterentwicklung vom klassischen LOD-Algorithmus, ermöglichten aber nicht eine effiziente Echtzeitdarstellung von großen Modellen. In \cite{bib:efPM} wurde schließlich ein Versuch unternommen eine effizientere Datenstrucktur zu entwickeln, um den Speicherverbrauch zu optimieren und bessere Geschwindigkeit zu erreichen. Diese effizientere Datenstruktur brachte zwar einige Verbesserungen, ermöglichte aber dennoch keine  Echtzeitdarstellung von großen Modellen. 
+Seit dem gab es eine Reihe von Verfahren, die das Ziel hatten eine effiziente Echtzeitdarstellung von großen Modellen zu ermöglichen. Einige von diesen Verfahren nutzten Multi-Triangulationen \cite{bib:DFMP98}, andere Versuchten die  View-Dependent Progressive Meshes weiterzuentwickeln \cite{bib:PAJ01, bib:PD04 ,bib:ESV99}. Doch keins dieser Verfahren konnte die Anforderungen vollständig erfüllen.\\
+Eine erst kürzlich veröffentlichte Arbeit \cite{bib:Hoppe2009} machte endlich einen Schritt in die richtige Richtung. Die in dieser Arbeit implementierte GPU-Variante von  parallelen View-Dependent Progressive Meshes ermöglichte eine akzeptable Echtzeitdarstellung von großen Modellen. Diese braucht durchschnittlich das dreifache der Zeit, die für das Rendering des  Modells benötigen wird und lässt somit einen großen Spielraum für die Optimierung offen.  
+
+ 
