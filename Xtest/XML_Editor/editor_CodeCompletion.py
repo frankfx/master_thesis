@@ -54,26 +54,39 @@ class EditorCodeCompletion(QTextEdit):
         cursor.movePosition(QTextCursor.Left)
         cursor.movePosition(QTextCursor.EndOfWord)
         cursor.insertText(completion)
-        cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, 4)
+        cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, len(completion))
         self.setTextCursor(cursor)
         cursor.endEditBlock()
         
     def getTagName(self, pos):
         cursor = self.textCursor()
         cursor.select(QTextCursor.LineUnderCursor)
-        txt = cursor.selectedText()[:pos]
-        try :
-            txt = re.findall('<.*?>', txt)[-1]
-            pattern = "(?<=[<]).*?(?=[\s>])"        # (?<=[<]) === look behind [<] ;;; .*? === any sign but not greedy
-            return re.search(pattern, txt).group(0) # (?=[\s>]) === look ahead [space or >] 
-        except IndexError:
-            return ''
+        if self.isWellfomed(cursor.selectedText()) :
+            txt = cursor.selectedText()[:pos]
+            try :
+                txt = re.findall('<.*?>', txt)[-1]
+                pattern = "(?<=[<]).*?(?=[\s>])"        # (?<=[<]) === look behind [<] ;;; .*? === any sign but not greedy
+                return re.search(pattern, txt).group(0) # (?=[\s>]) === look ahead [space or >] 
+            except IndexError:
+                return ''
+        else : return None
 
     def textUnderCursor(self):
         cursor = self.textCursor()
         cursor.select(QTextCursor.WordUnderCursor)
         return cursor.selectedText()
-        
+
+    def isWellfomed(self, str):
+        stack = re.findall("[<>]", str)
+        return False if len(stack)%2 != 0 else self.rec_isWellformed(stack)
+ 
+    def rec_isWellformed(self, stack):
+        return True if len(stack) == 0 else self.wellFormed(stack.pop(), stack.pop()) and self.rec_isWellformed(stack)
+    
+    def wellFormed(self, fst, snd):
+        return fst == ')' and snd == '(' or \
+               fst == '>' and snd == '<' or \
+               fst == '}' and snd == '{'        
  
     def keyPressEvent(self, event):
         
@@ -88,11 +101,12 @@ class EditorCodeCompletion(QTextEdit):
         # begin tag inline insertion 
         if self.flag_open_angle_bracket :
             if event.key() == 62  :  # >
-                self.insertCompletionInline('</' + self.getTagName(self.textCursor().position()) + '>')
-                self.tag_name = ""
-                self.flag_open_angle_bracket = False            
+                result = self.getTagName(self.textCursor().position())
+                if result is not None :
+                    self.insertCompletionInline('</' + result + '>')
+                    self.tag_name = ""
+                    self.flag_open_angle_bracket = False            
         elif event.key() == 60  :  # <
-            self.tag_start = self.textCursor().position()
             self.flag_open_angle_bracket = True
         # end tag inline insertion 
         # ============================================================================================= 

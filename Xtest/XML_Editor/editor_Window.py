@@ -8,7 +8,7 @@ from searchField import SearchField
 from numberBar import NumberBar
 from cpacsHandler import CPACS_Handler
 from config import Config
-from cpacsPy.tixi import tixiwrapper
+import tixiwrapper
 import re
 
 class EditorWindow(QMainWindow):

@@ -12,7 +12,7 @@ import sys
 from lxml import etree
 from PySide.QtGui import QTextDocument, QMainWindow, QGridLayout, QWidget, QPushButton, QMenu, QFont, QTextEdit, qApp, QApplication
 from PySide.QtCore import QFile
-from cpacsPy.tixi import tixiwrapper
+import tixiwrapper
 from xml.etree.ElementTree import ParseError
 from config import Config
 import re
