@@ -12,9 +12,11 @@ class SearchField(QLineEdit):
         
     def focusInEvent(self, focusevent):
         self.__focus = True
+        super(SearchField, self).focusInEvent(focusevent)
 
     def focusOutEvent(self, focusevent):
         self.__focus = False
-        
+        super(SearchField, self).focusInEvent(focusevent)
+
     def isFocused(self):
         return self.__focus

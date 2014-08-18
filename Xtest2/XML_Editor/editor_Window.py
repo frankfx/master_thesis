@@ -1,13 +1,15 @@
 import sys
 from Xtest.XML_Editor import highlighter
 from lxml import etree
-from PySide.QtGui import QStackedWidget, QMessageBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor, QFocusEvent, QMainWindow, QGridLayout, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QLineEdit, QFont, QTextEdit, qApp, QApplication
+from PySide.QtGui import QStackedWidget, QActionGroup, QMessageBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor, QFocusEvent, QMainWindow, QGridLayout, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QLineEdit, QFont, QTextEdit, qApp, QApplication
 from PySide.QtCore import QFile, QEvent, Qt, SIGNAL
 from Xtest.XML_Editor.editor_CodeCompletion import EditorCodeCompletion
 from searchField import SearchField
 from numberBar import NumberBar
 from cpacsHandler import CPACS_Handler
 from config import Config
+from cpacsPy.tixi import tixiwrapper
+import re
 
 class EditorWindow(QMainWindow):
     
@@ -16,6 +18,8 @@ class EditorWindow(QMainWindow):
         super(EditorWindow, self).__init__()   
        
         self.cpacsHandler = CPACS_Handler()
+        self.cur_file_path = ""
+        self.cur_schema_path = ""
         
         self.setupEditor()
         self.setupButtonMenu()
@@ -78,10 +82,6 @@ class EditorWindow(QMainWindow):
         self.number_bar.setTextEdit(self.getStates())
         self.editor.cursorPositionChanged.connect(self.fireUpdateNumbar)        
         self.connect(self.editor.verticalScrollBar(), SIGNAL("valueChanged(int)"), self.fireUpdateNumbar)  
-        
-    def fireUpdateNumbar(self):
-        self.updateLineNumber()
-        self.number_bar.update()
 
     def setupStatusbar(self):
         self.lineNumber = -1
@@ -104,33 +104,56 @@ class EditorWindow(QMainWindow):
         uncommentAction.setStatusTip('Comment Block')
         uncommentAction.triggered.connect(self.fireUnComment)        
                         
+        newAction = QAction('New', self)
+        newAction.setShortcut('Ctrl+N') 
+        newAction.setStatusTip('creats empty cpacs-file')
+        newAction.triggered.connect(self.fireNewAction)                       
+                        
         updateAction = QAction('Update', self)
         updateAction.setShortcut('Ctrl+U')
         updateAction.setStatusTip('Update CPACS')
         updateAction.triggered.connect(self.fireUpdate)
 
-        clearAction = QAction('Clear', self)
-        clearAction.setStatusTip('Clear Editor')
-        clearAction.triggered.connect(self.fireClear)
-
         revertAction = QAction('Revert', self)
         revertAction.setShortcut('Ctrl+R')
         revertAction.triggered.connect(self.fireRevert)        
 
+        clearAction = QAction('Clear', self)
+        clearAction.setStatusTip('Clear Editor')
+        clearAction.triggered.connect(self.fireClear)
+
         numbarAction = QAction('LineNumber', self)
-        numbarAction.triggered.connect(self.fireswitchLayout)                 
-        
+        numbarAction.triggered.connect(self.fireSwitchLayout)                 
+
+        link_to_node_YesAction = QAction('yes', self)
+        link_to_node_YesAction.triggered.connect(self.dummyFuction)  
+
+        link_to_node_NoAction = QAction('no', self)
+        link_to_node_NoAction.triggered.connect(self.dummyFuction)  
+
         menubar = self.menuBar()
         filemenu = menubar.addMenu("File")
+        filemenu.addAction(newAction)
         filemenu.addAction(updateAction) 
-        filemenu.addAction(clearAction) 
         filemenu.addAction(revertAction)         
         sourcemenu = menubar.addMenu("Source")  
         sourcemenu.addAction(commentAction)  
         sourcemenu.addAction(uncommentAction)
         editormenu = menubar.addMenu("Editor")
+        editormenu.addAction(clearAction) 
+        editormenu.addSeparator()
         editormenu.addAction(numbarAction)
-        
+        editormenu_child1 = editormenu.addMenu('Link to node')
+        editormenu_child1.addAction(link_to_node_YesAction)
+        editormenu_child1.addAction(link_to_node_NoAction)
+
+    def fireUpdateNumbar(self):
+        self.updateLineNumber()
+        self.number_bar.update()
+
+    def dummyFuction(self):
+        print "not implemented yet"
+  
     def getStates(self):
         self.stats = { "searchbox":self.searchbox, "editor":self.editor}
         return self.stats    
@@ -145,15 +168,35 @@ class EditorWindow(QMainWindow):
         
     ''' find next button '''    
     def handleButton2(self):
-        if self.editor.find(self.searchbox.text()) : 
-            ()
-        elif not self.editor.find(self.searchbox.text(), QTextDocument.FindBackward):
-            QMessageBox.about(self, "error", "String not %s not found" % (self.searchbox.text()))
+        list_p = self.searchbox.text().split('/')
+        if len(list_p) == 1 :
+            if self.editor.find(self.searchbox.text()) : 
+                ()
+            elif not self.editor.find(self.searchbox.text(), QTextDocument.FindBackward):
+                QMessageBox.about(self, "error", "String %s not found" % (self.searchbox.text()))
+            else :
+                self.editor.moveCursor(QTextCursor.Start)
+                self.editor.find(self.searchbox.text())
         else :
-            self.editor.moveCursor(QTextCursor.Start)
-            self.editor.find(self.searchbox.text())
+            self.searchXPath(self.searchbox.text())
                 
         self.searchbox.setFocus()     
+      
+    def searchXPath(self, path):
+        list_p = self.searchbox.text().split('/')
+        list_p = list_p[1:] if list_p[0] == '' else list_p
+        for x in list_p :
+            print x
+            if '[' in x :
+                num = int(re.findall('\d+', x)[0])
+                x = x.split('[').group(0)
+                while num > 0 : 
+                    if not self.editor.find(x) : QMessageBox.about(self, "error", "XPath %s not found" % path)
+                    num -= 1
+            elif not self.editor.find(x) : 
+                QMessageBox.about(self, "error", "XPath %s not found" % path) 
+                return
+          
         
     def updateLineNumber(self): 
         self.lineNumber = self.editor.textCursor().blockNumber() + 1
@@ -176,13 +219,27 @@ class EditorWindow(QMainWindow):
     def fireUpdate(self):
         print ('dummy funciton - update the model')
 
+    '''reloads cpacs file if not updated yet'''
     def fireRevert(self):
-        print ('dummy funciton - reload the cpacs file if not updated yet')  
+        if(self.cur_file_path != "" and self.cur_schema_path) :
+            self.openFile(self.cur_file_path, self.cur_schema_path)
+        else :
+            QMessageBox.about(self, "error", "CPACS-File or Validation-Schema not available")
+            
+    def fireSearchSTRING(self):
+        self.searchOpt = self.searchOptions.STRING
         
+    def fireSearchXPATH(self):
+        self.searchOpt = self.searchOptions.XPATH
+    
+    def fireNewAction(self):
+        self.editor.clear()
+        self.editor.setText(Config.cpacs_default)
+    
     def fireClear(self):
         self.editor.clear()
  
-    def fireswitchLayout(self): 
+    def fireSwitchLayout(self): 
         if(self.flag_layout) :
             self.number_bar.show()
         else :  
@@ -263,6 +320,7 @@ class EditorWindow(QMainWindow):
             
         if event.key() == Qt.Key_F and event.modifiers() == Qt.ControlModifier :
             self.ctrlSearchView()
+            self.searchbox.setText("/cpacs/vehicles/aircraft/model/name")
 
         elif self.searchbox.isFocused() and event.key() == Qt.Key_Return :            
             self.handleButton2()
@@ -280,16 +338,23 @@ class EditorWindow(QMainWindow):
 
     def openFile(self, path=None, schema = None):
         if path and schema :
-            text = self.cpacsHandler.loadFile(path, schema)
-            self.editor.setPlainText(text)
-
+            try :
+                text = self.cpacsHandler.loadFile(path, schema)
+                self.editor.setPlainText(text)
+                self.cur_file_path = path
+                self.cur_schema_path = schema
+            except tixiwrapper.TixiException, e :
+                print e.error
+                self.statusBar().showMessage('CPACS ERROR: ' + e.error)
+     
+     
               
 def main():
     app = QApplication(sys.argv)
     w = EditorWindow(None)
     conf = Config()
-    w.openFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
-#    w.openFile("configuration/A320_Fuse.xml","configuration/CPACS_21_Schema.xsd")
+    w.openFile(conf.path_cpacs_A380_Fuse, conf.path_cpacs_21_schema)
+  #  w.openFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
     sys.exit(app.exec_())
  
 if __name__ == "__main__":
