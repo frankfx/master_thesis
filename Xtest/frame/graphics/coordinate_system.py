@@ -38,11 +38,11 @@ class CoordinateSystem():
         f.close()
 
     def drawCoordinateAxisZ(self):
-        GL.glBegin(GL.GL_LINE_LOOP)     # circle in x-y plane
-        for a in range(0,360,1) :
-            angle = math.pi / 180 * a
-            GL.glVertex3f(math.cos(angle), math.sin(angle), 0)
-        GL.glEnd()
+        #----------------- GL.glBegin(GL.GL_LINE_LOOP)     # circle in x-y plane
+        #--------------------------------------------- for a in range(0,360,1) :
+            #----------------------------------------- angle = math.pi / 180 * a
+            #---------------- GL.glVertex3f(math.cos(angle), math.sin(angle), 0)
+        #------------------------------------------------------------ GL.glEnd()
         
         GL.glBegin(GL.GL_LINES);
         GL.glVertex3f(0.9, 0.0, 0.0)    # x-axis

@@ -1,15 +1,18 @@
 import sys
-from Xtest.XML_Editor import highlighter
+import re
+
 from lxml import etree
-from PySide.QtGui import QStackedWidget, QActionGroup, QMessageBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor, QFocusEvent, QMainWindow, QGridLayout, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QLineEdit, QFont, QTextEdit, qApp, QApplication
-from PySide.QtCore import QFile, QEvent, Qt, SIGNAL
-from Xtest.XML_Editor.editor_CodeCompletion import EditorCodeCompletion
+from PySide.QtGui import QMessageBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor, QMainWindow, QGridLayout, QHBoxLayout, QWidget, QPushButton, QFont, QTextEdit, QApplication
+from PySide.QtCore import Qt, SIGNAL
+from editor_CodeCompletion import EditorCodeCompletion
 from searchField import SearchField
 from numberBar import NumberBar
 from cpacsHandler import CPACS_Handler
 from config import Config
-import tixiwrapper
-import re
+# import tixiwrapper
+from cpacsPy.tixi import tixiwrapper
+
+from highlighter import Highlighter
 
 class EditorWindow(QMainWindow):
     
@@ -75,7 +78,7 @@ class EditorWindow(QMainWindow):
         self.editor.textChanged.connect(self.validate)
         
         #self.connect(self.editor, SIGNAL("cursorPositionChanged()"),self.updateLineNumber)
-        self.highlighter = highlighter.Highlighter(self.editor.document())
+        self.highlighter = Highlighter(self.editor.document())
     
     def setupNumbar(self):
         self.number_bar = NumberBar()

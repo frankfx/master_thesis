@@ -8,6 +8,7 @@ from lxml import etree
 from PySide.QtGui import QMainWindow, QGridLayout, QWidget, QPushButton, QMenu, QFont, QTextEdit, qApp, QApplication
 from PySide.QtCore import QFile
 from cpacsPy.tixi import tixiwrapper
+from cpacsPy.tigl import tiglwrapper
 from xml.etree.ElementTree import ParseError
 
 class Config():
@@ -29,6 +30,8 @@ class FileLoader():
     
     def __init__ (self):
         self.tixi = tixiwrapper.Tixi()
+        self.tigl = tiglwrapper.Tigl()
+       
         self.elementPath = conf.path_element2
         self.attributeName = conf.attrName2
         

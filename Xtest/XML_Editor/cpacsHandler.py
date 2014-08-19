@@ -9,11 +9,8 @@ Created on Aug 5, 2014
 @author: fran_re
 '''
 import sys
-from lxml import etree
-from PySide.QtGui import QTextDocument, QMainWindow, QGridLayout, QWidget, QPushButton, QMenu, QFont, QTextEdit, qApp, QApplication
-from PySide.QtCore import QFile
-import tixiwrapper
-from xml.etree.ElementTree import ParseError
+from PySide.QtGui import QTextDocument, QMainWindow, QTextEdit, QApplication
+from cpacsPy.tixi import tixiwrapper
 from config import Config
 import re
 
@@ -21,35 +18,36 @@ class CPACS_Handler():
     
     def __init__ (self):
         self.tixi = tixiwrapper.Tixi()
-     #   self.elementPath = conf.path_element2
-      #  self.attributeName = conf.attrName2
         
     def loadFile(self, xmlFilename, cpacs_schema):
         try:
             self.tixi.openDocument(xmlFilename) 
             self.tixi.schemaValidateFromFile(cpacs_schema)
- #       print attributeValue
-            #version = self.tixi.getTextElement('/cpacs/header/version')
-            version = self.tixi.getTextElement('/cpacs/vehicles/aircraft/model/name')
             
-            print "dsfdsf"
-            print version             
             return self.tixi.exportDocumentAsString()
         except tixiwrapper.TixiException, e:  
-          #  print e.error
-           ()
-           raise e
+            raise e
             
+    def updatedictionary(self,path_dict, path_schema):
+        dict_file = open(path_dict)
+        schema_file = open(path_schema, 'r')
+        flag = False
+        res = ""
+        with open(path_dict, "a") as mydict :
+            for line in schema_file :
+                res = re.search("(?<=\<xsd:complexType name=\").*(?=\"\>)", line)
+                if res != None :
+                    for tmp in dict_file : 
+                        if tmp == res.group(0) +"\n" :
+                            flag = True
+                            break
+                    if(not flag) :
+                        mydict.write(res.group(0)+"\n")
             
+        dict_file.close()
+        mydict.close()
+        schema_file.close()            
         
-            
- #       attributeValue = self.tixi.getTextAttribute(self.elementPath, self.attributeName)
-        version = self.tixi.getTextElement('/cpacs/header/version')
- 
- #       print attributeValue
-        print "dsfdsf"
-        print version 
-
     def __del__(self):
         self.tixi.close()
         self.tixi.cleanup() 
@@ -61,14 +59,18 @@ class EditorWindow(QMainWindow):
 
         self.editor = QTextEdit()      
         config = Config()
-        temp = CPACS_Handler()  
-        temp.loadFile(config.path_cpacs_A380_Fuse, config.path_cpacs_21_schema)
+        self.temp = CPACS_Handler()  
+        self.temp.loadFile(config.path_cpacs_A380_Fuse, config.path_cpacs_21_schema)
         
-        dir = temp.tixi.exportDocumentAsString()
+        directory = self.temp.tixi.exportDocumentAsString()
+        version = self.temp.tixi.getTextElement('/cpacs/vehicles/aircraft/model/name')
+        attributeValue = self.temp.tixi.getTextAttribute(config.path_element2, config.attrName2)
         
-        temp.tixi.close()
+        self.temp.tixi.close()
         
-        self.editor.setText(dir)
+        print version
+        print attributeValue
+        self.editor.setText(directory)
         
         self.statusBar()
         self.setWindowTitle('Simple XML editor')
@@ -80,33 +82,12 @@ class EditorWindow(QMainWindow):
 
     def search(self, xpath):
         print "test"
- 
-    def updatedictionary(self,path_dict, path_schema):
-        dict_file = open(path_dict)
-        schema_file = open(path_schema, 'r')
-        flag = False
-        res = ""
-        with open(path_dict, "a") as dict :
-            for line in schema_file :
-                res = re.search("(?<=\<xsd:complexType name=\").*(?=\"\>)", line)
-                if res != None :
-                    for tmp in dict_file : 
-                        if tmp == res.group(0) +"\n" :
-                            flag = True
-                            break
-                    if(not flag) :
-                        #print res.group(0)
-                        dict.write(res.group(0)+"\n")
-            
-        dict_file.close()
-        dict.close()
-        schema_file.close()
- 
+
 def main():
     app = QApplication(sys.argv)
     w = EditorWindow()
     w.show()
-    w.updatedictionary(Config.path_code_completion_dict, Config.path_cpacs_21_schema)
+    w.temp.updatedictionary(Config.path_code_completion_dict, Config.path_cpacs_21_schema)
     sys.exit(app.exec_())
  
 if __name__ == "__main__":
