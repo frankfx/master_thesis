@@ -6,7 +6,8 @@ Created on Aug 13, 2014
 class Config():
     path_cpacs_21_schema        = "configuration/CPACS_21_Schema.xsd"
     path_cpacs_D150             = "configuration/cpacs_files/D150_CPACS2.0_valid.xml"
-    path_cpacs_A380_Fuse        = "configuration/cpacs_files/A320_Fuse.xml"
+    path_cpacs_A320_Fuse        = "configuration/cpacs_files/A320_Fuse.xml"
+    path_cpacs_A320_Wing        = "configuration/cpacs_files/A320_Wing.xml"
     
     path_code_completion_dict   = "configuration/keywords"
     

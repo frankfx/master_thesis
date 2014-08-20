@@ -356,7 +356,7 @@ def main():
     app = QApplication(sys.argv)
     w = EditorWindow(None)
     conf = Config()
-    w.openFile(conf.path_cpacs_A380_Fuse, conf.path_cpacs_21_schema)
+    w.openFile(conf.path_cpacs_A320_Wing, conf.path_cpacs_21_schema)
   #  w.openFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
     sys.exit(app.exec_())
  

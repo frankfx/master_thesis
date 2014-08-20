@@ -1,9 +1,4 @@
 '''
-Created on Aug 13, 2014
-
-@author: fran_re
-'''
-'''
 Created on Aug 5, 2014
 
 @author: fran_re
@@ -11,6 +6,7 @@ Created on Aug 5, 2014
 import sys
 from PySide.QtGui import QTextDocument, QMainWindow, QTextEdit, QApplication
 from cpacsPy.tixi import tixiwrapper
+from cpacsPy.tigl import tiglwrapper
 from config import Config
 import re
 
@@ -18,24 +14,38 @@ class CPACS_Handler():
     
     def __init__ (self):
         self.tixi = tixiwrapper.Tixi()
+        self.tigl = tiglwrapper.Tigl()
         
     def loadFile(self, xmlFilename, cpacs_schema):
         try:
             self.tixi.openDocument(xmlFilename) 
             self.tixi.schemaValidateFromFile(cpacs_schema)
+            print self.tixi.TixiDocumentHandle()
+#            self.tigl.openCPACSConfiguration(0, "")
             
-            return self.tixi.exportDocumentAsString()
         except tixiwrapper.TixiException, e:  
             raise e
+
+    def getVectorX(self, prof_uid):
+        xpath = self.tixi.uIDGetXPath(prof_uid)
+        return self.tixi.getFloatVector(xpath + "/pointList/x",100)
+
+    def getVectorY(self, prof_uid):
+        xpath = self.tixi.uIDGetXPath(prof_uid)
+        return self.tixi.getFloatVector(xpath + "/pointList/y",100)
+    
+    def getVectorZ(self, prof_uid):
+        xpath = self.tixi.uIDGetXPath(prof_uid)
+        return self.tixi.getFloatVector(xpath + "/pointList/z",100)    
             
     def updatedictionary(self,path_dict, path_schema):
         dict_file = open(path_dict)
         schema_file = open(path_schema, 'r')
         flag = False
-        res = ""
-        with open(path_dict, "a") as mydict :
+        res = ''
+        with open(path_dict, 'a') as mydict :
             for line in schema_file :
-                res = re.search("(?<=\<xsd:complexType name=\").*(?=\"\>)", line)
+                res = re.search("(?<=\<xsd:complexType name=\").*(?=Type\"\>)", line)
                 if res != None :
                     for tmp in dict_file : 
                         if tmp == res.group(0) +"\n" :
@@ -61,16 +71,25 @@ class EditorWindow(QMainWindow):
         config = Config()
         self.temp = CPACS_Handler()  
         self.temp.loadFile(config.path_cpacs_A320_Wing, config.path_cpacs_21_schema)
+        text = self.temp.tixi.exportDocumentAsString()
         
-        directory = self.temp.tixi.exportDocumentAsString()
+        xpath = self.temp.tixi.uIDGetXPath('NACA0009')
+        print xpath
+        #directory = self.temp.tixi.exportDocumentAsString()
         #version = self.temp.tixi.getTextElement('/cpacs/vehicles/aircraft/model/name')
         #attributeValue = self.temp.tixi.getTextAttribute(config.path_element2, config.attrName2)
         
+        vecX = self.temp.tixi.getFloatVector(xpath + "/pointList/x",100)
+        vecY = self.temp.tixi.getFloatVector(xpath + "/pointList/y",100)
+        vecZ = self.temp.tixi.getFloatVector(xpath + "/pointList/z",100)
+        print vecX
+        print vecY
+        print vecZ
         self.temp.tixi.close()
         
         #print version
         #print attributeValue
-        self.editor.setText(directory)
+        self.editor.setText(text)
         
         self.statusBar()
         self.setWindowTitle('Simple XML editor')
