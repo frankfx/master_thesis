@@ -4,7 +4,6 @@ Created on Aug 20, 2014
 @author: fran_re
 '''
 
-import clips
 import sys
 from PySide import QtOpenGL, QtGui
 from cpacsHandler import CPACS_Handler

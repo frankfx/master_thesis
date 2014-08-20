@@ -3,16 +3,15 @@ Created on Jul 30, 2014
 
 @author: fran_re
 '''
-
-import clips
 import sys
 from PySide import QtOpenGL, QtGui
+from OpenGL import *
 try:
-    from OpenGL import GL,GLU, GLUT
+    from OpenGL import GL
 except ImportError:
     app = QtGui.QApplication(sys.argv)
     QtGui.QMessageBox.critical(None, "OpenGL hellogl",
-                            "PyOpenGL must be installed to run this example.",
+                              "PyOpenGL must be installed to run this example.",
                             QtGui.QMessageBox.Ok | QtGui.QMessageBox.Default,
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
@@ -20,9 +19,8 @@ except ImportError:
 
 class Renderer():
     def init(self):
-        clips.Clear()
-        print clips.__path__
-                
+        ()
+    
     def resize(self, w, h):
         GL.glViewport(0,0,w,h)      # describes current viewer window - first two params are for the pos of left bottom edge
                                     # glViewport gibt Transformation von Geraetekoordinaten auf Fensterkoordinaten an

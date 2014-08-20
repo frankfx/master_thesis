@@ -6,7 +6,8 @@ Created on Aug 6, 2014
 from PySide.QtGui import QLineEdit
 
 class SearchField(QLineEdit):    
-    def __init__(self, parent=None):
+    '''This is a docstring'''
+    def __init__(self):
         super(SearchField, self).__init__()
         self.__focus = False
         
@@ -19,4 +20,5 @@ class SearchField(QLineEdit):
         super(SearchField, self).focusInEvent(focusevent)
 
     def isFocused(self):
+        '''returns true if focus is on text field'''
         return self.__focus

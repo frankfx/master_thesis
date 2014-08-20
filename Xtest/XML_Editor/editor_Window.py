@@ -5,12 +5,12 @@ from lxml import etree
 from PySide.QtGui import QMessageBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor, QMainWindow, QGridLayout, QHBoxLayout, QWidget, QPushButton, QFont, QTextEdit, QApplication
 from PySide.QtCore import Qt, SIGNAL
 from editor_CodeCompletion import EditorCodeCompletion
-from searchField import SearchField
+from Xtest.XML_Editor.search_field import SearchField
 from numberBar import NumberBar
 from cpacsHandler import CPACS_Handler
 from config import Config
-# import tixiwrapper
-from cpacsPy.tixi import tixiwrapper
+import tixiwrapper
+#from cpacsPy.tixi import tixiwrapper
 
 from highlighter import Highlighter
 
@@ -357,7 +357,7 @@ def main():
     w = EditorWindow(None)
     conf = Config()
     w.openFile(conf.path_cpacs_A320_Wing, conf.path_cpacs_21_schema)
-  #  w.openFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
+    #  w.openFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
     sys.exit(app.exec_())
  
 if __name__ == "__main__":

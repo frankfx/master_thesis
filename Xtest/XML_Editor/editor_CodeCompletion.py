@@ -3,11 +3,9 @@ Created on Aug 12, 2014
 
 @author: fran_re
 '''
-import sys
 import re
-import os
-from PySide.QtGui import QTextEdit, QCompleter, QStringListModel, QTextCursor, QApplication, QWidget
-from PySide.QtCore import SIGNAL, Qt
+from PySide.QtGui import QTextEdit, QCompleter, QStringListModel, QTextCursor, QApplication
+from PySide.QtCore import Qt
 
     
 class EditorCodeCompletion(QTextEdit):

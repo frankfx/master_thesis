@@ -10,7 +10,8 @@ Created on Aug 5, 2014
 '''
 import sys
 from PySide.QtGui import QTextDocument, QMainWindow, QTextEdit, QApplication
-from cpacsPy.tixi import tixiwrapper
+#from cpacsPy.tixi import tixiwrapper
+import tixiwrapper
 from config import Config
 import re
 
@@ -27,6 +28,17 @@ class CPACS_Handler():
             return self.tixi.exportDocumentAsString()
         except tixiwrapper.TixiException, e:  
             raise e
+
+    def getVectorX(self, prof_uid):
+        xpath = self.tixi.uIDGetXPath(prof_uid)
+        return self.tixi.getFloatVector(xpath + "/pointList/x",100)
+
+    def getVectorY(self, prof_uid):
+        xpath = self.tixi.uIDGetXPath(prof_uid)
+        return self.tixi.getFloatVector(xpath + "/pointList/y",100)
+    
+    def getVectorZ(self, prof_uid):
+        xpath = self.tixi.uIDGetXPath(prof_uid)
             
     def updatedictionary(self,path_dict, path_schema):
         dict_file = open(path_dict)

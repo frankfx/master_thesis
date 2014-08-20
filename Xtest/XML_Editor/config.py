@@ -4,7 +4,7 @@ Created on Aug 13, 2014
 @author: fran_re
 '''
 class Config():
-    path_cpacs_21_schema        = "configuration/CPACS_21_Schema.xsd"
+    path_cpacs_21_schema        = "configuration/cpacs_files/CPACS_21_Schema.xsd"
     path_cpacs_D150             = "configuration/cpacs_files/D150_CPACS2.0_valid.xml"
     path_cpacs_A320_Fuse        = "configuration/cpacs_files/A320_Fuse.xml"
     path_cpacs_A320_Wing        = "configuration/cpacs_files/A320_Wing.xml"
