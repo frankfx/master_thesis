@@ -4,10 +4,12 @@ Created on Jul 30, 2014
 @author: fran_re
 '''
 import sys
-from PySide import QtOpenGL, QtGui
+from PySide import QtOpenGL, QtGui, QtCore
 from OpenGL import *
+from cpacsHandler import CPACS_Handler
+from config import Config
 try:
-    from OpenGL import GL
+    from OpenGL import GL, GLU
 except ImportError:
     app = QtGui.QApplication(sys.argv)
     QtGui.QMessageBox.critical(None, "OpenGL hellogl",
@@ -18,57 +20,72 @@ except ImportError:
 
 
 class Renderer():
+    def __init__(self, tixi):
+        self.tixi = tixi
+        self.scale = 1.5
+
     def init(self):
-        ()
+        # GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glEnable(GL.GL_COLOR_MATERIAL)
+        GL.glClearColor(1.0, 1.0 , 1.0, 1.0)        
     
     def resize(self, w, h):
-        GL.glViewport(0,0,w,h)      # describes current viewer window - first two params are for the pos of left bottom edge
-                                    # glViewport gibt Transformation von Geraetekoordinaten auf Fensterkoordinaten an
-                                    # Geraetekoordinaten bilden Bereich eines Ausgabemediums (viewport) auf Koordinatenspanne -1..1 auf jeder Achse ab.
-                                    # Wenn (xnd, ynd) normalisierte Geraetekoordinaten sind, dann werden die Fensterkoordinaten (xw, yw) wie folgt ermittelt
-                                    # xw = (xnd + 1)(width / 2) + x
-                                    # yw = (ynd + 1)(height / 2) + y
-        GL.glMatrixMode(GL.GL_PROJECTION);
-        GL.glLoadIdentity();
+        #GL.glViewport(0,0,w,w) if w <= h else GL.glViewport(0,0,h,h) 
+        GL.glViewport(0,0,w,h) 
+                                   
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glLoadIdentity()
+        
+        GLU.gluPerspective (64.0, w*1.0/h, 0.0, 10.0)
+        
     def display(self):
-        GL.glClearColor(0.0, 0.0, 0.0, 0.0) # Legt die Farbe fest, welche ein Farbpuffer nach seiner Leerung mit glClear enthaelt. 
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT)  # Leert die im Parameter festgelegten Buffer, indem sie mit einen Leerwert gefuellt werden. 
-        GL.glOrtho(-1, 1, -1, 1, -1, 1)     # aktiviert einen orthogonalen 2D-Rendermodus - glOrtho(left, right, bottom, top, znear, zfar)
-                                            # schaltet OpenGL in einen 2D-Modus, wo die Z-Koordiante keine Rolle mehr im Bezug auf die Groesse eines Objektes hat 
-                                            # (weit entfernte Objekte (mit hoher Z-Koordinate) werden genau so gross gezeichnet, wie nahe.)
-                                            # Damit dient die Z-Koordiante nur noch zur "Anordnung" von Vorder- und Hintergruenden auf der 2D-Zeichenflaeche. 
-        GL.glLoadIdentity()                   # Ersetzt die aktuelle Matrix durch die Einheitsmatrix
-        GL.glColor3f(1, 1, 1)               # sets current color
-        self.drawTriangle()
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)  # Leert die im Parameter festgelegten Buffer, indem sie mit einen Leerwert gefuellt werden. 
+        
+        GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glLoadIdentity()                 # Ersetzt die aktuelle Matrix durch die Einheitsmatrix
+       
+        #GL.glTranslatef(-0.51,0,-1)
         
         GL.glColor3f(0, 0, 1)
-        GL.glScalef(0.5, 0.5, 0.0)
-        self.drawTriangle()
 
-        GL.glColor3f(1.0, 0.0, 0.0);
-        GL.glRotatef(45.0, 0.0, 0.0, 1.0); #rotate 45 degrees
-        self.drawTriangle();
-
-        GL.glColor3f(0.0, 1.0, 0.0);
-        GL.glTranslatef(0.5, 0.5, 0.0);    # translate
-        self.drawTriangle();
+        GL.glScale(1.5, self.scale, 1)
+        self.drawProfile()
 
         GL.glFlush()                # clean puffer, execute all puffered commands
 
-    def drawTriangle(self):
-        GL.glBegin(GL.GL_TRIANGLES)
-        GL.glVertex2f(-0.5, -0.5)   # vertex on the left
-        GL.glVertex2f( 0.5, -0.5)   # vertex on the right
-        GL.glVertex2f( 0.0,  0.5)   # vertex at the top of the triangle
-        GL.glEnd()
+
+    def drawProfile(self):
+        vecX = self.tixi.getVectorX('NACA0009')
+        vecY = self.tixi.getVectorY('NACA0009')
+        vecZ = self.tixi.getVectorZ('NACA0009')
         
+        GL.glTranslatef(-self.norm_vec_list(vecX),0,-1)
+        
+        GL.glBegin(GL.GL_LINE_LOOP)
+        for i in range (0, len(vecX)) :
+            GL.glVertex3f(vecX[i], vecZ[i], vecY[i])
+        GL.glEnd()      
+        
+    def norm_vec_list(self, vlist):
+        '''set points to center (0,0)'''
+        vlist = list(vlist)
+        mx = max(vlist)
+        mn = min(vlist)
+        dist = mx - mn
+        mid = dist / 2.0
+        shift = mx - mid
+
+        return shift       
 
 class MyWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
         super(MyWidget, self).__init__(parent)
         self.resize(320,320)
         self.setWindowTitle("Rene Test")
-        self.renderer = Renderer()
+        #self.setFixedSize(QtCore.QSize(400,400))
+        tixi = CPACS_Handler()
+        tixi.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
+        self.renderer = Renderer(tixi)    
     
     def initializeGL(self):
         self.renderer.init()
@@ -78,7 +95,24 @@ class MyWidget(QtOpenGL.QGLWidget):
  
     def paintGL(self):
         self.renderer.display()
-        
+
+    def keyPressEvent(self, event):
+        redraw = False
+        offsetScl = 0.25
+        if event.modifiers() == QtCore.Qt.ControlModifier :
+            offsetScl = -1 *offsetScl
+
+        if event.key() == QtCore.Qt.Key_1:
+            self.renderer.scale += offsetScl
+            redraw = True
+        elif event.key() == QtCore.Qt.Key_0:
+            self.renderer.xRot = 0.0
+            self.renderer.yRot = 0.0
+            self.renderer.zRot = 0.0
+            self.renderer.scale = 1.0
+            redraw = True
+        if redraw :
+            self.paintGL()
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])

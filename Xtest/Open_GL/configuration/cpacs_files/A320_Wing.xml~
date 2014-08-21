@@ -183,18 +183,7 @@
                                 <fromElementUID isLink="True">kinkElement1</fromElementUID>
                                 <toElementUID isLink="True">tipElement1</toElementUID>
                             </segment>
-                        </segments>
-                        <positionings>
-                            <positioning uID="Aircraft1_Wing1_Pos1">
-                                <name>Aircraft1_Wing1_Pos1</name>
-                                <description>This positioning was created by the SGG.</description>
-                                <length>15.0</length>
-                                <sweepAngle>30.0</sweepAngle>
-                                <dihedralAngle>0.0</dihedralAngle>
-                                <fromSectionUID isLink="True">root</fromSectionUID>
-                                <toSectionUID isLink="True">tip</toSectionUID>
-                            </positioning>
-                        </positionings>   
+                        </segments>  
                     </wing>
                 </wings>                
             </model>

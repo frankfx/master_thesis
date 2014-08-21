@@ -5,10 +5,10 @@ Created on Aug 5, 2014
 '''
 import sys
 from PySide.QtGui import QTextDocument, QMainWindow, QTextEdit, QApplication
-#from cpacsPy.tixi import tixiwrapper
-#from cpacsPy.tigl import tiglwrapper
-import tiglwrapper
-import tixiwrapper
+from cpacsPy.tixi import tixiwrapper
+from cpacsPy.tigl import tiglwrapper
+#import tiglwrapper
+#import tixiwrapper
 from config import Config
 import re
 
@@ -22,8 +22,8 @@ class CPACS_Handler():
         try:
             self.tixi.openDocument(xmlFilename) 
             self.tixi.schemaValidateFromFile(cpacs_schema)
-            print self.tixi.TixiDocumentHandle()
-#            self.tigl.openCPACSConfiguration(0, "")
+            #print self.tixi._handle.value
+            #self.tigl.openCPACSConfiguration(self.tixi._handle.value, "")
             
         except tixiwrapper.TixiException, e:  
             raise e
@@ -66,13 +66,12 @@ class CPACS_Handler():
 
 class EditorWindow(QMainWindow):
     """initialize editor"""
-    def __init__(self):
+    def __init__(self, cpacs_file, cpacs_schema):
         super(EditorWindow, self).__init__()
 
         self.editor = QTextEdit()      
-        config = Config()
         self.temp = CPACS_Handler()  
-        self.temp.loadFile(config.path_cpacs_A320_Wing, config.path_cpacs_21_schema)
+        self.temp.loadFile(cpacs_file, cpacs_schema)
         text = self.temp.tixi.exportDocumentAsString()
         
         xpath = self.temp.tixi.uIDGetXPath('NACA0009')
@@ -106,7 +105,7 @@ class EditorWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    w = EditorWindow()
+    w = EditorWindow(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
     w.show()
     w.temp.updatedictionary(Config.path_code_completion_dict, Config.path_cpacs_21_schema)
     sys.exit(app.exec_())

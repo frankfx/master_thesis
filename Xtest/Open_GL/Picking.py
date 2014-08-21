@@ -36,9 +36,9 @@ class Renderer():
         
     def resize(self, w, h):
         GL.glViewport(0,0,w,h) 
-        GL.glMatrixMode(GL.GL_PROJECTION);
-        GL.glLoadIdentity();
-        GLU.gluPerspective (65.0, w/h, 0.1, 10.0);    
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glLoadIdentity()
+        GLU.gluPerspective (65.0, w/h, 0.1, 10.0)    
         
     def display(self):
        
