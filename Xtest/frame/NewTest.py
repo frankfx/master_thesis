@@ -7,7 +7,6 @@ import sys
 from PySide import QtOpenGL, QtGui, QtCore
 from cpacsHandler import CPACS_Handler
 from config import Config
-from PyQt4.Qt import QPushButton
 try:
     from OpenGL import GL, GLU
 except ImportError:
@@ -18,37 +17,6 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class Window(QtGui.QWidget):
-    def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
-
-        self.glWidget = MyWidget()
-
-        zoomIn = QtGui.QPushButton("+")
-        zoomOut = QtGui.QPushButton("-")
-        zoomIn.clicked.connect(self.fire_zoom_in)
-        zoomOut.clicked.connect(self.fire_zoom_out)
-
-        mainLayout = QtGui.QGridLayout()
-        mainLayout.addWidget(zoomIn, 0, 0)
-        mainLayout.addWidget(zoomOut, 0, 1)
-        mainLayout.addWidget(self.glWidget, 1, 0, 1, 2)
-        self.setLayout(mainLayout)
-        self.setFixedSize(300,300)
-
-        self.setWindowTitle(self.tr("Hello GL"))
-    
-    def keyPressEvent(self, event): 
-        self.glWidget.keyPressEvent(event)   
-
-    def fire_zoom_in(self):
-        self.glWidget.renderer.scale += 0.1
-        print self.glWidget.renderer.scale
-        self.glWidget.updateGL()
-        
-    def fire_zoom_out(self):
-        self.glWidget.renderer.scale -= 0.1
-        self.glWidget.updateGL()
 
 class Renderer():
     def __init__(self, tixi):
@@ -112,7 +80,6 @@ class MyWidget(QtOpenGL.QGLWidget):
         self.resize(320,320)
         self.setWindowTitle("Rene Test")
         #self.setFixedSize(QtCore.QSize(400,400))
-
         tixi = CPACS_Handler()
         tixi.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
         self.renderer = Renderer(tixi)    
@@ -146,6 +113,6 @@ class MyWidget(QtOpenGL.QGLWidget):
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = Window()
+    widget = MyWidget()
     widget.show()
     app.exec_()    
