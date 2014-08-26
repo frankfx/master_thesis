@@ -7,7 +7,7 @@ import sys
 from PySide import QtOpenGL, QtGui, QtCore
 from cpacsHandler import CPACS_Handler
 from config import Config
-from PyQt4.Qt import QPushButton
+from PySide.QtGui import QPushButton
 try:
     from OpenGL import GL, GLU
 except ImportError:
@@ -18,42 +18,15 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class Window(QtGui.QWidget):
-    def __init__(self, parent=None):
-        QtGui.QWidget.__init__(self, parent)
-
-        self.glWidget = MyWidget()
-
-        zoomIn = QtGui.QPushButton("+")
-        zoomOut = QtGui.QPushButton("-")
-        zoomIn.clicked.connect(self.fire_zoom_in)
-        zoomOut.clicked.connect(self.fire_zoom_out)
-
-        mainLayout = QtGui.QGridLayout()
-        mainLayout.addWidget(zoomIn, 0, 0)
-        mainLayout.addWidget(zoomOut, 0, 1)
-        mainLayout.addWidget(self.glWidget, 1, 0, 1, 2)
-        self.setLayout(mainLayout)
-        self.setFixedSize(300,300)
-
-        self.setWindowTitle(self.tr("Hello GL"))
-    
-    def keyPressEvent(self, event): 
-        self.glWidget.keyPressEvent(event)   
-
-    def fire_zoom_in(self):
-        self.glWidget.renderer.scale += 0.1
-        print self.glWidget.renderer.scale
-        self.glWidget.updateGL()
-        
-    def fire_zoom_out(self):
-        self.glWidget.renderer.scale -= 0.1
-        self.glWidget.updateGL()
-
 class Renderer():
     def __init__(self, tixi):
         self.tixi = tixi
         self.scale = 1.0
+        self.trans_x = 0
+        self.trans_y = 0
+        self.width = -1
+        self.height = -1
+        self.fovy = 64.0
 
     def init(self):
         # GL.glEnable(GL.GL_DEPTH_TEST)
@@ -61,21 +34,28 @@ class Renderer():
         GL.glClearColor(1.0, 1.0 , 1.0, 1.0)        
     
     def resize(self, w, h):
+        self.width , self.height = w , h
         GL.glViewport(0,0,w,h) #if w <= h else GL.glViewport(0,0,h,h) 
                                    
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        
-      #  GLU.gluPerspective (64.0, w*1.0/h, 0.0, 10.0)
+        GLU.gluPerspective (self.fovy * self.scale, w*1.0/h, 0.0, 10.0)
         
     def display(self):
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
-        
-        GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-       
-        #GL.glTranslatef(-0.51,0,-1)
+        GLU.gluPerspective (self.fovy * self.scale, self.width*1.0/self.height, 0.0, 10.0)
+        print self.width*1.0/self.height   
+           
+              
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
+
+        GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glLoadIdentity()        
+
+        GL.glTranslatef(self.trans_x,self.trans_y,-1.5)
         
+        self.drawGrid()
         self.drawProfile()
 
         GL.glFlush()                # clean puffer, execute all puffered commands
@@ -86,15 +66,105 @@ class Renderer():
         vecY = self.tixi.getVectorY('NACA0009')
         vecZ = self.tixi.getVectorZ('NACA0009')
         
-        GL.glColor3f(0, 0, 1)
-        GL.glScale(self.scale, self.scale, 1)
-        GL.glTranslatef(-self.norm_vec_list(vecX),0,-1)
+        print vecX
+        ctrlpts =[]
+        llist = []
         
+        for i in range (0, len(vecX), 1) :
+            llist.append( [vecX[i], vecZ[i], vecY[i]] )
+           
+        for j in range (0, len(llist)-3, 4) :
+            ctrlpts.append( [   [llist[j], llist[j+1], llist[j+2], llist[j+3]]    ] )
+        
+        chord_min_idx = self.get_index_of_min(vecX)
+        chord_max_idx = self.get_index_of_max(vecX)
+        
+        # draw profile        
+        GL.glColor3f(0, 0, 1)
+        #GL.glTranslatef(-self.norm_vec_list(vecX),0, 0)
+        #GL.glTranslatef(self.tx, self.ty, 0)
+        GL.glMap1f(GL.GL_MAP1_VERTEX_3, 0.0, 1.0, ctrlpts)
+        GL.glEnable(GL.GL_MAP1_VERTEX_3)
         GL.glBegin(GL.GL_LINE_LOOP)
         for i in range (0, len(vecX)) :
-            GL.glVertex3f(vecX[i], vecZ[i], vecY[i])
-        GL.glEnd()      
+       #     GL.glVertex3f(vecX[i], vecZ[i], vecY[i])
+            GL.glEvalCoord1f(i/30.0)    
+        GL.glEnd()
+        GL.glDisable(GL.GL_MAP1_VERTEX_3)
         
+        # draw chord
+        GL.glLineStipple(2, 0xAAAA)
+        GL.glEnable(GL.GL_LINE_STIPPLE)
+        GL.glBegin(GL.GL_LINES)
+        GL.glVertex3f(vecX[chord_min_idx], vecZ[chord_min_idx], vecY[chord_min_idx])
+        GL.glVertex3f(vecX[chord_max_idx], vecZ[chord_max_idx], vecY[chord_max_idx])
+        GL.glEnd()    
+        GL.glDisable(GL.GL_LINE_STIPPLE) 
+    
+
+    def get_index_of_min(self, vlist):
+        res = vlist[0]
+        index = 0
+
+        for i in range (1, len(vlist), 1) :
+            if vlist[i] < res :
+                res = vlist[i]
+                index = i
+        
+        return index
+
+    def get_index_of_max(self, vlist):
+        res = vlist[0]
+        index = 0
+
+        for i in range (1, len(vlist), 1) :
+            if vlist[i] > res :
+                res = vlist[i]
+                index = i
+        
+        return index
+
+    
+    def getIndex_of_list_minimum(self, vlist):
+        resMin = vlist[0]
+        resMax = vlist[0]
+        indexMin = 0
+        indexMax = 0
+        for i in range (1, len(vlist), 1) :
+            if vlist[i] < resMin :
+                resMin = vlist[i]
+                indexMin = i
+            elif vlist [i] > resMax :
+                resMax = vlist[i]
+                indexMax = i
+                
+        return [(indexMin, resMin),(indexMax, resMax)]
+                
+        
+    def drawGrid(self, x_fr = -0.9, x_to = 0.9, y_fr = -0.9, y_to = 0.9, no_lines = 6):
+        GL.glColor3f(1, 0.85, 0.55)
+        GL.glBegin(GL.GL_LINES)
+        # line at y-axis through the center
+        GL.glVertex3f(x_fr, 0, 0)
+        GL.glVertex3f(x_to, 0, 0)
+        # line at x-axis through the center
+        GL.glVertex3f(0, y_fr, 0)
+        GL.glVertex3f(0, y_to, 0)
+        for i in range(1, no_lines, 1) :
+            # positive lines at y-axis
+            GL.glVertex3f(x_fr,  i*1.0/no_lines, 0)
+            GL.glVertex3f(x_to,  i*1.0/no_lines, 0)
+            # negative lines at y-axis
+            GL.glVertex3f(x_fr, -i*1.0/no_lines, 0)
+            GL.glVertex3f(x_to, -i*1.0/no_lines, 0)  
+            # positive lines at x-axis
+            GL.glVertex3f( i*1.0/no_lines, y_fr, 0)
+            GL.glVertex3f( i*1.0/no_lines, y_to, 0)
+            # negative lines at x-axis
+            GL.glVertex3f(-i*1.0/no_lines, y_fr, 0)
+            GL.glVertex3f(-i*1.0/no_lines, y_to, 0)                       
+        GL.glEnd()       
+
     def norm_vec_list(self, vlist):
         '''set points to center (0,0)'''
         vlist = list(vlist)
@@ -112,7 +182,11 @@ class MyWidget(QtOpenGL.QGLWidget):
         self.resize(320,320)
         self.setWindowTitle("Rene Test")
         #self.setFixedSize(QtCore.QSize(400,400))
-
+        self.dx = 0.0
+        self.dy = 0.0
+        self.lastPos_x = 0.0
+        self.lastPos_y = 0.0
+        
         tixi = CPACS_Handler()
         tixi.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
         self.renderer = Renderer(tixi)    
@@ -128,24 +202,48 @@ class MyWidget(QtOpenGL.QGLWidget):
 
     def keyPressEvent(self, event):
         redraw = False
-        offsetScl = 0.1
-        if event.modifiers() == QtCore.Qt.ControlModifier :
-            offsetScl = -1 *offsetScl
-
-        if event.key() == QtCore.Qt.Key_1:
+        offsetScl = 0.008
+        offsetTrans = 0.02
+        if event.key() == QtCore.Qt.Key_Plus:
+            self.renderer.scale -= offsetScl
+            redraw = True
+        elif event.key() == QtCore.Qt.Key_Minus:
             self.renderer.scale += offsetScl
             redraw = True
-        elif event.key() == QtCore.Qt.Key_0:
-            self.renderer.xRot = 0.0
-            self.renderer.yRot = 0.0
-            self.renderer.zRot = 0.0
-            self.renderer.scale = 1.0
+        elif event.key() == QtCore.Qt.Key_Left:
+            self.renderer.trans_x += offsetTrans
+            redraw = True                         
+        elif event.key() == QtCore.Qt.Key_Right:
+            self.renderer.trans_x -= offsetTrans
             redraw = True
+        elif event.key() == QtCore.Qt.Key_Up:
+            self.renderer.trans_y -= offsetTrans
+            redraw = True
+        elif event.key() == QtCore.Qt.Key_Down:
+            self.renderer.trans_y += offsetTrans
+            redraw = True                                
+        
         if redraw :
             self.updateGL()
     
+            
+    def mousePressEvent(self, event):      
+        self.lastPos_x = event.pos().x()
+        self.lastPos_y = event.pos().y()
+                
+    def mouseMoveEvent(self, event):
+        self.dx = (event.pos().x() - self.lastPos_x ) 
+        self.dy =  (event.pos().y() - self.lastPos_y ) 
+        
+        self.lastPos_x += self.dx
+        self.lastPos_y += self.dy
+        
+        self.renderer.trans_x += (self.dx * 2.0 / self.width() * self.renderer.scale) 
+        self.renderer.trans_y -= (self.dy * 2.0 / self.height() * self.renderer.scale)
+        self.updateGL()
+        
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = Window()
+    widget = MyWidget()
     widget.show()
     app.exec_()    
