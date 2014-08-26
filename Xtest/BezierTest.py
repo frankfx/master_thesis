@@ -1,8 +1,4 @@
-# Parameter 0 <= t <= 1 #include <stdio.h>
-
-
-
-
+import math
 class Bezier():
 
     # Start value
@@ -14,9 +10,17 @@ class Bezier():
         AB = A*s + B*t
         BC = B*s + C*t
         CD = C*s + D*t
-        ABC = AB*s + CD*t
+       # ABC = AB*s + CD*t
+        ABC = BC*s + CD*t;
         BCD = BC*s + CD*t
         return ABC*s + BCD*t
+
+
+    def bezier2(self, P_0, P_1, P_2, P_3, t) :   
+        return (math.pow((1-t), 3) * P_0) + \
+                (3 * math.pow((1-t),2) * t * P_1) + \
+                (3 * (1-t) * t * t * P_2) + \
+                (math.pow(t,3) * P_3)
 
     def test(self):
         a = 10.0
@@ -30,7 +34,7 @@ class Bezier():
             if (t>1.0) :
                 break
             print("Bezier pt= %f\n" % self.bezier(a,b,c,d,t))
-            t += 0.5
+            t += 0.001
     
         return 1
 

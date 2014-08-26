@@ -8,6 +8,8 @@ from PySide import QtOpenGL, QtGui, QtCore
 from cpacsHandler import CPACS_Handler
 from config import Config
 from PySide.QtGui import QPushButton
+from Xtest.BezierTest import Bezier
+
 try:
     from OpenGL import GL, GLU
 except ImportError:
@@ -27,11 +29,21 @@ class Renderer():
         self.width = -1
         self.height = -1
         self.fovy = 64.0
+        self.besier = Bezier()
+        self.flag = 0
+        self.ctrlpoints = [
+                          [-0.4, -0.4, 0.0],
+                          [-0.2,  0.4, 0.0],
+                          [ 0.2, -0.4, 0.0],
+                          [ 0.4,  0.4, 0.0]
+                         ]        
 
     def init(self):
         # GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glEnable(GL.GL_COLOR_MATERIAL)
         GL.glClearColor(1.0, 1.0 , 1.0, 1.0)        
+
+        GL.glShadeModel(GL.GL_FLAT)
     
     def resize(self, w, h):
         self.width , self.height = w , h
@@ -39,22 +51,39 @@ class Renderer():
                                    
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        GLU.gluPerspective (self.fovy * self.scale, w*1.0/h, 0.0, 10.0)
+        #GLU.gluPerspective (self.fovy * self.scale, w*1.0/h, 0.0, 10.0)
         
     def display(self):
+        
+        #------------------------------------------------------------------ i= 0
+#------------------------------------------------------------------------------ 
+        #------------------------------------ GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+        #------------------------------------------- GL.glColor3f(0.0, 0.0, 0.0)
+        #------------------------------------------ GL.glBegin(GL.GL_LINE_STRIP)
+        #----------------------------------------------- for i in range(0, 31) :
+            #------------------------------------------ GL.glEvalCoord1f(i/30.0)
+        #------------------------------------------------------------ GL.glEnd()
+        #-------- ''' The following code displays the control points as dots.'''
+        #--------------------------------------------------- GL.glPointSize(5.0)
+        #------------------------------------------- GL.glColor3f(1.0, 1.0, 0.0)
+        #---------------------------------------------- GL.glBegin(GL.GL_POINTS)
+        #------------------------------------------------- for j in range(0, 4):
+            # GL.glVertex3f(self.ctrlpoints[j][0], self.ctrlpoints[j][1], self.ctrlpoints[j][2])
+        #------------------------------------------------------------ GL.glEnd()
+        
+        
+        
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         GLU.gluPerspective (self.fovy * self.scale, self.width*1.0/self.height, 0.0, 10.0)
-        print self.width*1.0/self.height   
-           
-              
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
+
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
         GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()        
+        GL.glLoadIdentity()
 
         GL.glTranslatef(self.trans_x,self.trans_y,-1.5)
-        
+
         self.drawGrid()
         self.drawProfile()
 
@@ -66,41 +95,100 @@ class Renderer():
         vecY = self.tixi.getVectorY('NACA0009')
         vecZ = self.tixi.getVectorZ('NACA0009')
         
-        print vecX
-        ctrlpts =[]
-        llist = []
-        
-        for i in range (0, len(vecX), 1) :
-            llist.append( [vecX[i], vecZ[i], vecY[i]] )
-           
-        for j in range (0, len(llist)-3, 4) :
-            ctrlpts.append( [   [llist[j], llist[j+1], llist[j+2], llist[j+3]]    ] )
-        
         chord_min_idx = self.get_index_of_min(vecX)
         chord_max_idx = self.get_index_of_max(vecX)
-        
+
+        if(self.flag == 0):
+            print "bezier"
+            vecX2 = self.createBezierList(vecX)
+            vecY2 = self.createBezierList(vecY)
+            vecZ2 = self.createBezierList(vecZ)  
+            # draw profile        
+            GL.glColor3f(0, 0, 1)
+            #GL.glTranslatef(-self.norm_vec_list(vecX),0, 0)
+            #GL.glTranslatef(self.tx, self.ty, 0)
+            GL.glBegin(GL.GL_LINE_LOOP)
+            for i in range (0, len(vecX2)) :
+                for j in range (0, 4) :
+                    GL.glVertex3f(vecX2[i], vecZ2[i], vecY2[i])
+            GL.glEnd()             
+        elif(self.flag == 1) :
+            print "normal"
+            # draw profile        
+            GL.glColor3f(0, 0, 1)
+            #GL.glTranslatef(-self.norm_vec_list(vecX),0, 0)
+            #GL.glTranslatef(self.tx, self.ty, 0)
+            GL.glBegin(GL.GL_LINE_LOOP)
+            for i in range (0, len(vecX)) :
+                GL.glVertex3f(vecX[i], vecZ[i], vecY[i])
+            GL.glEnd()
+        else:
+            i= 0
+            vec = self.createList(vecX, vecZ, vecY)
+            
+            GL.glMap1f(GL.GL_MAP1_VERTEX_3, 0.0, 1.0, vec)
+            GL.glEnable(GL.GL_MAP1_VERTEX_3)
+            
+            GL.glBegin(GL.GL_LINE_STRIP)
+            for i in range(0, 31) :
+                GL.glEvalCoord1f(i/30.0)
+            GL.glEnd()
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+#        def drawSomething(self):
+
+          
+          
         # draw profile        
-        GL.glColor3f(0, 0, 1)
         #GL.glTranslatef(-self.norm_vec_list(vecX),0, 0)
         #GL.glTranslatef(self.tx, self.ty, 0)
-        GL.glMap1f(GL.GL_MAP1_VERTEX_3, 0.0, 1.0, ctrlpts)
-        GL.glEnable(GL.GL_MAP1_VERTEX_3)
-        GL.glBegin(GL.GL_LINE_LOOP)
-        for i in range (0, len(vecX)) :
-       #     GL.glVertex3f(vecX[i], vecZ[i], vecY[i])
-            GL.glEvalCoord1f(i/30.0)    
-        GL.glEnd()
-        GL.glDisable(GL.GL_MAP1_VERTEX_3)
+
         
         # draw chord
-        GL.glLineStipple(2, 0xAAAA)
-        GL.glEnable(GL.GL_LINE_STIPPLE)
-        GL.glBegin(GL.GL_LINES)
-        GL.glVertex3f(vecX[chord_min_idx], vecZ[chord_min_idx], vecY[chord_min_idx])
-        GL.glVertex3f(vecX[chord_max_idx], vecZ[chord_max_idx], vecY[chord_max_idx])
-        GL.glEnd()    
-        GL.glDisable(GL.GL_LINE_STIPPLE) 
+        #------------------------------------------- GL.glLineStipple(2, 0xAAAA)
+        #--------------------------------------- GL.glEnable(GL.GL_LINE_STIPPLE)
+        #----------------------------------------------- GL.glBegin(GL.GL_LINES)
+        # GL.glVertex3f(vecX[chord_min_idx], vecZ[chord_min_idx], vecY[chord_min_idx])
+        # GL.glVertex3f(vecX[chord_max_idx], vecZ[chord_max_idx], vecY[chord_max_idx])
+        #------------------------------------------------------------ GL.glEnd()
+        #-------------------------------------- GL.glDisable(GL.GL_LINE_STIPPLE)
     
+    def createBezierList(self, vlist):
+        res = []
+        
+        for i in range(0, len(vlist)-3, 4) :
+            t = 0
+            while True :
+                if (t>1.0) :
+                    break
+                res.append( self.besier.bezier(vlist[i], vlist[i+1], vlist[i+2], vlist[i+3],t) )
+                t += 0.001  
+
+        return res
+
+
+    def createList(self, list1, list2, list3):
+        res = []
+        res2 = []
+        
+        for i in range(0, len(list1), 1) :
+            res.append([list1[i],list2[i],list3[i]])
+            
+        lengthres = len(res)
+        for j in range(0, lengthres-3, 4) :
+            res2.append([ res[j], res[j+1], res[j+2], res[j+3] ])
+        
+        print res2
+        
+        return res2
+
 
     def get_index_of_min(self, vlist):
         res = vlist[0]
@@ -204,6 +292,11 @@ class MyWidget(QtOpenGL.QGLWidget):
         redraw = False
         offsetScl = 0.008
         offsetTrans = 0.02
+        if event.modifiers() == QtCore.Qt.ControlModifier and event.key() == QtCore.Qt.Key_N :
+            if self.renderer.flag > 2 :
+                self.renderer.flag = 0
+            else : self.renderer.flag += 1
+            redraw = True
         if event.key() == QtCore.Qt.Key_Plus:
             self.renderer.scale -= offsetScl
             redraw = True
