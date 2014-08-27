@@ -5,7 +5,7 @@
 \contentsline {chapter}{\numberline {1}Einleitung}{1}{chapter.1}
 \contentsline {section}{\numberline {1.1}Motivation}{1}{section.1.1}
 \contentsline {section}{\numberline {1.2}Ziele}{1}{section.1.2}
-\contentsline {subsubsection}{Echtzeit}{1}{section*.4}
+\contentsline {subsubsection}{Echtzeit}{2}{section*.4}
 \contentsline {subsubsection}{Kosten}{2}{section*.5}
 \contentsline {section}{\numberline {1.3}Aufbau der Arbeit}{2}{section.1.3}
 \contentsline {section}{\numberline {1.4}Verwandte Arbeiten}{2}{section.1.4}
@@ -21,14 +21,14 @@
 \contentsline {section}{\numberline {3.4}Beispiel f\"ur eine Vektorgrafik}{8}{section.3.4}
 \contentsline {section}{\numberline {3.5}Beispiel f\"ur eine Vektorgrafik mit mathematischen Symbolen}{9}{section.3.5}
 \contentsline {section}{\numberline {3.6}Beispiel f\"ur eine Rastergrafik}{9}{section.3.6}
-\contentsline {section}{\numberline {3.7}Beispiel f\"ur die Darstellung von Algorithmen}{10}{section.3.7}
-\contentsline {section}{\numberline {3.8}Beispiel f\"ur die Darstellung von Quellcode-Ausz\"ugen}{10}{section.3.8}
-\contentsline {chapter}{\numberline {4}Ergebnisse und Evaluation}{12}{chapter.4}
-\contentsline {chapter}{\numberline {5}Zusammenfassung und Ausblick}{14}{chapter.5}
-\contentsline {chapter}{Abk\"urzungsverzeichnis}{16}{chapter*.13}
-\contentsline {chapter}{Abbildungsverzeichnis}{18}{chapter*.14}
-\contentsline {chapter}{Tabellenverzeichnis}{19}{chapter*.15}
-\contentsline {chapter}{Liste der Algorithmen}{21}{section*.16}
-\contentsline {chapter}{Listings}{23}{section*.18}
-\contentsline {chapter}{\numberline {A}Anhang}{25}{appendix.A}
-\contentsline {chapter}{Danksagung}{26}{appendix*.22}
+\contentsline {section}{\numberline {3.7}Beispiel f\"ur die Darstellung von Algorithmen}{11}{section.3.7}
+\contentsline {section}{\numberline {3.8}Beispiel f\"ur die Darstellung von Quellcode-Ausz\"ugen}{11}{section.3.8}
+\contentsline {chapter}{\numberline {4}Ergebnisse und Evaluation}{13}{chapter.4}
+\contentsline {chapter}{\numberline {5}Zusammenfassung und Ausblick}{15}{chapter.5}
+\contentsline {chapter}{Abk\"urzungsverzeichnis}{17}{chapter*.13}
+\contentsline {chapter}{Abbildungsverzeichnis}{19}{chapter*.14}
+\contentsline {chapter}{Tabellenverzeichnis}{20}{chapter*.15}
+\contentsline {chapter}{Liste der Algorithmen}{22}{section*.16}
+\contentsline {chapter}{Listings}{24}{section*.18}
+\contentsline {chapter}{\numberline {A}Anhang}{26}{appendix.A}
+\contentsline {chapter}{Danksagung}{27}{appendix*.22}

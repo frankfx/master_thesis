@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=latex 2014.8.10)  10 AUG 2014 19:44
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  26 AUG 2014 22:02
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -28,8 +28,7 @@ Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
 \every@verbatim=\toks14
 \verbatim@line=\toks15
 \verbatim@in@stream=\read1
-)
-No file test.aux.
+) (./test.aux)
 \openout1 = `test.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 9.
@@ -56,16 +55,27 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 12.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <5> on input line 12.
-[1
+ [1
 
-] (./test.aux) ) 
+{/usr/share/texmf/fonts/map/pdftex/updmap/pdftex.map}] (./test.aux) ) 
 Here is how much of TeX's memory you used:
- 260 strings out of 493316
- 2921 string characters out of 6145919
- 55155 words of memory out of 5000000
+ 263 strings out of 493315
+ 2949 string characters out of 6145893
+ 55158 words of memory out of 5000000
  3786 multiletter control sequences out of 15000+600000
  7804 words of font info for 28 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
  23i,6n,17p,264b,186s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/shar
+e/texmf/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf/fonts/type1/
+public/amsfonts/cm/cmr12.pfb></usr/share/texmf/fonts/type1/public/amsfonts/cm/c
+mr17.pfb></usr/share/texmf/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/
+texmf/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share/texmf/fonts/type1/p
+ublic/amsfonts/cm/cmtt10.pfb>
+Output written on test.pdf (1 page, 71114 bytes).
+PDF statistics:
+ 32 PDF objects out of 1000 (max. 8388607)
+ 22 compressed objects within 1 object stream
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
-Output written on test.dvi (1 page, 2044 bytes).

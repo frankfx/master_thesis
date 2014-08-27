@@ -20,6 +20,17 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
+class Point :
+    def __init__(self, idx, x, y, z):
+        self._id = idx
+        self._x = x
+        self._y = y
+        self._z = z
+
+
+    def PrintPoint(self) :
+        print("Point %d = <%f, %f, %f>\n" % (self._id, self._x, self._y, self._z))
+
 class Renderer():
     OPEN, CLOSED = range(2)
     DEFAULT, BEZIER_NEW, BEZIER_NEW_4, BEZIER_OPENGL = range(4)
@@ -78,6 +89,8 @@ class Renderer():
         vecX = self.tixi.getVectorX('NACA0009')
         vecY = self.tixi.getVectorY('NACA0009')
         vecZ = self.tixi.getVectorZ('NACA0009')
+        
+        plist = self.creatBezierList(vecX, vecY, vecZ)
 
         GL.glTranslatef(-self.norm_vec_list(vecX),0, 0)
         GL.glColor3f(0, 0, 1)
@@ -90,53 +103,26 @@ class Renderer():
             GL.glEnd()
         elif self.flag_view_algo == Renderer.BEZIER_NEW :
             print "BEZIER_NEW"
-            t = 31
-            GL.glBegin(GL.GL_LINE_LOOP)
-            for i in range(0, t, 1):
-                pos = i*1.0 / t
-                x = self.bezierCurve_full(pos, vecX)
-                y = self.bezierCurve_full(pos, vecY)
-                z = self.bezierCurve_full(pos, vecZ)
-
-                GL.glVertex3f(x, z, y)            
+            GL.glBegin(GL.GL_LINE_STRIP)
+            for i in range (0, len(plist), 1) :
+                GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])                
             GL.glEnd()
-            
         elif self.flag_view_algo == Renderer.BEZIER_NEW_4 :
             print "BEZIER_NEW_4"        
-            t = 31
-            GL.glBegin(GL.GL_LINE_LOOP)
-            for a in range(0, len(vecX), 1) :  
-                tmp = []
-                hlp = 4 if a < len(vecX) - 3 else len(vecX) - a
-                
-                if hlp < 4 : break
-                
-                for b in range (a, a + hlp, 1) :
-                    tmp.append([ vecX[b], vecY[b], vecZ[b] ])
-                  
-                for i in range(0, t, 1):
-                    print "sdfsdfsdf"
-                    pos = i*1.0 / t
-                    x = self.bezierCurve(pos, tmp[0][0], tmp[1][0], tmp[2][0], tmp[3][0])
-                    y = self.bezierCurve(pos, tmp[0][1], tmp[1][1], tmp[2][1], tmp[3][1])
-                    z = self.bezierCurve(pos, tmp[0][2], tmp[1][2], tmp[2][2], tmp[3][2])
-                            
-                    GL.glVertex3f(x, z, y)                
+            GL.glBegin(GL.GL_LINE_LOOP) 
+            for i in range (0, len(plist), 1) :
+                GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])                
             GL.glEnd()
-            
-            
         elif self.flag_view_algo == Renderer.BEZIER_OPENGL :
             print "BEZIER_OPENGL"
-            plist = self.to_opengl_bezier_list(vecX, vecZ, vecY)
-            GL.glColor3f(0.0, 0.0, 1.0)
-            for a in range (0, len(plist), 7):
+            for a in range (0, len(plist), 3):
                 tmp = []
-                hlp = 8  if a < len(plist) -7 else len(plist) - a
+                hlp = 4  if a < len(plist) -3 else len(plist) - a
                 
                 for b in range (a, a + hlp, 1) :
                     tmp.append(plist[b])
                 
-                if hlp < 8 and self.flag_view == Renderer.CLOSED :
+                if hlp < 4 and self.flag_view == Renderer.CLOSED :
                     tmp.append(plist[0])
     
                 GL.glMap1f(GL.GL_MAP1_VERTEX_3, 0.0, 1.0, tmp)
@@ -145,7 +131,7 @@ class Renderer():
                 for i in range (0, 31, 1):
                     GL.glEvalCoord1f(i/30.0)
                 GL.glEnd()
-                if (hlp < 8) :
+                if (hlp < 4) :
                     break
         else :
             print "NOTHING"
@@ -158,42 +144,39 @@ class Renderer():
         for i in range (0, len(vecX), 1):
             GL.glVertex3f(vecX[i], vecZ[i], vecY[i])
         GL.glEnd()  
+
     
-    def to_opengl_bezier_list(self, l1, l2, l3):
+    def compute_bezier_tangent(self, p1, p2):
+        dx = (p2._x - p1._x) / 3
+        dy = (p2._y - p1._y) / 3
+
+        x3 = p1._x + dx
+        y3 = p1._y + dy
+
+        x4 = x3 + dx
+        y4 = y3 + dy
+    
+        return Point(3 ,x3, y3, 0) , Point(4, x4, y4, 0)
+    
+
+    def creatBezierList(self, l_x, l_y, l_z, t=1):
         res = []
-        for i in range(0, len(l1)) :
-            res.append([ l1[i], l2[i], l3[i] ])
+                
+        for i in range(0, len(l_z)-1, 1) :  
+            start = Point(1, l_x[i],   l_z[i]  , l_y[i])
+            end   = Point(2, l_x[i+1], l_z[i+1], l_y[i+1])
+            tan1, tan2 = self.compute_bezier_tangent(start, end)
+                  
+            for j in range(0, t, 1):
+                pos = j*1.0 / t
+                x = self.bezierCurve_full(pos, [ start._x, tan1._x, tan2._x, end._x ])
+                y = self.bezierCurve_full(pos, [ start._y, tan1._y, tan2._y, end._y ])
+                z = self.bezierCurve_full(pos, [ start._z, tan1._z, tan2._z, end._z ])
+                
+                res.append([x,y,z])    
+
         return res
 
-    def creatBezierList(self, t, l1, l2, l3):
-        res = []
-        
-        for z in range(0, len(l1)) :
-            res.append([ l1[z], l2[z], l3[z] ])
-        
-        for a in range(0, len(l1), 1) :  
-            tmp = []
-            hlp = 4 if a < len(l1) - 3 else len(l2) - a
-                
-            if hlp < 4 : break
-                
-            for b in range (a, a + hlp, 1) :
-                tmp.append([ l1[b], l2[b], l3[b] ])
-                  
-            for i in range(0, t, 1):
-                pos = i*1.0 / t
-                x = self.bezierCurve(pos, tmp[0][0], tmp[1][0], tmp[2][0], tmp[3][0])
-                y = self.bezierCurve(pos, tmp[0][1], tmp[1][1], tmp[2][1], tmp[3][1])
-                z = self.bezierCurve(pos, tmp[0][2], tmp[1][2], tmp[2][2], tmp[3][2])
-                
-                res.append([x,y,z])            
-            
-            res.sort(cmp=self.compare(), key=None, reverse=False)
-            
-            for u in range(0, len(res))
-
-    def compare(self, x1, x2):
-        return x1[0] > x2[0]
         
     def drawGrid(self, x_fr = -0.9, x_to = 0.9, y_fr = -0.9, y_to = 0.9, no_lines = 6):
         GL.glColor3f(1, 0.85, 0.55)
