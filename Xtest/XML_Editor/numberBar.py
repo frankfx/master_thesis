@@ -20,7 +20,7 @@ class NumberBar(QtGui.QWidget):
     def setTextEdit(self, stats):
         self.states = stats
         self.edit = stats.get("editor")
-        self.flag = False
+        self.flag_view_algo = False
  
     def update(self):
         '''
@@ -47,9 +47,9 @@ class NumberBar(QtGui.QWidget):
  
     def paintEvent(self, event):
         if(self.states.get("searchbox").isFocused()) :
-            self.flag = True
+            self.flag_view_algo = True
         else :
-            self.flag = False
+            self.flag_view_algo = False
         
         contents_y = self.edit.verticalScrollBar().value()
         page_bottom = contents_y + self.edit.viewport().height()
@@ -99,6 +99,6 @@ class NumberBar(QtGui.QWidget):
  
         QtGui.QWidget.paintEvent(self, event)
         
-        if self.flag == True :
+        if self.flag_view_algo == True :
             self.states.get("searchbox").setFocus()      
         
