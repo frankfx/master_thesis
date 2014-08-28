@@ -5,10 +5,10 @@ Created on Aug 5, 2014
 '''
 import sys
 from PySide.QtGui import QTextDocument, QMainWindow, QTextEdit, QApplication
-# from cpacsPy.tixi import tixiwrapper
-# from cpacsPy.tigl import tiglwrapper
-import tiglwrapper
-import tixiwrapper
+from cpacsPy.tixi import tixiwrapper
+from cpacsPy.tigl import tiglwrapper
+#import tiglwrapper
+#import tixiwrapper
 from config import Config
 import re
 
@@ -30,15 +30,18 @@ class CPACS_Handler():
 
     def getVectorX(self, prof_uid):
         xpath = self.tixi.uIDGetXPath(prof_uid)
-        return self.tixi.getFloatVector(xpath + "/pointList/x", 31)
+        numX = self.tixi.getVectorSize(xpath + "/pointList/x")
+        return self.tixi.getFloatVector(xpath + "/pointList/x",numX)
 
     def getVectorY(self, prof_uid):
         xpath = self.tixi.uIDGetXPath(prof_uid)
-        return self.tixi.getFloatVector(xpath + "/pointList/y",31)
+        numY = self.tixi.getVectorSize(xpath + "/pointList/y")
+        return self.tixi.getFloatVector(xpath + "/pointList/y",numY)
     
     def getVectorZ(self, prof_uid):
         xpath = self.tixi.uIDGetXPath(prof_uid)
-        return self.tixi.getFloatVector(xpath + "/pointList/z",31)    
+        numZ = self.tixi.getVectorSize(xpath + "/pointList/z")
+        return self.tixi.getFloatVector(xpath + "/pointList/z",numZ)  
             
     def updatedictionary(self,path_dict, path_schema):
         dict_file = open(path_dict)

@@ -68,6 +68,21 @@ class Renderer:
         
         GL.glFlush()
 
+
+        
+    def split_profile(self, l_1, l_2, l_3):
+        l_fst = []
+        l_snd = []
+        for i in range(0, len(l_1)-1, 1) :
+            if l_1[i] > l_1[i+1] :
+                l_fst.append([ l_1[i], l_2[i], l_3[i] ]) 
+            else:
+                break
+        for j in range(j, len(l_1), 1) :
+            l_snd.append([ l_1[i], l_2[i], l_3[i] ])
+
+        return l_fst , l_snd
+
     def resize(self, w, h) :
         v = 0.5
         GL.glViewport(0, 0, w, h)
@@ -88,8 +103,12 @@ class MyWidget(QtOpenGL.QGLWidget):
         self.resize(620,620)
         self.setWindowTitle("Rene Test")
 
+
+
         self.renderer = Renderer()    
         self.renderer.set_flag_view(Renderer.CLOSED)
+        
+        self.rede
     
     def initializeGL(self):
         self.renderer.init()
