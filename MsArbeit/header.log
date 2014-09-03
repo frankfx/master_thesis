@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  30 AUG 2014 14:44
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  2 SEP 2014 10:59
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -38,31 +38,28 @@ Package tocbasic Info: omitting babel extension for `lof'
 Package tocbasic Info: omitting babel extension for `lot'
 (tocbasic)             because of feature `nobabel' available
 (tocbasic)             for `lot' on input line 119.
-Package scrreprt Info: You've used obsolete option `11pt'.
-(scrreprt)             \KOMAExecuteOptions{fontsize=11pt} will be
+Package scrreprt Info: You've used obsolete option `12pt'.
+(scrreprt)             \KOMAExecuteOptions{fontsize=12pt} will be
 (scrreprt)             used instead.
-(scrreprt)             You may simply replace `11pt'
-(scrreprt)             by `fontsize=11pt'.
-
-
-Class scrreprt Warning: You've used obsolete option `bibtotoc'.
-(scrreprt)              Usage of this option indicates an old document and
-(scrreprt)              changes compatibility level using
-(scrreprt)              `bibliography=totoc,version=first'.
-(scrreprt)              If you don't want this, you should simply replace
-(scrreprt)              usage of option `bibtotoc' by `bibliography=totoc'.
-
-Class scrreprt Info: Switching compatibility level to `first'.
-Class scrreprt Info: You've used standard option `abstracton'.
+(scrreprt)             You may simply replace `12pt'
+(scrreprt)             by `fontsize=12pt'.
+Class scrreprt Info: You've used standard option `oneside'.
 (scrreprt)           This is correct!
-(scrreprt)           Internally I'm using `abstract=true'.
+(scrreprt)           Internally I'm using `twoside=false'.
 (scrreprt)           If you'd like to set the option with \KOMAoptions,
-(scrreprt)           you'd have to use `abstract=true' there
-(scrreprt)           instead of `abstracton', too.
-Class scrreprt Info: File `scrsize11pt.clo' used to setup font sizes on input l
+(scrreprt)           you'd have to use `twoside=false' there
+(scrreprt)           instead of `oneside', too.
+Class scrreprt Info: You've used standard option `final'.
+(scrreprt)           This is correct!
+(scrreprt)           Internally I'm using `draft=false'.
+(scrreprt)           If you'd like to set the option with \KOMAoptions,
+(scrreprt)           you'd have to use `draft=false' there
+(scrreprt)           instead of `final', too.
+Class scrreprt Info: File `scrsize12pt.clo' used to setup font sizes on input l
 ine 1367.
-(/usr/share/texmf/tex/latex/koma-script/scrsize11pt.clo
-File: scrsize11pt.clo 2012/07/29 v3.11b KOMA-Script font size class option (11p
+
+(/usr/share/texmf/tex/latex/koma-script/scrsize12pt.clo
+File: scrsize12pt.clo 2012/07/29 v3.11b KOMA-Script font size class option (12p
 t)
 )
 (/usr/share/texmf/tex/latex/koma-script/typearea.sty
@@ -80,25 +77,31 @@ Package typearea Info: You've used standard option `a4paper'.
 (typearea)             If you'd like to set the option with \KOMAoptions,
 (typearea)             you'd have to use `paper=a4' there
 (typearea)             instead of `a4paper', too.
+Package typearea Info: You've used standard option `oneside'.
+(typearea)             This is correct!
+(typearea)             Internally I'm using `twoside=false'.
+(typearea)             If you'd like to set the option with \KOMAoptions,
+(typearea)             you'd have to use `twoside=false' there
+(typearea)             instead of `oneside', too.
 \ta@hblk=\skip42
 \ta@vblk=\skip43
 \ta@temp=\skip44
 Package typearea Info: These are the values describing the layout:
-(typearea)             DIV  = 10
+(typearea)             DIV  = 12
 (typearea)             BCOR = 0.0pt
 (typearea)             \paperwidth      = 597.50793pt
-(typearea)              \textwidth      = 418.25555pt
+(typearea)              \textwidth      = 448.13095pt
 (typearea)              DIV departure   = -6%
-(typearea)              \evensidemargin = 17.3562pt
-(typearea)              \oddsidemargin  = 17.3562pt
+(typearea)              \evensidemargin = 2.4185pt
+(typearea)              \oddsidemargin  = 2.4185pt
 (typearea)             \paperheight     = 845.04694pt
-(typearea)              \textheight     = 595.80026pt
-(typearea)              \topmargin      = -25.16531pt
-(typearea)              \headheight     = 17.0pt
-(typearea)              \headsep        = 20.40001pt
-(typearea)              \topskip        = 11.0pt
-(typearea)              \footskip       = 47.60002pt
-(typearea)              \baselineskip   = 13.6pt
+(typearea)              \textheight     = 635.5pt
+(typearea)              \topmargin      = -41.72441pt
+(typearea)              \headheight     = 18.125pt
+(typearea)              \headsep        = 21.75pt
+(typearea)              \topskip        = 12.0pt
+(typearea)              \footskip       = 50.75pt
+(typearea)              \baselineskip   = 14.5pt
 (typearea)              on input line 1213.
 )
 \c@part=\count80
@@ -276,6 +279,7 @@ File: pd1enc.def 2012/11/06 v6.83m Hyperref: PDFDocEncoding definition (HO)
 (/usr/share/texmf/tex/latex/latexconfig/hyperref.cfg
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
 )
+Package hyperref Info: Option `final' set `true' on input line 4319.
 Package hyperref Info: Option `colorlinks' set `false' on input line 4319.
 Package hyperref Info: Hyper figures OFF on input line 4443.
 Package hyperref Info: Link nesting OFF on input line 4448.
@@ -485,6 +489,24 @@ Package color Info: Driver file: pdftex.def on input line 130.
 \everycr=\toks24
 \minrowclearance=\skip75
 )
+(/usr/share/texmf/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2007/01/21 v2.11 LaTeX color extensions (UK)
+
+(/usr/share/texmf/tex/latex/latexconfig/color.cfg
+File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
+)
+Package xcolor Info: Driver file: pdftex.def on input line 225.
+LaTeX Info: Redefining \color on input line 702.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1337.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1341.
+Package xcolor Info: Model `RGB' extended on input line 1353.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1355.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1356.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1357.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1358.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1359.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1360.
+)
 (/usr/share/texmf/tex/latex/listings/listings.sty
 \lst@mode=\count127
 \lst@gtempboxa=\box37
@@ -509,17 +531,12 @@ File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
 File: listings.cfg 2007/02/22 1.4 listings configuration
 ))
 Package: listings 2007/02/22 1.4 (Carsten Heinz)
-Package color Info: Redefining color red on input line 52.
-Package color Info: Redefining color black on input line 56.
 
 (/usr/share/texmf/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
 (/usr/share/texmf/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
-)
-(/usr/share/texmf/tex/latex/listings/lstmisc.sty
-File: lstmisc.sty 2007/02/22 1.4 (Carsten Heinz)
 )
 (/usr/share/texmf/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
@@ -609,7 +626,7 @@ Package: longtable 2004/02/01 v4.11 Multi-page Table package (DPC)
 \c@LT@chunks=\count145
 \LT@p@ftn=\toks26
 )
-Class scrreprt Info: longtable captions redefined on input line 135.
+Class scrreprt Info: longtable captions redefined on input line 153.
 
 (/usr/share/texmf/tex/latex/lm/lmodern.sty
 Package: lmodern 2009/10/30 v1.6 Latin Modern Fonts
@@ -667,30 +684,34 @@ Package microtype Info: Loading configuration file microtype.cfg.
 (/usr/share/texmf/tex/latex/microtype/microtype.cfg
 File: microtype.cfg 2013/05/23 v2.5a microtype main configuration file (RS)
 ))
-No file header.aux.
+
+LaTeX Warning: File `cpuAnno.dat' already exists on the system.
+               Not generating it from this source.
+
+(./header.aux)
 \openout1 = `header.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 153.
-LaTeX Font Info:    ... okay on input line 153.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 153.
-LaTeX Font Info:    ... okay on input line 153.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 153.
-LaTeX Font Info:    ... okay on input line 153.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 153.
-LaTeX Font Info:    ... okay on input line 153.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 153.
-LaTeX Font Info:    ... okay on input line 153.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 153.
-LaTeX Font Info:    ... okay on input line 153.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 153.
-LaTeX Font Info:    ... okay on input line 153.
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 153.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 187.
+LaTeX Font Info:    ... okay on input line 187.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 187.
+LaTeX Font Info:    ... okay on input line 187.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 187.
+LaTeX Font Info:    ... okay on input line 187.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 187.
+LaTeX Font Info:    ... okay on input line 187.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 187.
+LaTeX Font Info:    ... okay on input line 187.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 187.
+LaTeX Font Info:    ... okay on input line 187.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 187.
+LaTeX Font Info:    ... okay on input line 187.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 187.
 
-(/usr/share/texmf/tex/latex/lm/ot1lmr.fd
+ (/usr/share/texmf/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 \AtBeginShipoutBox=\box43
-Package hyperref Info: Link coloring OFF on input line 153.
+Package hyperref Info: Link coloring OFF on input line 187.
 
 (/usr/share/texmf/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -700,14 +721,15 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count148
 )
-LaTeX Info: Redefining \ref on input line 153.
-LaTeX Info: Redefining \pageref on input line 153.
-LaTeX Info: Redefining \nameref on input line 153.
+LaTeX Info: Redefining \ref on input line 187.
+LaTeX Info: Redefining \pageref on input line 187.
+LaTeX Info: Redefining \nameref on input line 187.
+ (./header.out)
+(./header.out)
 \@outlinefile=\write4
 \openout4 = `header.out'.
 
-
-(/usr/share/texmf/tex/context/base/supp-pdf.mkii
+ (/usr/share/texmf/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count149
 \scratchdimen=\dimen158
@@ -743,8 +765,8 @@ Package caption Info: longtable package is loaded.
 Package: ltcaption 2013/02/03 v1.3-62 longtable captions (AR)
 )
 Package caption Info: End \AtBeginDocument code.
-LaTeX Info: Redefining \dots on input line 153.
-LaTeX Info: Redefining \microtypecontext on input line 153.
+LaTeX Info: Redefining \dots on input line 187.
+LaTeX Info: Redefining \microtypecontext on input line 187.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -758,17 +780,68 @@ Package microtype Info: No adjustment of character kerning.
 (/usr/share/texmf/tex/latex/microtype/mt-cmr.cfg
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
+) (./chapters/Titelblatt.tex
+<fig/siegel_uni.pdf, id=4, 220.825pt x 76.285pt>
+File: fig/siegel_uni.pdf Graphic file (type pdf)
+ <use fig/siegel_uni.pdf>
+Package pdftex.def Info: fig/siegel_uni.pdf used on input line 6.
+(pdftex.def)             Requested size: 220.82445pt x 76.2848pt.
+
+Overfull \hbox (166.76422pt too wide) in paragraph at lines 6--7
+[][] 
+ []
+
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 7.
+(/usr/share/texmf/tex/latex/lm/omllmm.fd
+File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-<fig/unilogo.pdf, id=4, 489.4512pt x 167.33328pt>
-File: fig/unilogo.pdf Graphic file (type pdf)
- <use fig/unilogo.pdf>
-Package pdftex.def Info: fig/unilogo.pdf used on input line 161.
-(pdftex.def)             Requested size: 334.60571pt x 114.39536pt.
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 7.
 
-[1
+(/usr/share/texmf/tex/latex/lm/omslmsy.fd
+File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 7.
+
+(/usr/share/texmf/tex/latex/lm/omxlmex.fd
+File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <12> on input line 7.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 7.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 7.
+LaTeX Font Info:    Try loading font information for U+msa on input line 7.
+
+(/usr/share/texmf/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+(/usr/share/texmf/tex/latex/microtype/mt-msa.cfg
+File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 7.
+
+(/usr/share/texmf/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+(/usr/share/texmf/tex/latex/microtype/mt-msb.cfg
+File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+)
+LaTeX Font Info:    Try loading font information for OT1+lmss on input line 10.
 
 
-{/usr/share/texmf/fonts/map/pdftex/updmap/pdftex.map} <./fig/unilogo.pdf>]
+(/usr/share/texmf/tex/latex/lm/ot1lmss.fd
+File: ot1lmss.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+Package microtype Info: Loading generic settings for font family
+(microtype)             `lmss' (encoding: OT1).
+(microtype)             For optimal results, create family-specific settings.
+(microtype)             See the microtype manual for details.
+ [1
+
+
+
+{/usr/share/texmf/fonts/map/pdftex/updmap/pdftex.map} <./fig/siegel_uni.pdf>]) 
 [2] [3] [4])
 ! Emergency stop.
 <*> header.tex
@@ -777,11 +850,11 @@ Package pdftex.def Info: fig/unilogo.pdf used on input line 161.
 
  
 Here is how much of TeX's memory you used:
- 14546 strings out of 493315
- 219033 string characters out of 6145893
- 398775 words of memory out of 5000000
- 17788 multiletter control sequences out of 15000+600000
- 30827 words of font info for 28 fonts, out of 8000000 for 9000
+ 15139 strings out of 493315
+ 226864 string characters out of 6145893
+ 407653 words of memory out of 5000000
+ 18301 multiletter control sequences out of 15000+600000
+ 48320 words of font info for 55 fonts, out of 8000000 for 9000
  958 hyphenation exceptions out of 8191
- 40i,6n,58p,268b,408s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 40i,6n,49p,268b,446s stack positions out of 5000i,500n,10000p,200000b,80000s
 !  ==> Fatal error occurred, no output PDF file produced!

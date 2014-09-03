@@ -3,6 +3,7 @@ Created on Aug 22, 2014
 
 @author: rene
 '''
+from Xtest.Open_GL import ImageViewer
 
 '''
 Created on Jul 30, 2014
@@ -164,7 +165,10 @@ class MyWidget(QtOpenGL.QGLWidget):
         self.resize(self.width ,self.height)
         self.setWindowTitle("Rene Test")
         #self.setFixedSize(QtCore.QSize(400,400))
+        self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.renderer = Renderer(self.width ,self.height)    
+        
+        
     
     def initializeGL(self):
         self.renderer.init()

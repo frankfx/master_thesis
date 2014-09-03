@@ -1,7 +1,18 @@
 % das Papierformat zuerst
 %
 %\documentclass[a4paper, 11pt,bibtotoc]{scrartcl}
-\documentclass[a4paper, 11pt,bibtotoc,abstracton]{scrreprt}  
+\documentclass[a4paper, 12pt, oneside, final, bibtotoc,abstracton]{scrreprt}  
+
+%\documentclass[
+%	a4paper,
+%	12pt,
+%	oneside,
+%	%twoside,
+%	%openright,
+%	final
+%	%draft,				% Entwurf: Druckt keine Bilder
+%]{scrreprt}
+
 
 %Für URL
 \usepackage{url}
@@ -20,6 +31,8 @@
 % für mathematische Symbole
 \usepackage{amsmath}
 
+% tabellen
+\usepackage{tabularx}
 
 % Vektorgrafiken mit Latex importieren
 \usepackage{import}
@@ -44,6 +57,7 @@
 
 
 %Farben
+\usepackage{xcolor}
 \usepackage{color}
 \usepackage{listings}%Code einbinden
 \definecolor{darkblue}{rgb}{.08,.21,.36}
@@ -58,7 +72,7 @@
 
 \lstloadlanguages{C++}
 \lstset{%
-  language=C++,
+  language=Python,
   basicstyle=\small,
   commentstyle=\itshape\color{darkgreen},
   keywordstyle=\bfseries\color{darkblue},
@@ -105,6 +119,11 @@
 \usepackage{caption}
 \captionsetup[table]{skip=10pt}
 
+
+\colorlet{chapter}{black!75}
+\addtokomafont{chapter}{\color{chapter}}
+%
+
 %Kapitelzahl sehr groß
 \makeatletter% siehe De-TeX-FAQ 
  \renewcommand*{\chapterformat}{% 
@@ -127,6 +146,7 @@
      \end{picture} % <-- Leerzeichen ist hier beabsichtigt! 
    \endgroup 
 }
+\makeatother% siehe \makeatletter
 
 \usepackage{ %a4wide,
             ellipsis, fixltx2e, mparhack,   %Fehlerkorrektur für Marginalien
@@ -135,6 +155,7 @@
 
 \usepackage{ifpdf} % part of the hyperref bundle
 \ifpdf % if pdflatex is used
+
 
 %set fonts for nicer pdf view
  \IfFileExists{lmodern.sty}{\usepackage{lmodern}}
@@ -150,57 +171,59 @@
  
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Hurenkinder und Schusterjungen werden vermieden
+\clubpenalty = 10000
+\widowpenalty = 10000
+\displaywidowpenalty = 10000
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Definitionen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{filecontents}{cpuAnno.dat}
+0 0 5 0.8 20 13.3 35 19.6 50 0.3
+\end{filecontents} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% End Definitionen
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \begin{document}
-\begin{titlepage}
-\begin{center}
-{\huge \textbf{Philipps-Universität Marburg}}\\[0.5cm]
-\textbf{Fachbereich 12 - Mathematik und Informatik}\\[0.5cm]
-
-\begin{figure}[h]
-	\centering
-		\includegraphics[width=0.8\textwidth]{fig/unilogo.pdf}
-\end{figure}
-
-{\huge \textbf{{\large \\[1cm]Masterarbeit}}}
-\\[1cm]
-
-{\huge \textbf{Entwicklung eines interaktiven Editors für Flugzeugkonfigurationen ~~~~~~~~~~~~~~ im Vorentwurf}}
-\\[1cm]
-
-{\large von}\\
-{\large Ren\'{e} Frank}\\
-{\large Januar 2015}\\[1.5cm]
-
-{\large
-Betreuer:\\Prof. Dr. Thorsten Thormählen\\[0.5cm]
-Arbeitsgruppe Grafik und Multimedia Programmierung}
-\\[0.8cm]
-{\large
-Betreuer:\\Carsten Liersch\\[0.5cm]Deutsches Zentrum für Luft- und Raumfahrt (DLR)\\
-Institut für Aerodynamik und Strömungstechnik}
-
-
-
-
-
-
-
-\end{center}
-\end{titlepage}
-\newpage
-\thispagestyle{empty}
-\section*{}
-\newpage
-\thispagestyle{empty}
-\vspace*{7cm}
-\textbf{\Large {Erklärung}}\\[0.5cm]
-Ich Ren\'{e} Frank (Informatikstudent an der Philipps-Universität Marburg, Matrikelnummer
-2209420), versichere an Eides statt, dass ich die vorliegende Masterarbeit selbstständig verfasst und keine anderen
-als die angegebenen Quellen und Hilfsmittel verwendet habe. Die hier vorliegende Masterarbeit wurde weder in ihrer jetzigen noch in einer ähnlichen Form keiner Prüfungskommission vorgelegt.\\[1cm]
-Braunschweig, \today\\[0.5cm]
-Ren\'{e} Frank
-\newpage
-\shipout\null
+%\begin{titlepage}
+%\begin{center}
+%{\huge \textbf{Philipps-Universität Marburg}}\\[0.5cm]
+%\textbf{Fachbereich 12 - Mathematik und Informatik}\\[0.5cm]
+%
+%\begin{figure}[h]
+%	\centering
+%		\includegraphics[width=0.8\textwidth]{fig/unilogo.pdf}
+%\end{figure}
+%
+%{\huge \textbf{{\large \\[1cm]Masterarbeit}}}
+%\\[1cm]
+%
+%{\huge \textbf{Entwicklung eines interaktiven Editors für Flugzeugkonfigurationen ~~~~~~~~~~~~~~ im Vorentwurf}}
+%\\[1cm]
+%
+%{\large von}\\
+%{\large Ren\'{e} Frank}\\
+%{\large Januar 2015}\\[1.5cm]
+%
+%{\large
+%Betreuer:\\Prof. Dr. Thorsten Thormählen\\[0.5cm]
+%Arbeitsgruppe Grafik und Multimedia Programmierung}
+%\\[0.8cm]
+%{\large
+%Betreuer:\\Carsten Liersch\\[0.5cm]Deutsches Zentrum für Luft- und Raumfahrt (DLR)\\
+%Institut für Aerodynamik und Strömungstechnik}
+%
+%
+%
+%
+%
+%
+%
+%\end{center}
+%\end{titlepage}
 
 %\setstretch {1.15}%Zeilenabstand setzen
 

@@ -36,7 +36,7 @@ class Renderer:
         self.ctrlpointsZ = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.ctrlpointsY = [0.00095, 0.00605, 0.01086, 0.01967, 0.02748, 0.03423, 0.03971, 0.04352, 0.04501, 0.04456, 0.04303, 0.04009, 0.03512, 0.0315, 0.02666, 0.01961, 0.0142, 0.0089, 0.0, -0.0089, -0.0142, -0.01961, -0.02666, -0.0315, -0.03512, -0.04009, -0.04303, -0.04456, -0.04501, -0.04352, -0.03971]        
 
-    def set_flag_view(self, value):
+    def flag_view(self, value):
         self.flag_view_algo = value
 
     def init(self):
@@ -134,7 +134,7 @@ class MyWidget(QtOpenGL.QGLWidget):
         self.setWindowTitle("Rene Test")
 
         self.renderer = Renderer()  
-        self.renderer.set_flag_view(Renderer.CLOSED) 
+        self.renderer.flag_view(Renderer.CLOSED) 
     
     def initializeGL(self):
         self.renderer.init()
