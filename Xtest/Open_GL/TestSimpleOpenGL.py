@@ -157,9 +157,9 @@ class Renderer():
         GL.glEnd()
                
 
-class MyWidget(QtOpenGL.QGLWidget):
+class MyProfileWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(MyWidget, self).__init__(parent)
+        super(MyProfileWidget, self).__init__(parent)
         self.width = 320
         self.height = 302
         self.resize(self.width ,self.height)
@@ -216,6 +216,6 @@ class MyWidget(QtOpenGL.QGLWidget):
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = MyWidget()
+    widget = MyProfileWidget()
     widget.show()
     app.exec_()    

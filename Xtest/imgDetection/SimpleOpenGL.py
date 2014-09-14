@@ -31,7 +31,7 @@ class Renderer():
         self.trans_y = 0
         self.width = -1
         self.height = -1
-        self.fovy = 64.0
+        self.fovy = 166.0
 
     def init(self):
         ()
@@ -42,23 +42,29 @@ class Renderer():
                                    
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        v=3.5#+self.scale
-        print v
-        #GLU.gluPerspective (64.0, w*1.0/h, 0.0, 10.0)
-        if (w <= h) :
-            GL.glFrustum(-v, v, -v * h / w, v * h / w, 1.1, 100)
-        else :
-            GL.glFrustum(-v * w / h, v * w / h, -v, v, 1.1, 100)
+        v=1.5+self.scale
+        print "v  ==============\n" , v
+        GLU.gluPerspective (166.0, w*1.0/h, 0.0, 100.0)
+        #--------------------------------------------------------- if (w <= h) :
+            #-------------- GL.glFrustum(-v, v, -v * h / w, v * h / w, 1.1, 100)
+        #---------------------------------------------------------------- else :
+            #-------------- GL.glFrustum(-v * w / h, v * w / h, -v, v, 1.1, 100)
     
     def display(self):
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glLoadIdentity()
+        GLU.gluPerspective (self.fovy * self.scale, self.width*1.0/self.height, 0.0, 10.0)
+
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()
+
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
        
         
-        GL.glTranslatef(self.trans_x,self.trans_y,-1.5)
-        #self.drawTriangle2()
+        GL.glTranslatef(self.trans_x,self.trans_y,0)
+
+        #self.drawTriangle()
         self.drawProfile()
         GL.glFlush()    
 
@@ -69,19 +75,98 @@ class Renderer():
         GL.glVertex3f(1.04, 3.58, -0.5)
         GL.glVertex3f(1.55, 3.5, -0.5)
         GL.glEnd()   
+        
+    def drawTriangle2(self):
+        GL.glColor3f(1.0, 1.0, 1.0)
+        GL.glBegin(GL.GL_TRIANGLES)
+        GL.glVertex3f(-0.5, -0.5, -0.5)
+        GL.glVertex3f( 0.5, -0.5, -0.5)
+        GL.glVertex3f( 0.0,  0.5, -0.5)
+        GL.glEnd()        
     
     def drawProfile(self):
-        coord = self.detectProfile()
+        top, bot = self.splineProfile(0.2)
+        
+        trX, trY = self.norm_vec_list(top) 
+        
+        GL.glTranslatef(-trX, -trY, 0)
         GL.glColor3f(1.0, 1.0, 1.0)
         GL.glBegin(GL.GL_LINE_LOOP)        
-        for i in range (0, len(coord)) :
-            for j in range (0, len(coord[i])) :
-                GL.glVertex3f(coord[i][j][0]/100.0, coord[i][j][1]/100.0, -0.5)
+        for i in range (0, len(top)) :
+            GL.glVertex3f(top[i][0], top[i][1], top[i][2])
         GL.glEnd()
     
+    def __getEndPoints(self, toplist, botlist):
+        min_t, max_t = self.__get_min_max_of_List(toplist)
+        min_b, max_b = self.__get_min_max_of_List(botlist)
+
+        mini = min_t if min_t[0] < min_b[0] else min_b
+        maxi = max_t if max_t[0] > max_b[0] else max_b
+        maxi = [maxi[0], max_b[1] + (max_t[1] - max_b[1])/2, maxi[2]]
+
+        return mini , maxi
+   
+    def __createPointList(self, plist, sort_desc = True):
+        l_fst = []
+        l_snd = []
+        for i in range(0, len(plist)-1, 1) :
+            if sort_desc:
+                if(plist[i][0] > plist[i+1][0]) :
+                    l_fst.append([ plist[i][0], plist[i][1], plist[i][2] ])
+                else : 
+                    l_fst.append([ plist[i][0], plist[i][1], plist[i][2] ])
+                    break
+            else :
+                if plist[i][0] < plist[i+1][0] :
+                    l_fst.append([ plist[i][0], plist[i][1], plist[i][2] ])
+                else:
+                    l_fst.append([ plist[i][0], plist[i][1], plist[i][2] ])
+                    break                    
+
+        for j in range(i, len(plist), 1) :
+            l_snd.append([ plist[j][0], plist[j][1], plist[j][2] ])
+
+        return l_fst , l_snd
+   
+
+    def printList(self, vlist):
+        res = []
+        for t in vlist :
+            res.append(t[0])
+        print "dsfasfs" ,res
+    
+    def splineProfile(self, distance):
+        coord = self.detectProfile()
+        toplist, botlist = self.__createPointList(coord)
+        
+        start, end = self.__getEndPoints(toplist, botlist)    
+        resTop = [toplist[0]]
+        resBot = [toplist[0]]
+        
+        cur = 0
+        for i in range(1, len(toplist)) :
+            if resTop[cur][0] + distance >= toplist[i][0] :
+                resTop.append(toplist[i])
+                cur += 1
+        cur = 0
+        for j in range(0, len(botlist)) :
+            if resBot[cur][0] + distance >= botlist[i][0] :
+                resBot.append(botlist[i])
+                cur += 1
+        
+        return resTop, resBot
+    
+    def transformCoord(self, vlist):
+        res = []
+        for i in range (0, len(vlist)) :
+            for j in range (0, len(vlist[i])) :
+                res.append([vlist[i][j][0]/100.0, vlist[i][j][1]/100.0, -0.5])
+        print "res" , res
+        return res
+    
     def detectProfile(self):        
-        img = cv2.imread('wing2.jpg')
-        gray = cv2.imread('wing2.jpg',0)
+        img = cv2.imread('wing.jpg')
+        gray = cv2.imread('wing.jpg',0)
 
         ret,thresh = cv2.threshold(gray,127,255,1)
         contours,h = cv2.findContours(thresh,1,2)
@@ -92,11 +177,48 @@ class Renderer():
             if len(approx)==5:
                 n+=1
             if n == 2 :
-                return cnt
+                return self.transformCoord(cnt)
 
-class MyWidget(QtOpenGL.QGLWidget):
+
+    def norm_vec_list(self, vlist):
+        '''set points of shape to center (0,0)'''
+        minX_list, maxX_list = self.__get_min_max_of_List(vlist)
+        minY_list, maxY_list = self.__get_min_max_of_List(vlist,1)
+        
+        mnX = minX_list[0] 
+        mxX = maxX_list[0] 
+        mnY = minY_list[1]
+        mxY = maxY_list[1]
+        
+        distX = mxX - mnX
+        distY = mxY - mnY
+        
+        midX = distX / 2.0
+        midY = distY / 2.0
+        
+        shiftX = mxX - midX
+        shiftY = mxY - midY
+
+        return shiftX , shiftY
+
+    '''
+    @param plist: format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
+    @param dim: dimension e.g. 0==x, 1==y, 2==z 
+    @return: minimum and maximum sublist compared by x 
+    '''
+    def __get_min_max_of_List(self, plist, dim=0):
+        id_max = 0 
+        id_min = 0
+        for i in range (1, len(plist),1) :
+            if plist[id_max][dim] < plist[i][dim] :
+                id_max = i
+            if plist[id_min][dim] > plist[i][dim] :
+                id_min = i
+        return plist[id_min], plist[id_max]
+
+class MyProfileWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(MyWidget, self).__init__(parent)
+        super(MyProfileWidget, self).__init__(parent)
         self.resize(320,320)
         self.setWindowTitle("Rene Test")
         #self.setFixedSize(QtCore.QSize(400,400))
@@ -118,7 +240,7 @@ class MyWidget(QtOpenGL.QGLWidget):
 
     def keyPressEvent(self, event):
         redraw = False
-        offsetScl = 0.5
+        offsetScl = 0.01
         offsetTrans = 0.02
         if event.modifiers() == QtCore.Qt.ControlModifier:
             if event.key() == QtCore.Qt.Key_N :
@@ -170,6 +292,6 @@ class MyWidget(QtOpenGL.QGLWidget):
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = MyWidget()
+    widget = MyProfileWidget()
     widget.show()
     app.exec_()    

@@ -127,9 +127,9 @@ class Renderer:
 
 
 
-class MyWidget(QtOpenGL.QGLWidget):
+class MyProfileWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(MyWidget, self).__init__(parent)
+        super(MyProfileWidget, self).__init__(parent)
         self.resize(620,620)
         self.setWindowTitle("Rene Test")
 
@@ -147,7 +147,7 @@ class MyWidget(QtOpenGL.QGLWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = MyWidget()
+    widget = MyProfileWidget()
     widget.show()
     app.exec_()    
 

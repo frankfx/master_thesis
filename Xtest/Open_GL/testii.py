@@ -114,9 +114,9 @@ class Ui_TabWidget(QtGui.QTabWidget):
 
 
 
-class MyWidget(QtGui.QWidget):
+class MyProfileWidget(QtGui.QWidget):
     def __init__(self, parent = None):
-        super(MyWidget, self).__init__(parent)
+        super(MyProfileWidget, self).__init__(parent)
         self.resize(320,320)
         self.setWindowTitle("Rene Test")
         #self.setFixedSize(QtCore.QSize(400,400))
@@ -127,6 +127,6 @@ class MyWidget(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = MyWidget()
+    widget = MyProfileWidget()
     widget.show()
     app.exec_()   

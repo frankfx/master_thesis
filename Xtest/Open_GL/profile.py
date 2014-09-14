@@ -9,6 +9,8 @@ import math
 from PySide import QtOpenGL, QtGui, QtCore
 from cpacsHandler import CPACS_Handler
 from config import Config
+from dataSet import DataSet
+
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -20,34 +22,31 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class Profile_Widget(QtOpenGL.QGLWidget):
+class Profile(QtOpenGL.QGLWidget):
     OPEN, CLOSED = range(2)
     DEFAULT, BEZIER_NEW_4, BEZIER_OPENGL = range(3) 
     def __init__(self, uid='NACA0009', parent = None):
-        super(Profile_Widget, self).__init__(parent)
+        super(Profile, self).__init__(parent)
            
         self._name               = uid
-        self._chord              = -1     # Profiltiefe/Sehne
-        self._work_angle         = -1     # Anstellwinkel
-        self._profile_arch       = -1     # Profilwoelbung
-        self._profile_thickness  = -1     # Profildicke
         self.flag_draw_points    = False  
-        self._flag_view          = Profile_Widget.OPEN
-        # ==========================================================
-        self.tixi = CPACS_Handler()
-        self.tixi.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
-        # ==========================================================
+        self._flag_view          = Profile.OPEN
+
         self.scale = 0.5
         self.trans_x = 0
         self.trans_y = 0
-        self.width = -1
-        self.height = -1
+        self.rotate  = 0
+        self.width = -1.0
+        self.height = -1.0
         self.fovy = 64.0
         # helper ===================================================
         self.lastPos_x = 0.0
         self.lastPos_y = 0.0
 
-        self.pointList_top, self.pointList_bot = self.__createPointList(uid)
+        self.dataSet = DataSet(uid)
+
+        #print self.pointList_top
+        #print self.pointList_bot
 
         self.resize(320,320)
         #self.setFixedSize(QtCore.QSize(400,400))
@@ -77,13 +76,23 @@ class Profile_Widget(QtOpenGL.QGLWidget):
         GL.glLoadIdentity()
 
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-
         GL.glTranslatef(self.trans_x,self.trans_y,-1.5)
 
         self.drawGrid()
+        
+        GL.glRotatef(self.rotate ,0, 0, 1) 
         self.drawProfile()
 
         GL.glFlush()
+
+    def initializeGL(self):
+        self.init()
+    
+    def resizeGL(self, w, h):
+        self.resize(w, h)
+ 
+    def paintGL(self):
+        self.display()
 
     def set_name(self, value):
         self._name = value
@@ -111,70 +120,88 @@ class Profile_Widget(QtOpenGL.QGLWidget):
 
     def set_scale(self, value):
         self.scale = value
+        
+    def set_rotate(self, value):
+        self.rotate = value
+        self.updateGL()
 
-    def get_chord(self):
-        return self._chord
+    def setFlagDrawPoints(self, value):
+        self.flag_draw_points = value
+        self.updateGL()        
+
+
+    def get_len_chord(self):
+        # len Profiltiefe/Sehne
+        start, end = self.dataSet.getEndPoints()
+        return self.dataSet.get_distance_btw_points(start, end)
 
     def get_work_angle (self):
-        return self._work_angle
+        # sin(x) = a/c
+        start, end = self.dataSet.getEndPoints()
+        x = start[1] / self.get_len_chord()
+        return math.sin(x)
 
+    # (Profilwoelbung) max Abweichung der Skelettlinie von der Profilsehne
     def get_profile_arch(self):
-        return self._profile_arch
-
+        #print self.dataSet.pointList_chord, self.dataSet.pointList_skeleton
+        return 100.0 * self.dataSet.get_max_distance_btw_pointLists(self.dataSet.pointList_chord, self.dataSet.pointList_skeleton)
+                                                     
+    # (Profildicke) max Kreisdurchmesser auf der Skelettlinie
     def get_profile_thickness(self):
-        return self._profile_thickness
+        print self.dataSet.pointList_top, self.dataSet.pointList_bot
+        return 100 * self.dataSet.get_max_distance_btw_pointLists(self.dataSet.pointList_top, self.dataSet.pointList_bot)        
 
     def get_flag_view(self):
         return self._flag_view
 
     def get_name(self):
         return self._name
+    
+    def getFlagDrawPoints(self):
+        return self.flag_draw_points    
 
+    '''abstract method'''
     def drawProfile(self):
         return NotImplemented
 
-    def fitToPage(self, bool):
-        if bool :
+    def fitToPage(self, boolean):
+        if boolean :
             self.set_transX(0)
             self.set_transY(0)
             self.set_scale(0.5)
-        self.setDisabled(bool)
+        self.setDisabled(boolean)
         self.updateGL()
 
     def drawChord(self):
-
-        min_t, max_t = self.__get_min_max_of_List(self.pointList_top)
-        min_b, max_b = self.__get_min_max_of_List(self.pointList_bot)
-
-        mini = min_t if min_t[0] < min_b[0] else min_b
-        maxi = max_t if max_t[0] > max_b[0] else max_b
-        maxi = [maxi[0], max_b[1] + (max_t[1] - max_b[1])/2, maxi[2]]
-
-
+        start, end = self.dataSet.getEndPoints()
+        
         GL.glBegin(GL.GL_LINES)
-        GL.glVertex3f(mini[0], mini[1], mini[2]) # left end (nose)
-        GL.glVertex3f(maxi[0], maxi[1], maxi[2]) # right end
+        GL.glVertex3f(start[0], start[1], start[2]) # leftend (nose)
+        GL.glVertex3f(end[0], end[1], end[2]) # right end
         GL.glEnd()
 
     def drawProfile_points(self):
+        plist_top = self.dataSet.pointList_top
+        plist_bot = self.dataSet.pointList_bot
+        
         GL.glPointSize(5.0)        
         GL.glColor3f(1.0, 0.0, 0.0)
         GL.glBegin(GL.GL_POINTS)
-        for i in range (0, len(self.pointList_top), 1):
-            GL.glVertex3f(self.pointList_top[i][0], self.pointList_top[i][1], self.pointList_top[i][2])
-        i = 0
-        for i in range (0, len(self.pointList_bot), 1):
-            GL.glVertex3f(self.pointList_bot[i][0], self.pointList_bot[i][1], self.pointList_bot[i][2])
+        for i in range (0, len(plist_top), 1):
+            GL.glVertex3f(plist_top[i][0], plist_top[i][1], plist_top[i][2])
+        for j in range (0, len(plist_bot), 1):
+            GL.glVertex3f(plist_bot[j][0], plist_bot[j][1], plist_bot[j][2])
         GL.glEnd() 
 
     def drawSkeleton(self):
+        plist = self.dataSet.pointList_skeleton
+        print plist
         GL.glBegin(GL.GL_LINES)
-        for i in range(0, len(self.pointList_top)) :
-            p = self.__computePoint(self.pointList_top[i], self.pointList_bot)
-            GL.glVertex3f(p[0], p[1], p[2]) # left end (nose)
+        for i in range(0, len(plist)) :
+            GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])# left end == nose
         GL.glEnd()
 
-    def drawGrid(self, x_fr = -1.0, x_to = 1.0, y_fr = -1.0, y_to = 1.0, no_lines = 6):
+    def drawGrid(self, x_fr = -1.0, x_to = 1.0, y_fr = -1.0, y_to = 1.0, no_lines = 5):
         GL.glColor3f(1, 0.85, 0.55)
         GL.glBegin(GL.GL_LINES)
         # line at y-axis through the center
@@ -198,92 +225,32 @@ class Profile_Widget(QtOpenGL.QGLWidget):
             GL.glVertex3f(-i*1.0/no_lines, y_to, 0)
         GL.glEnd()
 
+        
     def norm_vec_list(self, vlist):
         '''set points of shape to center (0,0)'''
-        min_list, max_list = self.__get_min_max_of_List(vlist)
-        mn = min_list[0] 
-        mx = max_list[0] 
-        dist = mx - mn
-        mid = dist / 2.0
-        shift = mx - mid
+        minX_list, maxX_list = self.dataSet.get_min_max_of_List(vlist)
+        minY_list, maxY_list = self.dataSet.get_min_max_of_List(vlist,1)
+        
+        mnX = minX_list[0] 
+        mxX = maxX_list[0] 
+        mnY = minY_list[1]
+        mxY = maxY_list[1]
 
-        return shift 
+        distX = mxX - mnX
+        distY = mxY - mnY
+        
+        midX = distX / 2.0
+        midY = distY / 2.0
 
-    '''
-    @param: uid from cpacs
-    @param: sort_desc boolean flag for splitting option
-     @return: lists for top and bottom profile in format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
-    '''
-    def __createPointList(self, uid, sort_desc = True):
-        vecX = self.tixi.getVectorX(uid)
-        vecY = self.tixi.getVectorZ(uid)
-        vecZ = self.tixi.getVectorY(uid)
-        l_fst = []
-        l_snd = []
-        for i in range(0, len(vecX)-1, 1) :
-            if sort_desc:
-                if(vecX[i] > vecX[i+1]) :
-                    l_fst.append([ vecX[i], vecY[i], vecZ[i] ])
-                else : break
-            else :
-                if vecX[i] < vecX[i+1] :
-                    l_fst.append([ vecX[i], vecY[i], vecZ[i] ])
-                else: break
+        shiftX = mxX - midX
+        shiftY = mxY - midY
 
-        for j in range(i, len(vecX), 1) :
-            l_snd.append([ vecX[j], vecY[j], vecZ[j] ])
+        return shiftX , -shiftY        
+        
 
-        return l_fst , l_snd
-
-
-    def __computePoint(self, p1, plist):
-        index_r = -1
-        index_l = -1
-        mini, maxi = self.__get_min_max_of_List(plist)
-
-        right_of_x = maxi[0]
-        left_of_x = mini[0]
-
-        for i in range(0 , len(plist)) :
-            if plist[i][0] < p1[0] and plist[i][0] > left_of_x :
-                left_of_x = plist[i][0]
-                index_l = i
-            if plist[i][0] > p1[0] and plist[i][0] < right_of_x :
-                right_of_x = plist[i][0]
-                index_r = i
-
-        # b = y2 - m-x2 ; m = (y2-y1) / (x2-x1)
-        m = ( plist[index_r][1] - plist[index_l][1] ) / ( plist[index_r][0] - plist[index_l][0] )
-        b = plist[index_r][1] - m * plist[index_r][0]
-
-        y = m * p1[0] + b
-
-        return [p1[0], p1[1] - (p1[1] - y) / 2.0, p1[2]]
-
-    def initializeGL(self):
-        self.init()
-    
-    def resizeGL(self, w, h):
-        self.resize(w, h)
- 
-    def paintGL(self):
-        self.display()
-
-    def __get_min_max_of_List(self, plist):
-        m_max = -1000 # random value
-        m_min = 1000  # random value
-        id_max = -1
-        id_min = -1
-        for i in range (0, len(plist),1) :
-            if m_max < plist[i][0] :
-                m_max = plist[i][0]
-                id_max = i
-            if m_min > plist[i][0] :
-                m_min = plist[i][0]
-                id_min = i
-
-        return plist[id_min], plist[id_max]
-
+    # ============================================================================================================
+    # mouse and key events
+    # ============================================================================================================
 
     def keyPressEvent(self, event):
         redraw = False
@@ -332,13 +299,19 @@ class Profile_Widget(QtOpenGL.QGLWidget):
         self.lastPos_x += self.dx
         self.lastPos_y += self.dy
         
-        self.trans_x += (self.dx * 2.0 / self.width * self.scale) 
-        self.trans_y -= (self.dy * 2.0 / self.height * self.scale)
+        #Betrachtsfeld = -1 bis 1
+        
+        #print self.width 
+        #print self.height 
+        
+        self.trans_x += (2*self.dx / (self.width*1.0) * self.scale) 
+        self.trans_y -= (2*self.dy / (self.height*1.0) * self.scale)
+
         self.updateGL()
 
         
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = Profile_Widget()
+    widget = Profile()
     widget.show()
     app.exec_()          

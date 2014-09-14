@@ -1,3 +1,12 @@
+% to be compiled with: pdflatex --jobname=profile-f1 profile.tex
+\documentclass[12pt]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[frenchstyle,fulloldstylenums,partialup]{kpfonts}
+\usepackage{tikz}
+\usetikzlibrary{snakes}
+%\pgfrealjobname{profile}
+\begin{document}
 \beginpgfgraphicnamed{profile-f1}
 \footnotesize
 \begin{tikzpicture}[>=latex,scale=1]
@@ -18,3 +27,4 @@
 \end{scope}%
 \end{tikzpicture}
 \endpgfgraphicnamed%
+\end{document}

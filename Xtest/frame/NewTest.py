@@ -74,9 +74,9 @@ class Renderer():
 
         return shift       
 
-class MyWidget(QtOpenGL.QGLWidget):
+class MyProfileWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(MyWidget, self).__init__(parent)
+        super(MyProfileWidget, self).__init__(parent)
         self.resize(320,320)
         self.setWindowTitle("Rene Test")
         #self.setFixedSize(QtCore.QSize(400,400))
@@ -113,6 +113,6 @@ class MyWidget(QtOpenGL.QGLWidget):
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = MyWidget()
+    widget = MyProfileWidget()
     widget.show()
     app.exec_()    
