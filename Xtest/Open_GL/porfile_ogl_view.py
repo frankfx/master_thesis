@@ -81,7 +81,7 @@ class MyProfileWidget(Profile):
         self.dataSet.setPointListTop(res_top)
         self.dataSet.setPointListBot(res_bot)
         self.dataSet.setPointListCamber(res_camber)
-        self.dataSet.updatePointlistSkeleton()
+        self.dataSet.updatePointlistCamber()
         self.updateGL()
         
            

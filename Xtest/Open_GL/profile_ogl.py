@@ -7,8 +7,6 @@ Created on Sep 3, 2014
 import sys
 import math
 from PySide import QtOpenGL, QtGui, QtCore
-from cpacsHandler import CPACS_Handler
-from config import Config
 from dataSet import DataSet
 
 
@@ -44,9 +42,6 @@ class Profile(QtOpenGL.QGLWidget):
         self.lastPos_y = 0.0
 
         self.dataSet = DataSet(uid)
-
-        #print self.pointList_top
-        #print self.pointList_bot
 
         self.resize(320,320)
         #self.setFixedSize(QtCore.QSize(400,400))

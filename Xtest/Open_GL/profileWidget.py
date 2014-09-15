@@ -29,7 +29,7 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG, filemode = 'w')
+logging.basicConfig(filename='example.log',level=logging.DEBUG)
 logging.info('\n#####################################################\nstart\n#####################################################')
 logging.info(datetime.datetime.now().time())
 

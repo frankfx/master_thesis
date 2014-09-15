@@ -8,6 +8,8 @@ import math
 from PySide import QtOpenGL, QtGui, QtCore
 from cpacsHandler import CPACS_Handler
 from config import Config
+import logging
+import datetime
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -19,6 +21,9 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
+logging.basicConfig(filename='example.log',level=logging.DEBUG)
+logging.info('\n#####################################################\nstart\n#####################################################')
+logging.info(datetime.datetime.now().time())
 
 class DataSet() :
     def __init__(self, uid, parent = None):
@@ -31,7 +36,7 @@ class DataSet() :
         self.pointList_top, self.pointList_bot  = self.__createPointList(uid)
         self._leftEndP , self._rightEndP        = self.__getEndPoints(self.pointList_top, self.pointList_bot)
         self.pointList_chord                    = self.__createPointList_chord(self._leftEndP, self._rightEndP, len(self.pointList_top))
-        self.pointList_camber                   = self.__createPointList_skeleton2(self.pointList_top, self.pointList_bot)
+        self.pointList_camber                   = self.__createPointList_camber(self.pointList_top, self.pointList_bot)
         
         
     '''
@@ -67,27 +72,54 @@ class DataSet() :
         print l_fst
         print l_snd 
         return l_fst , l_snd
-        
-        
-    def __getEndPoints(self, toplist, botlist):
-        dim = 0
-        min_t, max_t = self.get_min_max_of_List(toplist, dim)
-        min_b, max_b = self.get_min_max_of_List(botlist, dim)
-
-        mini = min_t if min_t[0] < min_b[0] else min_b
-        maxi = max_t if max_t[0] > max_b[0] else max_b
-        maxi = [maxi[0], max_b[1] + (max_t[1] - max_b[1])/2, maxi[2]]
-
-        return mini , maxi  
-    
+   
+   
+    '''
+    @return: left and right end point
+    '''
     def getEndPoints(self):
-        return self.__getEndPoints(self.pointList_top, self.pointList_bot)      
+        return self.__getEndPoints(self.pointList_top, self.pointList_bot)         
         
+    '''
+    @param toplist: profile top
+    @param botlist: profile bottom
+    @return: left and right end point
+    '''
+    def __getEndPoints(self, toplist, botlist):
+        
+        dim = 0
+        _ , max_top = self.get_min_max_of_List(toplist, dim)
+        _ , max_bot = self.get_min_max_of_List(botlist, dim)
+
+        maxP = max_top if max_top >= max_bot else max_bot
+        maxP = [maxP[0], max_bot[1] + (max_top[1] - max_bot[1])/2, maxP[2]]
+
+        minP = maxP
+        max_dist = 0
+        tmp_dist = 0
+
+        for p in toplist + botlist :
+            tmp_dist = self.get_distance_btw_points(p, maxP)
+            if tmp_dist > max_dist :
+                max_dist = tmp_dist
+                minP     = p
+        return minP , maxP  
+    
+    '''
+    @param p1: first point
+    @param p2: second point
+    @return: distance between p1 and p2
+    '''    
     def get_distance_btw_points(self, p1, p2):
         a = (p1[0] - p2[0]) * (p1[0] - p2[0])
         b = (p1[1] - p2[1]) * (p1[1] - p2[1])
         return math.sqrt( a + b )
 
+    '''
+    @param list1: first list
+    @param list2: second list
+    @return: distance between p1 of list1 and corresponding p2 of list2
+    '''   
     def get_max_distance_btw_pointLists(self, list1, list2):
         
         dist = -1   
@@ -113,25 +145,17 @@ class DataSet() :
             res.append(p)
         return res
 
-    def __createPointList_skeleton(self, topList, botList):
+    '''
+    @param topList: top list
+    @param botList: bottom list
+    @return: list of camber points 
+    '''
+    def __createPointList_camber(self, topList, botList):
         res = []
         for i in range(0, len(topList)):
             p = self.__computePoint(topList[i], botList)
             res.append(p)
         return res
-        
-
-    '''
-    Point in top has corresponding Point in bot
-    '''
-    def __createPointList_skeleton2(self, topList, botList):
-        res = []
-        for i in range(0, len(topList)):
-            x = (topList[i][0] + botList[i][0]) / 2
-            y = (topList[i][1] + botList[i][1]) / 2
-            res.append([x,y, topList[i][2]])
-        return res
-
         
     def setPointListTop(self, plist):
         self.pointList_top = plist
@@ -148,27 +172,25 @@ class DataSet() :
     def setPointListCamber(self, plist):
         self.pointList_camber = plist
 
-    def updatePointlistSkeleton(self):
-        self.pointList_camber = self.__createPointList_skeleton(self.pointList_top, self.pointList_bot)        
+    def updatePointlistCamber(self):
+        self.pointList_camber = self.__createPointList_camber(self.pointList_top, self.pointList_bot)        
 
-    def contain(self, x, plist):
-        i = 0
-        for l in plist :
-            if l[0] == x : 
-                return i
-            i += 1
-        return None        
-        
     '''
-    @return: Point of Line with Points p1 and p2
+    @param x: x-value of result point
+    @param p1: point one of line p1 to p2
+    @param p1: point two of line p1 to p2
+    @return: Point on Line of Points p1 to p2
     '''
     def __computePointOnLine(self, x, p1, p2):
         fst = p1 if p1[0] <= p2[0] else p2
         snd = p2 if p1[0] <= p2[0] else p1
         if (x < fst[0] or x > snd[0]):
+            logging.debug('None in MODULE: dataSet, FUNCTION: __computePointOnLine') 
+            logging.debug(str(x) + ', ' + str(p1) + ', ' + str(p2))
+            logging.debug('x < fst[0] or x > snd[0]')
             return None
 
-        # b = y2 - m-x2 ;;; m = (y2-y1) / (x2-x1)
+        # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
         m = ( snd[1] - fst[1] ) / ( snd[0] - fst[0] )
         b = snd[1] - m * snd[0]
 
@@ -177,6 +199,9 @@ class DataSet() :
         
         
     '''
+    ?????????????????????????????????????????????????????
+    Bug - nachragen wie line bestimmt wird
+    ????????????????????????????????????????????????????
     @param p1: point of topList
     @param plist: botList
     @return: Point in the center of topList and botList at position x  
@@ -204,7 +229,9 @@ class DataSet() :
                     idx_r = i
         
         if idx_r == -1 or idx_l == -1 :
-            self.__echo("dataSet__computePoint == None")
+            logging.debug('None in MODULE: dataSet, FUNCTION: __computePoint') 
+            logging.debug(str(idx_r) + ', ' + str(idx_l))
+            logging.debug('idx_r == -1 or idx_l == -1')
             return None
         elif idx_r == idx_l :
             y = p1[1] - (p1[1] - plist[idx_l][1]) / 2
@@ -220,7 +247,7 @@ class DataSet() :
     '''
     @param plist: format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
     @param dim: dimension e.g. 0==x, 1==y, 2==z 
-    @return: minimum and maximum sublist compared by dim 
+    @return: minimum and maximum point compared by dim 
     '''
     def get_min_max_of_List(self, plist, dim=0):
         id_max = 0 
@@ -231,7 +258,16 @@ class DataSet() :
             if plist[id_min][dim] > plist[i][dim] :
                 id_min = i
         return plist[id_min], plist[id_max]
-       
+
+
+    def contain(self, x, plist):
+        i = 0
+        for l in plist :
+            if l[0] == x : 
+                return i
+            i += 1
+        return None        
+               
        
     def __echo(self, value):
         print "#######################################################################"
