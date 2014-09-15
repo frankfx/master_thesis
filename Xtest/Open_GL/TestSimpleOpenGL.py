@@ -3,7 +3,7 @@ Created on Aug 22, 2014
 
 @author: rene
 '''
-from Xtest.Open_GL import ImageViewer
+from Xtest.Open_GL import profile_ogl_image_detector
 
 '''
 Created on Jul 30, 2014

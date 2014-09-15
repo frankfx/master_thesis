@@ -6,7 +6,7 @@ Created on Sep 8, 2014
 
 import sys
 import math
-from Xtest.Open_GL.profile import Profile
+from Xtest.Open_GL.profile_ogl import Profile
 from PySide import QtOpenGL, QtGui, QtCore
 from config import Config
 
@@ -39,7 +39,7 @@ class MyProfileWidget_Const(Profile):
         self.setPointListTop([])
         self.setPointListBot([])    
 
-    def zoom(self, value):
+    def slider_zoom(self, value):
         self.scale = (101 - value) / 100.0
         self.updateGL()
 

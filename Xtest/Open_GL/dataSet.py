@@ -31,7 +31,7 @@ class DataSet() :
         self.pointList_top, self.pointList_bot  = self.__createPointList(uid)
         self._leftEndP , self._rightEndP        = self.__getEndPoints(self.pointList_top, self.pointList_bot)
         self.pointList_chord                    = self.__createPointList_chord(self._leftEndP, self._rightEndP, len(self.pointList_top))
-        self.pointList_skeleton                 = self.__createPointList_skeleton(self.pointList_top, self.pointList_bot)
+        self.pointList_camber                   = self.__createPointList_skeleton2(self.pointList_top, self.pointList_bot)
         
         
     '''
@@ -63,14 +63,16 @@ class DataSet() :
 
         for j in range(i, len(vecX), 1) :
             l_snd.append([ vecX[j], vecY[j], vecZ[j] ])
-
+        l_snd.reverse()
+        print l_fst
+        print l_snd 
         return l_fst , l_snd
         
         
     def __getEndPoints(self, toplist, botlist):
-        
-        min_t, max_t = self.get_min_max_of_List(toplist)
-        min_b, max_b = self.get_min_max_of_List(botlist)
+        dim = 0
+        min_t, max_t = self.get_min_max_of_List(toplist, dim)
+        min_b, max_b = self.get_min_max_of_List(botlist, dim)
 
         mini = min_t if min_t[0] < min_b[0] else min_b
         maxi = max_t if max_t[0] > max_b[0] else max_b
@@ -95,7 +97,6 @@ class DataSet() :
             dist = cur_dist if cur_dist > dist else dist            
         return dist  
 
-
     '''
     @param p1: profile start point (nose)
     @param p2: profile end point
@@ -119,16 +120,36 @@ class DataSet() :
             res.append(p)
         return res
         
+
+    '''
+    Point in top has corresponding Point in bot
+    '''
+    def __createPointList_skeleton2(self, topList, botList):
+        res = []
+        for i in range(0, len(topList)):
+            x = (topList[i][0] + botList[i][0]) / 2
+            y = (topList[i][1] + botList[i][1]) / 2
+            res.append([x,y, topList[i][2]])
+        return res
+
         
     def setPointListTop(self, plist):
         self.pointList_top = plist
 
     def setPointListBot(self, plist):
         self.pointList_bot = plist
+        
+    def getPointList_top(self):
+        return self.pointList_top
+    
+    def getPointList_bot(self):
+        return self.pointList_bot
 
+    def setPointListCamber(self, plist):
+        self.pointList_camber = plist
 
     def updatePointlistSkeleton(self):
-        self.pointList_skeleton = self.__createPointList_skeleton(self.pointList_top, self.pointList_bot)        
+        self.pointList_camber = self.__createPointList_skeleton(self.pointList_top, self.pointList_bot)        
 
     def contain(self, x, plist):
         i = 0
@@ -193,6 +214,9 @@ class DataSet() :
         return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
 
 
+    def cosineSpacing(self, x, c, i, N) :
+        return x/c
+
     '''
     @param plist: format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
     @param dim: dimension e.g. 0==x, 1==y, 2==z 
@@ -217,7 +241,7 @@ class DataSet() :
     def __printDetails(self):
         print "top: " , self.pointList_top
         print "bot: " , self.pointList_bot[::-1]
-        print "cham:" , self.pointList_skeleton
+        print "cham:" , self.pointList_camber
         #print "chord:", self.pointList_chord
         #print "arch"  , self.get_profile_arch()
         #print "len"   , self.get_len_chord()
