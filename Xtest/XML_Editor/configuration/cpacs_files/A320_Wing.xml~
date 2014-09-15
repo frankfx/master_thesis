@@ -1,0 +1,216 @@
+<cpacs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="CPACS_21_Schema.xsd">
+    <header>
+        <name>Init file for the SGG</name>
+        <description>This file contains some standard data for the SGG (Simple Geometry Generator). It is used to initialize profiles and airfoils.</description>
+        <creator>Jonas Jepsen from TU-Hamburg-Harburg</creator>
+        <timestamp>2012-03-21T08:55:23</timestamp>
+        <version>0.1</version>
+        <cpacsVersion>2.0</cpacsVersion>
+    </header>
+    <vehicles>
+        <aircraft>
+            <model uID="Aircraft1">
+                <name>A320</name>
+                <description>This aircraft was created using the SGG!</description>
+                <wings>
+                    <wing uID="Aircraft1_Wing1" symmetry="x-z-plane">
+                        <name>Tragflaeche</name>
+                        <description>This wing was created using the SGG!</description>
+                        <transformation uID="Aircraft1_Wing1_Transf">
+                            <scaling uID="Aircraft1_Wing1_Transf_Sca">
+                                <x>1.0</x>
+                                <y>1.0</y>
+                                <z>1.0</z>
+                            </scaling>
+                            <rotation uID="Aircraft1_Wing1_Transf_Rot">
+                                <x>0.0</x>
+                                <y>0.0</y>
+                                <z>0.0</z>
+                            </rotation>
+                            <translation refType="absGlobal" uID="Aircraft1_Wing1_Transf_Transl">
+                                <x>12.7</x>
+                                <y>0.0</y>
+                                <z>-1.0</z>
+                            </translation>
+                        </transformation>
+                        <sections>
+                            <section uID="root">
+                                <name>Aircraft1_Wing1_Sec1</name>
+                                <description>This section was created by the SGG.</description>
+                                <transformation uID="Aircraft1_Wing1_Sec1_Transf">
+                                    <scaling uID="Aircraft1_Wing1_Sec1_Transf_Sca">
+                                        <x>6.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Wing1_Sec1_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Wing1_Sec1_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="rootElement1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <airfoilUID isLink="True">NACA0009</airfoilUID>
+                                        <transformation uID="Aircraft1_Wing1_Sec1_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Wing1_Sec1_Elem1_Transf_Sca">
+                                                <x>1.0</x>
+                                                <y>1.0</y>
+                                                <z>1.0</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Wing1_Sec1_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Wing1_Sec1_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="kink">
+                                <name>Aircraft1_Wing1_Sec2</name>
+                                <description>This section was created by the SGG.</description>
+                                <transformation uID="Aircraft1_Wing1_Sec2_Transf">
+                                    <scaling uID="Aircraft1_Wing1_Sec2_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Wing1_Sec2_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Wing1_Sec2_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="kinkElement1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <airfoilUID isLink="True">NACA0009</airfoilUID>
+                                        <transformation uID="Aircraft1_Wing1_Sec2_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Wing1_Sec2_Elem1_Transf_Sca">
+                                                <x>6.0</x>
+                                                <y>1.0</y>
+                                                <z>6.0</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Wing1_Sec2_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Wing1_Sec2_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                            <section uID="tip">
+                                <name>Aircraft1_Wing1_Sec2</name>
+                                <description>This section was created by the SGG.</description>
+                                <transformation uID="Aircraft1_Wing1_Sec3_Transf">
+                                    <scaling uID="Aircraft1_Wing1_Sec3_Transf_Sca">
+                                        <x>1.0</x>
+                                        <y>1.0</y>
+                                        <z>1.0</z>
+                                    </scaling>
+                                    <rotation uID="Aircraft1_Wing1_Sec3_Transf_Rot">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </rotation>
+                                    <translation refType="absGlobal" uID="Aircraft1_Wing1_Sec3_Transf_Transl">
+                                        <x>0.0</x>
+                                        <y>0.0</y>
+                                        <z>0.0</z>
+                                    </translation>
+                                </transformation>
+                                <elements>
+                                    <element uID="tipElement1">
+                                        <name>Element Name</name>
+                                        <description>Element Description</description>
+                                        <airfoilUID isLink="True">NACA0009</airfoilUID>
+                                        <transformation uID="Aircraft1_Wing1_Sec3_Elem1_Transf">
+                                            <scaling uID="Aircraft1_Wing1_Sec3_Elem1_Transf_Sca">
+                                                <x>6.0</x>
+                                                <y>1.0</y>
+                                                <z>6.0</z>
+                                            </scaling>
+                                            <rotation uID="Aircraft1_Wing1_Sec3_Elem1_Transf_Rot">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </rotation>
+                                            <translation refType="absGlobal" uID="Aircraft1_Wing1_Sec3_Elem1_Transf_Transl">
+                                                <x>0.0</x>
+                                                <y>0.0</y>
+                                                <z>0.0</z>
+                                            </translation>
+                                        </transformation>
+                                    </element>
+                                </elements>
+                            </section>
+                        </sections>    
+                        <segments>
+                            <segment uID="inner">
+                                <name>Segment Name</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">rootElement1</fromElementUID>
+                                <toElementUID isLink="True">kinkElement1</toElementUID>
+                            </segment>
+                            <segment uID="outer">
+                                <name>Segment Name</name>
+                                <description>Segment Description</description>
+                                <fromElementUID isLink="True">kinkElement1</fromElementUID>
+                                <toElementUID isLink="True">tipElement1</toElementUID>
+                            </segment>
+                        </segments>
+                        <positionings>
+                            <positioning uID="Aircraft1_Wing1_Pos1">
+                                <name>Aircraft1_Wing1_Pos1</name>
+                                <description>This positioning was created by the SGG.</description>
+                                <length>15.0</length>
+                                <sweepAngle>30.0</sweepAngle>
+                                <dihedralAngle>0.0</dihedralAngle>
+                                <fromSectionUID isLink="True">root</fromSectionUID>
+                                <toSectionUID isLink="True">tip</toSectionUID>
+                            </positioning>
+                        </positionings>   
+                    </wing>
+                </wings>                
+            </model>
+        </aircraft>
+        <profiles>
+            <wingAirfoils>
+                <wingAirfoil uID="NACA0009">
+                    <name>NACA0009 Airfoil</name>
+                    <description>NACA 4-digit symmetrical airfoil with a thickness of 9percent</description>
+                    <pointList>
+                        <x mapType="vector">1.0;0.95;0.9;0.8;0.7;0.6;0.5;0.4;0.3;0.25;0.2;0.15;0.1;0.075;0.05;0.025;0.0125;0.005;0.0;0.005;0.0125;0.025;0.05;0.075;0.1;0.15;0.2;0.25;0.3;0.4;0.5;0.6;0.7;0.8;0.9;0.95;1.0</x>
+                        <y mapType="vector">0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0;0.0</y>
+                        <z mapType="vector">0.00095;0.00605;0.01086;0.01967;0.02748;0.03423;0.03971;0.04352;0.04501;0.04456;0.04303;0.04009;0.03512;0.0315;0.02666;0.01961;0.0142;0.0089;0.0;-0.0089;-0.0142;-0.01961;-0.02666;-0.0315;-0.03512;-0.04009;-0.04303;-0.04456;-0.04501;-0.04352;-0.03971;-0.03423;-0.02748;-0.01967;-0.01086;-0.00605;-0.00095</z>
+                    </pointList>
+                </wingAirfoil>
+            </wingAirfoils>
+        </profiles>
+    </vehicles>
+</cpacs>
