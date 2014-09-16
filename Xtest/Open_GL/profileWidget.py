@@ -85,8 +85,9 @@ class ProfileWidget(QtGui.QWidget):
         self.butNaca            = QtGui.QPushButton("NacaCreator")
         self.butImgDetect       = QtGui.QPushButton("ImgDetect")
         self.dial_rot           = QtGui.QDial()
+        self.spinBoxRot         = QtGui.QDoubleSpinBox() 
         self.slider_zoom        = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
-        
+  
         gridEval.addWidget(labelName                , 0, 0)
         gridEval.addWidget(labelLength              , 1, 0)
         gridEval.addWidget(labelAngle               , 2, 0)
@@ -103,15 +104,28 @@ class ProfileWidget(QtGui.QWidget):
         gridView.addWidget(checkCloseTrailingedge   , 1, 1)        
         gridView.addWidget(checkFitToPage           , 2, 0)
         gridView.addWidget(checkCosineSpacing       , 2, 1)
-        gridView.addWidget(self.dial_rot            , 1, 2, 2, 1) 
+        gridView.addWidget(self.spinBoxRot          , 1, 2, 2, 1) 
         
         gridView.addWidget(self.butNaca             , 1, 4)
         gridView.addWidget(self.butImgDetect        , 2, 4)
 
+        self.textName.setReadOnly(True)
+        self.textLength.setReadOnly(True)
+        self.textAngle.setReadOnly(True)
+        self.textThickness.setReadOnly(True)
+        self.textCamber.setReadOnly(True)
+
+        self.spinBoxRot.setStyleSheet("QDoubleSpinBox { border: 3px inset grey; } \
+            QDoubleSpinBox::up-button { subcontrol-position: left; width: 30px; height: 25px;} \
+            QDoubleSpinBox::down-button { subcontrol-position: right; width: 30px; height: 25px;}")
        
-        self.dial_rot.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.dial_rot.setRange(0,90)
-        self.dial_rot.valueChanged.connect(self.fireSetRotValue)
+        #self.dial_rot.setFocusPolicy(QtCore.Qt.StrongFocus)
+        #self.dial_rot.setRange(0,90)
+        #self.dial_rot.valueChanged.connect(self.fireSetRotValue)
+
+        self.spinBoxRot.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.spinBoxRot.setRange(0,90)
+        self.spinBoxRot.valueChanged.connect(self.fireSetRotValue)
 
         self.slider_zoom.setMinimum(1)
         self.slider_zoom.setValue(51)
@@ -143,6 +157,7 @@ class ProfileWidget(QtGui.QWidget):
 
     def fireSetRotValue(self, value):
         self.ogl_widget.set_rotate(-value)
+        self.updateEvalList() ##### Loeschen!!!!!!!!!!!!
    
     def fireShowPoints(self, value):
         self.ogl_widget.setDrawPointsOption(value)   
@@ -154,13 +169,12 @@ class ProfileWidget(QtGui.QWidget):
         else:
             self.slider_zoom.setEnabled(True)
         self.ogl_widget.fitToPage(value)  
-
     
     def fireCloseTrailingEdge(self, value):
         self.ogl_widget.setCloseTrailingEdge(value)
     
     def fireCosineSpacing(self, value):
-        self.ogl_widget.setCosineSpacing(self, value)
+        self.ogl_widget.setCosineSpacing(value)
     
     def fireNacaWidget(self):
         self.ogl_widget_naca.show()
@@ -284,14 +298,14 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.butCreate           = QtGui.QPushButton("create")
         self.butCancel           = QtGui.QPushButton("cancel")        
         self.ogl_widget          = ogl_widget
-        self.ogl_detector_widget = None
+        self.ogl_detector_widget = profile_ogl_image_detector.MyProfileWidget()
         #self.ogl_widget.setFixedSize(200,200)
         
-        grid.addWidget(self.ogl_widget, 1,1,1,4)
-        grid.addWidget(label1,              2,1)
-        grid.addWidget(self.text1Name,      2,2)
-        grid.addWidget(self.butCreate,      2,3)
-        grid.addWidget(self.butCancel,      2,4)
+        grid.addWidget(self.ogl_detector_widget, 1,1,1,4)
+        grid.addWidget(label1,                       2,1)
+        grid.addWidget(self.text1Name,               2,2)
+        grid.addWidget(self.butCreate,               2,3)
+        grid.addWidget(self.butCancel,               2,4)
         
         self.butCreate.clicked.connect(self.fireButtonCreate)
         self.butCancel.clicked.connect(self.close)
@@ -299,7 +313,8 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.createActions()
         self.createMenus()
         
-        self.setLayout(grid)  
+        self.setLayout(grid) 
+        self.resize(320,320)
         
     def fireButtonCreate(self):
         self.ogl_widget.set_name(self.text1Name)
@@ -312,26 +327,23 @@ class ProfileDetectWidget(QtGui.QWidget):
         (fileName, _) = QtGui.QFileDialog.getOpenFileName(self,
                                      "Open File", QtCore.QDir.currentPath())
         
-        image = None
         if (fileName) :
             print fileName
-            image = QtGui.QImage(fileName)
-            print image
-            if (image is None) :
-                QtGui.QMessageBox.information(self, "Image Viewer",
-                                         "Cannot load " + str(fileName))
-                return
+            #---------------------------------------------- if (image is None) :
+                #----------- QtGui.QMessageBox.information(self, "Image Viewer",
+                                         #------ "Cannot load " + str(fileName))
+                #-------------------------------------------------------- return
     
-            self.imageLabel.setPixmap(QtGui.QPixmap.fromImage(image))
-            self.scaleFactor = 1.0
+            #self.imageLabel.setPixmap(QtGui.QPixmap.fromImage(image))
+           # self.scaleFactor = 1.0
     
-            self.printAct.setEnabled(True)
-            self.fitToWindowAct.setEnabled(True)
-            self.updateActions()
+            #self.printAct.setEnabled(True)
+           # self.fitToWindowAct.setEnabled(True)
+            #self.updateActions()
 
-            if (not self.fitToWindowAct.isChecked()) :
-                self.imageLabel.adjustSize()
-
+           # if (not self.fitToWindowAct.isChecked()) :
+            #   self.imageLabel.adjustSize()
+            self.ogl_detector_widget.drawImage(fileName)
 
     def createActions(self):
         self.openAct = QtGui.QAction('Open...', self)

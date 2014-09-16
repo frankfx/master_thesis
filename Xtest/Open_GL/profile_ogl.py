@@ -75,7 +75,10 @@ class Profile(QtOpenGL.QGLWidget):
 
         self.drawGrid()
         
-        GL.glRotatef(self.rotate ,0, 0, 1) 
+       # GL.glTranslatef(0.5, 0, 0)
+       # GL.glRotatef(self.rotate, 0.0, 0.0, 1.0)
+       # GL.glTranslatef(-0.5, 0, 0)
+       # GL.glRotatef(self.rotate ,0, 0, 1) 
         self.drawProfile()
 
         GL.glFlush()
@@ -124,7 +127,10 @@ class Profile(QtOpenGL.QGLWidget):
         
     def set_rotate(self, value):
         self.rotate = value
+        self.dataSet.updateRotationLists(value)
         self.updateGL()
+
+       
 
     def setDrawPointsOption(self, value):
         self.flag_draw_points = value 
@@ -142,8 +148,7 @@ class Profile(QtOpenGL.QGLWidget):
 
     def get_len_chord(self):
         # len Profiltiefe/Sehne
-        start, end = self.dataSet.getEndPoints()
-        return self.dataSet.get_distance_btw_points(start, end)
+        return self.dataSet.getLenChord()
 
     def get_work_angle (self):
         # sin(x) = a/c

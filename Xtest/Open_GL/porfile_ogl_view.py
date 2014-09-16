@@ -148,7 +148,11 @@ class MyProfileWidget(Profile):
         GL.glColor3f(0, 0, 1)
         GL.glTranslatef(-trX, trY, 0)
         
-        self.drawProfile_default(self.dataSet.pointList_top, self.dataSet.pointList_bot, shape)
+        
+        if self.rotate == 0 :
+            self.drawProfile_default(self.dataSet.pointList_top, self.dataSet.pointList_bot, shape)
+        else:
+            self.drawProfile_default(self.dataSet.pointList_top_rot, self.dataSet.pointList_bot_rot, shape)
         # self.drawProfile_bezier(self.pointList_top, self.pointList_bot, shape, self.testValue)
         # self.drawProfile_openGL(self.pointList_top, self.pointList_bot, shape, 5)
        

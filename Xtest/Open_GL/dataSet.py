@@ -38,6 +38,8 @@ class DataSet() :
         self.pointList_chord                    = self.__createPointList_chord(self._leftEndP, self._rightEndP, len(self.pointList_top))
         self.pointList_camber                   = self.__createPointList_camber(self.pointList_top, self.pointList_bot)
         
+        self.pointList_top_rot                  = self.pointList_top
+        self.pointList_bot_rot                  = self.pointList_bot
         
     '''
     @param: uid from cpacs
@@ -105,16 +107,20 @@ class DataSet() :
                 minP     = p
         return minP , maxP  
     
-    '''
-    @param p1: first point
-    @param p2: second point
-    @return: distance between p1 and p2
-    '''    
-    def get_distance_btw_points(self, p1, p2):
-        a = (p1[0] - p2[0]) * (p1[0] - p2[0])
-        b = (p1[1] - p2[1]) * (p1[1] - p2[1])
-        return math.sqrt( a + b )
 
+
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     '''
     @param list1: first list
     @param list2: second list
@@ -129,6 +135,22 @@ class DataSet() :
             dist = cur_dist if cur_dist > dist else dist            
         return dist  
 
+    
+    #def get_max_distancecomputeDistance
+    
+    
+    
+    
+
+     
+     
+     
+     
+       
+   
+    
+    
+    
     '''
     @param p1: profile start point (nose)
     @param p2: profile end point
@@ -169,6 +191,10 @@ class DataSet() :
     def getPointList_bot(self):
         return self.pointList_bot
 
+    def getLenChord(self):
+        start, end = self.getEndPoints()
+        return self.get_distance_btw_points(start, end)
+
     def setPointListCamber(self, plist):
         self.pointList_camber = plist
 
@@ -178,7 +204,7 @@ class DataSet() :
     '''
     @param x: x-value of result point
     @param p1: point one of line p1 to p2
-    @param p1: point two of line p1 to p2
+    @param p2: point two of line p1 to p2
     @return: Point on Line of Points p1 to p2
     '''
     def __computePointOnLine(self, x, p1, p2):
@@ -196,7 +222,54 @@ class DataSet() :
 
         y = m * x + b
         return [x, y, p1[2]]        
+    
+    
+    
+    def createLineNormale(self, plist, srcPoint):
+        if len(plist) < 2 :
+            return None
+        p1 = plist[0] 
+        p2 = plist[1]
+        # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
+        m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
         
+        m_normal =-1/m
+        b = srcPoint[1] - m_normal * srcPoint[0]
+
+        return lambda x : m_normal * x + b   
+      
+      
+    
+      
+      
+    def computeSteigungM_in_Point(self, plist, p):
+        func, _ = self.createLineFunc(plist)
+        
+        m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] 
+
+    
+        return
+    
+      
+        
+    def blablacar(self):
+        plist = self.pointList_chord
+        for p in plist:
+            normale = self.createLineNormale(plist)
+        for p : plist :
+            p[0]
+        
+        
+       
+    '''
+    @param p1: first point
+    @param p2: second point
+    @return: distance between p1 and p2
+    '''    
+    def get_distance_btw_points(self, p1, p2):
+        a = (p1[0] - p2[0]) * (p1[0] - p2[0])
+        b = (p1[1] - p2[1]) * (p1[1] - p2[1])
+        return math.sqrt( a + b )       
         
     '''
     ?????????????????????????????????????????????????????
@@ -208,10 +281,8 @@ class DataSet() :
     '''
     def __computePoint(self, p1, plist):
                 
-        idx_r = -1
-        idx_l = -1
-        flag_l = False
-        flag_r = False
+        idx_r  , idx_l   = -1   , -1
+        flag_l , flag_r = False , False
 
         for i in range(0 , len(plist)) :
             if plist[i][0] <= p1[0]:
@@ -232,7 +303,17 @@ class DataSet() :
             logging.debug('None in MODULE: dataSet, FUNCTION: __computePoint') 
             logging.debug(str(idx_r) + ', ' + str(idx_l))
             logging.debug('idx_r == -1 or idx_l == -1')
-            return None
+            logging.debug("plist = " + str(plist))
+            logging.debug("x = " + str(p1))
+            
+            mini, maxi = self.get_min_max_of_List(plist, 0)
+            p_r = maxi if idx_r == -1 else plist[idx_r]
+            p_l = mini if idx_l == -1 else plist[idx_l]
+
+            p_new = self.__computePointOnLine(p1[0], p_l, p_r)
+            print p_new , p_l, p_r, p1[0]
+            return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
+        
         elif idx_r == idx_l :
             y = p1[1] - (p1[1] - plist[idx_l][1]) / 2
             return [p1[0], y, p1[2]]
@@ -267,8 +348,34 @@ class DataSet() :
                 return i
             i += 1
         return None        
-               
+
+    def updateRotationLists(self, angle):
+        length = self.getLenChord()
+        self.pointList_top = self.rotPointList(self.pointList_top_rot, angle, length)
+        self.pointList_bot = self.rotPointList(self.pointList_bot_rot, angle, length)        
+
+    def rotPointList(self, plist, angle, curTransX = 1):
+        res = []
+        for p in plist :
+            rotP = self.getRotPoint(p[0]-curTransX, p[1], p[2], self.degToRad(angle))
+            rotP = [rotP[0]+curTransX, rotP[1], rotP[2]]
+            res.append(rotP)
+        return res
+
+    def getRotPoint(self, x, y, z, theta):
+        x_new = x * math.cos(theta) - y * math.sin(theta)
+        y_new = x * math.sin(theta) + y * math.cos(theta)
+        z_new = z
+        return [x_new, y_new, z_new]                
        
+    '''
+    @param angle: angle in degrees
+    @return: angle in radians 
+    '''   
+    def degToRad(self, angle):
+        return angle/(180/math.pi)   
+    
+    
     def __echo(self, value):
         print "#######################################################################"
         print str(value)
