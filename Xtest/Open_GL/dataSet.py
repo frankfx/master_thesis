@@ -108,19 +108,6 @@ class DataSet() :
         return minP , maxP  
     
 
-
-   
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     '''
     @param list1: first list
     @param list2: second list
@@ -173,11 +160,12 @@ class DataSet() :
     @return: list of camber points 
     '''
     def __createPointList_camber(self, topList, botList):
-        res = []
-        for i in range(0, len(topList)):
-            p = self.__computePoint(topList[i], botList)
-            res.append(p)
-        return res
+       # res = []
+       # for i in range(0, len(topList)):
+       #     p = self.__computePoint(topList[i], botList)
+       #     res.append(p)
+       # return res
+       return self.blablacar()
         
     def setPointListTop(self, plist):
         self.pointList_top = plist
@@ -233,33 +221,47 @@ class DataSet() :
         # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
         m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
         
-        m_normal =-1/m
+        m_normal = 0 if m == 0 else -1/m
         b = srcPoint[1] - m_normal * srcPoint[0]
 
         return lambda x : m_normal * x + b   
       
       
-    
-      
-      
-    def computeSteigungM_in_Point(self, plist, p):
-        func, _ = self.createLineFunc(plist)
-        
-        m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] 
-
-    
-        return
-    
-      
         
     def blablacar(self):
-        plist = self.pointList_chord
-        for p in plist:
-            normale = self.createLineNormale(plist)
-        for p : plist :
-            p[0]
-        
-        
+        res = []
+        for p in self.pointList_chord:
+            res_top = None
+            normale = self.createLineNormale(self.pointList_chord, p)
+            
+            for p_t in self.pointList_top :
+                if res_top is None :
+                    res_top = p_t
+                else:
+                    y = normale (p_t[0])
+                    if y - p_t[1] < y-res_top[1] :
+                        res_top = p_t
+
+            res_bot = None
+            for p_b in self.pointList_bot :
+                if res_bot is None :
+                    res_bot = p_b
+                else:
+                    y = normale (p_b[0])
+                    if y - p_b[1] < y-res_bot[1] :
+                        res_bot = p_b
+
+            res.append( self.computePointBtw(res_top, res_bot) )
+            
+        return res
+    
+    
+    def computePointBtw(self, p1, p2):
+        distX = p1[0] - p2[0]
+        distY = p1[1] - p2[1]
+        halfX = distX / 2
+        halfY = distY / 2
+        return [p1[0] - halfX, p1[1] - halfY, p1[2]]
        
     '''
     @param p1: first point
@@ -279,47 +281,47 @@ class DataSet() :
     @param plist: botList
     @return: Point in the center of topList and botList at position x  
     '''
-    def __computePoint(self, p1, plist):
-                
-        idx_r  , idx_l   = -1   , -1
-        flag_l , flag_r = False , False
-
-        for i in range(0 , len(plist)) :
-            if plist[i][0] <= p1[0]:
-                if not flag_l :
-                    idx_l = i
-                    flag_l = True
-                elif plist[i][0] > plist[idx_l][0]:
-                    idx_l = i
-                    
-            if plist[i][0] >= p1[0] :
-                if not flag_r:
-                    idx_r = i
-                    flag_r = True
-                elif plist[i][0] < plist[idx_r][0] :
-                    idx_r = i
-        
-        if idx_r == -1 or idx_l == -1 :
-            logging.debug('None in MODULE: dataSet, FUNCTION: __computePoint') 
-            logging.debug(str(idx_r) + ', ' + str(idx_l))
-            logging.debug('idx_r == -1 or idx_l == -1')
-            logging.debug("plist = " + str(plist))
-            logging.debug("x = " + str(p1))
-            
-            mini, maxi = self.get_min_max_of_List(plist, 0)
-            p_r = maxi if idx_r == -1 else plist[idx_r]
-            p_l = mini if idx_l == -1 else plist[idx_l]
-
-            p_new = self.__computePointOnLine(p1[0], p_l, p_r)
-            print p_new , p_l, p_r, p1[0]
-            return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
-        
-        elif idx_r == idx_l :
-            y = p1[1] - (p1[1] - plist[idx_l][1]) / 2
-            return [p1[0], y, p1[2]]
-
-        p_new = self.__computePointOnLine(p1[0], plist[idx_l], plist[idx_r])
-        return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
+    #-------------------------------------- def __computePoint(self, p1, plist):
+#------------------------------------------------------------------------------ 
+        #------------------------------------------ idx_r  , idx_l   = -1   , -1
+        #--------------------------------------- flag_l , flag_r = False , False
+#------------------------------------------------------------------------------ 
+        #-------------------------------------- for i in range(0 , len(plist)) :
+            #------------------------------------------ if plist[i][0] <= p1[0]:
+                #----------------------------------------------- if not flag_l :
+                    #------------------------------------------------- idx_l = i
+                    #--------------------------------------------- flag_l = True
+                #--------------------------- elif plist[i][0] > plist[idx_l][0]:
+                    #------------------------------------------------- idx_l = i
+#------------------------------------------------------------------------------ 
+            #----------------------------------------- if plist[i][0] >= p1[0] :
+                #------------------------------------------------ if not flag_r:
+                    #------------------------------------------------- idx_r = i
+                    #--------------------------------------------- flag_r = True
+                #-------------------------- elif plist[i][0] < plist[idx_r][0] :
+                    #------------------------------------------------- idx_r = i
+#------------------------------------------------------------------------------ 
+        #--------------------------------------- if idx_r == -1 or idx_l == -1 :
+            # logging.debug('None in MODULE: dataSet, FUNCTION: __computePoint')
+            #--------------------- logging.debug(str(idx_r) + ', ' + str(idx_l))
+            #----------------------- logging.debug('idx_r == -1 or idx_l == -1')
+            #---------------------------- logging.debug("plist = " + str(plist))
+            #----------------------------------- logging.debug("x = " + str(p1))
+#------------------------------------------------------------------------------ 
+            #------------------- mini, maxi = self.get_min_max_of_List(plist, 0)
+            #----------------------- p_r = maxi if idx_r == -1 else plist[idx_r]
+            #----------------------- p_l = mini if idx_l == -1 else plist[idx_l]
+#------------------------------------------------------------------------------ 
+            #---------------- p_new = self.__computePointOnLine(p1[0], p_l, p_r)
+            #------------------------------------- print p_new , p_l, p_r, p1[0]
+            #----------- return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
+#------------------------------------------------------------------------------ 
+        #------------------------------------------------- elif idx_r == idx_l :
+            #------------------------- y = p1[1] - (p1[1] - plist[idx_l][1]) / 2
+            #------------------------------------------ return [p1[0], y, p1[2]]
+#------------------------------------------------------------------------------ 
+        #-- p_new = self.__computePointOnLine(p1[0], plist[idx_l], plist[idx_r])
+        #--------------- return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
 
 
     def cosineSpacing(self, x, c, i, N) :
