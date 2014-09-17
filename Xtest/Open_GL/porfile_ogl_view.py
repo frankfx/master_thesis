@@ -139,38 +139,78 @@ class MyProfileWidget(Profile):
         return res
 
 
+    def drawProfile_bezier(self, plist):
+        GL.glBegin(GL.GL_LINE_STRIP) 
+        for i in range (0, len(plist), 1) :
+            GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])              
+        GL.glEnd()       
+
+
+    #---------------------------------------------------- def drawProfile(self):
+#------------------------------------------------------------------------------ 
+        #------------------------------- profi = self.dataSet.createBezierList()
+        #----------------------------------------------- print "hier444" , profi
+        #---------------------------------- trX, trY = self.norm_vec_list(profi)
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+        #------------------------------------------------- GL.glColor3f(0, 0, 1)
+        #----------------------------------------- GL.glTranslatef(-trX, trY, 0)
+#------------------------------------------------------------------------------ 
+        #---------------------------------------- self.drawProfile_bezier(profi)
+#------------------------------------------------------------------------------ 
+        #--------------------------------------------------- #The Trainling edge
+        #--------------------------------- if self.getCloseTrailingEdgeValue() :
+            #--------- p1 = self.dataSet.getEndPoint(self.dataSet.pointList_top)
+            #--------- p2 = self.dataSet.getEndPoint(self.dataSet.pointList_bot)
+            #------------------------------------- self.drawTrailingEdge(p1, p2)
+#------------------------------------------------------------------------------ 
+        #-------------- #The following code displays the control points as dots.
+        #-------------------------------------------- if self.flag_draw_points :
+            #----------------------------------------- self.drawProfile_points()
+
+
+
     def drawProfile(self):
-        if self.flag_close_TrailingEdge : shape = GL.GL_LINE_STRIP
-        else : shape = GL.GL_LINE_LOOP
-        
-        trX, trY = self.norm_vec_list(self.dataSet.pointList_top + self.dataSet.pointList_bot) 
-        
+
+        trX, trY = self.norm_vec_list(self.dataSet.pointList_top + self.dataSet.pointList_bot)
+
         GL.glColor3f(0, 0, 1)
         GL.glTranslatef(-trX, trY, 0)
-        
-        
+
         if self.rotate == 0 :
-            self.drawProfile_default(self.dataSet.pointList_top, self.dataSet.pointList_bot, shape)
+            self.drawProfile_default(self.dataSet.pointList_top, self.dataSet.pointList_bot)
         else:
-            self.drawProfile_default(self.dataSet.pointList_top_rot, self.dataSet.pointList_bot_rot, shape)
-        # self.drawProfile_bezier(self.pointList_top, self.pointList_bot, shape, self.testValue)
-        # self.drawProfile_openGL(self.pointList_top, self.pointList_bot, shape, 5)
-       
+            self.drawProfile_default(self.dataSet.pointList_top, self.dataSet.pointList_bot)
+          # self.drawProfile_bezier(self.pointList_top, self.pointList_bot, shape, self.testValue)
+          # self.drawProfile_openGL(self.pointList_top, self.pointList_bot, shape, 5)
+
+        #The Trainling edge
+        if self.getCloseTrailingEdgeValue() :
+            p1 = self.dataSet.getEndPoint(self.dataSet.pointList_top)
+            p2 = self.dataSet.getEndPoint(self.dataSet.pointList_bot)
+            self.drawTrailingEdge(p1, p2)
+
         #The following code displays the control points as dots.
         if self.flag_draw_points :
             self.drawProfile_points()
 
-    def drawProfile_default(self, top_prof, bot_prof, shape):
-        p_list = top_prof + bot_prof
-        GL.glBegin(shape)
-        for i in range (0, len(p_list)) :
-            GL.glVertex3f(p_list[i][0], p_list[i][1], p_list[i][2])
-        GL.glEnd()  
-        self.drawChord()      
-        self.drawSkeleton()
+    def drawProfile_default(self, top_prof, bot_prof):
+        self.drawProfile_default_hlp(top_prof)
+        self.drawProfile_default_hlp(bot_prof)
+        #self.drawChord()      
+        self.drawCamber()        
 
-
-  
+    def drawProfile_default_hlp(self, plist):
+        GL.glBegin(GL.GL_LINE_STRIP)
+        for i in range (0, len(plist)) :
+            GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])
+        GL.glEnd()
+        
+    def drawTrailingEdge(self, p1, p2):
+        GL.glBegin(GL.GL_LINES)
+        GL.glVertex3f(p1[0], p1[1], p1[2])
+        GL.glVertex3f(p2[0], p2[1], p2[2])
+        GL.glEnd()        
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])

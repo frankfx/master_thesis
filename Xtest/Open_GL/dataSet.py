@@ -10,6 +10,7 @@ from cpacsHandler import CPACS_Handler
 from config import Config
 import logging
 import datetime
+from coverage import start
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -37,7 +38,7 @@ class DataSet() :
         self._leftEndP , self._rightEndP        = self.__getEndPoints(self.pointList_top, self.pointList_bot)
         self.pointList_chord                    = self.__createPointList_chord(self._leftEndP, self._rightEndP, len(self.pointList_top))
         self.pointList_camber                   = self.__createPointList_camber(self.pointList_top, self.pointList_bot)
-        
+        print "hierer" , self.pointList_camber
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
         
@@ -52,6 +53,7 @@ class DataSet() :
         vecX = self.tixi.getVectorX(uid)
         vecY = self.tixi.getVectorZ(uid)
         vecZ = self.tixi.getVectorY(uid)
+        
         l_fst = []
         l_snd = []
         for i in range(0, len(vecX)-1, 1) :
@@ -70,11 +72,17 @@ class DataSet() :
 
         for j in range(i, len(vecX), 1) :
             l_snd.append([ vecX[j], vecY[j], vecZ[j] ])
-        l_snd.reverse()
+        #l_snd.reverse()
         print l_fst
         print l_snd 
         return l_fst , l_snd
    
+   
+   
+    def getEndPoint(self, plist):
+        dim = 0
+        _ , maxi = self.get_min_max_of_List(plist, dim)
+        return maxi
    
     '''
     @return: left and right end point
@@ -88,7 +96,6 @@ class DataSet() :
     @return: left and right end point
     '''
     def __getEndPoints(self, toplist, botlist):
-        
         dim = 0
         _ , max_top = self.get_min_max_of_List(toplist, dim)
         _ , max_bot = self.get_min_max_of_List(botlist, dim)
@@ -96,7 +103,7 @@ class DataSet() :
         maxP = max_top if max_top >= max_bot else max_bot
         maxP = [maxP[0], max_bot[1] + (max_top[1] - max_bot[1])/2, maxP[2]]
 
-        minP = maxP
+        minP = [maxP]
         max_dist = 0
         tmp_dist = 0
 
@@ -121,22 +128,6 @@ class DataSet() :
             cur_dist = self.get_distance_btw_points(p, p1)
             dist = cur_dist if cur_dist > dist else dist            
         return dist  
-
-    
-    #def get_max_distancecomputeDistance
-    
-    
-    
-    
-
-     
-     
-     
-     
-       
-   
-    
-    
     
     '''
     @param p1: profile start point (nose)
@@ -160,12 +151,91 @@ class DataSet() :
     @return: list of camber points 
     '''
     def __createPointList_camber(self, topList, botList):
-       # res = []
-       # for i in range(0, len(topList)):
-       #     p = self.__computePoint(topList[i], botList)
-       #     res.append(p)
-       # return res
-       return self.blablacar()
+        return self.computeCamber(topList, botList)
+      #  res = []    
+      #  for i in range(0, len(topList)):     
+      #      p = self.__computePoint(topList[i], botList)    
+      #      res.append(p)    
+      #  return res        
+    
+        
+    '''
+    @param plist: list of line
+    @return: gradient of line perpendicular
+    '''
+    def computeLinePerpendicularGradient(self, plist):
+        if len(plist) < 2 :
+            return None
+        p1 = plist[0] 
+        p2 = plist[1]
+        # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
+        m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
+        
+        print p1, p2
+        print "mmmm" , m  
+        m_perpendicular = 0 if m == 0 else -1/m
+        return m_perpendicular      
+
+    '''
+    @param plist: list with line coordinates
+    @param srcPoint: point on plist where perpendicular intersects
+    @return: perpendicular as lambda function  or  None if m is 0
+    '''
+    def createLinePerpendicular(self, plist, srcPoint):
+        m_perpendicular = self.computeLinePerpendicularGradient(plist)
+        b = srcPoint[1] - m_perpendicular * srcPoint[0]
+        
+        return None if m_perpendicular == 0 else lambda x : m_perpendicular * x + b   
+       
+    '''
+    @return: camber list
+    ''' 
+    def computeCamber(self, topList, botList):
+        res = []
+        for p in self.pointList_chord :
+            fct_perpendicular   = self.createLinePerpendicular(self.pointList_chord, p)
+            print "fct_perpendicular" , fct_perpendicular
+            if fct_perpendicular is None:
+                print "not intersect case"
+                return self.computeCamber2(topList, botList)
+            else:
+                print "intersect case"
+                intersect_top       = self.getIntersectionPoint(topList, fct_perpendicular)
+                intersect_bot       = self.getIntersectionPoint(botList, fct_perpendicular)
+            
+                res.append( self.computePointBtw(intersect_top, intersect_bot)) 
+            
+        return res
+
+    def computeCamber2(self, topList, botList):
+        res = []    
+        for i in range(0, len(topList)):     
+            p = self.__computePoint(topList[i], botList)    
+            res.append(p)    
+        return res   
+
+    '''
+    @param plist: top or bottom list
+    @param fct_perpendicular: the perpendicular of chord line as a lambda function 
+    @return: approximated intersection point between plist line and chord perpendicular
+    '''
+    def getIntersectionPoint(self, plist, fct_perpendicular):
+        res = None
+        for p in plist :
+            if res is None :
+                res = p
+            else:
+                y = fct_perpendicular (p[0])
+                print y, p, " ==== " , self.abs(y - p[1])
+                if self.abs(y - p[1]) < self.abs(y-res[1]) :
+                    res = p
+        print "intersect Point" , res
+        return res     
+
+
+    def abs(self, value):
+        return -value if value < 0 else value        
+        
         
     def setPointListTop(self, plist):
         self.pointList_top = plist
@@ -178,6 +248,7 @@ class DataSet() :
     
     def getPointList_bot(self):
         return self.pointList_bot
+    
 
     def getLenChord(self):
         start, end = self.getEndPoints()
@@ -202,7 +273,8 @@ class DataSet() :
             logging.debug('None in MODULE: dataSet, FUNCTION: __computePointOnLine') 
             logging.debug(str(x) + ', ' + str(p1) + ', ' + str(p2))
             logging.debug('x < fst[0] or x > snd[0]')
-            return None
+            #return None
+            return p2
 
         # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
         m = ( snd[1] - fst[1] ) / ( snd[0] - fst[0] )
@@ -213,47 +285,7 @@ class DataSet() :
     
     
     
-    def createLineNormale(self, plist, srcPoint):
-        if len(plist) < 2 :
-            return None
-        p1 = plist[0] 
-        p2 = plist[1]
-        # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
-        m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
-        
-        m_normal = 0 if m == 0 else -1/m
-        b = srcPoint[1] - m_normal * srcPoint[0]
 
-        return lambda x : m_normal * x + b   
-      
-      
-        
-    def blablacar(self):
-        res = []
-        for p in self.pointList_chord:
-            res_top = None
-            normale = self.createLineNormale(self.pointList_chord, p)
-            
-            for p_t in self.pointList_top :
-                if res_top is None :
-                    res_top = p_t
-                else:
-                    y = normale (p_t[0])
-                    if y - p_t[1] < y-res_top[1] :
-                        res_top = p_t
-
-            res_bot = None
-            for p_b in self.pointList_bot :
-                if res_bot is None :
-                    res_bot = p_b
-                else:
-                    y = normale (p_b[0])
-                    if y - p_b[1] < y-res_bot[1] :
-                        res_bot = p_b
-
-            res.append( self.computePointBtw(res_top, res_bot) )
-            
-        return res
     
     
     def computePointBtw(self, p1, p2):
@@ -281,47 +313,46 @@ class DataSet() :
     @param plist: botList
     @return: Point in the center of topList and botList at position x  
     '''
-    #-------------------------------------- def __computePoint(self, p1, plist):
-#------------------------------------------------------------------------------ 
-        #------------------------------------------ idx_r  , idx_l   = -1   , -1
-        #--------------------------------------- flag_l , flag_r = False , False
-#------------------------------------------------------------------------------ 
-        #-------------------------------------- for i in range(0 , len(plist)) :
-            #------------------------------------------ if plist[i][0] <= p1[0]:
-                #----------------------------------------------- if not flag_l :
-                    #------------------------------------------------- idx_l = i
-                    #--------------------------------------------- flag_l = True
-                #--------------------------- elif plist[i][0] > plist[idx_l][0]:
-                    #------------------------------------------------- idx_l = i
-#------------------------------------------------------------------------------ 
-            #----------------------------------------- if plist[i][0] >= p1[0] :
-                #------------------------------------------------ if not flag_r:
-                    #------------------------------------------------- idx_r = i
-                    #--------------------------------------------- flag_r = True
-                #-------------------------- elif plist[i][0] < plist[idx_r][0] :
-                    #------------------------------------------------- idx_r = i
-#------------------------------------------------------------------------------ 
-        #--------------------------------------- if idx_r == -1 or idx_l == -1 :
-            # logging.debug('None in MODULE: dataSet, FUNCTION: __computePoint')
-            #--------------------- logging.debug(str(idx_r) + ', ' + str(idx_l))
-            #----------------------- logging.debug('idx_r == -1 or idx_l == -1')
-            #---------------------------- logging.debug("plist = " + str(plist))
-            #----------------------------------- logging.debug("x = " + str(p1))
-#------------------------------------------------------------------------------ 
-            #------------------- mini, maxi = self.get_min_max_of_List(plist, 0)
-            #----------------------- p_r = maxi if idx_r == -1 else plist[idx_r]
-            #----------------------- p_l = mini if idx_l == -1 else plist[idx_l]
-#------------------------------------------------------------------------------ 
-            #---------------- p_new = self.__computePointOnLine(p1[0], p_l, p_r)
-            #------------------------------------- print p_new , p_l, p_r, p1[0]
-            #----------- return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
-#------------------------------------------------------------------------------ 
-        #------------------------------------------------- elif idx_r == idx_l :
-            #------------------------- y = p1[1] - (p1[1] - plist[idx_l][1]) / 2
-            #------------------------------------------ return [p1[0], y, p1[2]]
-#------------------------------------------------------------------------------ 
-        #-- p_new = self.__computePointOnLine(p1[0], plist[idx_l], plist[idx_r])
-        #--------------- return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
+    def __computePoint(self, p1, plist):
+
+        idx_r  , idx_l   = -1   , -1
+        flag_l , flag_r = False , False
+
+        for i in range(0 , len(plist)) :
+            if plist[i][0] <= p1[0]:
+                if not flag_l :
+                    idx_l = i
+                    flag_l = True
+                elif plist[i][0] > plist[idx_l][0]:
+                    idx_l = i
+
+            if plist[i][0] >= p1[0] :
+                if not flag_r:
+                    idx_r = i
+                    flag_r = True
+                elif plist[i][0] < plist[idx_r][0] :
+                    idx_r = i
+
+        if idx_r == -1 or idx_l == -1 :
+            logging.debug('None in MODULE: dataSet, FUNCTION: __computePoint')
+            logging.debug(str(idx_r) + ', ' + str(idx_l))
+            logging.debug('idx_r == -1 or idx_l == -1')
+            logging.debug("plist = " + str(plist))
+            logging.debug("x = " + str(p1))
+
+            mini, maxi = self.get_min_max_of_List(plist, 0)
+            p_r = maxi if idx_r == -1 else plist[idx_r]
+            p_l = mini if idx_l == -1 else plist[idx_l]
+
+            p_new = self.__computePointOnLine(p1[0], p_l, p_r)
+            return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
+
+        elif idx_r == idx_l :
+            y = p1[1] - (p1[1] - plist[idx_l][1]) / 2
+            return [p1[0], y, p1[2]]
+
+        p_new = self.__computePointOnLine(p1[0], plist[idx_l], plist[idx_r])
+        return [p1[0], p1[1] - (p1[1] - p_new[1]) / 2.0, p1[2]]
 
 
     def cosineSpacing(self, x, c, i, N) :
@@ -352,9 +383,12 @@ class DataSet() :
         return None        
 
     def updateRotationLists(self, angle):
-        length = self.getLenChord()
+        length = self.getLenChord()       
         self.pointList_top = self.rotPointList(self.pointList_top_rot, angle, length)
-        self.pointList_bot = self.rotPointList(self.pointList_bot_rot, angle, length)        
+        self.pointList_bot = self.rotPointList(self.pointList_bot_rot, angle, length)
+        self._leftEndP , self._rightEndP = self.__getEndPoints(self.pointList_top, self.pointList_bot)
+        self.pointList_chord = self.__createPointList_chord(self._leftEndP, self._rightEndP, len(self.pointList_top))     
+
 
     def rotPointList(self, plist, angle, curTransX = 1):
         res = []
@@ -377,6 +411,70 @@ class DataSet() :
     def degToRad(self, angle):
         return angle/(180/math.pi)   
     
+
+
+
+
+### bezier:
+
+
+    def bezierCurve_full(self, t, pList):
+        # Curve with level n has n + 1 points : P0 ... Pn
+        n = len(pList) - 1
+        return self.bezierCurve_full_rec(0, n, t, pList)
+
+    def bezierCurve_full_rec(self, i, n, t, pList):
+        if i == n :
+            return math.pow(t, i) * pList[i]
+        else :
+            return self.compute_Bernsteinpolynom(i, n, t) * pList[i] + self.bezierCurve_full_rec(i+1, n, t, pList)
+            
+    def compute_Bernsteinpolynom(self,i, n, t):
+        return math.factorial(n) / ( math.factorial(i) * math.factorial(n-i) ) * math.pow(t,i) * math.pow(1-t, n-i) 
+
+    def __compute_bezier_tangent(self, p1, p2):
+        dx = (p2[0] - p1[0]) / 3
+        dy = (p2[1] - p1[1]) / 3
+
+        x3 = p1[0] + dx
+        y3 = p1[1] + dy
+
+        x4 = x3 + dx
+        y4 = y3 + dy
+    
+        return [x3, y3, 0] , [x4, y4, 0]
+
+    
+    def createBezierList(self):
+        print self.pointList_top
+        self.pointList_bot.reverse()
+        print self.pointList_bot
+        
+        return self.computeBezierList(self.pointList_top)
+    
+
+    def computeBezierList(self, plist, t=11):
+        res = []
+        
+        for i in range(0, len(plist)-2, 2) :
+            start = plist[i]
+            tan1  = plist[i+1]
+            end   = plist[i+2]
+        
+            for j in range(0, t, 1):
+                pos = j*1.0 / t
+                x = self.bezierCurve_full(pos, [ start[0], tan1[0], end[0] ])
+                y = self.bezierCurve_full(pos, [ start[1], tan1[1], end[1] ])
+                z = self.bezierCurve_full(pos, [ start[2], tan1[2], end[2] ])
+                        
+                res.append([x,y,z])   
+         
+        res.append(plist[len(plist)-1])        
+        return res     
+                
+      
+                
+
     
     def __echo(self, value):
         print "#######################################################################"

@@ -152,8 +152,8 @@ class ProfileWidget(QtGui.QWidget):
         self.textName.setText(self.ogl_widget.get_name())
         self.textLength.setText(str(self.ogl_widget.get_len_chord()))
         self.textAngle.setText(str(self.ogl_widget.get_work_angle()))
-        self.textThickness.setText(str(self.ogl_widget.get_profile_thickness()))
-        self.textCamber.setText(str(self.ogl_widget.get_profile_arch()))
+        #self.textThickness.setText(str(self.ogl_widget.get_profile_thickness()))
+        #self.textCamber.setText(str(self.ogl_widget.get_profile_arch()))
 
     def fireSetRotValue(self, value):
         self.ogl_widget.set_rotate(-value)

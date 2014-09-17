@@ -108,7 +108,6 @@ class MyProfileWidget(QtOpenGL.QGLWidget):
         self.renderer = Renderer()    
         self.renderer.flag_view(Renderer.CLOSED)
         
-        self.rede
     
     def initializeGL(self):
         self.renderer.init()

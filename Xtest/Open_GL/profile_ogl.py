@@ -115,6 +115,7 @@ class Profile(QtOpenGL.QGLWidget):
 
     def setCloseTrailingEdge(self, value):
         self.flag_close_TrailingEdge = value
+        self.updateGL()
 
     def set_transX(self, value):
         self.trans_x = value
@@ -127,10 +128,12 @@ class Profile(QtOpenGL.QGLWidget):
         
     def set_rotate(self, value):
         self.rotate = value
+        self.dataSet.updatePointlistCamber()
         self.dataSet.updateRotationLists(value)
         self.updateGL()
 
-       
+    def getCloseTrailingEdgeValue(self):
+        return self.flag_close_TrailingEdge
 
     def setDrawPointsOption(self, value):
         self.flag_draw_points = value 
@@ -206,9 +209,8 @@ class Profile(QtOpenGL.QGLWidget):
             GL.glVertex3f(plist_bot[j][0], plist_bot[j][1], plist_bot[j][2])
         GL.glEnd() 
 
-    def drawSkeleton(self):
+    def drawCamber(self):
         plist = self.dataSet.pointList_camber
-        print "skeleton" , plist
         GL.glBegin(GL.GL_LINES)
         for i in range(0, len(plist)) :
             GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])# left end == nose

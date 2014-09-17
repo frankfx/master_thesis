@@ -133,8 +133,8 @@ class MyProfileWidget_Const(Profile):
         GL.glTranslatef(-self.norm_vec_list(self.pointList_top),0, 0)
         
         self.drawProfile_default(self.pointList_top, self.pointList_bot, shape)
-        # self.drawProfile_bezier(self.pointList_top, self.pointList_bot, shape, self.testValue)
-        # self.drawProfile_openGL(self.pointList_top, self.pointList_bot, shape, 5)
+        #self.drawProfile_bezier(self.pointList_top, self.pointList_bot, shape, self.testValue)
+        #self.drawProfile_openGL(self.pointList_top, self.pointList_bot, shape, 5)
        
         #The following code displays the control points as dots.
         if self.flag_draw_points :
@@ -149,7 +149,7 @@ class MyProfileWidget_Const(Profile):
             GL.glVertex3f(p_list[i][0], p_list[i][1], p_list[i][2])
         GL.glEnd()  
         #self.drawChord()      
-        self.drawSkeleton()
+        self.drawCamber()
 
 
   
