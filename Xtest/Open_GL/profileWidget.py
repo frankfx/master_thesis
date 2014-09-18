@@ -81,7 +81,7 @@ class ProfileWidget(QtGui.QWidget):
         checkShowPoints         = QtGui.QCheckBox("Show points")
         checkFitToPage          = QtGui.QCheckBox("Fit to page")
         checkCloseTrailingedge  = QtGui.QCheckBox("Close Trailing edge")
-        checkCosineSpacing      = QtGui.QCheckBox("Cosine spacing")
+        checkBezierCurve        = QtGui.QCheckBox("Bezier curve ")
         self.butNaca            = QtGui.QPushButton("NacaCreator")
         self.butImgDetect       = QtGui.QPushButton("ImgDetect")
         self.dial_rot           = QtGui.QDial()
@@ -103,7 +103,7 @@ class ProfileWidget(QtGui.QWidget):
         gridView.addWidget(checkShowPoints          , 1, 0)
         gridView.addWidget(checkCloseTrailingedge   , 1, 1)        
         gridView.addWidget(checkFitToPage           , 2, 0)
-        gridView.addWidget(checkCosineSpacing       , 2, 1)
+        gridView.addWidget(checkBezierCurve         , 2, 1)
         gridView.addWidget(self.spinBoxRot          , 1, 2, 2, 1) 
         
         gridView.addWidget(self.butNaca             , 1, 4)
@@ -130,12 +130,12 @@ class ProfileWidget(QtGui.QWidget):
         self.slider_zoom.setMinimum(1)
         self.slider_zoom.setValue(51)
         self.slider_zoom.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.slider_zoom.valueChanged[int].connect(self.ogl_widget.slider_zoom) 
+        self.slider_zoom.valueChanged[int].connect(self.ogl_widget.setScale) 
         
         checkShowPoints.toggled.connect(self.fireShowPoints)
         checkFitToPage.toggled.connect(self.fireFitToPage)
         checkCloseTrailingedge.toggled.connect(self.fireCloseTrailingEdge)
-        checkCosineSpacing.toggled.connect(self.fireCosineSpacing)
+        checkBezierCurve.toggled.connect(self.fireBezierCurve)
         self.butNaca.clicked.connect(self.fireNacaWidget)
         self.butImgDetect.clicked.connect(self.fireDetectWidget)
 
@@ -149,14 +149,14 @@ class ProfileWidget(QtGui.QWidget):
         return vboxLayout
         
     def updateEvalList(self):      
-        self.textName.setText(self.ogl_widget.get_name())
-        self.textLength.setText(str(self.ogl_widget.get_len_chord()))
-        self.textAngle.setText(str(self.ogl_widget.get_work_angle()))
-        #self.textThickness.setText(str(self.ogl_widget.get_profile_thickness()))
-        #self.textCamber.setText(str(self.ogl_widget.get_profile_arch()))
+        self.textName.setText(self.ogl_widget.getName())
+        self.textLength.setText(str(self.ogl_widget.getLenChord()))
+        self.textAngle.setText(str(self.ogl_widget.getWorkAngle()))
+        self.textThickness.setText(str(self.ogl_widget.getProfileThickness()))
+        self.textCamber.setText(str(self.ogl_widget.getProfileArch()))
 
     def fireSetRotValue(self, value):
-        self.ogl_widget.set_rotate(-value)
+        self.ogl_widget.setRotate(-value)
         self.updateEvalList() ##### Loeschen!!!!!!!!!!!!
    
     def fireShowPoints(self, value):
@@ -173,8 +173,8 @@ class ProfileWidget(QtGui.QWidget):
     def fireCloseTrailingEdge(self, value):
         self.ogl_widget.setCloseTrailingEdge(value)
     
-    def fireCosineSpacing(self, value):
-        self.ogl_widget.setCosineSpacing(value)
+    def fireBezierCurve(self, value):
+        self.ogl_widget.setBezierCurve(value)
     
     def fireNacaWidget(self):
         self.ogl_widget_naca.show()
@@ -201,7 +201,7 @@ class NacaWidget(QtGui.QWidget):
         label6 = QtGui.QLabel("Number of points")
         
         label3_1 = QtGui.QLabel("First digit. %d to %s%%:" % (0, "9.5"))
-        label4_1 = QtGui.QLabel("Second digit. %d to %d%%:" % (0, 90))
+        label4_1 = QtGui.QLabel("Second digit. %d to %d%%:" % (1, 9))
         label5_1 = QtGui.QLabel("Third & fourth digit. %d to %d%%:" % (1, 40))
         label6_1 = QtGui.QLabel("%d to %d" % (20, 200))
         
@@ -209,11 +209,12 @@ class NacaWidget(QtGui.QWidget):
         self.text1Name.setText('NACA 00xx')
         self.text1Name.setReadOnly(True)
         self.text2Length = QtGui.QLineEdit()
-        self.text2Length.setText('1.0')        
+        self.text2Length.setText('1.0') 
+        self.text2Length.setReadOnly(True)               
         self.text3MaxCamber = QtGui.QLineEdit()
         self.text3MaxCamber.setText('2')
         self.text4PosCamber = QtGui.QLineEdit()
-        self.text4PosCamber.setText('4')
+        self.text4PosCamber.setText('1')
         self.text5Thickness = QtGui.QLineEdit()
         self.text5Thickness.setText('12') 
         
@@ -261,13 +262,20 @@ class NacaWidget(QtGui.QWidget):
             maxCamber   = float(maxCamber)
             posCamber   = float(posCamber)
             thick       = float(thick)
+            
+            if maxCamber == 0 :
+                posCamber = 0 
+                self.text4PosCamber.setText('0')
                
             if maxCamber > 9.5 or maxCamber < 0 :
                 self.text3MaxCamber.selectAll() 
                 return
-            elif posCamber > 90 or posCamber < 0 :
+            elif posCamber > 9 :
                 self.text4PosCamber.selectAll()
                 return
+            elif maxCamber != 0 and posCamber < 1 :
+                self.text4PosCamber.selectAll()
+                return            
             elif thick > 40 or thick < 1 : 
                 self.text5Thickness.selectAll()
                 return
@@ -285,7 +293,7 @@ class NacaWidget(QtGui.QWidget):
         else :
             self.ogl_widget.createSym_Naca(length, thick/100.0, pcnt)
         
-        self.ogl_widget.set_name(self.text1Name.text())
+        self.ogl_widget.setName(self.text1Name.text())
 
 
 class ProfileDetectWidget(QtGui.QWidget): 
@@ -317,7 +325,7 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.resize(320,320)
         
     def fireButtonCreate(self):
-        self.ogl_widget.set_name(self.text1Name)
+        self.ogl_widget.setName(self.text1Name)
         self.ogl_widget.set_pointList_top(self.ogl_detector_widget.getPointList_top)
         self.ogl_widget.set_pointList_bot(self.ogl_detector_widget.getPointList_bot)
         print "dummy function"

@@ -117,7 +117,7 @@ class MyProfileWidget(Profile):
                 "shows how to use QPainter to print an image.</p>"))
 
 
-    def echo(self):
+    def debug(self):
         print()
 
     def createActions(self):
@@ -126,7 +126,7 @@ class MyProfileWidget(Profile):
     
         self.printAct = QtGui.QAction("Print...", self)
         self.printAct.setEnabled(False)
-        self.printAct.triggered.connect(self.echo)
+        self.printAct.triggered.connect(self.debug)
         
         
         self.exitAct = QtGui.QAction("E&xit", self);

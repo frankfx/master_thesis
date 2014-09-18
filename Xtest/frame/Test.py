@@ -12,15 +12,15 @@ class Test():
         self.pointList_bot = [[1.0, -0.00095, 0.0], [0.95, -0.00605, 0.0], [0.9, -0.01086, 0.0], [0.8, -0.01967, 0.0], [0.7, -0.02748, 0.0], [0.6, -0.03423, 0.0], [0.5, -0.03971, 0.0], [0.4, -0.04352, 0.0], [0.3, -0.04501, 0.0], [0.25, -0.04456, 0.0], [0.2, -0.04303, 0.0], [0.15, -0.04009, 0.0], [0.1, -0.03512, 0.0], [0.075, -0.0315, 0.0], [0.05, -0.02666, 0.0], [0.025, -0.01961, 0.0], [0.0125, -0.0142, 0.0], [0.005, -0.0089, 0.0], [0.0, 0.0, 0.0]]
         self._leftEndP , self._rightEndP        = self.__getEndPoints(self.pointList_top, self.pointList_bot)        
         self.pointList_chord                    = self.__createPointList_chord(self._leftEndP, self._rightEndP, len(self.pointList_top)) 
-        self.__linePerpendicularGradient_m      = self.computeLinePerpendicularGradient(self.pointList_chord)
-        self.pointList_camber                   = self.computeCamber()
+        self.__linePerpendicularGradient_m      = self.__computeLinePerpendicularGradient(self.pointList_chord)
+        self.pointList_camber                   = self.__computeCamber()
         print self.pointList_camber
     
     '''
     @param plist: list of line
     @return: gradient of line perpendicular
     '''
-    def computeLinePerpendicularGradient(self, plist):
+    def __computeLinePerpendicularGradient(self, plist):
         if len(plist) < 2 :
             return None
         p1 = plist[0] 
@@ -35,8 +35,8 @@ class Test():
     @param srcPoint: point on plist where perpendicular intersects
     @return: perpendicular as lambda function  or  None if m is 0
     '''
-    def createLinePerpendicular(self, plist, srcPoint):
-        m_perpendicular = self.computeLinePerpendicularGradient(plist)
+    def __createLinePerpendicular(self, plist, srcPoint):
+        m_perpendicular = self.__computeLinePerpendicularGradient(plist)
         b = srcPoint[1] - m_perpendicular * srcPoint[0]
         
         return None if m_perpendicular == 0 else lambda x : m_perpendicular * x + b   
@@ -44,20 +44,20 @@ class Test():
     '''
     @return: camber list
     ''' 
-    def computeCamber(self):
+    def __computeCamber(self):
         res = []
         for p in self.pointList_chord :
-            fct_perpendicular   = self.createLinePerpendicular(self.pointList_chord, p)
+            fct_perpendicular   = self.__createLinePerpendicular(self.pointList_chord, p)
             if fct_perpendicular is not None:
-                intersect_top       = self.getIntersectionPoint(self.pointList_top, fct_perpendicular)
-                intersect_bot       = self.getIntersectionPoint(self.pointList_bot, fct_perpendicular)
+                intersect_top       = self.__computeIntersectionPoint(self.pointList_top, fct_perpendicular)
+                intersect_bot       = self.__computeIntersectionPoint(self.pointList_bot, fct_perpendicular)
             
-                res.append( self.computePointBtw(intersect_top, intersect_bot)) 
+                res.append( self.getPointBtwPoints(intersect_top, intersect_bot)) 
             
         
         return res
 
-    def computeCamber2(self):
+    def __computeCamber2(self):
         for i in range(0, len(self.pointList_top)) :
             
 
@@ -66,7 +66,7 @@ class Test():
     @param fct_perpendicular: the perpendicular of chord line as a lambda function 
     @return: approximated intersection point between plist line and chord perpendicular
     '''
-    def getIntersectionPoint(self, plist, fct_perpendicular):
+    def __computeIntersectionPoint(self, plist, fct_perpendicular):
         res = None
         for p in plist :
             if res is None :
@@ -145,7 +145,7 @@ class Test():
         tmp_dist = 0
 
         for p in toplist + botlist :
-            tmp_dist = self.get_distance_btw_points(p, maxP)
+            tmp_dist = self.__getDistanceBtwPoints(p, maxP)
             if tmp_dist > max_dist :
                 max_dist = tmp_dist
                 minP     = p
@@ -156,12 +156,12 @@ class Test():
     @param p2: second point
     @return: distance between p1 and p2
     '''    
-    def get_distance_btw_points(self, p1, p2):
+    def __getDistanceBtwPoints(self, p1, p2):
         a = (p1[0] - p2[0]) * (p1[0] - p2[0])
         b = (p1[1] - p2[1]) * (p1[1] - p2[1])
         return math.sqrt( a + b )    
    
-    def computePointBtw(self, p1, p2):
+    def getPointBtwPoints(self, p1, p2):
         distX = p1[0] - p2[0]
         distY = p1[1] - p2[1]
         halfX = distX / 2

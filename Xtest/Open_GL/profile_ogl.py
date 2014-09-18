@@ -28,12 +28,11 @@ class Profile(QtOpenGL.QGLWidget):
         self._name                   = uid
         self.flag_draw_points        = False  
         self.flag_close_TrailingEdge = False
-        self.flag_cosine_spacing     = False
+        self.flag_bezier_curve       = False
 
         self.scale = 0.5
         self.trans_x = 0
         self.trans_y = 0
-        self.rotate  = 0
         self.width = -1.0
         self.height = -1.0
         self.fovy = 64.0
@@ -47,13 +46,13 @@ class Profile(QtOpenGL.QGLWidget):
         #self.setFixedSize(QtCore.QSize(400,400))
         self.setWindowTitle("Rene Test")
 
-    def init(self):
+    def initializeGL(self):
         GL.glEnable(GL.GL_COLOR_MATERIAL)
         GL.glEnable(GL.GL_MAP1_VERTEX_3)
         GL.glClearColor(1.0, 1.0 , 1.0, 1.0)
         GL.glShadeModel(GL.GL_FLAT)
 
-    def resize(self, w, h):
+    def resizeGL(self, w, h):
         self.width , self.height = w , h
         GL.glViewport(0,0,w,h)
 
@@ -61,8 +60,7 @@ class Profile(QtOpenGL.QGLWidget):
         GL.glLoadIdentity()
         GLU.gluPerspective (self.fovy * self.scale, w*1.0/h, 0.0, 10.0)
 
-    def display(self):
-
+    def paintGL(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         GLU.gluPerspective (self.fovy * self.scale, self.width*1.0/self.height, 0.0, 10.0)
@@ -74,132 +72,35 @@ class Profile(QtOpenGL.QGLWidget):
         GL.glTranslatef(self.trans_x,self.trans_y,-1.5)
 
         self.drawGrid()
-        
-       # GL.glTranslatef(0.5, 0, 0)
-       # GL.glRotatef(self.rotate, 0.0, 0.0, 1.0)
-       # GL.glTranslatef(-0.5, 0, 0)
-       # GL.glRotatef(self.rotate ,0, 0, 1) 
         self.drawProfile()
 
         GL.glFlush()
 
-    def initializeGL(self):
-        self.init()
-    
-    def resizeGL(self, w, h):
-        self.resize(w, h)
- 
-    def paintGL(self):
-        self.display()
-
-    def set_pointList_top(self, plist):
-        self.dataSet.setPointListTop(plist)
-    
-    def set_pointList_bot(self, plist):
-        self.dataSet.setPointListBot(plist)
-
-    def set_name(self, value):
-        self._name = value
-    
-    def set_chord(self, value):
-        self._chord = value
-
-    def set_work_angle (self, value):
-        self._work_angle  = value
-
-    def set_profile_arch(self, value):
-        self._profile_arch = value
-
-    def set_profile_thickness(self, value):
-        self._profile_thickness = value
-
-    def setCloseTrailingEdge(self, value):
-        self.flag_close_TrailingEdge = value
-        self.updateGL()
-
-    def set_transX(self, value):
-        self.trans_x = value
-
-    def set_transY(self, value):
-        self.trans_y = value
-
-    def set_scale(self, value):
-        self.scale = value
-        
-    def set_rotate(self, value):
-        self.rotate = value
-        self.dataSet.updatePointlistCamber()
-        self.dataSet.updateRotationLists(value)
-        self.updateGL()
-
-    def getCloseTrailingEdgeValue(self):
-        return self.flag_close_TrailingEdge
-
-    def setDrawPointsOption(self, value):
-        self.flag_draw_points = value 
-        self.updateGL()        
-
-    def setCosineSpacing(self, value):
-        self.flag_cosine_spacing = value
-        self.updateGL()
-
-    def getPointList_top(self):
-        return self.dataSet.getPointList_top()
-
-    def getPointList_bot(self):
-        return self.dataSet.getPointList_bot()
-
-    def get_len_chord(self):
-        # len Profiltiefe/Sehne
-        return self.dataSet.getLenChord()
-
-    def get_work_angle (self):
-        # sin(x) = a/c
-        start, end = self.dataSet.getEndPoints()
-        x = start[1] / self.get_len_chord()
-        return math.sin(x)
-
-    # (Profilwoelbung) max Abweichung der Skelettlinie von der Profilsehne
-    def get_profile_arch(self):
-        #print self.dataSet.pointList_chord, self.dataSet.pointList_camber
-        return 100.0 * self.dataSet.get_max_distance_btw_pointLists(self.dataSet.pointList_chord, self.dataSet.pointList_camber)
-                                                     
-    # (Profildicke) max Kreisdurchmesser auf der Skelettlinie
-    def get_profile_thickness(self):
-        #print self.dataSet.pointList_top, self.dataSet.pointList_bot
-        return 100 * self.dataSet.get_max_distance_btw_pointLists(self.dataSet.pointList_top, self.dataSet.pointList_bot)        
-
-
-    def get_name(self):
-        return self._name
-    
-    def getFlagDrawPoints(self):
-        return self.flag_draw_points    
+    # ================================================================================================================
+    # drawing functions
+    # ================================================================================================================
 
     '''abstract method'''
     def drawProfile(self):
         return NotImplemented
 
-    def fitToPage(self, boolean):
-        if boolean :
-            self.set_transX(0)
-            self.set_transY(0)
-            self.set_scale(0.5)
-        self.setDisabled(boolean)
-        self.updateGL()
-
     def drawChord(self):
-        start, end = self.dataSet.getEndPoints()
-        
+        start, end = self.getEndPoints()
         GL.glBegin(GL.GL_LINES)
         GL.glVertex3f(start[0], start[1], start[2]) # leftend (nose)
         GL.glVertex3f(end[0], end[1], end[2]) # right end
         GL.glEnd()
 
-    def drawProfile_points(self):
-        plist_top = self.dataSet.pointList_top
-        plist_bot = self.dataSet.pointList_bot
-        
+    def drawCamber(self):
+        plist = self.getPointListCamber()
+        GL.glBegin(GL.GL_LINES)
+        for i in range(0, len(plist)) :
+            GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])# left end == nose
+        GL.glEnd()
+
+    def drawProfilePoints(self):
+        plist_top = self.getPointListTop()
+        plist_bot = self.getPointListBot()
         GL.glPointSize(5.0)        
         GL.glColor3f(1.0, 0.0, 0.0)
         GL.glBegin(GL.GL_POINTS)
@@ -208,13 +109,12 @@ class Profile(QtOpenGL.QGLWidget):
         for j in range (0, len(plist_bot), 1):
             GL.glVertex3f(plist_bot[j][0], plist_bot[j][1], plist_bot[j][2])
         GL.glEnd() 
-
-    def drawCamber(self):
-        plist = self.dataSet.pointList_camber
+        
+    def drawTrailingEdge(self, p1, p2):
         GL.glBegin(GL.GL_LINES)
-        for i in range(0, len(plist)) :
-            GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])# left end == nose
-        GL.glEnd()
+        GL.glVertex3f(p1[0], p1[1], p1[2])
+        GL.glVertex3f(p2[0], p2[1], p2[2])
+        GL.glEnd() 
 
     def drawGrid(self, x_fr = -1.0, x_to = 1.0, y_fr = -1.0, y_to = 1.0, no_lines = 5):
         GL.glColor3f(1, 0.85, 0.55)
@@ -240,10 +140,21 @@ class Profile(QtOpenGL.QGLWidget):
             GL.glVertex3f(-i*1.0/no_lines, y_to, 0)
         GL.glEnd()
 
+    # ================================================================================================================
+    # helper and drawing options
+    # ================================================================================================================
+
+    def fitToPage(self, boolean):
+        if boolean :
+            self.setTransX(0)
+            self.setTransY(0)
+            self.setScale(0.5)
+        self.setDisabled(boolean)
+        self.updateGL()
         
     def norm_vec_list(self, vlist):
         '''set points of shape to center (0,0)'''
-        minX_list, maxX_list = self.dataSet.get_min_max_of_List(vlist)
+        minX_list, maxX_list = self.dataSet.get_min_max_of_List(vlist,0)
         minY_list, maxY_list = self.dataSet.get_min_max_of_List(vlist,1)
         
         mnX = minX_list[0] 
@@ -260,8 +171,109 @@ class Profile(QtOpenGL.QGLWidget):
         shiftX = mxX - midX
         shiftY = mxY - midY
 
-        return shiftX , -shiftY        
+        return shiftX , -shiftY           
+
+    # ================================================================================================================
+    # getter and setter
+    # ================================================================================================================
+
+    def setPointListTop(self, plist):
+        self.dataSet.setPointListTop(plist)
+    
+    def setPointListBot(self, plist):
+        self.dataSet.setPointListBot(plist)
+
+    def setPointListChord(self, plist):
+        self.dataSet.setPointListChord(plist)
+
+    def setPointListCamber(self, plist):
+        self.dataSet.setPointListCamber(plist)
         
+    def setPointListTop_rot(self, plist):
+        self.dataSet.setPointListTop_rot(plist)
+
+    def setPointListBot_rot(self, plist):
+        self.dataSet.setPointListBot_rot(plist)
+
+    def setName(self, value):
+        self._name = value
+
+    def setTransX(self, value):
+        self.trans_x = value
+
+    def setTransY(self, value):
+        self.trans_y = value
+
+    def setScale(self, value):
+        print value
+        self.scale = (101 - value) / 100.0  # transform scale range (1 to 99) to perspective  
+        self.updateGL()
+        
+    def setRotate(self, value):
+        self.dataSet.updateRotationLists(value)
+        self.updateGL()
+        
+    def setDrawPointsOption(self, value):
+        self.flag_draw_points = value 
+        self.updateGL()        
+
+    def setBezierCurve(self, value):
+        self.flag_bezier_curve = value
+        self.updateGL()        
+
+    def setCloseTrailingEdge(self, value):
+        self.flag_close_TrailingEdge = value
+        self.updateGL()
+
+    def getPointListTop(self):
+        return self.dataSet.getPointListTop()
+
+    def getPointListBot(self):
+        return self.dataSet.getPointListBot()
+
+    def getPointListChord(self):
+        return self.dataSet.getPointListChord()
+
+    def getPointListCamber(self):
+        return self.dataSet.getPointListCamber()
+
+    def getPointListTop_rot(self):
+        return self.dataSet.setPointListTop_rot()
+
+    def getPointListBot_rot(self):
+        return self.dataSet.setPointListBot_rot()
+
+    def getEndPoints(self):
+        return self.dataSet.getEndPoints()
+    
+    def getName(self):
+        return self._name
+
+    def getLenChord(self):
+        return self.dataSet.getLenChord()
+
+    def getWorkAngle (self):
+        # sin(x) = a/c
+        start, _ = self.dataSet.getEndPoints()
+        x = start[1] / self.getLenChord()
+        return math.sin(x)
+
+    # (Profilwoelbung) max Abweichung der Skelettlinie von der Profilsehne
+    def getProfileArch(self):
+        self.dataSet.getProfileArch()
+                                                     
+    # (Profildicke) max Kreisdurchmesser auf der Skelettlinie
+    def getProfileThickness(self):
+        self.dataSet.getProfileThickness()
+    
+    def getFlagDrawPoints(self):
+        return self.flag_draw_points    
+
+    def getFlagCloseTrailingEdge(self):
+        return self.flag_close_TrailingEdge
+        
+    def getFlagBezierCurve(self):
+        return self.flag_bezier_curve
 
     # ============================================================================================================
     # mouse and key events
@@ -271,16 +283,6 @@ class Profile(QtOpenGL.QGLWidget):
         redraw = False
         offsetScl = 0.008
         offsetTrans = 0.02
-        if event.modifiers() == QtCore.Qt.ControlModifier:
-            if event.key() == QtCore.Qt.Key_N :
-                if self.flag_view_algo > 1 :
-                    self.flag_view_algo = 0
-                else : self.flag_view_algo += 1
-            elif event.key() == QtCore.Qt.Key_S :
-                self.nextTestValue()
-            elif event.key() == QtCore.Qt.Key_A :
-                self.prevTestValue()
-            redraw = True
         if event.key() == QtCore.Qt.Key_Plus:
             self.scale -= offsetScl
             redraw = True
@@ -308,19 +310,19 @@ class Profile(QtOpenGL.QGLWidget):
         self.lastPos_y = event.pos().y()
                 
     def mouseMoveEvent(self, event):
-        self.dx = (event.pos().x() - self.lastPos_x ) 
-        self.dy =  (event.pos().y() - self.lastPos_y ) 
+        dx = (event.pos().x() - self.lastPos_x ) 
+        dy =  (event.pos().y() - self.lastPos_y ) 
         
-        self.lastPos_x += self.dx
-        self.lastPos_y += self.dy
+        self.lastPos_x += dx
+        self.lastPos_y += dy
         
         #Betrachtsfeld = -1 bis 1
         
         #print self.width 
         #print self.height 
         
-        self.trans_x += (2*self.dx / (self.width*1.0) * self.scale) 
-        self.trans_y -= (2*self.dy / (self.height*1.0) * self.scale)
+        self.trans_x += (2*dx / (self.width*1.0) * self.scale) 
+        self.trans_y -= (2*dy / (self.height*1.0) * self.scale)
 
         self.updateGL()
 

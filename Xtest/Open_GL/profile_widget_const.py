@@ -90,9 +90,9 @@ class MyProfileWidget_Const(Profile):
             return None
         return math.atan(res)
     
-    def __computeY_c(self, x, length, maxChamber, posMaxChamber):
-        m = maxChamber / 100.00
-        p = posMaxChamber / 10.0
+    def __computeY_c(self, x, length, maxCamber, posMaxCamber):
+        m = maxCamber / 100.00
+        p = posMaxCamber / 10.0
         c = length
         
         if x >= 0 and x <= p*c :
@@ -138,7 +138,7 @@ class MyProfileWidget_Const(Profile):
        
         #The following code displays the control points as dots.
         if self.flag_draw_points :
-            self.drawProfile_points()
+            self.drawProfilePoints()
 
     def drawProfile_default(self, top_prof, bot_prof, shape):
         if top_prof == [] :
