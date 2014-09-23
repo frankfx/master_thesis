@@ -42,3 +42,17 @@ if __name__ == '__main__':
     bez = Bezier()
     bez.test()  
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

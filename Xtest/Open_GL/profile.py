@@ -21,14 +21,13 @@ except ImportError:
     sys.exit(1)
 
 class Profile(QtOpenGL.QGLWidget):
-    DEFAULT, BEZIER_NEW_4, BEZIER_OPENGL = range(3) 
-    def __init__(self, uid='NACA0009', parent = None):
+    def __init__(self, uid='BWB_Root', parent = None):
         super(Profile, self).__init__(parent)
            
         self._name                   = uid
         self.flag_draw_points        = False  
         self.flag_close_TrailingEdge = False
-        self.flag_bezier_curve       = False
+        self.flag_spline_curve       = False
 
         self.scale = 0.5
         self.trans_x = 0
@@ -97,24 +96,6 @@ class Profile(QtOpenGL.QGLWidget):
         for i in range(0, len(plist)) :
             GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])# left end == nose
         GL.glEnd()
-
-    def drawProfilePoints(self):
-        plist_top = self.getPointListTop()
-        plist_bot = self.getPointListBot()
-        GL.glPointSize(5.0)        
-        GL.glColor3f(1.0, 0.0, 0.0)
-        GL.glBegin(GL.GL_POINTS)
-        for i in range (0, len(plist_top), 1):
-            GL.glVertex3f(plist_top[i][0], plist_top[i][1], plist_top[i][2])
-        for j in range (0, len(plist_bot), 1):
-            GL.glVertex3f(plist_bot[j][0], plist_bot[j][1], plist_bot[j][2])
-        GL.glEnd() 
-        
-    def drawTrailingEdge(self, p1, p2):
-        GL.glBegin(GL.GL_LINES)
-        GL.glVertex3f(p1[0], p1[1], p1[2])
-        GL.glVertex3f(p2[0], p2[1], p2[2])
-        GL.glEnd() 
 
     def drawGrid(self, x_fr = -1.0, x_to = 1.0, y_fr = -1.0, y_to = 1.0, no_lines = 5):
         GL.glColor3f(1, 0.85, 0.55)
@@ -205,7 +186,7 @@ class Profile(QtOpenGL.QGLWidget):
         self.trans_y = value
 
     def setScale(self, value):
-        print value
+        print "scale value" ,  value
         self.scale = (101 - value) / 100.0  # transform scale range (1 to 99) to perspective  
         self.updateGL()
         
@@ -217,8 +198,8 @@ class Profile(QtOpenGL.QGLWidget):
         self.flag_draw_points = value 
         self.updateGL()        
 
-    def setBezierCurve(self, value):
-        self.flag_bezier_curve = value
+    def setChaikinCurve(self, value):
+        self.flag_spline_curve = value
         self.updateGL()        
 
     def setCloseTrailingEdge(self, value):
@@ -272,8 +253,8 @@ class Profile(QtOpenGL.QGLWidget):
     def getFlagCloseTrailingEdge(self):
         return self.flag_close_TrailingEdge
         
-    def getFlagBezierCurve(self):
-        return self.flag_bezier_curve
+    def getFlagSplineCurve(self):
+        return self.flag_spline_curve
 
     # ============================================================================================================
     # mouse and key events

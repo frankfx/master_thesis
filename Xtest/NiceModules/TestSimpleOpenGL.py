@@ -3,7 +3,7 @@ Created on Aug 22, 2014
 
 @author: rene
 '''
-from Xtest.Open_GL import profile_ogl_image_detector
+from Xtest.Open_GL import profileDetectorWidget
 
 '''
 Created on Jul 30, 2014
@@ -12,8 +12,8 @@ Created on Jul 30, 2014
 '''
 import sys
 from PySide import QtOpenGL, QtGui, QtCore
-from cpacsHandler import CPACS_Handler
-from config import Config
+from Xtest.Open_GL.cpacsHandler import CPACS_Handler
+from Xtest.Open_GL.configuration.config import Config
 try:
     from OpenGL import GL, GLU
 except ImportError:
@@ -157,9 +157,9 @@ class Renderer():
         GL.glEnd()
                
 
-class MyProfileWidget(QtOpenGL.QGLWidget):
+class ProfileDetectorWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(MyProfileWidget, self).__init__(parent)
+        super(ProfileDetectorWidget, self).__init__(parent)
         self.width = 320
         self.height = 302
         self.resize(self.width ,self.height)
@@ -216,6 +216,6 @@ class MyProfileWidget(QtOpenGL.QGLWidget):
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = MyProfileWidget()
+    widget = ProfileDetectorWidget()
     widget.show()
     app.exec_()    

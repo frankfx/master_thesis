@@ -7,10 +7,10 @@ import sys
 import math
 from PySide import QtOpenGL, QtGui, QtCore
 from cpacsHandler import CPACS_Handler
-from config import Config
+from Xtest.Open_GL.configuration.config import Config
 import logging
 import datetime
-from coverage import start
+from chaikin_spline import Chaikin_Spline
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -34,12 +34,13 @@ class DataSet() :
         self.tixi.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
         # ==========================================================        
         
-        self.pointList_top, self.pointList_bot  = self.__createPointList(uid)
+        self.pointList_bot, self.pointList_top  = self.__createPointList(uid)
         self._leftEndP , self._rightEndP        = self.__computeEndPoints(self.pointList_top, self.pointList_bot)
         self.pointList_chord                    = self.__createPointList_chord(self._leftEndP, self._rightEndP, len(self.pointList_top))
         self.pointList_camber                   = self.__createPointList_camber(self.pointList_top, self.pointList_bot)
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
+       
         
     '''
     @param: uid from cpacs
@@ -72,8 +73,6 @@ class DataSet() :
         for j in range(i, len(vecX), 1) :
             l_snd.append([ vecX[j], vecY[j], vecZ[j] ])
         #l_snd.reverse()
-        print l_fst
-        print l_snd 
         return l_fst , l_snd
    
     '''
@@ -111,12 +110,12 @@ class DataSet() :
         res = []
         for p in self.pointList_chord :
             fct_perpendicular   = self.__createLinePerpendicular(self.pointList_chord, p)
-            print "fct_perpendicular" , fct_perpendicular
+            #print "fct_perpendicular" , fct_perpendicular
             if fct_perpendicular is None:
-                print "not intersect case"
+               # print "not intersect case"
                 return self.__computeCamber2(topList, botList)
             else:
-                print "intersect case"
+                #print "intersect case"
                 intersect_top       = self.__computeIntersectionPoint(topList, fct_perpendicular)
                 intersect_bot       = self.__computeIntersectionPoint(botList, fct_perpendicular)
             
@@ -168,10 +167,10 @@ class DataSet() :
                 res = p
             else:
                 y = fct_perpendicular (p[0])
-                print y, p, " ==== " , self.abs(y - p[1])
+                #print y, p, " ==== " , self.abs(y - p[1])
                 if self.abs(y - p[1]) < self.abs(y-res[1]) :
                     res = p
-        print "intersect Point" , res
+       # print "intersect Point" , res
         return res      
    
     # ============================================================================================================
@@ -245,6 +244,9 @@ class DataSet() :
         
     def setPointListBot_rot(self, plist):
         self.pointList_bot_rot = plist
+   
+    def getCompletePointList(self):
+        return  self.pointList_bot + self.pointList_top[1:]
     
     def getPointListTop(self):
         return self.pointList_top
@@ -292,8 +294,14 @@ class DataSet() :
     def updatePointLists(self):
         self._leftEndP , self._rightEndP = self.__computeEndPoints(self.pointList_top, self.pointList_bot)
         self.pointList_chord = self.__createPointList_chord(self._leftEndP, self._rightEndP, len(self.pointList_top))  
-        self.pointList_camber = self.__createPointList_camber(self.pointList_top, self.pointList_bot)     
+      #  self.pointList_camber = self.__createPointList_camber(self.pointList_top, self.pointList_bot)     
 
+    def getSplineCurve(self):
+        spline = Chaikin_Spline(self.getCompletePointList())
+        spline.IncreaseLod()
+        spline.IncreaseLod()
+        return spline.getPointList()
+        
  
     # ================================================================================================================
     # geometrie helper
@@ -398,7 +406,6 @@ class DataSet() :
             gradient         = self.__computeGradient(p_left, p_right)
             perpendicular    = self.__computePerpendicularInPoint(gradient, p)
             p                = self.__computeIntersectionPoint(plist, perpendicular)
-            if y
 
     def __computePerpendicularInPoint(self, m, srcPoint):
         m_perpendicular = 0 if m == 0 else -1/m
@@ -551,8 +558,8 @@ class DataSet() :
        
     def __printDetails(self):
         print "top: " , self.pointList_top
-        print "bot: " , self.pointList_bot[::-1]
-        print "cham:" , self.pointList_camber
+       # print "bot: " , self.pointList_bot[::-1]
+       # print "cham:" , self.pointList_camber
         #print "chord:", self.pointList_chord
         #print "arch"  , self.get_profile_arch()
         #print "len"   , self.get_len_chord()

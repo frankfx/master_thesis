@@ -9,7 +9,7 @@ from cpacsPy.tixi import tixiwrapper
 from cpacsPy.tigl import tiglwrapper
 #import tiglwrapper
 #import tixiwrapper
-from config import Config
+from Xtest.Open_GL.configuration.config import Config
 import re
 
 class CPACS_Handler():

@@ -90,9 +90,9 @@ class Renderer():
         GL.glFlush()               
         
 
-class MyProfileWidget(QtOpenGL.QGLWidget):
+class ProfileDetectorWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(MyProfileWidget, self).__init__(parent)
+        super(ProfileDetectorWidget, self).__init__(parent)
         self.resize(320,320)
         self.setWindowTitle("Rene Test")
         self.renderer = Renderer()
@@ -162,6 +162,6 @@ class MyProfileWidget(QtOpenGL.QGLWidget):
   
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = MyProfileWidget()
+    widget = ProfileDetectorWidget()
     widget.show()
     app.exec_()    

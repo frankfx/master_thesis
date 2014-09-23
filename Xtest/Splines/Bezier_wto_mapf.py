@@ -32,9 +32,9 @@ class Renderer:
     OPEN,CLOSED = range(2)
     def __init__(self):
         self.flag_view_algo = Renderer.OPEN
-        self.ctrlpointsX = [1.0, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.075, 0.05, 0.025, 0.0125, 0.005, 0.0, 0.005, 0.0125, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]
-        self.ctrlpointsZ = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.ctrlpointsY = [0.00095, 0.00605, 0.01086, 0.01967, 0.02748, 0.03423, 0.03971, 0.04352, 0.04501, 0.04456, 0.04303, 0.04009, 0.03512, 0.0315, 0.02666, 0.01961, 0.0142, 0.0089, 0.0, -0.0089, -0.0142, -0.01961, -0.02666, -0.0315, -0.03512, -0.04009, -0.04303, -0.04456, -0.04501, -0.04352, -0.03971]        
+        self.pntX = [1.0, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.075, 0.05, 0.025, 0.0125, 0.005, 0.0, 0.005, 0.0125, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]
+        self.pntZ = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.pntY = [0.00095, 0.00605, 0.01086, 0.01967, 0.02748, 0.03423, 0.03971, 0.04352, 0.04501, 0.04456, 0.04303, 0.04009, 0.03512, 0.0315, 0.02666, 0.01961, 0.0142, 0.0089, 0.0, -0.0089, -0.0142, -0.01961, -0.02666, -0.0315, -0.03512, -0.04009, -0.04303, -0.04456, -0.04501, -0.04352, -0.03971]        
 
     def flag_view(self, value):
         self.flag_view_algo = value
@@ -89,9 +89,9 @@ class Renderer:
             pos = i*1.0 / t
             #x = self.bezierCurve(pos, start._x, tan1._x, tan2._x, end._x)
             #y = self.bezierCurve(pos, start._y, tan1._y, tan2._y, end._y)
-            x = self.bezierCurve_full(pos, self.ctrlpointsX)
-            y = self.bezierCurve_full(pos, self.ctrlpointsY)
-            z = self.bezierCurve_full(pos, self.ctrlpointsZ)
+            x = self.bezierCurve_full(pos, self.pntX)
+            y = self.bezierCurve_full(pos, self.pntY)
+            z = self.bezierCurve_full(pos, self.pntZ)
                 
             #In our case, the z should always be empty
             #z = self.bezierCurve(pos, start._z, tan1._z, tan2._z, end._z)
@@ -106,8 +106,8 @@ class Renderer:
         GL.glPointSize(5.0)        
         GL.glColor3f(1.0, 0.0, 0.0)
         GL.glBegin(GL.GL_POINTS)
-        for i in range (0, len(self.ctrlpointsX), 1):
-            GL.glVertex3f(self.ctrlpointsX[i], self.ctrlpointsY[i], self.ctrlpointsZ[i])
+        for i in range (0, len(self.pntX), 1):
+            GL.glVertex3f(self.pntX[i], self.pntY[i], self.pntZ[i])
         GL.glEnd()        
         
         GL.glFlush()
@@ -127,9 +127,9 @@ class Renderer:
 
 
 
-class MyProfileWidget(QtOpenGL.QGLWidget):
+class ProfileDetectorWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(MyProfileWidget, self).__init__(parent)
+        super(ProfileDetectorWidget, self).__init__(parent)
         self.resize(620,620)
         self.setWindowTitle("Rene Test")
 
@@ -147,7 +147,7 @@ class MyProfileWidget(QtOpenGL.QGLWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = MyProfileWidget()
+    widget = ProfileDetectorWidget()
     widget.show()
     app.exec_()    
 
