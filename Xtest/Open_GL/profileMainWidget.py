@@ -107,6 +107,10 @@ class ProfileMainWidget(QtGui.QWidget):
         checkFitToPage          = QtGui.QCheckBox("Fit to page")
         checkCloseTrailingedge  = QtGui.QCheckBox("Close Trailing edge")
         checkChaikinCurve       = QtGui.QCheckBox("Chaikin curve ")
+        checkDrawCamber         = QtGui.QCheckBox("Camber")
+        checkDrawChord          = QtGui.QCheckBox("Chord")
+        
+        
         self.butNaca            = QtGui.QPushButton("NacaCreator")
         self.butImgDetect       = QtGui.QPushButton("ImgDetect")
         self.dial_rot           = QtGui.QDial()
@@ -118,6 +122,8 @@ class ProfileMainWidget(QtGui.QWidget):
         gridView.addWidget(checkCloseTrailingedge   , 1, 1)        
         gridView.addWidget(checkFitToPage           , 2, 0)
         gridView.addWidget(checkChaikinCurve        , 2, 1)
+        gridView.addWidget(checkDrawCamber          , 3, 0)
+        gridView.addWidget(checkDrawChord           , 3, 1)
         gridView.addWidget(self.spinBoxRot          , 1, 2, 2, 1) 
         
         gridView.addWidget(self.butNaca             , 1, 4)
@@ -140,6 +146,8 @@ class ProfileMainWidget(QtGui.QWidget):
         checkFitToPage.toggled.connect(self.fireFitToPage)
         checkCloseTrailingedge.toggled.connect(self.fireCloseTrailingEdge)
         checkChaikinCurve.toggled.connect(self.fireChaikinCurve)
+        checkDrawCamber.toggled.connect(self.fireDrawCamber)
+        checkDrawChord.toggled.connect(self.fireDrawChord)
 
         self.butNaca.clicked.connect(self.fireNacaWidget)
         self.butImgDetect.clicked.connect(self.fireDetectWidget)    
@@ -169,10 +177,16 @@ class ProfileMainWidget(QtGui.QWidget):
         self.ogl_widget.fitToPage(value)  
     
     def fireCloseTrailingEdge(self, value):
-        self.ogl_widget.setCloseTrailingEdge(value)
+        self.ogl_widget.setFlagCloseTrailingEdge(value)
     
     def fireChaikinCurve(self, value):
-        self.ogl_widget.setChaikinCurve(value)
+        self.ogl_widget.setFlagChaikinCurve(value)
+    
+    def fireDrawCamber(self, value):
+        self.ogl_widget.setFlagDrawCamber(value)
+        
+    def fireDrawChord(self, value):    
+        self.ogl_widget.setFlagDrawChord(value)
     
     def fireNacaWidget(self):
         self.ogl_widget_naca.show()
@@ -210,8 +224,11 @@ class ProfileWidget(Profile):
             GL.glVertex3f(p[0], p[1], p[2])              
         GL.glEnd()            
 
-        #self.drawChord()      
-        self.drawCamber() 
+        if self.getFlagDrawCamber() :      
+            self.drawCamber() 
+
+        if self.getFlagDrawChord() :
+            self.drawChord()
 
         #The Trailing edge
         if self.getFlagCloseTrailingEdge() :
@@ -368,9 +385,9 @@ class NacaWidget(QtGui.QWidget):
         self.text2Length.setText('1.0') 
         self.text2Length.setReadOnly(True)               
         self.text3MaxCamber = QtGui.QLineEdit()
-        self.text3MaxCamber.setText('2')
+        self.text3MaxCamber.setText('0')
         self.text4PosCamber = QtGui.QLineEdit()
-        self.text4PosCamber.setText('1')
+        self.text4PosCamber.setText('0')
         self.text5Thickness = QtGui.QLineEdit()
         self.text5Thickness.setText('12') 
         
@@ -460,31 +477,37 @@ class ProfileDetectWidget(QtGui.QWidget):
         label1                   = QtGui.QLabel("Name")
         self.text1Name           = QtGui.QLineEdit()       
         self.butCreate           = QtGui.QPushButton("create")
+        self.butDetect           = QtGui.QPushButton("detect")
         self.butCancel           = QtGui.QPushButton("cancel")        
         self.ogl_widget          = ogl_widget
         self.ogl_detector_widget = profileDetectorWidget.ProfileDetectorWidget()
         #self.ogl_widget.setFixedSize(200,200)
         
-        grid.addWidget(self.ogl_detector_widget, 1,1,1,4)
+        grid.addWidget(self.ogl_detector_widget, 1,1,1,5)
         grid.addWidget(label1,                       2,1)
         grid.addWidget(self.text1Name,               2,2)
         grid.addWidget(self.butCreate,               2,3)
-        grid.addWidget(self.butCancel,               2,4)
+        grid.addWidget(self.butDetect,               2,4)
+        grid.addWidget(self.butCancel,               2,5)
         
         self.butCreate.clicked.connect(self.fireButtonCreate)
+        self.butDetect.clicked.connect(self.fireButtonDetect)
         self.butCancel.clicked.connect(self.close)
         
         self.createActions()
         self.createMenus()
         
         self.setLayout(grid) 
-        self.resize(320,320)
+        self.resize(420,320)
         
     def fireButtonCreate(self):
         self.ogl_widget.setName(self.text1Name)
         self.ogl_widget.set_pointList_top(self.ogl_detector_widget.getPointList_top)
         self.ogl_widget.set_pointList_bot(self.ogl_detector_widget.getPointList_bot)
         print "dummy function"
+
+    def fireButtonDetect(self):
+        ()
 
 
     def open(self) :

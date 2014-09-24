@@ -11,6 +11,8 @@ from Xtest.Open_GL.configuration.config import Config
 import logging
 import datetime
 from chaikin_spline import Chaikin_Spline
+from numpy import place
+from plistlib import Plist
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -41,7 +43,228 @@ class DataSet() :
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
        
+       
+       
+#just find point where the sign of dx is flipping
+#compute dx(i)=x(i)-x(i-1)
+#mark zones where dx is positive or negative
+#find the middle between them (usually dx==0 for that zone)
+#mark the edge point as ix1       
+       
+       
+    # find leading edge point
+    def getLeadingEdge(self, plist):
+        for i in range(1, len(plist), 2) :
+            p0 = plist[i-1]
+            p1 = plist[i]
+            p2 = plist[i+2]
+            
+            if ((p1[0]-p0[0])*(p2[0]-p1[0])<=0.0) : 
+                return plist[i]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # find leading edge point
+    def getLeadingEdge2(self, plist):
+        n = 4                   # for safty
+                                # plist = getCompleteList
+        axis0 = []              # result list
+        idx_b = 0               # index botList first point
+        idx_t = len(plist) - 1  # index topList first point
         
+        # for all bottom points 
+        for idx_b in range(0, idx_t) : 
+            if not idx_b + n < idx_t : break
+
+            # get x, y, z of bottom
+            x_b = plist[idx_b][0]
+            y_b = plist[idx_b][1]
+            z_b = plist[idx_b][2]
+            
+            # set i to last possible value of top points (trailing edge)
+            i = len(plist)-1 if idx_t + n > len(plist)-1 else idx_t + n
+            
+            # save idx_t
+            tmp_idx_t = idx_t
+            
+            # dist help value, set to None
+            dist=-1.0
+            
+            # look for top points
+            for i in range(i, idx_b + n, -1) :
+                x_t = plist[i][0]
+                y_t = plist[i][1]
+                z_t = plist[i][2]                
+                
+                # cur_dist = distance between current bot and top point
+                cur_dist = ((x_t-x_b)*(x_t-x_b))+((y_t-y_b)*(y_t-y_b))
+                
+                # find closest distance
+                if ((dist < 0.0) or ((cur_dist <= dist) and (cur_dist>1e-10))) :
+                    idx_t = i 
+                    dist = cur_dist
+                if ((dist >= 0.0) and (cur_dist > dist)) :
+                    break
+                
+            if (dist >= 0.0) :
+                # stop if non valid closest point found
+                if (idx_t - idx_b <= n+1) :
+                    idx_t = tmp_idx_t 
+                    break 
+                
+                x_t = plist[idx_t][0]
+                y_t = plist[idx_t][1]
+                z_t = plist[idx_t][2]
+                
+                axis0.append([0.5*(x_b + x_t), 0.5*(y_b + y_t), 0.5*(z_b + z_t)])
+                
+    
+        # =======================================================================
+        # find leading edge point (the farest point from last found axis point)
+        axis0 = self.__addLeadingEdgePoint(self, axis0, plist, idx_b, idx_t)
+
+        # =======================================================================
+        # find axis1: midpoint of i0=(ix1,pnt.num) i1=find closest from (0,ix1) 
+
+        axis1 = []
+        idx_b = 0
+        idx_t = len(plist) - 1
+        
+        for idx_t in range(idx_t, idx_b, -1) :
+            if not idx_t > idx_b + n : break
+            
+            x_t = plist[idx_t][0]
+            y_t = plist[idx_t][1]           
+            z_t = plist[idx_t][2]
+            
+            i = 0 if idx_b-n < 0 else idx_b-n
+          
+            tmp_idx_b = idx_b
+            
+            dist = -1.0
+            
+            for i in range (i, idx_t-n):
+                x_b = plist[i][0]
+                y_b = plist[i][1]
+                z_b = plist[i][2]
+                
+                cur_dist = ((x_b-x_t)*(x_b-x_t))+((y_b-y_t)*(y_b-y_t));
+            
+                if ((dist < 0.0) or ((cur_dist <= dist) and (cur_dist > 1e-10))) :
+                    idx_b = i
+                    dist = cur_dist
+                    
+                if ((dist >= 0.0) and (cur_dist > dist)): 
+                    break                
+            
+            if dist >= 0.0 :
+                if idx_t - idx_b <= n+2:
+                    idx_b = tmp_idx_b
+                    break       # stop if non valid closest point found
+                
+                x_b = plist[idx_b][0]
+                y_b = plist[idx_b][1]
+                z_b = plist[idx_b][2]
+            
+                axis1.append([0.5*(x_t + x_b), 0.5*(y_t+y_b), 0.5*(z_t+z_b)])    
+    
+   
+        # =======================================================================
+        # find leading edge point (the farest point from last found axis point)      
+        axis1 = self.__addLeadingEdgePoint(self, axis1, plist, idx_t, idx_b)
+       
+        # =======================================================================
+        # find axis: midpoint of i0=<0-axis0.num) i1=find closest from <0-axis1.num) 
+
+        idx_b = 0
+        idx_t = 0
+        axis = []
+        
+        for idx_b in range(0, len(axis0)):
+            x_b = axis0[idx_b][0]
+            y_b = axis0[idx_b][1]
+            z_b = axis0[idx_b][2]
+            
+            i = idx_t
+            
+            dist = -1.0
+            
+            for i in range(i, len(axis1)) :
+                x_t = axis1[i][0]
+                y_t = axis1[i][1]
+                z_t = axis1[i][2]
+                
+                cur_dist = ((x_t-x_b)*(x_t-x_b))+((y_t-y_b)*(y_t-y_b))
+                
+                if ((dist < 0.0) or (cur_dist <= dist)) :
+                    idx_t = i
+                    dist = cur_dist
+            if (dist >= 0.0) :
+                x_t = axis1[idx_t][0]
+                y_t = axis1[idx_t][1]
+                z_t = axis1[idx_t][2]
+                
+                axis.append([0.5*(x_b+x_t), 0.5*(y_b+y_t), 0.5*(z_b+z_t)])
+  
+    
+    # =======================================================================
+    # find leading edge point (the farest point from last found axis point)
+    def __addLeadingEdgePoint(self, axis, plist, idx_0, idx_1):
+        #last found axis point
+        x_b = axis[len(axis)-1][0]
+        y_b = axis[len(axis)-1][1]
+    
+        dist = 0.0
+        i = idx_0
+        
+        for i in range(i, idx_1 + 1) :
+            x_t = plist[i][0]
+            y_t = plist[i][1]
+            
+            cur_dist =((x_t-x_b)*(x_t-x_b))+((y_t-y_b)*(y_t-y_b))
+            
+            if (cur_dist > dist) : 
+                res = i
+                dist = cur_dist
+            
+        axis.append(plist[res])
+        return axis    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+                
+             
     '''
     @param: uid from cpacs
     @param: sort_desc boolean flag for splitting option
@@ -54,26 +277,26 @@ class DataSet() :
         vecY = self.tixi.getVectorZ(uid)
         vecZ = self.tixi.getVectorY(uid)
         
-        l_fst = []
-        l_snd = []
+        l_top = []
+        l_bot = []
         for i in range(0, len(vecX)-1, 1) :
             if sort_desc:
                 if(vecX[i] > vecX[i+1]) :
-                    l_fst.append([ vecX[i], vecY[i], vecZ[i] ])
+                    l_bot.append([ vecX[i], vecY[i], vecZ[i] ])
                 else : 
-                    l_fst.append([ vecX[i], vecY[i], vecZ[i] ])
+                    l_bot.append([ vecX[i], vecY[i], vecZ[i] ])
                     break
             else :
                 if vecX[i] < vecX[i+1] :
-                    l_fst.append([ vecX[i], vecY[i], vecZ[i] ])
+                    l_bot.append([ vecX[i], vecY[i], vecZ[i] ])
                 else:
-                    l_fst.append([ vecX[i], vecY[i], vecZ[i] ])
+                    l_bot.append([ vecX[i], vecY[i], vecZ[i] ])
                     break                    
 
         for j in range(i, len(vecX), 1) :
-            l_snd.append([ vecX[j], vecY[j], vecZ[j] ])
-        #l_snd.reverse()
-        return l_fst , l_snd
+            l_top.append([ vecX[j], vecY[j], vecZ[j] ])
+        
+        return l_bot , l_top
    
     '''
     @param p1: profile start point (nose)
@@ -336,7 +559,7 @@ class DataSet() :
     @param p2: second point
     @return: distance between p1 and p2
     '''    
-    def __getDistanceBtwPoints(self, p1, p2):
+    def __getDistanceBtwPoints(self, p1, p2):        
         a = (p1[0] - p2[0]) * (p1[0] - p2[0])
         b = (p1[1] - p2[1]) * (p1[1] - p2[1])
         return math.sqrt( a + b )  
@@ -525,10 +748,7 @@ class DataSet() :
             if l[dim] == val : 
                 return i
             i += 1
-        return -1     
-     
-    def bezierCurve(self, x, c, i, N) :
-        return x/c     
+        return -1        
        
     '''
     @param angle: angle in degrees
@@ -565,4 +785,6 @@ class DataSet() :
         #print "len"   , self.get_len_chord()
         #print "thick" , self.get_profile_thickness() 
        
+
+
         

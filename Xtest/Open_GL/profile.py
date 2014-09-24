@@ -28,6 +28,8 @@ class Profile(QtOpenGL.QGLWidget):
         self.flag_draw_points        = False  
         self.flag_close_TrailingEdge = False
         self.flag_spline_curve       = False
+        self.flag_draw_camber        = False
+        self.flag_draw_chord         = False
 
         self.scale = 0.5
         self.trans_x = 0
@@ -198,11 +200,19 @@ class Profile(QtOpenGL.QGLWidget):
         self.flag_draw_points = value 
         self.updateGL()        
 
-    def setChaikinCurve(self, value):
+    def setFlagChaikinCurve(self, value):
         self.flag_spline_curve = value
         self.updateGL()        
 
-    def setCloseTrailingEdge(self, value):
+    def setFlagDrawCamber(self, value):
+        self.flag_draw_camber = value
+        self.updateGL()      
+        
+    def setFlagDrawChord(self, value):
+        self.flag_draw_chord = value
+        self.updateGL()  
+
+    def setFlagCloseTrailingEdge(self, value):
         self.flag_close_TrailingEdge = value
         self.updateGL()
 
@@ -255,6 +265,12 @@ class Profile(QtOpenGL.QGLWidget):
         
     def getFlagSplineCurve(self):
         return self.flag_spline_curve
+    
+    def getFlagDrawCamber(self):
+        return self.flag_draw_camber
+    
+    def getFlagDrawChord(self):
+        return self.flag_draw_chord
 
     # ============================================================================================================
     # mouse and key events

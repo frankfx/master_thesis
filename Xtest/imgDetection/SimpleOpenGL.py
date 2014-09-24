@@ -165,8 +165,8 @@ class Renderer():
         return res
     
     def detectProfile(self):        
-        img = cv2.imread('wing.jpg')
-        gray = cv2.imread('wing.jpg',0)
+        img = cv2.imread('wing3.jpg')
+        gray = cv2.imread('wing3.jpg',0)
 
         ret,thresh = cv2.threshold(gray,127,255,1)
         contours,h = cv2.findContours(thresh,1,2)
