@@ -7,6 +7,7 @@ from Xtest.Open_GL import profileDetectorWidget
 from Xtest.Open_GL.profile import Profile
 import logging
 import datetime
+from Cython.Compiler.Nodes import OverrideCheckNode
 '''
 Created on Jul 30, 2014
 
@@ -51,6 +52,7 @@ class ProfileMainWidget(QtGui.QWidget):
         grid.addWidget(self.ogl_widget, 1,1)
 
         self.setLayout(grid)
+        self.updateEvalList()
         
         self.setWindowTitle('Profile-Widget')    
         self.resize(560,520)
@@ -72,7 +74,7 @@ class ProfileMainWidget(QtGui.QWidget):
         labelLength             = QtGui.QLabel("Length")
         labelAngle              = QtGui.QLabel("Angle of attack")
         labelThickness          = QtGui.QLabel("Thickness")
-        labelCamber             = QtGui.QLabel("Camber")
+        labelCamber             = QtGui.QLabel("Arch")
         self.textName           = QtGui.QLineEdit()
         self.textLength         = QtGui.QLineEdit()
         self.textAngle          = QtGui.QLineEdit()
@@ -113,7 +115,6 @@ class ProfileMainWidget(QtGui.QWidget):
         
         self.butNaca            = QtGui.QPushButton("NacaCreator")
         self.butImgDetect       = QtGui.QPushButton("ImgDetect")
-        self.dial_rot           = QtGui.QDial()
         self.spinBoxRot         = QtGui.QDoubleSpinBox() 
         self.slider_zoom        = QtGui.QSlider(QtCore.Qt.Horizontal, self)     
         
@@ -164,6 +165,7 @@ class ProfileMainWidget(QtGui.QWidget):
 
     def fireSetRotValue(self, value):
         self.ogl_widget.setRotate(-value)
+        self.updateEvalList()
    
     def fireShowPoints(self, value):
         self.ogl_widget.setDrawPointsOption(value)   
@@ -208,16 +210,18 @@ class ProfileWidget(Profile):
         self.setMinimumHeight(200)
         self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
-    # implement abstract method
     def drawProfile(self):
         trX, trY = self.norm_vec_list(self.dataSet.getCompletePointList())
-        GL.glTranslatef(-trX, trY, 0)
+       
+
+        GL.glTranslatef(1,0,0)
+        GL.glRotate(self.getRotAngle(), 0,0,1)
+        GL.glTranslatef(-1,0,0)
+       # GL.glTranslatef(-trX, trY, 0) 
+        
         GL.glColor3f(0, 0, 1)
         
         plist = self.dataSet.getSplineCurve() if self.getFlagSplineCurve() else self.dataSet.getCompletePointList()  
-        
-        print self.dataSet.getPointListTop()
-        print self.dataSet.getPointListBot()
         
         GL.glBegin(GL.GL_LINE_STRIP) 
         for p in plist :
@@ -232,17 +236,19 @@ class ProfileWidget(Profile):
 
         #The Trailing edge
         if self.getFlagCloseTrailingEdge() :
-            p1 = self.dataSet.getEndPoint(self.getPointListTop())
-            p2 = self.dataSet.getEndPoint(self.getPointListBot())
-            self.drawTrailingEdge(p1, p2)
+            self.drawTrailingEdge(self.dataSet.getTrailingEdge())
 
         #The following code displays the control points as dots.
         if self.getFlagDrawPoints() :
             self.drawPoints(plist)
             
-    def drawTrailingEdge(self, p1, p2):
-        GL.glBegin(GL.GL_LINES)
+    def drawTrailingEdge(self, p):
+        plist = self.dataSet.getPointList()
+        p1 = plist[0]
+        p2 = plist[len(plist)-1]
+        GL.glBegin(GL.GL_LINE_STRIP)
         GL.glVertex3f(p1[0], p1[1], p1[2])
+        GL.glVertex3f(p[0], p[1], p[2])
         GL.glVertex3f(p2[0], p2[1], p2[2])
         GL.glEnd()        
 
@@ -275,8 +281,9 @@ class ProfileWidget(Profile):
             res_bot.append([x, -y, 0])
         
         res_bot.reverse()    
-        self.setPointListTop(res_top)
-        self.setPointListBot(res_bot)
+        self.setPointList(res_bot + res_top[1:])
+        self.dataSet.updatePointListCamber()
+        self.dataSet.updatePointListsForNaca()
         self.updateGL()
 
     def createCambered_Naca(self, length, thickness, maxCamber, posMaxCamber, pcnt=10):
@@ -299,11 +306,10 @@ class ProfileWidget(Profile):
             res_bot.append([x_l, y_l, 0])
             res_camber.append([x, y_c, 0])
         res_bot.reverse()
-        
-        self.setPointListTop(res_top)
-        self.setPointListBot(res_bot)
+
+        self.setPointList(res_bot + res_top[1:])      
         self.setPointListCamber(res_camber)
-        self.dataSet.updatePointLists()
+        self.dataSet.updatePointListsForNaca()
         self.updateGL()
            
     def __computeCamber(self, x, length, maxCamber, posMaxCamber):
@@ -492,7 +498,7 @@ class ProfileDetectWidget(QtGui.QWidget):
         
         self.butCreate.clicked.connect(self.fireButtonCreate)
         self.butDetect.clicked.connect(self.fireButtonDetect)
-        self.butCancel.clicked.connect(self.close)
+        self.butCancel.clicked.connect(self.fireButtonClose)
         
         self.createActions()
         self.createMenus()
@@ -501,14 +507,23 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.resize(420,320)
         
     def fireButtonCreate(self):
-        self.ogl_widget.setName(self.text1Name)
-        self.ogl_widget.set_pointList_top(self.ogl_detector_widget.getPointList_top)
-        self.ogl_widget.set_pointList_bot(self.ogl_detector_widget.getPointList_bot)
+        name = self.text1Name.text() if self.text1Name.text() == "" else "untitled"
+        self.ogl_widget.setName(name)
+        self.ogl_widget.setPointList(self.ogl_detector_widget.getPointList())
+       # self.ogl_widget.set_pointList_top(self.ogl_detector_widget.getPointList_top)
+       # self.ogl_widget.set_pointList_bot(self.ogl_detector_widget.getPointList_bot)
         print "dummy function"
 
     def fireButtonDetect(self):
-        ()
+        if False: 
+            ()
+        else:
+            self.ogl_detector_widget.flagDrawDefaultProfile = True
+            self.ogl_detector_widget.updateGL()
 
+    def fireButtonClose(self):
+        self.ogl_detector_widget.flagDrawDefaultProfile = False
+        self.close()
 
     def open(self) :
         (fileName, _) = QtGui.QFileDialog.getOpenFileName(self,

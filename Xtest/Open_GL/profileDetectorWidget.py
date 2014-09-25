@@ -10,6 +10,7 @@ Created on Jul 30, 2014
 @author: fran_re
 '''
 import sys
+import math
 from PySide import QtOpenGL, QtGui, QtCore
 #from cpacsHandler import CPACS_Handler
 from Xtest.Open_GL.configuration.config import Config
@@ -31,7 +32,9 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
         self.img_width = -1
         self.img_height = -1
         self.resize(320,320)
+        self.flagDrawDefaultProfile = False
         self.setWindowTitle("Rene Test")
+        self.pointList = []
 
     def drawImage(self, filename):
         self.filename = filename
@@ -54,7 +57,10 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
         GL.glLoadIdentity()
         
         GLU.gluPerspective (144.0, w*1.0/h, 0.0, 10.0)
-        
+      
+    def getPointList(self):
+        return self.pointList
+      
     def paintGL(self):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
@@ -62,8 +68,11 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
         GL.glLoadIdentity()
        
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.textures[0])
-                   
-        self.drawRectangle()
+        
+        if self.flagDrawDefaultProfile :
+            self.drawProfile()    
+        else :
+            self.drawRectangle()
 
         GL.glFlush()    
 
@@ -85,7 +94,58 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
             GL.glTexCoord2f(0,  1)
             GL.glVertex3f(-px,  py, -0.5)
             GL.glEnd()         
-              
+
+    
+    def drawProfile(self):
+        self.pointList = self.createSym_Naca(1.0, 12.0/100.0)
+        plist = self.getPointList()
+        GL.glTranslatef(-0.5,0,-0.25)
+        GL.glBegin(GL.GL_LINE_STRIP) 
+        for p in plist :
+            GL.glVertex3f(p[0], p[1], p[2])              
+        GL.glEnd()        
+    
+
+    def createSym_Naca(self, length, thickness, pcnt=10):
+        res_top = []
+        res_bot = []
+    
+        c = length
+        t = thickness
+        plist = self.__createXcoords(c, pcnt)
+    
+        for x in plist:
+            y = self.__computeY_t(x, c, t) 
+            res_top.append([x,  y, 0])
+            res_bot.append([x, -y, 0])
+        
+        res_bot.reverse()    
+        return res_bot + res_top[1:]
+  
+    def __createXcoords(self, dist=1.0, point_cnt=35):
+        interval = dist/ point_cnt
+        
+        res = [0]
+        for i in range(0, point_cnt):
+            p = round(res[i] + interval, 3)
+            if p < dist : 
+                res.append(p)
+            elif p == dist : 
+                res.append(p)
+                return res
+            else :
+                break
+        res.append(dist)
+        return res               
+    
+    def __computeY_t(self, x, c, t):
+        tmp = -0.1036 if (x/c) == 1 else -0.1015
+        y = t/0.2 * c * math.fabs( ( 0.2969  * math.sqrt(x/c)   +
+                        (-0.1260) * (x/c)            +
+                        (-0.3516) * math.pow(x/c, 2) +
+                        ( 0.2843) * math.pow(x/c, 3) +
+                        (tmp)     * math.pow(x/c, 4)) )        
+        return y  
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])

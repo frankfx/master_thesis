@@ -21,7 +21,7 @@ except ImportError:
     sys.exit(1)
 
 class Profile(QtOpenGL.QGLWidget):
-    def __init__(self, uid='BWB_Root', parent = None):
+    def __init__(self, uid='NACA0009', parent = None):
         super(Profile, self).__init__(parent)
            
         self._name                   = uid
@@ -31,6 +31,7 @@ class Profile(QtOpenGL.QGLWidget):
         self.flag_draw_camber        = False
         self.flag_draw_chord         = False
 
+        self.rotate = 0.0
         self.scale = 0.5
         self.trans_x = 0
         self.trans_y = 0
@@ -87,6 +88,7 @@ class Profile(QtOpenGL.QGLWidget):
 
     def drawChord(self):
         start, end = self.getEndPoints()
+        
         GL.glBegin(GL.GL_LINES)
         GL.glVertex3f(start[0], start[1], start[2]) # leftend (nose)
         GL.glVertex3f(end[0], end[1], end[2]) # right end
@@ -94,7 +96,7 @@ class Profile(QtOpenGL.QGLWidget):
 
     def drawCamber(self):
         plist = self.getPointListCamber()
-        GL.glBegin(GL.GL_LINES)
+        GL.glBegin(GL.GL_LINE_STRIP)
         for i in range(0, len(plist)) :
             GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])# left end == nose
         GL.glEnd()
@@ -160,6 +162,9 @@ class Profile(QtOpenGL.QGLWidget):
     # getter and setter
     # ================================================================================================================
 
+    def setPointList(self, plist):
+        self.dataSet.setPointList(plist)
+    
     def setPointListTop(self, plist):
         self.dataSet.setPointListTop(plist)
     
@@ -193,7 +198,8 @@ class Profile(QtOpenGL.QGLWidget):
         self.updateGL()
         
     def setRotate(self, value):
-        self.dataSet.updateRotationLists(value)
+        self.rotate = value
+        #self.dataSet.updateRotationLists(value)
         self.updateGL()
         
     def setDrawPointsOption(self, value):
@@ -244,18 +250,19 @@ class Profile(QtOpenGL.QGLWidget):
         return self.dataSet.getLenChord()
 
     def getWorkAngle (self):
-        # sin(x) = a/c
+        ## sin(x) = a/c
         start, _ = self.dataSet.getEndPoints()
         x = start[1] / self.getLenChord()
-        return math.sin(x)
+        #return math.sin(x)
+        return -self.getRotAngle()
 
     # (Profilwoelbung) max Abweichung der Skelettlinie von der Profilsehne
     def getProfileArch(self):
-        self.dataSet.getProfileArch()
+        return self.dataSet.getProfileArch()
                                                      
     # (Profildicke) max Kreisdurchmesser auf der Skelettlinie
     def getProfileThickness(self):
-        self.dataSet.getProfileThickness()
+        return self.dataSet.getProfileThickness()
     
     def getFlagDrawPoints(self):
         return self.flag_draw_points    
@@ -271,6 +278,9 @@ class Profile(QtOpenGL.QGLWidget):
     
     def getFlagDrawChord(self):
         return self.flag_draw_chord
+
+    def getRotAngle(self):
+        return self.rotate
 
     # ============================================================================================================
     # mouse and key events
