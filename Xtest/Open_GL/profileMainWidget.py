@@ -45,7 +45,8 @@ class ProfileMainWidget(QtGui.QWidget):
         self.ogl_widget_naca     = NacaWidget(self.ogl_widget) 
         self.ogl_widget_detector = ProfileDetectWidget(self.ogl_widget)
        
-        self.ogl_widget_naca.butCreate.clicked.connect(self.updateEvalList)
+       # self.ogl_widget_naca.naca4.butCreate.clicked.connect(self.updateEvalList)
+       # self.ogl_widget_naca.naca5.butCreate.clicked.connect(self.updateEvalList)
         self.ogl_widget_detector.butCreate.clicked.connect(self.updateEvalList)
         
         grid.addLayout(self.createTopOfWidget(),0,1)
@@ -286,7 +287,58 @@ class ProfileWidget(Profile):
         self.dataSet.updatePointListsForNaca()
         self.updateGL()
 
-    def createCambered_Naca(self, length, thickness, maxCamber, posMaxCamber, pcnt=10):
+
+
+    def createCambered_Naca5(self, liftCoeff, posMaxCamber, thickness, pcnt=10):
+        c      = 1.0 # c = maxChord ; length
+        p      = 0.5 * posMaxCamber/10.0
+        t      = thickness/100.0
+        cl    = liftCoeff*(3.0/2.0) / 10.0        
+        m , k1 = self.__setConstantsOfP(posMaxCamber, cl) # constant values 
+
+        
+        res_top , res_bot , res_camber = [] , [] , []
+        plist = self.__createXcoords(1.0, pcnt)
+        
+        for x in plist :
+            y_t = self.__computeY_t(x, c, t)
+            
+            if x >= 0 and x <= p :
+                y_c = k1 / 6 * ( x*x*x - 3*m*x*x + m*m*(3-m) * x)
+            elif x >= p and x <= c :
+                y_c = (k1 * m * m * m) / 6 * (1-x)  
+            
+            theta = self.__computeCamber(x, c, m, p)
+            
+            x_u = x - y_t * math.sin(theta)
+            x_l = x + y_t * math.sin(theta)
+            y_u = y_c + y_t * math.cos(theta)
+            y_l = y_c - y_t * math.cos(theta)
+
+            res_top.append([x_u, y_u, 0])
+            res_bot.append([x_l, y_l, 0])
+            res_camber.append([x, y_c, 0])
+        res_bot.reverse()
+
+        self.setPointList(res_bot + res_top[1:])      
+        self.setPointListCamber(res_camber)
+        self.dataSet.updatePointListsForNaca()
+        self.updateGL()
+
+    def __setConstantsOfP(self, p, cl):
+        print cl
+        # table for various positions of the maximum camber at a coefficient of lift value of 0.3. 
+        # The camber and gradient can be scaled linearly to the required Cl value.
+        cl_default = 0.3
+        P = [0.05,0.1,0.15,0.2,0.25]
+        M = [0.0580,0.1260,0.2025,0.2900,0.3910]
+        K = [361.4,51.64,15.957,6.643,3.230]
+        for i in range(0, len(P)) :
+            if p == P[i]:
+                return M[i] * cl / cl_default , K[i] * cl / cl_default
+        print "nix gefunden"
+
+    def createCambered_Naca(self, length, maxCamber, posMaxCamber, thickness, pcnt=10):
         res_top = []
         res_bot = []     
         res_camber = []   
@@ -369,8 +421,24 @@ class ProfileWidget(Profile):
 class NacaWidget(QtGui.QWidget):
     def __init__(self, ogl_widget, parent = None):
         super(NacaWidget, self).__init__(parent)
-        grid = QtGui.QGridLayout()
         self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        
+        self.naca4 = Naca4Tab(ogl_widget)
+        self.naca5 = Naca5Tab(ogl_widget)
+        tabWidget = QtGui.QTabWidget()
+        tabWidget.addTab(self.naca4, self.tr("Naca4"))
+        tabWidget.addTab(self.naca5, self.tr("Naca5"))
+        
+        mainLayout = QtGui.QVBoxLayout()
+        mainLayout.addWidget(tabWidget)
+        self.setLayout(mainLayout)
+        self.setWindowTitle(self.tr("Tab Dialog"))        
+        
+class Naca4Tab(QtGui.QWidget):
+    def __init__(self, ogl_widget, parent = None):        
+        QtGui.QWidget.__init__(self, parent)
+        
+        grid = QtGui.QGridLayout()
         
         label1 = QtGui.QLabel("Name")
         label2 = QtGui.QLabel("Length")
@@ -468,11 +536,93 @@ class NacaWidget(QtGui.QWidget):
             return
         
         if maxCamber > 0 or posCamber > 0 :
-            self.ogl_widget.createCambered_Naca(length, thick/100.0, maxCamber/100.0, posCamber/10.0, pcnt)
+            self.ogl_widget.createCambered_Naca(length, maxCamber/100.0, posCamber/10.0, thick/100.0, pcnt)
         else :
             self.ogl_widget.createSym_Naca(length, thick/100.0, pcnt)
         
         self.ogl_widget.setName(self.text1Name.text())
+
+
+
+class Naca5Tab(QtGui.QWidget):
+    def __init__(self, ogl_widget, parent = None):        
+        QtGui.QWidget.__init__(self, parent)
+        
+        grid = QtGui.QGridLayout()
+        
+        label1 = QtGui.QLabel("Name")
+        label2 = QtGui.QLabel("Design coefficient of lift")
+        label3 = QtGui.QLabel("Pos. max. Camber")
+        label4 = QtGui.QLabel("Thickness")
+        label5 = QtGui.QLabel("Number of points")
+        
+        label2_1 = QtGui.QLabel("First digit = Cl * 20/3. %s to %s%%:" % ("0", "9"))
+        label3_1 = QtGui.QLabel("Second & third digits.")
+        label4_1 = QtGui.QLabel("Fourth & fifth digits. %d to %d%%:" % (1, 30))
+        label5_1 = QtGui.QLabel("%d to %d" % (20, 200))
+        
+        self.text1Name = QtGui.QLineEdit()
+        self.text1Name.setText('NACA xxxxx')
+        self.text1Name.setReadOnly(True)
+        self.text2Cl = QtGui.QLineEdit()
+        self.text2Cl.setText('0.05')        
+        self.combosCamberPos = QtGui.QComboBox()
+        self.combosCamberPos.addItem("0.05")
+        self.combosCamberPos.addItem("0.10")
+        self.combosCamberPos.addItem("0.15")
+        self.combosCamberPos.addItem("0.20")
+        self.combosCamberPos.addItem("0.25")
+        
+        self.text4Thickness = QtGui.QLineEdit()
+        self.text4Thickness.setText('12')
+        
+        self.countSpinBox = QtGui.QSpinBox()
+        self.countSpinBox.setRange(20, 200)
+        self.countSpinBox.setSingleStep(5)
+        self.countSpinBox.setSuffix('pts')
+        self.countSpinBox.setSpecialValueText("Automatic")
+        self.countSpinBox.setValue(10)
+        
+        self.butCreate = QtGui.QPushButton("create")
+        self.butCreate.clicked.connect(self.fireButtonCreate)
+        self.ogl_widget = ogl_widget
+        
+        grid.addWidget(label1, 1, 1)
+        grid.addWidget(label2, 2, 1)
+        grid.addWidget(label3, 3, 1)
+        grid.addWidget(label4, 4, 1)
+        grid.addWidget(label5, 5, 1)
+        grid.addWidget(self.text1Name,      1, 3)
+        grid.addWidget(self.text2Cl,        2, 3)        
+        grid.addWidget(self.combosCamberPos, 3, 3)
+        grid.addWidget(self.text4Thickness, 4, 3)        
+        grid.addWidget(self.countSpinBox,   5, 3)
+        grid.addWidget(label2_1, 2, 4)
+        grid.addWidget(label3_1, 3, 4)
+        grid.addWidget(label4_1, 4, 4)
+        grid.addWidget(label5_1, 5, 4)
+        
+        grid.addWidget(self.butCreate, 6, 1)
+        self.setLayout(grid)        
+
+    def fireButtonCreate(self):
+        
+        cl          = self.text2Cl.text()
+        posCamber   = self.combosCamberPos.currentText()        
+        thick       = self.text4Thickness.text()
+        pcnt        = self.countSpinBox.value()
+        
+        try : 
+            cl          = float(cl)
+            posCamber   = float(posCamber)
+            thick       = float(thick)
+        except ValueError:
+            print "Exception fireButtonCreate in profileWidget (NACA Creator)" ,  thick
+            return
+        
+        self.ogl_widget.createCambered_Naca5(cl, posCamber, thick, pcnt)        
+        self.ogl_widget.setName(self.text1Name.text())
+
 
 
 class ProfileDetectWidget(QtGui.QWidget): 
