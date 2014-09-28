@@ -1,0 +1,206 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{\uppercase{DFMP98}}
+
+\bibitem[CEI01]{bib:HLOD2}
+\textsc{Carl~Erikson D.~M., III W. V.~B.}:
+\newblock Hlods for faster display of large static and dynamic environments.
+\newblock \emph{University of North Carolina at Chapel Hill} (2001).
+
+\bibitem[Cha08]{bib:CPUvsGPU}
+\textsc{Charpentier F.}:
+\newblock \emph{Nvidia Cuda: Das Ende der CPU?}
+\newblock Technical report, Tom's Hardware, Jun 2008.
+\newblock
+  \url{http://www.tomshardware.com/de/CUDA-Nvidia-CPU-GPU,testberichte-240065.html}
+  (20.08.2009).
+
+\bibitem[Cla76]{bib:LOD2}
+\textsc{Clark J.~H.}:
+\newblock Hierarchical geometric models for visible surface algorithms.
+\newblock \emph{Communications of the ACM 19}, 10 (Oct 1976), 547--554.
+\newblock
+  \url{http://design.osu.edu/carlson/history/PDFs/clark-vis-surface.pdf}
+  (09.09.2009).
+
+\bibitem[Dat13]{bib:profil_database}
+\textsc{Database U. A.~C.}:, 2013.
+\newblock \url{http://www.ae.uiuc.edu/m-selig/ads/coord_database.html}
+  (27.10.2014).
+
+\bibitem[DFMP98]{bib:DFMP98}
+\textsc{De~Floriani L., Magillo P., Puppo E.}:
+\newblock Efficient implementation of multi-triangulations.
+\newblock In \emph{VIS '98: Proceedings of the conference on Visualization '98}
+  (Los Alamitos, CA, USA, 1998), IEEE Computer Society Press, pp.~43--50.
+
+\bibitem[Eck99]{bib:neuman}
+\textsc{Eckert M.}:
+\newblock \emph{Von-Neuman Architektur}.
+\newblock Technical report, TecChannel, sep 1999.
+\newblock
+  \url{http://www.tecchannel.de/server/prozessoren/401364/so_funktioniert_ein_prozessor}
+  (19.08.2009).
+
+\bibitem[Eis06]{bib:NormWinkel}
+\textsc{Eiserle M.}:
+\newblock Progressive techniken in der computergrafik.
+\newblock \emph{Universität Rostock} (2006).
+\newblock
+  \url{http://vcg.informatik.uni-rostock.de/assets/publications/theses_sem/SA_Eiserle2006.pdf}
+  (15.09.2009).
+
+\bibitem[ESV99]{bib:ESV99}
+\textsc{El-Sana J., Varshney A.}:
+\newblock Generalized view-dependent simplification.
+\newblock \emph{Computer Graphics Forum 18}, 3 (1999), 83--94.
+
+\bibitem[Fos95]{bib:Foster}
+\textsc{Foster I.}:
+\newblock \emph{Designing and Building Parallel Programs}.
+\newblock Addison Wesley Pub Co Inc, Reading, MA, USA, 1995.
+
+\bibitem[Har08]{bib:SCAN}
+\textsc{Harris M.}:
+\newblock \emph{Parallel Prefix Sum (Scan) with CUDA}.
+\newblock Programming guide, NVIDIA, 2008.
+
+\bibitem[Hop96]{bib:hoppePM}
+\textsc{Hoppe H.}:
+\newblock Progressive meshes.
+\newblock In \emph{SIGGRAPH '96: Proceedings of the 23rd annual conference on
+  Computer graphics and interactive techniques} (New York, NY, USA, 1996), ACM,
+  pp.~99--108.
+
+\bibitem[Hop97]{bib:hoppeVPM}
+\textsc{Hoppe H.}:
+\newblock View-dependent refinement of progressive meshes.
+\newblock In \emph{SIGGRAPH '97: Proceedings of the 24th annual conference on
+  Computer graphics and interactive techniques} (New York, NY, USA, 1997), ACM
+  Press/Addison-Wesley Publishing Co., pp.~189--198.
+
+\bibitem[Hop98]{bib:efPM}
+\textsc{Hoppe H.}:
+\newblock Efficient implementation of progressive meshes.
+\newblock \emph{Computers {\&} Graphics 22}, 1 (1998), 27--36.
+
+\bibitem[HSH09]{bib:Hoppe2009}
+\textsc{Hu L., Sander P.~V., Hoppe H.}:
+\newblock Parallel view-dependent refinement of progressive meshes.
+\newblock In \emph{I3D '09: Proceedings of the 2009 symposium on Interactive 3D
+  graphics and games} (New York, NY, USA, 2009), ACM, pp.~169--176.
+
+\bibitem[JNS08]{bib:CUDA2}
+\textsc{John~Nickölls Ian~Buck M.~G., Skadron K.}:
+\newblock \emph{Scalable Parallel Programming}.
+\newblock Programming guide, UNIVERSITY OF VIRGINIA, 2008.
+
+\bibitem[Lit08]{bib:GPUAufbau}
+\textsc{Littschwager T.}:
+\newblock \emph{Neue Grafik-Generation: Alle Details}.
+\newblock Technical report, Chip, Sep 2008.
+\newblock
+  \url{http://www.chip.de/artikel/Neue-Grafik-Generation-Alle-Details_32708718.html}
+  (19.08.2009).
+
+\bibitem[Lue01]{bib:LODHase}
+\textsc{Luebke D.~P.}:
+\newblock A developer's survey of polygonal simplification algorithms.
+\newblock \emph{IEEE Computer Graphics and Applications 21}, 3 (May\slash Jun
+  2001), 24--35.
+\newblock
+  \url{http://www.cs.virginia.edu/~luebke/publications/pdf/cg+a.2001.pdf}
+  (11.09.2009).
+
+\bibitem[Mar]{bib:naca_docu}
+\textsc{Marzocca P.}:
+\newblock \emph{The NACA airfoil series}.
+\newblock Technical report, Clarkson University, Department of Mechanical and
+  Aeronautical Engineering.
+\newblock
+  \url{http://people.clarkson.edu/~pmarzocc/AE429/The%20NACA%20airfoil%20series.pdf}
+  (27.10.2014).
+
+\bibitem[MB00]{bib:einfuhrungPM}
+\textsc{Mrohs~Bernd C.~R.}:
+\newblock Progressive meshes - eine einführung.
+\newblock \emph{test} (Jul 2000).
+\newblock
+  \url{http://www.mrohs.com/publications/Bernd\%20Mrohs,\%20Christian\%20Raeck\%20-\%20Progressive\%20Meshes.pdf}(29.07.09).
+
+\bibitem[MGK03]{bib:HLOD}
+\textsc{Michael~Guthe P.~B., Klein R.}:
+\newblock Efficient view-dependent out-of-core visualization.
+\newblock \emph{University of Bonn, Institute of Computer Science II} (2003).
+\newblock
+  \url{http://www.uni-marburg.de/fb12/informatik/homepages/guthe/files/guthe-2003-efficient}
+  (12.09.2009).
+
+\bibitem[Nah02]{bib:viewFrustum}
+\textsc{Nahmias J.-D.}:
+\newblock Real-time massive model rendering.
+\newblock \emph{University College London} (Sep 2002).
+\newblock
+  \url{http://www.cs.ucl.ac.uk/research/equator/papers/Documents2002/Jean-Daniel_Nahmias/Massive_Model_Rendering.htm}
+  (29.07.09).
+
+\bibitem[NVI07]{bib:CUDADoc}
+\textsc{NVIDIA}:
+\newblock \emph{NVIDIA CUDA Compute Unified Device Architecture}.
+\newblock Programming Guide Version 1.0, NVIDIA Corporation, Santa Clara, CA,
+  USA, 2007.
+
+\bibitem[NVI08]{bib:GTX295}
+\textsc{NVIDIA}:
+\newblock \emph{NVIDIA GeForce GTX 295}, 2008.
+\newblock \url{http://www.nvidia.de/object/product_geforce_gtx_295_de.html}
+  (02.10.2009).
+
+\bibitem[NVI09]{bib:OpenCLDoc}
+\textsc{NVIDIA}:
+\newblock \emph{OpenCL Programming Guide for the CUDA Architecture}.
+\newblock Programming Guide Version 2.3, NVIDIA Corporation, Santa Clara, CA,
+  USA, 2009.
+
+\bibitem[OLG{\etalchar{*}}05]{bib:GraphicsHardware}
+\textsc{Owens J.~D., Luebke D., Govindaraju N., Harris M., Krüger J., Lefohn
+  A.~E., Purcell T.~J.}:
+\newblock A survey of general-purpose computation on graphics hardware.
+\newblock In \emph{Eurographics 2005, State of the Art Reports} (Aug 2005),
+  pp.~21--51.
+
+\bibitem[Paj01]{bib:PAJ01}
+\textsc{Pajarola R.}:
+\newblock Fastmesh: Efficient view-dependent meshing.
+\newblock \emph{Computer Graphics and Applications, Pacific Conference on 0}
+  (2001), 0022.
+
+\bibitem[PD04]{bib:PD04}
+\textsc{Pajarola R., DeCoro C.}:
+\newblock Efficient implementation of real-time view-dependent multiresolution
+  meshing.
+\newblock \emph{IEEE Transactions on Visualization and Computer Graphics 10}, 3
+  (2004), 353--368.
+
+\bibitem[Riß99]{bib:Corei7}
+\textsc{Rißka V.}:
+\newblock \emph{Test: Intel Core i7 920, 940 und 965 Extreme Edition}.
+\newblock Technical report, Computerbase, Sep 1999.
+\newblock
+  \url{http://www.computerbase.de/artikel/hardware/prozessoren/2008/test_intel_core_i7_920_940_965_extreme_edition/}
+  (20.08.2009).
+
+\bibitem[Tro01]{bib:LOD1}
+\textsc{Troger C.}:
+\newblock Levels of detail.
+\newblock \emph{Institute of Computer Graphics and Algorithms Vienna University
+  of Technology} (2001).
+\newblock
+  \url{http://www.cg.tuwien.ac.at/courses/Seminar/SS2001/lod/troger_paper.pdf}
+  (09.09.2009).
+
+\bibitem[WIK]{bib:octree}
+\textsc{WIKIPEDIA}:
+\newblock \emph{Octree}.
+\newblock \url{http://de.wikipedia.org/wiki/Octree} (29.07.2009).
+
+\end{thebibliography}

@@ -1,3 +1,4 @@
+ 
 '''
 Created on Aug 22, 2014
 
@@ -50,7 +51,8 @@ class Renderer():
         GL.glLoadIdentity()
        
         '''gluunproject vs gluperspective'''
-      #  GLU.gluPerspective (200.0, w*1.0/h, 0.0, 10.0)
+        GLU.gluPerspective (170.0, w*1.0/h, 0.001, 10.0)
+       # GL.glLoadIdentity()
         
     def display(self):
         # Clear screen and Z-buffer
@@ -74,30 +76,58 @@ class Renderer():
                     #GL.glTranslatef(-0.51,0,-1)
                     #self.drawTriangle()
         #Multi-colored side - FRONT
+        GL.glTranslatef(0,0,-1)
         self.drawCube()
+
         GL.glFlush()    
 
-    def set_coordinates(self, x, y, z):
-
+    '''
+    get the world coordinates from the screen coordinates
+    '''
+    def fkt_winPosTo3DPos(self, x, y):
+        point = [-1,-1,-1]                                      # result point
         modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
         projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
         viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
  
-        winX = x
-        winY = viewport[3] - y
-        winZ = 1
+        print projection
+        # in OpenGL y soars (steigt) from bottom (0) to top
+        y_new = viewport[3] - y     
  
-        # get the world coordinates from the screen coordinates
-        ''' winz should not be 0!!!!!!!!!!'''
-        ''' error when projection matrix not identity (gluPerspective) '''
-        self.x, self.y, self.z = GLU.gluUnProject(winX, winY, winZ, modelview, projection, viewport)
+        # read depth buffer at position (X/Y_new)
+        z = GL.glReadPixels(x, y_new, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT)
+        # winz should not be 0!!!
+        # error when projection matrix not identity (gluPerspective) 
+        point[0], point[1], point[2] = GLU.gluUnProject(x, y_new, z, modelview, projection, viewport)                         
+        
+        print "(",x,",",y,") = " , "(",point[0],",",point[1],",",point[2],")"
+        return point
+
+    '''
+    get the the screen coordinates from the world coordinates 
+    '''
+    def fkt_3DPosToWinPos(self, x, y, z):
+        point = [-1,-1,-1]                                      # result point
+        modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
+        projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
+        viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
+
+        # in OpenGL y soars (steigt) from bottom (0) to top
+        y_new = y 
+ 
+        point[0], point[1], point[2]  = GLU.gluProject(x, y_new, z, modelview, projection, viewport)                         
+        point[1] = self.height -point[1]
+        
+        print "(",x,",",y,",",z,") = " , "(",point[0],",",point[1],")"
+        return point
+
 
     def drawTriangle(self):
         GL.glColor3f(1.0, 1.0, 1.0)
         GL.glBegin(GL.GL_TRIANGLES)
-        GL.glVertex3f(-0.5 + self.x, -0.5 + self.y, -0.5)
-        GL.glVertex3f( 0.5 + self.x, -0.5 + self.y, -0.5)
-        GL.glVertex3f( 0.0 + self.x,  0.5 + self.y, -0.5)
+        GL.glVertex3f(-0.5 + self.x, -0.5 + self.y, -0.6)
+        GL.glVertex3f( 0.5 + self.x, -0.5 + self.y, -0.6)
+        GL.glVertex3f( 0.0 + self.x,  0.5 + self.y, -0.6)
         GL.glEnd()            
               
     def drawCube(self):
@@ -181,11 +211,14 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
 
     def mousePressEvent(self, event):
         self.lastPos = QtCore.QPoint(event.pos())
+        p = self.renderer.fkt_winPosTo3DPos(event.x(), event.y())
+        self.renderer.fkt_3DPosToWinPos(p[0], p[1], p[2])
 
     def mouseMoveEvent(self, event):
         
         if event.buttons() & QtCore.Qt.LeftButton:
-            self.renderer.set_coordinates(event.x(), event.y(), 1)
+            ()
+            #self.renderer.set_coordinates(event.x(), event.y(), 1)
         elif event.buttons() & QtCore.Qt.RightButton :
             ()
 

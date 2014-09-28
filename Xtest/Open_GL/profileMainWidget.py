@@ -7,7 +7,6 @@ from Xtest.Open_GL import profileDetectorWidget
 from Xtest.Open_GL.profile import Profile
 import logging
 import datetime
-from Cython.Compiler.Nodes import OverrideCheckNode
 '''
 Created on Jul 30, 2014
 
@@ -639,12 +638,12 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.ogl_detector_widget = profileDetectorWidget.ProfileDetectorWidget()
         #self.ogl_widget.setFixedSize(200,200)
         
-        grid.addWidget(self.ogl_detector_widget, 1,1,1,5)
-        grid.addWidget(label1,                       2,1)
-        grid.addWidget(self.text1Name,               2,2)
-        grid.addWidget(self.butCreate,               2,3)
-        grid.addWidget(self.butDetect,               2,4)
-        grid.addWidget(self.butCancel,               2,5)
+        grid.addWidget(self.ogl_detector_widget, 2,1,1,5)
+        grid.addWidget(label1,                       3,1)
+        grid.addWidget(self.text1Name,               3,2)
+        grid.addWidget(self.butCreate,               3,3)
+        grid.addWidget(self.butDetect,               3,4)
+        grid.addWidget(self.butCancel,               3,5)
         
         self.butCreate.clicked.connect(self.fireButtonCreate)
         self.butDetect.clicked.connect(self.fireButtonDetect)
@@ -668,11 +667,11 @@ class ProfileDetectWidget(QtGui.QWidget):
         if False: 
             ()
         else:
-            self.ogl_detector_widget.flagDrawDefaultProfile = True
+            self.ogl_detector_widget.flagDetectProfile = True
             self.ogl_detector_widget.updateGL()
 
     def fireButtonClose(self):
-        self.ogl_detector_widget.flagDrawDefaultProfile = False
+        self.ogl_detector_widget.flagDetectProfile = False
         self.close()
 
     def open(self) :
