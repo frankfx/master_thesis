@@ -30,7 +30,7 @@ def createPerpendicular2(p1, p2, p3):
     
     return lambda x : m * x + b
 
-def getIntersection(m1, b1, m2, b2):
+def getIntersectionPoint(m1, b1, m2, b2):
     m = m1 - m2
     b = b2 - b1
     x = b / m
@@ -42,11 +42,14 @@ def getIntersection(m1, b1, m2, b2):
 @param p2: second point
 @return: distance between p1 and p2 
 '''    
-def distanceBtwPoints(p1, p2):
+def getDistanceBtwPoints(p1, p2):
     x = p1[0] - p2[0] 
     y = p1[1] - p2[1] 
     z = p1[2] - p2[2] 
     return math.sqrt(x*x + y*y + z*z)
+
+
+
 
 
 l = [1,-4,0]

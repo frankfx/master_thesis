@@ -15,7 +15,7 @@ def computePointWithMinDistance(p, plist):
     dist = -1.0
     pnt = None
     for p1 in plist :
-        cur_dist = distanceBtwPoints(p, p1)
+        cur_dist = getDistanceBtwPoints(p, p1)
         if dist < 0.0 or cur_dist < dist :
             dist = cur_dist
             pnt = p1
@@ -30,7 +30,7 @@ def computeIdxOfPointWithMinDistance(p, plist):
     dist = -1.0
     idx = None
     for i in range(0, len(plist)) :
-        cur_dist = distanceBtwPoints(p, plist[i])
+        cur_dist = getDistanceBtwPoints(p, plist[i])
         if dist < 0.0 or cur_dist < dist :
             dist = cur_dist
             idx = i
@@ -66,7 +66,7 @@ def getCenterPoint(p1, p2):
 @param p2: second point
 @return: distance between p1 and p2 
 '''    
-def distanceBtwPoints(p1, p2):
+def getDistanceBtwPoints(p1, p2):
     x = p1[0] - p2[0] 
     y = p1[1] - p2[1] 
     z = p1[2] - p2[2] 
@@ -80,7 +80,7 @@ def distanceBtwPoints(p1, p2):
 def computeMinDistance(p, plist):
     dist = -1.0
     for p1 in plist :
-        cur_dist = distanceBtwPoints(p, p1)
+        cur_dist = getDistanceBtwPoints(p, p1)
         if dist < 0.0 or cur_dist < dist :
             dist = cur_dist
     return dist
@@ -109,3 +109,45 @@ def searchPoint(p, plist):
         if plist[i] == p :
             return i
     return -1
+
+'''
+@param m1: gradient of first line
+@param b1: y-intercept of first line
+@param m2: gradient of second line
+@param b2: y-intercept of second line
+@return: the intersection point of the two lines
+'''
+def getIntersectionPoint(m1, b1, m2, b2):
+    m = m1 - m2
+    b = b2 - b1
+    x = 0 if m == 0 else b / m
+    y = m1 * x + b1
+    return [x,y,1]
+
+'''
+@param p1: first point of line
+@param p2: second point of line
+@param p3: line goes through this point p3
+@param return: gradient and y-intercept of line
+'''
+def createLineFunction(p1,p2,p3):
+    # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
+    m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
+    b = p3[1] - m * p3[0]
+    
+    return m , b
+
+'''
+@param p1: start of line
+@param p2: end of line
+@param p3: normal goes through this point p3
+@return: gradient and y-intercept of line
+'''
+def createPerpendicular(p1, p2, p3):
+    m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
+    if m == 0 :
+        return None , p3[0]
+    m_per = -1/m
+    b = p3[1] - m_per * p3[0]
+    
+    return m_per , b

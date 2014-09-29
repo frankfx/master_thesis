@@ -39,8 +39,8 @@ class DataSet() :
         self.trailingEdge                       = self.__computeTrailingEdge(self.pointList)
         self.leadingEdge                        = self.__computeLeadingEdge(self.pointList)
         self.pointList_bot , self.pointList_top = self.__createPointList_bot_top(self.leadingEdge, self.pointList)
-        self.pointList_camber                   = self.__createPointList_camber(self.pointList_bot, self.pointList_top)
-        self.pointList_chord                    = self.__createPointList_chord(self.leadingEdge, self.trailingEdge, len(self.pointList_top))
+        self.pointList_chord                    = self.__createPointList_chord(self.leadingEdge, self.trailingEdge, len(self.pointList_top))        
+        self.pointList_camber                   = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
        
@@ -75,7 +75,7 @@ class DataSet() :
         idx  = -1
         
         for i in range(0, len(plist)) : 
-            cur_dist = utility.distanceBtwPoints(plist[i], trailingEdge)
+            cur_dist = utility.getDistanceBtwPoints(plist[i], trailingEdge)
             if cur_dist > dist : 
                 dist = cur_dist
                 idx = i
@@ -98,7 +98,7 @@ class DataSet() :
     @return: list with chord points    
     ''' 
     def __createPointList_chord(self, p1, p2, point_cnt) : 
-        dist = utility.distanceBtwPoints(p1, p2)
+        dist = utility.getDistanceBtwPoints(p1, p2)
         interval = dist/ point_cnt  
          
         res = [p1]
@@ -113,7 +113,7 @@ class DataSet() :
     @param plist_bot: point list of bottom profile
     @return: list with camber points    
     ''' 
-    def __createPointList_camber(self, plist_bot, plist_top) : 
+    def __createPointList_camber2(self, plist_bot, plist_top) : 
         plist_top.reverse()
         axis0 = self.__createApproximateCamber(plist_bot, plist_top)
         axis1 = self.__createApproximateCamber(plist_top, plist_bot)
@@ -132,16 +132,46 @@ class DataSet() :
             axis.append(p)
         return axis    
     
-    def doItall(self):
-        ()
+
+    def __createPointList_camber(self, plist_bot, plist_top, plist_chord):
+        res= []
+        for p_chord in plist_chord :
+            m, b = utility.createPerpendicular(self.leadingEdge, self.trailingEdge, p_chord)
+            # fkt has gradient 0, then fkt x = b and compute y by neigbors
+            if m == None :
+                p_bot = [b,self.approxYByNeighbors(b, plist_bot), p_chord[2]]
+                p_top = [b,self.approxYByNeighbors(b, plist_top), p_chord[2]]
+            else :
+                p_bot = self.__getPointWithMinDistanceToChordPerpendicular(m, b, plist_bot)
+                p_top = self.__getPointWithMinDistanceToChordPerpendicular(m, b, plist_top)
+            res.append(utility.getCenterPoint(p_bot, p_top))
+        print res
+        return res
         
-    def createLineFunction(self,p1,p2):
-        # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
-        m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
-        b = p2[1] - m * p2[0]
-        
-        return lambda x : m * x + b
-    
+    '''
+    not save!!! danger!!!
+    '''    
+    def approxYByNeighbors(self, x, plist):
+        for i in range(0, len(plist)):
+            if plist[i][0] == x :
+                return plist[i][1]
+            elif plist[i-1][0] > x and plist[i][0] < x or plist[i-1][0] < x and plist[i][0] > x:
+                return utility.getCenterPoint(plist[i-1], plist[i])[1]
+
+            
+            
+    def __getPointWithMinDistanceToChordPerpendicular(self, m_per, b_per, plist):
+        dist = -1.0
+        point = None
+        for p1 in plist :
+            m1, b1 = utility.createLineFunction(self.leadingEdge, self.trailingEdge, p1) 
+            isectP = utility.getIntersectionPoint(m_per, b_per, m1, b1)
+            cur_dist   = utility.getDistanceBtwPoints(isectP, p1)
+            if (dist < 0.0 or cur_dist < dist) :
+                dist = cur_dist      
+                point = p1
+        return point  
+
 
     # ============================================================================================================
     # rotation functions
@@ -209,7 +239,7 @@ class DataSet() :
         return self.pointList_bot_rot    
     
     def getLenChord(self):
-        return utility.distanceBtwPoints(self.getTrailingEdge(), self.getLeadingEdge())   
+        return utility.getDistanceBtwPoints(self.getTrailingEdge(), self.getLeadingEdge())   
     
     def getEndPoints(self):
         return self.leadingEdge, self.trailingEdge

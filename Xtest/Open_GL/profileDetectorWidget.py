@@ -73,12 +73,17 @@ class ProfileDetectorWidget(Profile):
        
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.textures[0])
         GL.glScalef(self.scale,self.scale,1)
-        self.drawDefaultProfile()
-       # if self.flagDetectProfile :
-       #     self.drawDefaultProfile()    
-       # else :
-        #    self.drawBackgroundImg()
-        #    self.drawDefaultProfile()
+        
+        if self.flagDetectProfile :
+            self.drawDefaultProfile()    
+        else :
+            GL.glTranslatef(self.trans_x, self.trans_y, 0)
+            self.drawBackgroundImg()
+            GL.glTranslatef(-self.trans_x, -self.trans_y, 0)
+            self.drawDefaultProfile()
+            
+            
+            
             
             
 
@@ -241,7 +246,6 @@ class ProfileDetectorWidget(Profile):
             else : 
                 Profile.mousePressEvent(self, event)
         
-            
     def mouseMoveEvent(self, event):
         if self.__idxSelectedPoint >= 0 :
             p = self.winPosTo3DPos(event.pos().x(), event.pos().y())
@@ -262,8 +266,8 @@ class ProfileDetectorWidget(Profile):
         idx_l = len(self.pointList) - 1 if idx == 0 else idx - 1
         idx_r = 0 if idx == len(self.pointList) - 1 else idx + 1
         
-        dist_l = utility.distanceBtwPoints(p, self.pointList[idx_l])
-        dist_r = utility.distanceBtwPoints(p, self.pointList[idx_r])
+        dist_l = utility.getDistanceBtwPoints(p, self.pointList[idx_l])
+        dist_r = utility.getDistanceBtwPoints(p, self.pointList[idx_r])
         
         if dist_l < dist_r :
             self.pointList.insert(idx, p)
