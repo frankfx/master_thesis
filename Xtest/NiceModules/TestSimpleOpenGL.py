@@ -51,7 +51,7 @@ class Renderer():
         GL.glLoadIdentity()
        
         '''gluunproject vs gluperspective'''
-        GLU.gluPerspective (170.0, w*1.0/h, 0.001, 10.0)
+        GLU.gluPerspective (100.0, w*1.0/h, 0.001, 10.0)
        # GL.glLoadIdentity()
         
     def display(self):
@@ -66,9 +66,10 @@ class Renderer():
         #GL.glTranslatef( 0.1, 0.0, 0.0 )      # Not included
         #GL.glRotatef( 180, 0.0, 1.0, 0.0 )    # Not included       
        
+       # GL.glTranslatef(0,0,-2.2)
         # Rotate when user changes rotate_x and rotate_y
-        GL.glRotatef( self.rotX, 1.0, 0.0, 0.0 )
-        GL.glRotatef( self.rotY, 0.0, 1.0, 0.0 )       
+      #  GL.glRotatef( self.rotX, 1.0, 0.0, 0.0 )
+       # GL.glRotatef( self.rotY, 0.0, 1.0, 0.0 )       
        
         # Other Transformations
         #GL.glScalef( 2.0, 2.0, 0.0 )          # Not included
@@ -76,15 +77,16 @@ class Renderer():
                     #GL.glTranslatef(-0.51,0,-1)
                     #self.drawTriangle()
         #Multi-colored side - FRONT
-        GL.glTranslatef(0,0,-1)
-        self.drawCube()
+       # GL.glTranslatef(1,0,0)
+        #self.drawCube()
+        self.drawTriangle()
 
         GL.glFlush()    
 
     '''
     get the world coordinates from the screen coordinates
     '''
-    def fkt_winPosTo3DPos(self, x, y):
+    def winPosTo3DPos(self, x, y):
         point = [-1,-1,-1]                                      # result point
         modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
         projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
@@ -125,9 +127,9 @@ class Renderer():
     def drawTriangle(self):
         GL.glColor3f(1.0, 1.0, 1.0)
         GL.glBegin(GL.GL_TRIANGLES)
-        GL.glVertex3f(-0.5 + self.x, -0.5 + self.y, -0.6)
-        GL.glVertex3f( 0.5 + self.x, -0.5 + self.y, -0.6)
-        GL.glVertex3f( 0.0 + self.x,  0.5 + self.y, -0.6)
+        GL.glVertex3f(-0.5 + self.x, -0.5 + self.y, -0.5)
+        GL.glVertex3f( 0.5 + self.x, -0.5 + self.y, -0.5)
+        GL.glVertex3f( 0.0 + self.x,  0.5 + self.y, -0.5)
         GL.glEnd()            
               
     def drawCube(self):
@@ -211,7 +213,7 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
 
     def mousePressEvent(self, event):
         self.lastPos = QtCore.QPoint(event.pos())
-        p = self.renderer.fkt_winPosTo3DPos(event.x(), event.y())
+        p = self.renderer.winPosTo3DPos(event.x(), event.y())
         self.renderer.fkt_3DPosToWinPos(p[0], p[1], p[2])
 
     def mouseMoveEvent(self, event):

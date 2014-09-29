@@ -6,6 +6,7 @@ Created on Sep 3, 2014
 
 import sys
 import math
+import utility
 from PySide import QtOpenGL, QtGui, QtCore
 from dataSet import DataSet
 
