@@ -633,18 +633,33 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.butCreate           = QtGui.QPushButton("create")
         self.butDetect           = QtGui.QPushButton("detect")
         self.butCancel           = QtGui.QPushButton("cancel")        
+        self.butDelPnt           = QtGui.QPushButton("reduce")
       
-        self.sizeSpinBox = QtGui.QSpinBox()
-        self.sizeSpinBox.setRange(1, 100)
-        self.sizeSpinBox.setSingleStep(5)
-        self.sizeSpinBox.setSuffix('%')
-        self.sizeSpinBox.setValue(50)        
+      
+        label2              = QtGui.QLabel("Image size")
+        self.sizeImgSpinBox = QtGui.QSpinBox()
+        self.sizeImgSpinBox.setRange(1, 100)
+        self.sizeImgSpinBox.setSingleStep(5)
+        self.sizeImgSpinBox.setSuffix('%')
+        self.sizeImgSpinBox.setValue(50)        
+
+        label3              = QtGui.QLabel("Profile size")
+        self.sizeProSpinBox = QtGui.QSpinBox()
+        self.sizeProSpinBox.setRange(1, 100)
+        self.sizeProSpinBox.setSingleStep(5)
+        self.sizeProSpinBox.setSuffix('%')
+        self.sizeProSpinBox.setValue(50)
+
         
         self.ogl_widget          = ogl_widget
         self.ogl_detector_widget = profileDetectorWidget.ProfileDetectorWidget()
         #self.ogl_widget.setFixedSize(200,200)
         
-        grid.addWidget(self.sizeSpinBox, 1,1)
+        grid.addWidget(label2,                       1,1)
+        grid.addWidget(self.sizeImgSpinBox,          1,2)
+        grid.addWidget(label3,                       1,3)
+        grid.addWidget(self.sizeProSpinBox,          1,4) 
+        grid.addWidget(self.butDelPnt,               1,5)      
         grid.addWidget(self.ogl_detector_widget, 2,1,1,5)
         grid.addWidget(label1,                       3,1)
         grid.addWidget(self.text1Name,               3,2)
@@ -654,9 +669,11 @@ class ProfileDetectWidget(QtGui.QWidget):
         
         self.butCreate.clicked.connect(self.fireButtonCreate)
         self.butDetect.clicked.connect(self.fireButtonDetect)
+        self.butDelPnt.clicked.connect(self.fireButtonReduce)
         self.butCancel.clicked.connect(self.fireButtonClose)
         
-        self.sizeSpinBox.valueChanged.connect(self.fireSetScaleImg)
+        self.sizeImgSpinBox.valueChanged.connect(self.fireSetScaleImg)
+        self.sizeProSpinBox.valueChanged.connect(self.fireSetScale)
         
         self.createActions()
         self.createMenus()
@@ -664,8 +681,19 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.setLayout(grid) 
         self.resize(420,320)
         
+        
+    def fireButtonReduce(self):
+        l = len(self.ogl_detector_widget.getPointList()) / 2
+        for i in range(1, l) : 
+            self.ogl_detector_widget.removeFromPointList(i)
+        self.ogl_detector_widget.updateGL()
+    
     def fireSetScaleImg(self):
-        self.ogl_detector_widget.scale = float(self.sizeSpinBox.value()) /50
+        self.ogl_detector_widget.scaleImg = float(self.sizeImgSpinBox.value()) /50
+        self.ogl_detector_widget.updateGL()
+
+    def fireSetScale(self):
+        self.ogl_detector_widget.scale = float(self.sizeProSpinBox.value()) /25
         self.ogl_detector_widget.updateGL()
     
     def fireButtonCreate(self):

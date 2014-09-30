@@ -33,6 +33,8 @@ class ProfileDetectorWidget(Profile):
         self.filename = ""
         self.img_width = -1
         self.img_height = -1
+        self.scaleImg = 1
+        self.scale = 2
         self.flag_detected = False
         self.resize(self.width,self.height)
         self.setWindowTitle("Rene Test")
@@ -59,14 +61,14 @@ class ProfileDetectorWidget(Profile):
         GL.glLoadIdentity()
        
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.textures[0])
-        # GL.glScalef(self.scale*1.5,self.scale*1.5,1)
         
         if self.filename != "" : 
             GL.glTranslatef(self.trans_x, self.trans_y, 0)
-            GL.glScalef(self.scale, self.scale,1)
+            GL.glScalef(self.scaleImg, self.scaleImg,1)
             self.drawBackgroundImg()
             GL.glTranslatef(-self.trans_x, -self.trans_y, 0)
         if self.flag_detected:
+            GL.glScalef(self.scale, self.scale,1)
             self.drawProfile()
 
         GL.glFlush()    
@@ -77,6 +79,9 @@ class ProfileDetectorWidget(Profile):
     def drawProfile(self):
         if self.getPointList() == [] :
             self.createDefaultProfile()
+
+        trX, trY = self.norm_vec_list(self.getPointList())
+        GL.glTranslatef(-trX, trY, 0) 
 
         # draw profile by pointList        
         GL.glLineWidth(2)
