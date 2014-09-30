@@ -86,7 +86,7 @@ class Renderer():
     '''
     get the world coordinates from the screen coordinates
     '''
-    def winPosTo3DPos(self, x, y):
+    def __winPosTo3DPos(self, x, y):
         point = [-1,-1,-1]                                      # result point
         modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
         projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
@@ -213,7 +213,7 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
 
     def mousePressEvent(self, event):
         self.lastPos = QtCore.QPoint(event.pos())
-        p = self.renderer.winPosTo3DPos(event.x(), event.y())
+        p = self.renderer.__winPosTo3DPos(event.x(), event.y())
         self.renderer.fkt_3DPosToWinPos(p[0], p[1], p[2])
 
     def mouseMoveEvent(self, event):

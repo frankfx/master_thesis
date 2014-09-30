@@ -24,9 +24,9 @@ def computePointWithMinDistance(p, plist):
 '''
 @param p: first point
 @param plist: point list 
-@return: index of Point of plist with minimum distance to p
+@return: Point of plist with minimum distance to p
 '''  
-def computeIdxOfPointWithMinDistance(p, plist):
+def computeIdxOfPointWithMinDistance1(p, plist):
     dist = -1.0
     idx = None
     for i in range(0, len(plist)) :
@@ -35,6 +35,25 @@ def computeIdxOfPointWithMinDistance(p, plist):
             dist = cur_dist
             idx = i
     return idx
+
+'''
+@param p: first point
+@param plist: point list 
+@param cnt: count of result values 
+@return: indexes of Points of plist with minimum distance to p, beginning with smallest distance
+'''  
+def computeIdxOfPointWithMinDistance(p, plist, cnt = 1):
+    # idx = list of indexes and there distances
+    # idx = [ [i1, i2, i3, ...] , [d1, d2, d3, ...] ]
+    idx = [cnt*[-1],cnt*[-1]]
+    for i in range(0, len(plist)) :
+        cur_dist = getDistanceBtwPoints(p, plist[i])
+        for j in range (0, cnt) :
+            if idx[1][j] < 0.0 or cur_dist < idx[1][j] :
+                idx[1].insert(j, cur_dist)
+                idx[0].insert(j, i)
+                break
+    return idx[0][:cnt]
   
 '''
 @param x: x-value of result point
@@ -151,3 +170,24 @@ def createPerpendicular(p1, p2, p3):
     b = p3[1] - m_per * p3[0]
     
     return m_per , b
+
+    '''
+@param plist: format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
+@param dim: dimension e.g. 0==x, 1==y, 2==z 
+@return: minimum and maximum point compared by dim 
+'''
+def get_min_max_of_List(plist, dim=0):
+    id_max = 0 
+    id_min = 0
+    for i in range (1, len(plist),1) :
+        if plist[id_max][dim] < plist[i][dim] :
+            id_max = i
+        if plist[id_min][dim] > plist[i][dim] :
+            id_min = i
+    return plist[id_min], plist[id_max] 
+
+
+def normalize(plist):
+    x_min , x_max = plist[get_min_max_of_List(plist, 0)]
+    y_min , y_max = plist[get_min_max_of_List(plist, 1)]
+    

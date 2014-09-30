@@ -211,8 +211,7 @@ class ProfileWidget(Profile):
         self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
     def drawProfile(self):
-        trX, trY = self.norm_vec_list(self.dataSet.getCompletePointList())
-       
+        trX, trY = self.norm_vec_list(self.getPointList())
 
         GL.glTranslatef(1,0,0)
         GL.glRotate(self.getRotAngle(), 0,0,1)
@@ -267,7 +266,7 @@ class ProfileWidget(Profile):
     '''
     @summary: generating naca airfoils, based on http://en.wikipedia.org/wiki/NACA_airfoil    
     '''
-    def createSym_Naca(self, length, thickness, pcnt=10):
+    def __createSym_Naca(self, length, thickness, pcnt=10):
         res_top = []
         res_bot = []
     
@@ -537,7 +536,7 @@ class Naca4Tab(QtGui.QWidget):
         if maxCamber > 0 or posCamber > 0 :
             self.ogl_widget.createCambered_Naca(length, maxCamber/100.0, posCamber/10.0, thick/100.0, pcnt)
         else :
-            self.ogl_widget.createSym_Naca(length, thick/100.0, pcnt)
+            self.ogl_widget.__createSym_Naca(length, thick/100.0, pcnt)
         
         self.ogl_widget.setName(self.text1Name.text())
 
@@ -634,10 +633,18 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.butCreate           = QtGui.QPushButton("create")
         self.butDetect           = QtGui.QPushButton("detect")
         self.butCancel           = QtGui.QPushButton("cancel")        
+      
+        self.sizeSpinBox = QtGui.QSpinBox()
+        self.sizeSpinBox.setRange(1, 100)
+        self.sizeSpinBox.setSingleStep(5)
+        self.sizeSpinBox.setSuffix('%')
+        self.sizeSpinBox.setValue(50)        
+        
         self.ogl_widget          = ogl_widget
         self.ogl_detector_widget = profileDetectorWidget.ProfileDetectorWidget()
         #self.ogl_widget.setFixedSize(200,200)
         
+        grid.addWidget(self.sizeSpinBox, 1,1)
         grid.addWidget(self.ogl_detector_widget, 2,1,1,5)
         grid.addWidget(label1,                       3,1)
         grid.addWidget(self.text1Name,               3,2)
@@ -649,52 +656,39 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.butDetect.clicked.connect(self.fireButtonDetect)
         self.butCancel.clicked.connect(self.fireButtonClose)
         
+        self.sizeSpinBox.valueChanged.connect(self.fireSetScaleImg)
+        
         self.createActions()
         self.createMenus()
         
         self.setLayout(grid) 
         self.resize(420,320)
         
+    def fireSetScaleImg(self):
+        self.ogl_detector_widget.scale = float(self.sizeSpinBox.value()) /50
+        self.ogl_detector_widget.updateGL()
+    
     def fireButtonCreate(self):
-        name = self.text1Name.text() if self.text1Name.text() == "" else "untitled"
+        name = self.text1Name.text() if self.text1Name.text() != "" else "untitled"
         self.ogl_widget.setName(name)
         self.ogl_widget.setPointList(self.ogl_detector_widget.getPointList())
-       # self.ogl_widget.set_pointList_top(self.ogl_detector_widget.getPointList_top)
-       # self.ogl_widget.set_pointList_bot(self.ogl_detector_widget.getPointList_bot)
-        print "dummy function"
+        self.ogl_widget.dataSet.updateAll()
+        self.ogl_widget.updateGL()
 
     def fireButtonDetect(self):
-        if False: 
-            ()
-        else:
-            self.ogl_detector_widget.flagDetectProfile = True
-            self.ogl_detector_widget.updateGL()
+        self.ogl_detector_widget.detectProfile()
+        self.ogl_detector_widget.updateGL()
 
     def fireButtonClose(self):
-        self.ogl_detector_widget.flagDetectProfile = False
+        self.ogl_detector_widget.cancelWidget()
         self.close()
 
     def open(self) :
         (fileName, _) = QtGui.QFileDialog.getOpenFileName(self,
                                      "Open File", QtCore.QDir.currentPath())
-        
         if (fileName) :
-            print fileName
-            #---------------------------------------------- if (image is None) :
-                #----------- QtGui.QMessageBox.information(self, "Image Viewer",
-                                         #------ "Cannot load " + str(fileName))
-                #-------------------------------------------------------- return
-    
-            #self.imageLabel.setPixmap(QtGui.QPixmap.fromImage(image))
-           # self.scaleFactor = 1.0
-    
-            #self.printAct.setEnabled(True)
-           # self.fitToWindowAct.setEnabled(True)
-            #self.updateActions()
-
-           # if (not self.fitToWindowAct.isChecked()) :
-            #   self.imageLabel.adjustSize()
-            self.ogl_detector_widget.drawImage(fileName)
+            self.ogl_detector_widget.setFileName(fileName)
+            self.ogl_detector_widget.updateGL()
 
     def createActions(self):
         self.openAct = QtGui.QAction('Open...', self)
@@ -711,8 +705,6 @@ class ProfileDetectWidget(QtGui.QWidget):
 
         menubar = QtGui.QMenuBar(self)
         menubar.addMenu(fileMenu)
-
-
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])

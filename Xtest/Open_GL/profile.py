@@ -140,8 +140,8 @@ class Profile(QtOpenGL.QGLWidget):
         
     def norm_vec_list(self, vlist):
         '''set points of shape to center (0,0)'''
-        minX_list, maxX_list = self.dataSet.get_min_max_of_List(vlist,0)
-        minY_list, maxY_list = self.dataSet.get_min_max_of_List(vlist,1)
+        minX_list, maxX_list = utility.get_min_max_of_List(vlist,0)
+        minY_list, maxY_list = utility.get_min_max_of_List(vlist,1)
         
         mnX = minX_list[0] 
         mxX = maxX_list[0] 
@@ -165,6 +165,15 @@ class Profile(QtOpenGL.QGLWidget):
 
     def setPointList(self, plist):
         self.dataSet.setPointList(plist)
+
+    def setPointListAtIdx(self, idx, val):
+        self.dataSet.setPointListAtIdx(idx, val)
+
+    def insertToPointList(self, idx, val):
+        self.dataSet.insertToPointList(idx, val)
+    
+    def removeFromPointList(self, idx):
+        self.dataSet.removeFromPointList(idx)    
     
     def setPointListTop(self, plist):
         self.dataSet.setPointListTop(plist)
@@ -222,6 +231,9 @@ class Profile(QtOpenGL.QGLWidget):
     def setFlagCloseTrailingEdge(self, value):
         self.flag_close_TrailingEdge = value
         self.updateGL()
+
+    def getPointList(self):
+        return self.dataSet.getPointList()
 
     def getPointListTop(self):
         return self.dataSet.getPointListTop()

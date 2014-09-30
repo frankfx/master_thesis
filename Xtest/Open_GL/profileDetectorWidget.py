@@ -31,23 +31,14 @@ class ProfileDetectorWidget(Profile):
     def __init__(self,parent = None):
         Profile.__init__(self)
         self.filename = ""
-        self.width = 320
-        self.height = 320
         self.img_width = -1
         self.img_height = -1
+        self.flag_detected = False
         self.resize(self.width,self.height)
-        self.flagDetectProfile = False
         self.setWindowTitle("Rene Test")
-        self.pointList = self.createSym_Naca(1.0, 12.0/100.0)
-
-    def drawImage(self, filename):
-        self.filename = filename
-        self.initializeGL()
-        self.updateGL()
 
     def initializeGL(self):
         self.textures = []
-        #GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glEnable(GL.GL_TEXTURE_2D)
         pixmap = QtGui.QPixmap(self.filename)
         self.textures.append(self.bindTexture(pixmap))
@@ -59,11 +50,7 @@ class ProfileDetectorWidget(Profile):
         GL.glViewport(0,0,w,h) 
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-       # GLU.gluPerspective (144.0, w*1.0/h, 0.001, 10.0)
-      
-    def getPointList(self):
-        return self.pointList
-      
+
     def paintGL(self):
         GL.glClearColor(1,1,1,1)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
@@ -72,27 +59,48 @@ class ProfileDetectorWidget(Profile):
         GL.glLoadIdentity()
        
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.textures[0])
-        GL.glScalef(self.scale,self.scale,1)
+        # GL.glScalef(self.scale*1.5,self.scale*1.5,1)
         
-        if self.flagDetectProfile :
-            self.drawDefaultProfile()    
-        else :
+        if self.filename != "" : 
             GL.glTranslatef(self.trans_x, self.trans_y, 0)
+            GL.glScalef(self.scale, self.scale,1)
             self.drawBackgroundImg()
             GL.glTranslatef(-self.trans_x, -self.trans_y, 0)
-            self.drawDefaultProfile()
-            
-            
-            
-            
-            
+        if self.flag_detected:
+            self.drawProfile()
 
         GL.glFlush()    
+
+    # ================================================================================================================
+    # profile drawing
+    # ================================================================================================================ 
+    def drawProfile(self):
+        if self.getPointList() == [] :
+            self.createDefaultProfile()
+
+        # draw profile by pointList        
+        GL.glLineWidth(2)
+        GL.glColor3f(0.0, 0.0, 0.0)
+        GL.glBegin(GL.GL_LINE_STRIP) 
+        for p in self.getPointList() :
+            GL.glVertex3f(p[0], p[1], p[2])              
+        GL.glEnd()    
         
+        # draw profile points
+        GL.glColor3f(1.0, 0.0, 0.0)
+        GL.glPointSize(10)
+        GL.glBegin(GL.GL_POINTS) 
+        for p in self.getPointList() :
+            GL.glVertex3f(p[0], p[1], p[2])              
+        GL.glEnd()         
         
     # ================================================================================================================
     # draw the background
     # ================================================================================================================ 
+    def setFileName(self, filename):
+        self.filename = filename
+        self.initializeGL()    
+    
     def isImageAvailable(self):
         return not self.img_height == 0.0 and not self.img_width == 0.0
 
@@ -101,7 +109,7 @@ class ProfileDetectorWidget(Profile):
             px = xsize
             py = 1.0*self.img_height/self.img_width * px
             GL.glColor3f(1.0, 1.0, 1.0)
-           # GL.glTranslatef(self.trans_x, self.trans_y,0)
+            # GL.glTranslatef(self.trans_x, self.trans_y,0)
             GL.glBegin(GL.GL_QUADS)
             GL.glTexCoord2f(0,0)
             GL.glVertex3f(-px, -py, -0.5)
@@ -112,79 +120,30 @@ class ProfileDetectorWidget(Profile):
             GL.glTexCoord2f(0,  1)
             GL.glVertex3f(-px,  py, -0.5)
             GL.glEnd() 
-        else :
-            ()#print "no image"        
-            
+
     # ================================================================================================================
-    # default Naca profile
+    # default Naca 0009 profile
     # ================================================================================================================   
-    def drawDefaultProfile(self):
-       # GL.glTranslatef(-self.trans_x, -self.trans_y,0)
-        
-        GL.glLineWidth(2)
-        GL.glColor3f(0.0, 0.0, 0.0)
-      #  GL.glTranslatef(-0,0,-0.65)
-        GL.glBegin(GL.GL_LINE_STRIP) 
-        for p in self.pointList :
-            GL.glVertex3f(p[0], p[1], p[2])              
-        GL.glEnd()    
-        GL.glColor3f(1.0, 0.0, 0.0)
-        GL.glPointSize(10)
-        GL.glBegin(GL.GL_POINTS) 
-        for p in self.pointList :
-            GL.glVertex3f(p[0], p[1], p[2])              
-        GL.glEnd()   
-    
-    def createSym_Naca(self, length, thickness, pcnt=10):
-        res_top = []
-        res_bot = []
-    
-        c = length
-        t = thickness
-        plist = self.__createXcoords(c, pcnt)
-    
-        for x in plist:
-            y = self.__computeY_t(x, c, t) 
-            res_top.append([x,  y, 0])
-            res_bot.append([x, -y, 0])
-        
-        res_bot.reverse()    
-        return res_bot + res_top[1:]
-  
-    def __createXcoords(self, dist=1.0, point_cnt=35):
-        interval = dist/ point_cnt
-        
-        res = [0]
-        for i in range(0, point_cnt):
-            p = round(res[i] + interval, 3)
-            if p < dist : 
-                res.append(p)
-            elif p == dist : 
-                res.append(p)
-                return res
-            else :
-                break
-        res.append(dist)
-        return res               
-    
-    def __computeY_t(self, x, c, t):
-        tmp = -0.1036 if (x/c) == 1 else -0.1015
-        y = t/0.2 * c * math.fabs( ( 0.2969  * math.sqrt(x/c)   +
-                        (-0.1260) * (x/c)            +
-                        (-0.3516) * math.pow(x/c, 2) +
-                        ( 0.2843) * math.pow(x/c, 3) +
-                        (tmp)     * math.pow(x/c, 4)) )        
-        return y  
-    
+    def createDefaultProfile(self):
+        self.setPointList([[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], \
+                           [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], \
+                           [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], \
+                           [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], \
+                           [0.0125, 0.0142, 0.0], [0.005, 0.0089, 0.0], [0.0, 0.0, 0.0], [0.005, -0.0089, 0.0], \
+                           [0.0125, -0.0142, 0.0], [0.025, -0.01961, 0.0], [0.05, -0.02666, 0.0], [0.075, -0.0315, 0.0], \
+                           [0.1, -0.03512, 0.0], [0.15, -0.04009, 0.0], [0.2, -0.04303, 0.0], [0.25, -0.04456, 0.0], \
+                           [0.3, -0.04501, 0.0], [0.4, -0.04352, 0.0], [0.5, -0.03971, 0.0], [0.6, -0.03423, 0.0], \
+                           [0.7, -0.02748, 0.0], [0.8, -0.01967, 0.0], [0.9, -0.01086, 0.0], [0.95, -0.00605, 0.0], \
+                           [1.0, -0.00095, 0.0]])
     
     # ================================================================================================================
-    # profile resizing
+    # opengl vs window transformation
     # ================================================================================================================         
     '''
     get the world coordinates from the screen coordinates
     '''
-    def winPosTo3DPos(self, x, y):
-        point = [-1,-1,-1]                                      # result point
+    def __winPosTo3DPos(self, x, y):
+        point = [None, None, None]                                      # result point
         modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
         projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
         viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
@@ -194,18 +153,17 @@ class ProfileDetectorWidget(Profile):
  
         # read depth buffer at position (X/Y_new)
         z = GL.glReadPixels(x, y_new, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT)
-        # winz should not be 0!!!
+        # z should not be 0!!!
         # error when projection matrix not identity (gluPerspective) 
         point[0], point[1], point[2] = GLU.gluUnProject(x, y_new, z, modelview, projection, viewport)                         
-        
-        print "(",x,",",y,") = " , "(",point[0],",",point[1],",",point[2],")"
+        point[2] = 0
         return point
 
     '''
     get the the screen coordinates from the world coordinates 
     '''
     def fkt_3DPosToWinPos(self, x, y, z):
-        point = [-1,-1,-1]                                      # result point
+        point = [None, None, None]                                      # result point
         modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
         projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
         viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
@@ -215,17 +173,30 @@ class ProfileDetectorWidget(Profile):
  
         point[0], point[1], point[2]  = GLU.gluProject(x, y_new, z, modelview, projection, viewport)                         
         point[1] = self.height -point[1]
-        
-        print "(",x,",",y,",",z,") = " , "(",point[0],",",point[1],")"
         return point        
+   
+    # ================================================================================================================
+    # profile detecting
+    # ================================================================================================================  
+    def detectProfile(self):
+        self.flag_detected = True
+        if False :
+            ()
+        else :
+            QtGui.QMessageBox.about(self, "error", "create default profile" )
+        
+        print "do something for detection" 
 
+    # ================================================================================================================
+    # helper point selection
+    # ================================================================================================================ 
     def __roundPnt(self, p):
         return [round(p[0],2), round(p[1],2), round(p[2],2)]
 
     def __isInRange(self, x, xfrom, xto):
         return x >= xfrom and x <= xto
 
-    def __getIdxOfSelectedPoint(self, point, plist, radius=0.05):
+    def __getIdxOfSelectedPoint(self, point, plist, radius=0.01):
         point = self.__roundPnt(point)
         for i in range(0, len(plist)) :
             p = self.__roundPnt(plist[i])
@@ -233,13 +204,19 @@ class ProfileDetectorWidget(Profile):
                self.__isInRange(point[1], p[1]-radius, p[1]+radius) :
                 return i
         return -1
-                
+    
     # ================================================================================================================
-    # mouse event
+    # mouse events and others
     # ================================================================================================================       
+    def cancelWidget(self):
+        self.setPointList([])
+        self.flag_detected = False
+        self.setFileName("")    
+    
     def mousePressEvent(self, event):
-        self.selected_point = self.winPosTo3DPos(event.pos().x(), event.pos().y())
-        self.__idxSelectedPoint    = self.__getIdxOfSelectedPoint(self.selected_point, self.pointList) 
+        self.updateGL() # important for __winPosTo3DPos
+        self.__selectedPoint    = self.__winPosTo3DPos(event.pos().x(), event.pos().y())
+        self.__idxSelectedPoint = self.__getIdxOfSelectedPoint(self.__selectedPoint, self.getPointList()) 
         if self.__idxSelectedPoint < 0 :
             if(event.button() == QtCore.Qt.RightButton) :
                 ()
@@ -248,32 +225,34 @@ class ProfileDetectorWidget(Profile):
         
     def mouseMoveEvent(self, event):
         if self.__idxSelectedPoint >= 0 :
-            p = self.winPosTo3DPos(event.pos().x(), event.pos().y())
-            self.pointList[self.__idxSelectedPoint] = p
+            p = self.__winPosTo3DPos(event.pos().x(), event.pos().y())
+            self.setPointListAtIdx(self.__idxSelectedPoint, p)
             self.updateGL()
         else:
             Profile.mouseMoveEvent(self, event)
+        
+    def addPoint(self):
+        idx = utility.computeIdxOfPointWithMinDistance(self.__selectedPoint, self.getPointList(), 1)[0]
+        if idx == None :
+            self.insertToPointList(0, self.__selectedPoint)
+        else :
+            idx_l = len(self.getPointList()) - 1 if idx == 0 else idx - 1
+            idx_r = 0 if idx == len(self.getPointList()) - 1 else idx + 1
+            
+            dist_l = utility.getDistanceBtwPoints(self.__selectedPoint, self.getPointList()[idx_l])
+            dist_r = utility.getDistanceBtwPoints(self.__selectedPoint, self.getPointList()[idx_r])
+            
+            if dist_l < dist_r :
+                self.insertToPointList(idx, self.__selectedPoint)
+            else : self.insertToPointList(idx_r, self.__selectedPoint)
+        
+        #self.insertToPointList(idx, self.__selectedPoint) if dist_l < dist_r else self.insertToPointList(idx_r, self.__selectedPoint)
+        self.updateGL()
 
     def removePoint(self):
         if self.__idxSelectedPoint >= 0 :
-            del self.pointList[self.__idxSelectedPoint]
+            self.removeFromPointList(self.__idxSelectedPoint)
             self.updateGL()
-        
-    def addPoint(self):
-        p = self.selected_point
-        idx = utility.computeIdxOfPointWithMinDistance(p, self.pointList)
-        
-        idx_l = len(self.pointList) - 1 if idx == 0 else idx - 1
-        idx_r = 0 if idx == len(self.pointList) - 1 else idx + 1
-        
-        dist_l = utility.getDistanceBtwPoints(p, self.pointList[idx_l])
-        dist_r = utility.getDistanceBtwPoints(p, self.pointList[idx_r])
-        
-        if dist_l < dist_r :
-            self.pointList.insert(idx, p)
-        else :
-            self.pointList.insert(idx_r, p)
-        self.updateGL()
 
     def contextMenuEvent(self, event):
         self.addAct = QtGui.QAction("add", self)
@@ -282,19 +261,18 @@ class ProfileDetectorWidget(Profile):
         self.delAct.triggered.connect(self.removePoint)
         
         self.menu = QtGui.QMenu(self)
-        self.menu1 = QtGui.QMenu(self)
+        self.menuwth = QtGui.QMenu(self)
 
         self.menu.addAction(self.delAct)
         self.menu.addAction(self.addAct)        
-        self.menu1.addAction(self.addAct)
+        self.menuwth.addAction(self.addAct)
 
+        # if point is selected show menu with delete else show menu without delete
         if self.__idxSelectedPoint >= 0 :
             self.menu.exec_(event.globalPos())
         else :
-            self.menu1.exec_(event.globalPos())
+            self.menuwth.exec_(event.globalPos())
         
-
-
         
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])

@@ -195,6 +195,15 @@ class DataSet() :
     # ================================================================================================================
     def setPointList(self, plist):
         self.pointList = plist
+
+    def setPointListAtIdx(self, idx, val):
+        self.pointList[idx] = val
+
+    def insertToPointList(self, idx, val):
+        self.pointList.insert(idx, val)
+   
+    def removeFromPointList(self, idx):
+        del self.pointList[idx]
    
     def setPointListTop(self, plist):
         self.pointList_top = plist
@@ -292,24 +301,17 @@ class DataSet() :
         self.updateLeadingEdge()
         self.updatePointList_Bot_Top()
         self.updatePointListChord()
+        
+    def updateAll(self):
+        self.updatePointListsForNaca()
+        self.pointList_camber                   = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
+        self.pointList_top_rot                  = self.pointList_top
+        self.pointList_bot_rot                  = self.pointList_bot
  
     # ================================================================================================================
     # geometrie helper
     # ================================================================================================================
-    '''
-    @param plist: format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
-    @param dim: dimension e.g. 0==x, 1==y, 2==z 
-    @return: minimum and maximum point compared by dim 
-    '''
-    def get_min_max_of_List(self, plist, dim=0):
-        id_max = 0 
-        id_min = 0
-        for i in range (1, len(plist),1) :
-            if plist[id_max][dim] < plist[i][dim] :
-                id_max = i
-            if plist[id_min][dim] > plist[i][dim] :
-                id_min = i
-        return plist[id_min], plist[id_max] 
+
     
            
     '''
