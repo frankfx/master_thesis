@@ -634,6 +634,7 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.butDetect           = QtGui.QPushButton("detect")
         self.butCancel           = QtGui.QPushButton("cancel")        
         self.butDelPnt           = QtGui.QPushButton("reduce")
+        self.checkCent           = QtGui.QCheckBox("center")
       
       
         label2              = QtGui.QLabel("Image size")
@@ -659,8 +660,9 @@ class ProfileDetectWidget(QtGui.QWidget):
         grid.addWidget(self.sizeImgSpinBox,          1,2)
         grid.addWidget(label3,                       1,3)
         grid.addWidget(self.sizeProSpinBox,          1,4) 
-        grid.addWidget(self.butDelPnt,               1,5)      
-        grid.addWidget(self.ogl_detector_widget, 2,1,1,5)
+        grid.addWidget(self.butDelPnt,               1,5)
+        grid.addWidget(self.checkCent,               1,6)      
+        grid.addWidget(self.ogl_detector_widget, 2,1,1,6)
         grid.addWidget(label1,                       3,1)
         grid.addWidget(self.text1Name,               3,2)
         grid.addWidget(self.butCreate,               3,3)
@@ -674,6 +676,7 @@ class ProfileDetectWidget(QtGui.QWidget):
         
         self.sizeImgSpinBox.valueChanged.connect(self.fireSetScaleImg)
         self.sizeProSpinBox.valueChanged.connect(self.fireSetScale)
+        self.checkCent.toggled.connect(self.fireSetToCenter)
         
         self.createActions()
         self.createMenus()
@@ -681,6 +684,10 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.setLayout(grid) 
         self.resize(420,320)
         
+        
+    def fireSetToCenter(self, value):
+        self.ogl_detector_widget.flag_setCenter = value  
+        self.ogl_detector_widget.updateGL() 
         
     def fireButtonReduce(self):
         l = len(self.ogl_detector_widget.getPointList()) / 2

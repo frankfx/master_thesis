@@ -36,6 +36,7 @@ class ProfileDetectorWidget(Profile):
         self.scaleImg = 1
         self.scale = 2
         self.flag_detected = False
+        self.flag_setCenter = False
         self.resize(self.width,self.height)
         self.setWindowTitle("Rene Test")
 
@@ -79,9 +80,10 @@ class ProfileDetectorWidget(Profile):
     def drawProfile(self):
         if self.getPointList() == [] :
             self.createDefaultProfile()
-
-        trX, trY = self.norm_vec_list(self.getPointList())
-        GL.glTranslatef(-trX, trY, 0) 
+        
+        if self.flag_setCenter :
+            trX, trY = self.norm_vec_list(self.getPointList())
+            GL.glTranslatef(-trX, trY, 0) 
 
         # draw profile by pointList        
         GL.glLineWidth(2)
