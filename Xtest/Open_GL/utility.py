@@ -189,6 +189,14 @@ def get_min_max_of_List(plist, dim=0):
     return plist[id_min], plist[id_max] 
 
 
+
+def equalFloats(a, b):
+    return abs(a - b) <= 10**-9
+
+def equalFloats2(a, b):
+    return str(a) == str(b)
+
+
 def normalize(plist):
     x_min , x_max = plist[get_min_max_of_List(plist, 0)]
     y_min , y_max = plist[get_min_max_of_List(plist, 1)]

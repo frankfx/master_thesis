@@ -45,7 +45,7 @@ class ProfileMainWidget(QtGui.QWidget):
         self.ogl_widget_detector = ProfileDetectWidget(self.ogl_widget)
        
         self.ogl_widget_naca.naca4.butCreate.clicked.connect(self.updateEvalList)
-       # self.ogl_widget_naca.naca5.butCreate.clicked.connect(self.updateEvalList)
+        # self.ogl_widget_naca.naca5.butCreate.clicked.connect(self.updateEvalList)
         self.ogl_widget_detector.butCreate.clicked.connect(self.updateEvalList)
         
         grid.addLayout(self.createTopOfWidget(),0,1)
@@ -320,6 +320,7 @@ class ProfileWidget(Profile):
         self.setPointList(res_bot + res_top[1:])      
         self.setPointListCamber(res_camber)
         self.dataSet.updatePointListsForNaca()
+        self.dataSet.updateThickness()        
         self.updateGL()
 
     def __setConstantsOfP(self, p, cl):
@@ -359,6 +360,7 @@ class ProfileWidget(Profile):
         self.setPointList(res_bot + res_top[1:])      
         self.setPointListCamber(res_camber)
         self.dataSet.updatePointListsForNaca()
+        self.dataSet.updateThickness()
         self.updateGL()
            
     def __computeCamber(self, x, length, maxCamber, posMaxCamber):
