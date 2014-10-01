@@ -263,11 +263,16 @@ class Profile(QtOpenGL.QGLWidget):
         return self.dataSet.getLenChord()
 
     def getWorkAngle (self):
+        # computes the the real rotation of the coordinates
         ## sin(x) = a/c
         start, _ = self.dataSet.getEndPoints()
         x = start[1] / self.getLenChord()
-        #return math.sin(x)
-        return -self.getRotAngle()
+        
+        # get the virtual openGL rotate
+        res = -self.getRotAngle() + math.sin(x)
+        # sum both
+        
+        return 0 if res == -0 else res
 
     # (Profilwoelbung) max Abweichung der Skelettlinie von der Profilsehne
     def getProfileArch(self):

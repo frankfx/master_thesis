@@ -44,7 +44,7 @@ class ProfileMainWidget(QtGui.QWidget):
         self.ogl_widget_naca     = NacaWidget(self.ogl_widget) 
         self.ogl_widget_detector = ProfileDetectWidget(self.ogl_widget)
        
-       # self.ogl_widget_naca.naca4.butCreate.clicked.connect(self.updateEvalList)
+        self.ogl_widget_naca.naca4.butCreate.clicked.connect(self.updateEvalList)
        # self.ogl_widget_naca.naca5.butCreate.clicked.connect(self.updateEvalList)
         self.ogl_widget_detector.butCreate.clicked.connect(self.updateEvalList)
         
@@ -112,37 +112,36 @@ class ProfileMainWidget(QtGui.QWidget):
         checkDrawCamber         = QtGui.QCheckBox("Camber")
         checkDrawChord          = QtGui.QCheckBox("Chord")
         
-        
         self.butNaca            = QtGui.QPushButton("NacaCreator")
         self.butImgDetect       = QtGui.QPushButton("ImgDetect")
-        self.spinBoxRot         = QtGui.QDoubleSpinBox() 
-        self.slider_zoom        = QtGui.QSlider(QtCore.Qt.Horizontal, self)     
         
-        gridView.addWidget(self.slider_zoom         , 0, 1,1,2)
-        gridView.addWidget(checkShowPoints          , 1, 0)
-        gridView.addWidget(checkCloseTrailingedge   , 1, 1)        
-        gridView.addWidget(checkFitToPage           , 2, 0)
-        gridView.addWidget(checkChaikinCurve        , 2, 1)
-        gridView.addWidget(checkDrawCamber          , 3, 0)
-        gridView.addWidget(checkDrawChord           , 3, 1)
-        gridView.addWidget(self.spinBoxRot          , 1, 2, 2, 1) 
+        labelSpin_rot = QtGui.QLabel("Rotation")
+        self.spin_rot = QtGui.QDoubleSpinBox() 
+        self.spin_rot.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.spin_rot.setRange(0,45)
+        self.spin_rot.valueChanged.connect(self.fireSetRotValue)        
         
+        labelSpin_zoom = QtGui.QLabel("Zoom")        
+        self.spin_zoom = QtGui.QSpinBox()
+        self.spin_zoom.setRange(1, 100)
+        self.spin_zoom.setSingleStep(5)
+        self.spin_zoom.setSuffix('%')
+        self.spin_zoom.setValue(50)        
+        self.spin_zoom.valueChanged[int].connect(self.ogl_widget.setScale) 
+        
+        gridView.addWidget(checkDrawChord           , 1, 0)
+        gridView.addWidget(checkDrawCamber          , 2, 0)
+        gridView.addWidget(checkCloseTrailingedge   , 3, 0)        
+        gridView.addWidget(checkChaikinCurve        , 1, 1)                
+        gridView.addWidget(checkShowPoints          , 2, 1)
+        gridView.addWidget(checkFitToPage           , 3, 1)
+        gridView.addWidget(self.spin_zoom           , 1, 2)
+        gridView.addWidget(self.spin_rot            , 2, 2)
+        gridView.addWidget(labelSpin_zoom           , 1, 3)
+        gridView.addWidget(labelSpin_rot            , 2, 3)         
         gridView.addWidget(self.butNaca             , 1, 4)
         gridView.addWidget(self.butImgDetect        , 2, 4)  
-
-        self.spinBoxRot.setStyleSheet("QDoubleSpinBox { border: 3px inset grey; } \
-            QDoubleSpinBox::up-button { subcontrol-position: left; width: 30px; height: 25px;} \
-            QDoubleSpinBox::down-button { subcontrol-position: right; width: 30px; height: 25px;}")     
          
-        self.spinBoxRot.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.spinBoxRot.setRange(0,45)
-        self.spinBoxRot.valueChanged.connect(self.fireSetRotValue)
-
-        self.slider_zoom.setMinimum(1)
-        self.slider_zoom.setValue(51)
-        self.slider_zoom.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.slider_zoom.valueChanged[int].connect(self.ogl_widget.setScale)         
-
         checkShowPoints.toggled.connect(self.fireShowPoints)
         checkFitToPage.toggled.connect(self.fireFitToPage)
         checkCloseTrailingedge.toggled.connect(self.fireCloseTrailingEdge)
@@ -172,10 +171,10 @@ class ProfileMainWidget(QtGui.QWidget):
 
     def fireFitToPage(self, value):
         if value:
-            self.slider_zoom.setValue(51) 
-            self.slider_zoom.setEnabled(False)
+            self.spin_zoom.setValue(51) 
+            self.spin_zoom.setEnabled(False)
         else:
-            self.slider_zoom.setEnabled(True)
+            self.spin_zoom.setEnabled(True)
         self.ogl_widget.fitToPage(value)  
     
     def fireCloseTrailingEdge(self, value):
@@ -211,12 +210,12 @@ class ProfileWidget(Profile):
         self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
     def drawProfile(self):
-        trX, trY = self.norm_vec_list(self.getPointList())
-
+        trX, _ = self.norm_vec_list(self.getPointList())
+        
+        GL.glTranslatef(-trX, 0, 0) 
         GL.glTranslatef(1,0,0)
         GL.glRotate(self.getRotAngle(), 0,0,1)
         GL.glTranslatef(-1,0,0)
-       # GL.glTranslatef(-trX, trY, 0) 
         
         GL.glColor3f(0, 0, 1)
         
@@ -266,7 +265,8 @@ class ProfileWidget(Profile):
     '''
     @summary: generating naca airfoils, based on http://en.wikipedia.org/wiki/NACA_airfoil    
     '''
-    def __createSym_Naca(self, length, thickness, pcnt=10):
+    def createSym_Naca(self, length, thickness, pcnt=10):
+        
         res_top = []
         res_bot = []
     
@@ -281,8 +281,7 @@ class ProfileWidget(Profile):
         
         res_bot.reverse()    
         self.setPointList(res_bot + res_top[1:])
-        self.dataSet.updatePointListCamber()
-        self.dataSet.updatePointListsForNaca()
+        self.dataSet.updateAll()
         self.updateGL()
 
 
@@ -536,7 +535,7 @@ class Naca4Tab(QtGui.QWidget):
         if maxCamber > 0 or posCamber > 0 :
             self.ogl_widget.createCambered_Naca(length, maxCamber/100.0, posCamber/10.0, thick/100.0, pcnt)
         else :
-            self.ogl_widget.__createSym_Naca(length, thick/100.0, pcnt)
+            self.ogl_widget.createSym_Naca(length, thick/100.0, pcnt)
         
         self.ogl_widget.setName(self.text1Name.text())
 
@@ -629,20 +628,19 @@ class ProfileDetectWidget(QtGui.QWidget):
         
         grid                     = QtGui.QGridLayout()
         label1                   = QtGui.QLabel("Name")
-        self.text1Name           = QtGui.QLineEdit()       
+        self.text1Name           = QtGui.QLineEdit()
         self.butCreate           = QtGui.QPushButton("create")
         self.butDetect           = QtGui.QPushButton("detect")
-        self.butCancel           = QtGui.QPushButton("cancel")        
+        self.butCancel           = QtGui.QPushButton("cancel")
         self.butDelPnt           = QtGui.QPushButton("reduce")
         self.checkCent           = QtGui.QCheckBox("center")
-      
-      
+
         label2              = QtGui.QLabel("Image size")
         self.sizeImgSpinBox = QtGui.QSpinBox()
         self.sizeImgSpinBox.setRange(1, 100)
         self.sizeImgSpinBox.setSingleStep(5)
         self.sizeImgSpinBox.setSuffix('%')
-        self.sizeImgSpinBox.setValue(50)        
+        self.sizeImgSpinBox.setValue(50)
 
         label3              = QtGui.QLabel("Profile size")
         self.sizeProSpinBox = QtGui.QSpinBox()
@@ -651,7 +649,6 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.sizeProSpinBox.setSuffix('%')
         self.sizeProSpinBox.setValue(50)
 
-        
         self.ogl_widget          = ogl_widget
         self.ogl_detector_widget = profileDetectorWidget.ProfileDetectorWidget()
         #self.ogl_widget.setFixedSize(200,200)
@@ -659,9 +656,9 @@ class ProfileDetectWidget(QtGui.QWidget):
         grid.addWidget(label2,                       1,1)
         grid.addWidget(self.sizeImgSpinBox,          1,2)
         grid.addWidget(label3,                       1,3)
-        grid.addWidget(self.sizeProSpinBox,          1,4) 
+        grid.addWidget(self.sizeProSpinBox,          1,4)
         grid.addWidget(self.butDelPnt,               1,5)
-        grid.addWidget(self.checkCent,               1,6)      
+        grid.addWidget(self.checkCent,               1,6)
         grid.addWidget(self.ogl_detector_widget, 2,1,1,6)
         grid.addWidget(label1,                       3,1)
         grid.addWidget(self.text1Name,               3,2)
@@ -729,7 +726,7 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.openAct = QtGui.QAction('Open...', self)
         self.openAct.triggered.connect(self.open)    
         
-        self.exitAct = QtGui.QAction("E&xit", self);
+        self.exitAct = QtGui.QAction("Exit", self);
         self.exitAct.triggered.connect(self.close)
         
     def createMenus(self):

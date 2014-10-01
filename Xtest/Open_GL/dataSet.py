@@ -39,7 +39,7 @@ class DataSet() :
         self.trailingEdge                       = self.__computeTrailingEdge(self.pointList)
         self.leadingEdge                        = self.__computeLeadingEdge(self.pointList)
         self.pointList_bot , self.pointList_top = self.__createPointList_bot_top(self.leadingEdge, self.pointList)
-        self.pointList_chord                    = self.__createPointList_chord(self.leadingEdge, self.trailingEdge, len(self.pointList_top))        
+        self.pointList_chord                    = self.__createPointList_chord(self.leadingEdge, self.trailingEdge, len(self.pointList_bot))        
         self.pointList_camber                   = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
@@ -135,28 +135,47 @@ class DataSet() :
 
     def __createPointList_camber(self, plist_bot, plist_top, plist_chord):
         res= []
+        dist = -1.0
         for p_chord in plist_chord :
             m, b = utility.createPerpendicular(self.leadingEdge, self.trailingEdge, p_chord)
-            # fkt has gradient 0, then fkt x = b and compute y by neigbors
-            if m == None :
-                p_bot = [b,self.approxYByNeighbors(b, plist_bot), p_chord[2]]
-                p_top = [b,self.approxYByNeighbors(b, plist_top), p_chord[2]]
+            # fkt is perpendicular to y-axis, then for all y: fkt(y) = b and compute y by neigbors
+            if m == (None, "y") :
+                p_bot = [b,self.approxNeighbors(b, plist_bot), p_chord[2]]
+                p_top = [b,self.approxNeighbors(b, plist_top), p_chord[2]]
+            # fkt has gradient 0, then for all x: fkt(x) = b and compute x by neigbors
+            elif m == (None, "x") :
+                p_bot = [self.approxNeighbors(b, plist_bot, 1), b, p_chord[2]]
+                p_top = [self.approxNeighbors(b, plist_top, 1), b, p_chord[2]]
             else :
                 p_bot = self.__getPointWithMinDistanceToChordPerpendicular(m, b, plist_bot)
                 p_top = self.__getPointWithMinDistanceToChordPerpendicular(m, b, plist_top)
+            ## =================================================================================
+            ## extra calculation --> thicknes
+            print p_chord , p_bot , " f " , p_top
+            cur_dist = utility.getDistanceBtwPoints(p_top, p_bot)
+            if dist < 0.0 or cur_dist > dist :
+                dist = cur_dist
+            ## =================================================================================
+            
             res.append(utility.getCenterPoint(p_bot, p_top))
-        print res
+        print "dist" , 100.0 * dist
         return res
         
     '''
     not save!!! danger!!!
     '''    
-    def approxYByNeighbors(self, x, plist):
+    def approxNeighbors(self, val, plist, dim=0):
         for i in range(0, len(plist)):
-            if plist[i][0] == x :
+            print "val in plist" , val
+            print plist
+            
+            if plist[i][dim] == val :
                 return plist[i][1]
-            elif plist[i-1][0] > x and plist[i][0] < x or plist[i-1][0] < x and plist[i][0] > x:
-                return utility.getCenterPoint(plist[i-1], plist[i])[1]
+            elif plist[i-1][dim] > val and plist[i][dim] < val or plist[i-1][dim] < val and plist[i][dim] > val:
+                print "neigh" , plist[i-1], plist[i]
+                print "result" , utility.getCenterPoint(plist[i-1], plist[i])
+                print "result (elif): " , utility.getCenterPoint(plist[i-1], plist[i])[0 if dim == 1 else 1]
+                return utility.getCenterPoint(plist[i-1], plist[i])[0 if dim == 1 else 1]
 
             
             
@@ -281,15 +300,19 @@ class DataSet() :
         self.trailingEdge = self.__computeTrailingEdge(self.pointList)    
         
     def updatePointList_Bot_Top(self):
+        #print "warning, depends on updated pointList and leading Edge"
         self.pointList_bot, self.pointList_top  = self.__createPointList_bot_top(self.leadingEdge, self.pointList)            
     
     def updatePointListChord(self):
+        #print "warning, depends on updated pointList, trailing Edge and leading Edge"
         self.pointList_chord = self.__createPointList_chord(self.leadingEdge, self.trailingEdge, len(self.pointList)/2)    
     
     def updatePointListCamber(self):
-        self.pointList_camber = self.__createPointList_camber(self.pointList_bot, self.pointList_top)    
+        #print "warning, depends on updated pointList_bot, pointList_top and pointList_chord"
+        self.pointList_camber = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)    
     
     def updateRotationLists(self, angle):
+        #print "warning, depends on updated pointList_chord and pointList"
         length = self.getLenChord()       
         self.pointList = self.__createRotPointList(self.getPointList(), angle, length)
         #self.pointList_top = self.__createRotPointList(self.pointList_top_rot, angle, length)
@@ -304,9 +327,9 @@ class DataSet() :
         
     def updateAll(self):
         self.updatePointListsForNaca()
-        self.pointList_camber                   = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
-        self.pointList_top_rot                  = self.pointList_top
-        self.pointList_bot_rot                  = self.pointList_bot
+        self.pointList_camber           = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
+        self.pointList_top_rot          = self.pointList_top
+        self.pointList_bot_rot          = self.pointList_bot
  
     # ================================================================================================================
     # geometrie helper
@@ -317,15 +340,23 @@ class DataSet() :
     '''
     @param list1: first list
     @param list2: second list
-    @return: distance between p1 of list1 and corresponding p2 of list2
+    @return: max distance between p1 of list1 and corresponding p2 of list2
     '''   
     def __computeProfileThickness(self, list1, list2):
+        print "s1" , list1
+        print "s2" , list2
+        print "S" , self.getPointListCamber()
+        mini , maxi = utility.get_min_max_of_List(list1, 1)
+        print mini
+        mini , maxi = utility.get_min_max_of_List(list2, 1)
+        print maxi
         dist = -1.0
         for p in self.getPointListCamber() :
             dist1 = utility.computeMinDistance(p, list1)
             dist2 = utility.computeMinDistance(p, list2)
             cur_dist = dist1 + dist2
-            if dist < 0.0 or cur_dist > dist :            
+            if dist < 0.0 or cur_dist > dist : 
+                print "p" , p , dist1, dist2          
                 dist = cur_dist
         return dist
  

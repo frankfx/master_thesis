@@ -37,7 +37,7 @@ class ProfileDetectorWidget(Profile):
         self.scale = 2
         self.flag_detected = False
         self.flag_setCenter = False
-        self.resize(self.width,self.height)
+        #self.resize(self.width,self.height)
         self.setWindowTitle("Rene Test")
 
     def initializeGL(self):
@@ -64,10 +64,12 @@ class ProfileDetectorWidget(Profile):
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.textures[0])
         
         if self.filename != "" : 
+            GL.glPushMatrix()
             GL.glTranslatef(self.trans_x, self.trans_y, 0)
             GL.glScalef(self.scaleImg, self.scaleImg,1)
             self.drawBackgroundImg()
-            GL.glTranslatef(-self.trans_x, -self.trans_y, 0)
+            #GL.glTranslatef(-self.trans_x, -self.trans_y, 0)
+            GL.glPopMatrix()
         if self.flag_detected:
             GL.glScalef(self.scale, self.scale,1)
             self.drawProfile()
@@ -111,10 +113,41 @@ class ProfileDetectorWidget(Profile):
     def isImageAvailable(self):
         return not self.img_height == 0.0 and not self.img_width == 0.0
 
+    #----------------------------------- def drawBackgroundImg(self, xsize=1.0):
+        #---------------------------------------- if (self.isImageAvailable()) :
+            #-------------------------------------------------------- px = xsize
+            #---------------------- py = 1.0*self.img_height/self.img_width * px
+#------------------------------------------------------------------------------ 
+            #--------------------------------------- GL.glColor3f(1.0, 1.0, 1.0)
+            #------------------- # GL.glTranslatef(self.trans_x, self.trans_y,0)
+            #------------------------------------------- GL.glBegin(GL.GL_QUADS)
+            #---------------------------------------------- GL.glTexCoord2f(0,0)
+            #------------------------------------- GL.glVertex3f(-px, -py, -0.5)
+            #--------------------------------------------- GL.glTexCoord2f(1, 0)
+            #------------------------------------- GL.glVertex3f( px, -py, -0.5)
+            #--------------------------------------------- GL.glTexCoord2f(1, 1)
+            #------------------------------------- GL.glVertex3f( px,  py, -0.5)
+            #-------------------------------------------- GL.glTexCoord2f(0,  1)
+            #------------------------------------- GL.glVertex3f(-px,  py, -0.5)
+            #-------------------------------------------------------- GL.glEnd()
+            
     def drawBackgroundImg(self, xsize=1.0):
         if (self.isImageAvailable()) :
-            px = xsize
-            py = 1.0*self.img_height/self.img_width * px
+            if self.height > self.width :
+                if self.img_height > self.img_width :
+                    px = (1.0 * self.img_width / self.img_height) * (self.width / self.height)
+                    py = 1.0 
+                else :
+                    px = 1.0 * (self.width / self.height)
+                    py = 1.0 * (self.img_height / self.img_width)
+            else : 
+                if self.img_height > self.img_width :
+                    px = (1.0 * self.img_width / self.img_height)
+                    py = 1.0 * (self.width / self.height)
+                else :
+                    px = 1.0 
+                    py = 1.0 * (self.img_height / self.img_width) * (self.width / self.height)          
+           
             GL.glColor3f(1.0, 1.0, 1.0)
             # GL.glTranslatef(self.trans_x, self.trans_y,0)
             GL.glBegin(GL.GL_QUADS)
@@ -127,6 +160,8 @@ class ProfileDetectorWidget(Profile):
             GL.glTexCoord2f(0,  1)
             GL.glVertex3f(-px,  py, -0.5)
             GL.glEnd() 
+            
+            
 
     # ================================================================================================================
     # default Naca 0009 profile
@@ -191,6 +226,7 @@ class ProfileDetectorWidget(Profile):
             ()
         else :
             QtGui.QMessageBox.about(self, "error", "create default profile" )
+            self.setPointList([])
         
         print "do something for detection" 
 

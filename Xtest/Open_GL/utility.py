@@ -163,9 +163,11 @@ def createLineFunction(p1,p2,p3):
 @return: gradient and y-intercept of line
 '''
 def createPerpendicular(p1, p2, p3):
+    if p2[0] - p1[0] == 0 :
+        return (None,"x") , p3[1]
     m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
     if m == 0 :
-        return None , p3[0]
+        return (None,"y") , p3[0]
     m_per = -1/m
     b = p3[1] - m_per * p3[0]
     
