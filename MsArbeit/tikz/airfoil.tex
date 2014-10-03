@@ -1,3 +1,5 @@
+\begin{figure}[htpb]
+	\centering
 \beginpgfgraphicnamed{profile-f1}
 \footnotesize
 \begin{tikzpicture}[>=latex,scale=1.11]
@@ -20,9 +22,10 @@
 \endpgfgraphicnamed%
 
 
+
 \begin{tikzpicture}
 % profile with data file
-\newcounter{y}
+%\newcounter{y}
 \setcounter{y}{0}
 \foreach \x in {1.00}
     \draw (11 cm,1pt) -- (11 cm,-1pt) node[anchor=north] {$\x$};
@@ -48,7 +51,7 @@
 \draw[thick,-] (11,0)  -- (12,0) node[anchor=west] {x};
 \draw[thick,-] (0,-2) -- (0,2) node[anchor=south] {y};
 % profile with data file
-\newcounter{y}
+%\newcounter{y}
 \setcounter{y}{0}
 \foreach \x in {1.00}
     \draw (11 cm,1pt) -- (11 cm,-1pt) node[anchor=north] {$\x$};
@@ -64,8 +67,16 @@
 % camber line    
 \draw[smooth, dashed, color=red, scale=11] plot coordinates {(1.0,0.0)(0.998459,0.000614)(0.993844,0.0024245)(0.986185,0.0053355)(0.975528,0.00919)(0.96194,0.0137755)(0.945503,0.018829)(0.92632,0.0240435)(0.904508,0.029078)(0.880203,0.0335675)(0.853553,0.037132)(0.824724,0.039389)(0.793893,0.0399975)(0.761249,0.0399065)(0.726995,0.039667)(0.691342,0.039262)(0.654508,0.038677)(0.616723,0.037901)(0.578217,0.036926)(0.53923,0.03575)(0.5,0.034375)(0.46077,0.0328075)(0.421783,0.0310595)(0.383277,0.0291465)(0.345492,0.0270885)(0.308658,0.0249115)(0.273005,0.022642)(0.238751,0.0203125)(0.206107,0.0179555)(0.175276,0.0156075)(0.146447,0.013304)(0.119797,0.0110825)(0.095492,0.008979)(0.07368,0.0070285)(0.054497,0.005264)(0.03806,0.0037155)(0.024472,0.0024095)(0.013815,0.0013695)(0.006156,0.000613)(0.001541,0.000154)(0.0,0.0)};  
 % sehne
-\draw[line width=0.5pt,color=red, pattern=on 4pt off 1.5pt](0,0)--(11,0);    	
+\draw[line width=0.5pt,color=red](0,0)--(11,0);    	
 \end{tikzpicture} 
+	\caption{Eine Vektorgrafik}
+	\label{fig:vectorExample}
+\end{figure}
+
+
+
+
+
 
 
 

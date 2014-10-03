@@ -46,7 +46,11 @@
 \usepackage[english,ngerman]{babel}
 \renewcommand{\sectfont}{\rmfamily\bfseries}
 % wegen deutschen Umlauten
-\usepackage[ansinew]{inputenc}
+%%unter windows
+%\usepackage[ansinew]{inputenc}
+%%unter linux
+\usepackage[latin1]{inputenc}
+
 \usepackage{graphicx}
 \usepackage{subfigure}\hyphenation{Bit-rate}
 
@@ -75,7 +79,7 @@
 
 \usepackage[frenchstyle,fulloldstylenums,partialup]{kpfonts}
 \usepackage{tikz}
-\usetikzlibrary{snakes}
+\usetikzlibrary{snakes,chains,shadows}
 %\pgfrealjobname{profile}
 
 

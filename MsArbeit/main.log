@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  28 SEP 2014 00:07
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  3 OCT 2014 18:51
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -406,8 +406,8 @@ Package: inputenc 2008/03/30 v1.1d Input encoding file
 \inpenc@prehook=\toks23
 \inpenc@posthook=\toks24
 
-(/usr/share/texmf/tex/latex/base/ansinew.def
-File: ansinew.def 2008/03/30 v1.1d Input encoding file
+(/usr/share/texmf/tex/latex/base/latin1.def
+File: latin1.def 2008/03/30 v1.1d Input encoding file
 ))
 (/usr/share/texmf/tex/latex/graphics/graphicx.sty
 Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
@@ -1202,7 +1202,27 @@ athreplacing.code.tex))
 (/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarydecor
 ations.shapes.code.tex
 (/usr/share/texmf/tex/generic/pgf/libraries/decorations/pgflibrarydecorations.s
-hapes.code.tex))) (/usr/share/texmf/tex/latex/listings/lstlang1.sty
+hapes.code.tex)))
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarychain
+s.code.tex
+File: tikzlibrarychains.code.tex 2008/02/27 v2.10 (rcs-revision 1.5)
+
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryposit
+ioning.code.tex
+File: tikzlibrarypositioning.code.tex 2008/10/06 v2.10 (rcs-revision 1.7)
+))
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshado
+ws.code.tex
+File: tikzlibraryshadows.code.tex 2008/01/13 v2.10 (rcs-revision 1.3)
+
+(/usr/share/texmf/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryfadin
+gs.code.tex
+File: tikzlibraryfadings.code.tex 2009/11/15 v2.10 (rcs-revision 1.2)
+
+(/usr/share/texmf/tex/generic/pgf/libraries/pgflibraryfadings.code.tex
+File: pgflibraryfadings.code.tex 2008/02/07 v2.10 (rcs-revision 1.3)
+)))
+(/usr/share/texmf/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
 (/usr/share/texmf/tex/latex/listings/lstlang1.sty
@@ -1538,7 +1558,7 @@ Package: longtable 2004/02/01 v4.11 Multi-page Table package (DPC)
 \c@LT@chunks=\count188
 \LT@p@ftn=\toks36
 )
-Class scrreprt Info: longtable captions redefined on input line 164.
+Class scrreprt Info: longtable captions redefined on input line 168.
 
 (/usr/share/texmf/tex/latex/lm/lmodern.sty
 Package: lmodern 2009/10/30 v1.6 Latin Modern Fonts
@@ -1600,66 +1620,62 @@ File: microtype.cfg 2013/05/23 v2.5a microtype main configuration file (RS)
 LaTeX Warning: File `cpuAnno.dat' already exists on the system.
                Not generating it from this source.
 
-(./main.aux
-
-LaTeX Warning: Label `fig:vectorExample' multiply defined.
-
-)
+(./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/jkp/m/it on input line 199.
-LaTeX Font Info:    Try loading font information for OML+jkp on input line 199.
+LaTeX Font Info:    Checking defaults for OML/jkp/m/it on input line 203.
+LaTeX Font Info:    Try loading font information for OML+jkp on input line 203.
 
  (/usr/share/texmf/tex/latex/kpfonts/omljkp.fd
 File: omljkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 199.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 199.
-LaTeX Font Info:    ... okay on input line 199.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 199.
-LaTeX Font Info:    ... okay on input line 199.
-LaTeX Font Info:    Checking defaults for OMS/jkp/m/n on input line 199.
-LaTeX Font Info:    Try loading font information for OMS+jkp on input line 199.
+LaTeX Font Info:    ... okay on input line 203.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 203.
+LaTeX Font Info:    ... okay on input line 203.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 203.
+LaTeX Font Info:    ... okay on input line 203.
+LaTeX Font Info:    Checking defaults for OMS/jkp/m/n on input line 203.
+LaTeX Font Info:    Try loading font information for OMS+jkp on input line 203.
 
 
 (/usr/share/texmf/tex/latex/kpfonts/omsjkp.fd
 File: omsjkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 199.
-LaTeX Font Info:    Checking defaults for OMX/jkp/m/n on input line 199.
-LaTeX Font Info:    Try loading font information for OMX+jkp on input line 199.
+LaTeX Font Info:    ... okay on input line 203.
+LaTeX Font Info:    Checking defaults for OMX/jkp/m/n on input line 203.
+LaTeX Font Info:    Try loading font information for OMX+jkp on input line 203.
 
 
 (/usr/share/texmf/tex/latex/kpfonts/omxjkp.fd
 File: omxjkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 199.
-LaTeX Font Info:    Checking defaults for U/jkpexa/m/n on input line 199.
-LaTeX Font Info:    Try loading font information for U+jkpexa on input line 199
+LaTeX Font Info:    ... okay on input line 203.
+LaTeX Font Info:    Checking defaults for U/jkpexa/m/n on input line 203.
+LaTeX Font Info:    Try loading font information for U+jkpexa on input line 203
 .
 
 (/usr/share/texmf/tex/latex/kpfonts/ujkpexa.fd
 File: ujkpexa.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 199.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 199.
-LaTeX Font Info:    ... okay on input line 199.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 199.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 199.
+LaTeX Font Info:    ... okay on input line 203.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 203.
+LaTeX Font Info:    ... okay on input line 203.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 203.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 203.
 
 
 (/usr/share/texmf/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 199.
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 199.
+LaTeX Font Info:    ... okay on input line 203.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 203.
 
 
 (/usr/share/texmf/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 \AtBeginShipoutBox=\box53
-Package hyperref Info: Link coloring OFF on input line 199.
+Package hyperref Info: Link coloring OFF on input line 203.
 
 (/usr/share/texmf/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -1669,9 +1685,9 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count191
 )
-LaTeX Info: Redefining \ref on input line 199.
-LaTeX Info: Redefining \pageref on input line 199.
-LaTeX Info: Redefining \nameref on input line 199.
+LaTeX Info: Redefining \ref on input line 203.
+LaTeX Info: Redefining \pageref on input line 203.
+LaTeX Info: Redefining \nameref on input line 203.
  (./main.out)
 (./main.out)
 \@outlinefile=\write5
@@ -1715,8 +1731,8 @@ Package caption Info: longtable package is loaded.
 Package: ltcaption 2013/02/03 v1.3-62 longtable captions (AR)
 )
 Package caption Info: End \AtBeginDocument code.
-LaTeX Info: Redefining \dots on input line 199.
-LaTeX Info: Redefining \microtypecontext on input line 199.
+LaTeX Info: Redefining \dots on input line 203.
+LaTeX Info: Redefining \microtypecontext on input line 203.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -1731,7 +1747,7 @@ Package microtype Info: No adjustment of character kerning.
 File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman 
 (RS)
 )) (./chapters/Titelblatt.tex
-<fig/siegel_uni.pdf, id=131, 220.825pt x 76.285pt>
+<fig/siegel_uni.pdf, id=111, 220.825pt x 76.285pt>
 File: fig/siegel_uni.pdf Graphic file (type pdf)
  <use fig/siegel_uni.pdf>
 Package pdftex.def Info: fig/siegel_uni.pdf used on input line 6.
@@ -1829,13 +1845,13 @@ l.1 \begin{abstract}
 
 ] [4
 
-]) [0] (./main.toc [1
-
-])
+]) [0] (./main.toc)
 \tf@toc=\write6
 \openout6 = `main.toc'.
 
- [2] (./Einleitung.tex
+ [1
+
+] (./Einleitung.tex
 Kapitel 1.
 
 Class scrreprt Warning: \float@addtolists detected!
@@ -1863,6 +1879,30 @@ ine 24.
 LaTeX Warning: Reference `chp:ParallelViewDependentRefinementofComprPM' on page
  2 undefined on input line 24.
 
+
+LaTeX Warning: Citation `bib:hoppePM' on page 2 undefined on input line 29.
+
+
+LaTeX Warning: Citation `bib:hoppeVPM' on page 2 undefined on input line 29.
+
+
+LaTeX Warning: Citation `bib:efPM' on page 2 undefined on input line 29.
+
+
+LaTeX Warning: Citation `bib:DFMP98' on page 2 undefined on input line 30.
+
+
+LaTeX Warning: Citation `bib:PAJ01' on page 2 undefined on input line 30.
+
+
+LaTeX Warning: Citation `bib:PD04' on page 2 undefined on input line 30.
+
+
+LaTeX Warning: Citation `bib:ESV99' on page 2 undefined on input line 30.
+
+
+LaTeX Warning: Citation `bib:Hoppe2009' on page 2 undefined on input line 31.
+
 pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has 
 been already used, duplicate ignored
 <to be read again> 
@@ -1873,254 +1913,104 @@ entifier (name{page.3}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
 l.1 \chapter
-            {Grundlagen}\label{chp:Grundlageb} [3]
+            {Grundlagen}\label{chp:Grundlagen} [3]
 Kapitel 2.
+LaTeX Font Info:    Try loading font information for TS1+lmr on input line 2.
+(/usr/share/texmf/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+Overfull \hbox (12.50525pt too wide) in paragraph at lines 14--15
+\OT1/lmr/m/n/12 (-20) spiels-wei-se die Er-zeu-gung ei-nes dy-na-mi-schem Auf-t
+riebs bei ge-rin-gem Str[]A\TS1/lmr/m/n/12 ¶\OT1/lmr/m/n/12 (-20) mungswidersta
+nd.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--15
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 14--15
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 16--17
+
+ []
+
 (./tikz/airfoil_general.tex
 \c@y=\count199
 )
-! Argument of \caption@ydblarg has an extra }.
-<inserted text> 
-                \par 
-l.17 	\caption{Tragfl\"achenprofile\footnotemark}
-                                                 
-I've run across a `}' that doesn't seem to match anything.
-For example, `\def\a#1{...}' and `\a}' would produce
-this error. If you simply proceed now, the `\par' that
-I've just inserted will cause me to report a runaway
-argument that might be the root of the problem. But if
-your `}' was spurious, just type `2' and it will go away.
-
-Runaway argument?
-{\@caption \@captype }{\@xfootnotemark }\def \reserved@b {\stepcounter \ETC.
-! Paragraph ended before \caption@ydblarg was complete.
-<to be read again> 
-                   \par 
-l.17 	\caption{Tragfl\"achenprofile\footnotemark}
-                                                 
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 20.
+(Font)              <10> on input line 22.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7.6> on input line 20.
+(Font)              <7.6> on input line 22.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 20.
+(Font)              <6> on input line 22.
 pdfTeX warning (ext4): destination with the same identifier (name{page.4}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.23 
+l.27 
       [4
 
-] (./tikz/airfoil.tex
+] [5]
 
-! LaTeX Error: Command \c@y already defined.
-               Or name \end... illegal, see p.192 of the manual.
+LaTeX Warning: Citation `bib:naca_docu' on page 6 undefined on input line 75.
 
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.25 \newcounter{y}
-                   
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-
-! LaTeX Error: Command \c@y already defined.
-               Or name \end... illegal, see p.192 of the manual.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.51 \newcounter{y}
-                   
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-
-! Package tikz Error: You need to say \usetikzlibrary{patterns}.
-
-See the tikz package documentation for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.67 ...0.5pt,color=red, pattern=on 4pt off 1.5pt]
-                                                  (0,0)--(11,0);
-This error message was generated by an \errmessage
-command, so I can't give any explicit help.
-Pretend that you're Hercule Poirot: Examine all clues,
-and deduce the truth by order and method.
-
-)) (./EigenesVerfahren.tex [5] [6]
+(./tikz/airfoil_chamber_algorithm.tex
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8> on input line 14.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6.8> on input line 14.
+ [6]) (./tikz/airfoil.tex) [7] [8])
+(./Ergebnisse.tex [9]
 Kapitel 3.
-LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 36.
-
-(/usr/share/texmf/tex/latex/lm/ot1lmtt.fd
-File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-Package microtype Info: Loading generic settings for font family
-(microtype)             `lmtt' (encoding: OT1).
-(microtype)             For optimal results, create family-specific settings.
-(microtype)             See the microtype manual for details.
-LaTeX Font Info:    Try loading font information for OT1+jkposn on input line 4
-1.
-
-(/usr/share/texmf/tex/latex/kpfonts/ot1jkposn.fd
-File: ot1jkposn.fd 2008/02/18 Fontinst v1.928 font definitions for OT1/jkposn.
-)
-Package microtype Info: Loading generic settings for font family
-(microtype)             `jkposn' (encoding: OT1).
-(microtype)             For optimal results, create family-specific settings.
-(microtype)             See the microtype manual for details.
- [7
+) (./ZusammenfassungAusblick.tex [10
 
 ]
-<fig/vectordrawing.pdf, id=283, 383.55988pt x 238.25188pt>
-File: fig/vectordrawing.pdf Graphic file (type pdf)
-
-<use fig/vectordrawing.pdf>
-Package pdftex.def Info: fig/vectordrawing.pdf used on input line 76.
-(pdftex.def)             Requested size: 134.44064pt x 83.50937pt.
- [8 <./fig/vectordrawing.pdf>]
-(./fig/vectordrawingSymbol.pdf_tex
-<./fig/vectordrawingSymbol.pdf, id=307, 383.55988pt x 238.25188pt>
-File: ./fig/vectordrawingSymbol.pdf Graphic file (type pdf)
-
-<use ./fig/vectordrawingSymbol.pdf>
-Package pdftex.def Info: ./fig/vectordrawingSymbol.pdf used on input line 52.
-(pdftex.def)             Requested size: 134.44064pt x 83.50937pt.
-)
-Underfull \hbox (badness 10000) in paragraph at lines 96--97
-
- []
-
-<fig/Buddha2.png, id=309, 1927.2pt x 1084.05pt>
-File: fig/Buddha2.png Graphic file (type png)
- <use fig/Buddha2.png>
-Package pdftex.def Info: fig/Buddha2.png used on input line 100.
-(pdftex.def)             Requested size: 358.50612pt x 201.65437pt.
- [9 <./fig/vectordrawingSymbol.pdf> <./fig/Buddha2.png (PNG copy)>]
-Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 133.
-LaTeX Font Info:    Try loading font information for OMS+lmr on input line 134.
-
-
-(/usr/share/texmf/tex/latex/lm/omslmr.fd
-File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
-)
-LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 134.
-) (./Ergebnisse.tex [10]
 Kapitel 4.
-) (./ZusammenfassungAusblick.tex [11
+) [11
 
 ]
-Kapitel 5.
-) [12
-
-] (./main.bblpdfTeX warning (ext4): destination with the same identifier (name{
-page.I}) has been already used, duplicate ignored
+No file main.bbl.
+pdfTeX warning (ext4): destination with the same identifier (name{page.I}) has 
+been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.80 
-      [1
-
-]
-Underfull \hbox (badness 10000) in paragraph at lines 98--104
-[]\OT1/lmr/m/sc/12 (+20) Littschwager T.\OT1/lmr/m/n/12 (+20) :  \OT1/lmr/m/it/
-12 (+20) Neue Grafik-Generation: Al-le De-tails\OT1/lmr/m/n/12 (+20) .
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 98--104
-\OT1/lmr/m/n/12 (+20) Tech-ni-cal re-port, Chip, Sep 2008.  []$http : / / www .
- chip . de / artikel /
- []
-
-
-Underfull \hbox (badness 3449) in paragraph at lines 115--122
-\OT1/lmr/m/n/12 (+20) son Uni-ver-si-ty, De-part-ment of Me-cha-ni-cal and Ae-r
-o-nau-ti-cal En-gi-
- []
-
-
-Underfull \hbox (badness 3780) in paragraph at lines 124--129
-[]\OT1/lmr/m/sc/12 (+20) Mrohs Bernd C. R.\OT1/lmr/m/n/12 (+20) :  Pro-gres-si-
-ve mes-hes - ei-ne einf[]uhrung.
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 139--145
-\OT1/lmr/m/n/12 (+20) Documents2002 / Jean-[]Daniel[]Nahmias / Massive[]Model[]
-Rendering . htm$[]
- []
-
-pdfTeX warning (ext4): destination with the same identifier (name{page.II}) has
- been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.158 \bibitem[NVI09]{bib:OpenCLDoc}
-                                     [2]) [3] [4] (./Abkurzungen.tex
+l.34 ...e\thispagestyle{empty}\hspace{1em}\newpage
+                                                   [1] (./Abkurzungen.tex
 LaTeX Font Info:    Font shape `OT1/lmss/b/n' in size <12> not available
 (Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 2.
-) [5
-
-]
-[6] (./main.lof
-Runaway argument?
-{\numberline {2.1}{\ignorespaces Tragfl\"achenprofile\let \reserved@d \ETC.
-! Paragraph ended before \contentsline was complete.
-<to be read again> 
-                   \par 
-l.6 ...l\"achenprofile\let \reserved@d =[\def \par
-                                                   }}{4}{figure.caption.6}
-I suspect you've forgotten a `}', causing me to apply this
-control sequence to too much text. How can we recover?
-My plan is to forget the whole thing and hope for the best.
-
-! Extra }, or forgotten \endgroup.
-l.6 ..."achenprofile\let \reserved@d =[\def \par }
-                                                  }{4}{figure.caption.6}
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
-! Extra }, or forgotten \endgroup.
-l.6 ...achenprofile\let \reserved@d =[\def \par }}
-                                                  {4}{figure.caption.6}
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
 )
+[2
+
+] [3] (./main.lof)
 \tf@lof=\write7
 \openout7 = `main.lof'.
 
- [7
+ [4
 
 ] (./main.lot)
 \tf@lot=\write8
 \openout8 = `main.lot'.
 
- [8
+ [5
 
-] [9] (./main.loa)
+] [6] (./main.loa)
 \tf@loa=\write9
 \openout9 = `main.loa'.
 
- [10
+ [7
 
-] [11]
+] [8]
 
 Class scrreprt Warning: Usage of deprecated \float@listhead!
 (scrreprt)              You should use the features of package `tocbasic'
@@ -2133,13 +2023,13 @@ e 54.
 \tf@lol=\write10
 \openout10 = `main.lol'.
 
- [12
+ [9
 
-] [13] (./Anhang.tex
+] [10] (./Anhang.tex
 Anhang A.
-[14
+[11
 
-]) (./Danksagung.tex) [15
+]) (./Danksagung.tex) [12
 
 ]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 61.
@@ -2147,50 +2037,68 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 61.
  (./main.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 61.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 61.
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 087EC612850F5958E120FEF3423023CA;1989.
 
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: 2BDE4D34DB37C26E58A273C1891147D8;1239
+(rerunfilecheck)             After:  A3E7BA951E651D6D5F77636073ADED9E;1179.
 
 LaTeX Warning: There were undefined references.
 
 
-LaTeX Warning: There were multiply-defined labels.
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 61.
  ) 
 Here is how much of TeX's memory you used:
- 27255 strings out of 493315
- 466363 string characters out of 6145893
- 593774 words of memory out of 5000000
- 29797 multiletter control sequences out of 15000+600000
- 106959 words of font info for 160 fonts, out of 8000000 for 9000
+ 26941 strings out of 493315
+ 467052 string characters out of 6145893
+ 600712 words of memory out of 5000000
+ 29581 multiletter control sequences out of 15000+600000
+ 103540 words of font info for 144 fonts, out of 8000000 for 9000
  958 hyphenation exceptions out of 8191
- 67i,17n,71p,1314b,1462s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf/fonts/enc/dvips/lm/lm-rmsc.enc}{/usr/share/texmf/fonts/enc/
-dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/sha
-re/texmf/fonts/enc/dvips/base/8r.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-ma
-thsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/share/texmf/f
-onts/enc/dvips/lm/lm-rmtt.enc}</usr/share/texmf/fonts/type1/public/kpfonts/jkpm
-ia.pfb></usr/share/texmf/fonts/type1/public/kpfonts/jkpmn8a.pfb></usr/share/tex
-mf/fonts/type1/public/lm/lmb10.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx
-12.pfb></usr/share/texmf/fonts/type1/public/lm/lmcsc10.pfb></usr/share/texmf/fo
-nts/type1/public/lm/lmex10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi10.p
-fb></usr/share/texmf/fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/fonts/t
-ype1/public/lm/lmmi9.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></us
-r/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/pub
-lic/lm/lmr6.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></usr/share/te
-xmf/fonts/type1/public/lm/lmr9.pfb></usr/share/texmf/fonts/type1/public/lm/lmri
-12.pfb></usr/share/texmf/fonts/type1/public/lm/lmro12.pfb></usr/share/texmf/fon
-ts/type1/public/lm/lmss10.pfb></usr/share/texmf/fonts/type1/public/lm/lmss12.pf
-b></usr/share/texmf/fonts/type1/public/lm/lmss17.pfb></usr/share/texmf/fonts/ty
-pe1/public/lm/lmss8.pfb></usr/share/texmf/fonts/type1/public/lm/lmssbx10.pfb></
-usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf/fonts/type1/
-public/lm/lmsy9.pfb></usr/share/texmf/fonts/type1/public/lm/lmtt12.pfb></usr/sh
-are/texmf/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on main.pdf (35 pages, 2179104 bytes).
+ 67i,17n,73p,1717b,829s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exi
+st, replaced by a fixed one
+
+pdfTeX warning (dest): name{equation.2.2.1} has been referenced but does not ex
+ist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.2.2.2} has been referenced but does not 
+exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.2.2.1} has been referenced but does not 
+exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.2.1.2} has been referenced but does not 
+exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{subsection.2.1.1} has been referenced but does not 
+exist, replaced by a fixed one
+
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/
+dvips/lm/lm-mathsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathex.enc}{/usr
+/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dvips/lm/
+lm-ts1.enc}</usr/share/texmf/fonts/type1/public/kpfonts/jkpmia.pfb></usr/share/
+texmf/fonts/type1/public/lm/lmb10.pfb></usr/share/texmf/fonts/type1/public/lm/l
+mex10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi10.pfb></usr/share/texmf/
+fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi9.
+pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf/fonts/t
+ype1/public/lm/lmr12.pfb></usr/share/texmf/fonts/type1/public/lm/lmr8.pfb></usr
+/share/texmf/fonts/type1/public/lm/lmr9.pfb></usr/share/texmf/fonts/type1/publi
+c/lm/lmri12.pfb></usr/share/texmf/fonts/type1/public/lm/lmro12.pfb></usr/share/
+texmf/fonts/type1/public/lm/lmss10.pfb></usr/share/texmf/fonts/type1/public/lm/
+lmss12.pfb></usr/share/texmf/fonts/type1/public/lm/lmss17.pfb></usr/share/texmf
+/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf/fonts/type1/public/lm/lmssbx
+10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb>
+Output written on main.pdf (30 pages, 388480 bytes).
 PDF statistics:
- 616 PDF objects out of 1000 (max. 8388607)
- 541 compressed objects within 6 object streams
- 145 named destinations out of 1000 (max. 500000)
- 32537 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 427 PDF objects out of 1000 (max. 8388607)
+ 355 compressed objects within 4 object streams
+ 97 named destinations out of 1000 (max. 500000)
+ 26402 words of extra memory for PDF output out of 29859 (max. 10000000)
 

@@ -3,7 +3,7 @@ Created on Sep 2, 2014
 
 @author: rene
 '''
-from Xtest.Open_GL import profileDetectorWidget
+from Xtest.Open_GL import profileDetectorWidget, utility
 from Xtest.Open_GL.profile import Profile
 import logging
 import datetime
@@ -118,7 +118,7 @@ class ProfileMainWidget(QtGui.QWidget):
         labelSpin_rot = QtGui.QLabel("Rotation")
         self.spin_rot = QtGui.QDoubleSpinBox() 
         self.spin_rot.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.spin_rot.setRange(0,45)
+        self.spin_rot.setRange(-45,45)
         self.spin_rot.valueChanged.connect(self.fireSetRotValue)        
         
         labelSpin_zoom = QtGui.QLabel("Zoom")        
@@ -332,7 +332,7 @@ class ProfileWidget(Profile):
         M = [0.0580,0.1260,0.2025,0.2900,0.3910]
         K = [361.4,51.64,15.957,6.643,3.230]
         for i in range(0, len(P)) :
-            if p == P[i]:
+            if utility.equalFloats(p, P[i]):
                 return M[i] * cl / cl_default , K[i] * cl / cl_default
         print "nix gefunden"
 
@@ -384,15 +384,11 @@ class ProfileWidget(Profile):
         if x >= 0 and x < p*c :
             y = m * (x / (p*p)) * (2 * p - x / c) 
         elif x >= p*c and x <= c :
-            
-            print "((1-p)*(1-p)) * (1 + x/c - 2*p)"
-            print "p (==posMaxCamber) = " , p , "x = " , x , "c (==length) = " , c ,
-            
             y = m * ((c-x) / ((1-p)*(1-p))) * (1 + x/c - 2*p)
         return y
     
     def __computeY_t(self, x, c, t):
-        tmp = -0.1036 if (x/c) == 1 else -0.1015
+        tmp = -0.1036 if utility.equalFloats((x/c), 1) else -0.1015
         y = t/0.2 * c * math.fabs( ( 0.2969  * math.sqrt(x/c)   +
                         (-0.1260) * (x/c)            +
                         (-0.3516) * math.pow(x/c, 2) +
@@ -408,7 +404,7 @@ class ProfileWidget(Profile):
             p = round(res[i] + interval, 3)
             if p < dist : 
                 res.append(p)
-            elif p == dist : 
+            elif utility.equalFloats(p, dist) : 
                 res.append(p)
                 return res
             else :

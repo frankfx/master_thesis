@@ -1,33 +1,116 @@
-\chapter{Grundlagen}\label{chp:Grundlageb}
-In diesem Kapitel werden die Grundlagen beschrieben
+\chapter{Grundlagen}\label{chp:Grundlagen}
+Im Folgenden soll ein \"Uberblick über die in dieser Arbeit verwendeten Technologien gegeben
+werden. Eine allgemeine Einf\"uhrung in den Flugzeugentwurfsprozess zeigt anfangs die Einsatzgebiete des SGG-Editors auf.
+Weiterhin wird auf das zentrale Datenformat CPACS, auf dem der SGG arbeitet, eingegangen und dessen Aufbau erl\"autert.
+Im zweiten Teil werden die dargestellten Flugzeugkomponenten und verwendete Generierungsverfahren vorgestellt.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Grundlage 1}\label{sec:Grundlage1}
-\subsection{subsection}
-text
+\section{Flugzeugentwurf}\label{sec:CPACS}
+hier steht alles zum Flugzeugentwurfsprozess
 
-\section{CPACS}
+\section{CPACS}\label{sec:CPACS}
+Wie schon in Kapitel~\ref{sec:CPACS} beschrieben ... steht hier alles zu CPACS
 
-\section{Airfoils}
-Wie schon in Kapitel~\ref{sec:Grundlage1} beschrieben ...
+\section{Profile}
+Die Form des Querschnitts eines K\"orpers, wird im Folgenden als Profil bezeichnet. In der Aerodynamik ist die Entwicklung und Charakterisierung von Profilen ein wichtiges Teilgebiet. Konstruierte Profile sollen in ihrer Form bestimmten Funktionen gen\"ugen wie beispielsweise die Erzeugung eines dynamischem Auftriebs bei geringem Strömungswiderstand. In Cpacs wird zwischen Rumpf- und Tragfl\"achenprofilen unterschieden. Beide Profiltypen sind unter dem Konten \textit{profiles} als Listen f\"ur x, y und z Koordinaten repr\"asentiert.\\\\
 
-\begin{figure}[htpb]
-	\centering
-		\input{tikz/airfoil_general}
-	\caption{Tragfl\"achenprofile\footnotemark}
-	\label{fig:airfoil_general}
-\end{figure}
+	ooo hier steht ein tikz xml editor\\\\ 
+
+\subsection{Fl\"ugelprofile}
+hier steht allgemeines Zeug zu den Profilen
+
+\input{tikz/airfoil_general}
 \footnotetext{Quelle: http://www.texample.net/tikz/examples/airfoil-profiles, Zugriff: 27.10.2014}
 
-\blindtext
 
-\begin{figure}[htpb]
-	\centering
-		\input{tikz/airfoil}
-	\caption{Eine Vektorgrafik}
-	\label{fig:vectorExample}
-\end{figure}
-\blindtext
+\subsubsection{NACA-Serie}
+Das National Advisory Committee for Aeronautics oder kurz NACA wurde 1915 gegründet und ist ein direkter Vorg\"anger der US-Bundesbehörde für Luft- und Raumfahrt, NASA. Die NACA war eine amerikanische Organisation, die sich mit der Grundlagenforschung in der Luftfahrt beschäftigte. Eine bedeutende Entwicklung der NACA-Forschungen, sind optimierte Tragf\"achenprofile. Durch aerodynamischen Tests im Windkanal wurde bereits fr\"uh erkannt, dass die Fl\"ugelprofile mit den besten Eigenschaften hinsichtlich Auftriebsbeiwert und Widerstandsbeiwert, viele Gemeinsamkeiten besitzen. NACA-Profile sind somit Variationen eines Ursprungsprofils, die mit Hilfe von analytischen Gleichungen definiert werden. Spezifische Variationen dieses Profils werden durch die Kr\"ummung bzw. Steigung der Skelettlinie sowie die Dicke der Tragfl\"ache oberhalb und unterhalb jener Skelettlinie erzeugt. Im SGG-Editor wurde ein NACA-Generator implementiert, mit dem sich Profile der NACA 4-digit und NACA 5-digit Serie erstellen lassen.
 
-\section{Flugzeug}
+\paragraph{Profile der Vierer-Serie}
+
+In der vierstelligen NACA-Serie ist ein Profil definiert durch:
+\begin{itemize}
+\item[1.]Ziffer: maximale Profilw\"olbung 
+	\begin{itemize}
+		\item angegeben in Prozent, bezogen auf die L\"ange der Profilsehne
+	\end{itemize}
+\item[2.]Ziffer: W\"olbungsrücklage, Position der maximalen Profilw\"olbung
+	\begin{itemize}
+		\item angegeben in Zehnteln der L\"ange der Profilsehne
+	\end{itemize}
+\item[3./4.]Ziffer: maximale Profildicke
+	\begin{itemize}
+		\item angegeben in Prozent, bezogen auf die L\"ange der Profilsehne
+	\end{itemize}
+\end{itemize} 
+
+
+Ein symmetrisches NACA 4 Profil kann mit Gleichung \ref{eq:symyt} konstruiert werden. Das Profil ist in seiner Form, nur durch die angegebene Profildicke ver\"andertbar, da die Profilw\"olbung und somit auch dessen Position die Werte Null haben. Gleichung \ref{eq:symyt} enth\"alt Konstanten, die f\"ur eine Profildicke von 20\% vorgesehen sind. Um diese Werte an die jeweils angegebene Profildicke anzupassen, wird die eigentliche Berechung mit $\frac{t}{0.2}$ multipliziert. In Gleichung \ref{eq:symyt} werden zus\"atzlich folgende Parameter verwendet:
+
+\begin{itemize}
+	\item[$c$ :] L\"ange der Profilsehne
+	\item[$x$ :] Position entlang der Profilsehne auf der Abszissenachse von 0 to c, 
+	\item[$y_t$ :] Entfernung der Skelettlinie zur jeweiligen Profilseite an Position x
+	\item[$t$ :] Maximale Dicke des Profils
+\end{itemize}
+
+
+\begin{multline}\label{eq:symyt}
+y_t= \frac{t}{0.2}c\left[0.2969 \sqrt{\frac{x}{c}} + (-0.1260) \left(\frac{x}{c}\right) + (-0.3516) \left(\frac{x}{c}\right)^2 + 0.2842 \left(\frac{x}{c}\right)^3 \right. \\\left. + (-1.015) \left(\frac{x}{c}\right)^4 \right]
+\end{multline}
+
+
+Sie die trailing edge geschlossen sein, also das Profil an dieser Position eine Dicke gleich Null haben, wird als Koeffizient an der letzen Stelle statt $-1.015$ ein Wert von $-0.1036$ gew\"ahlt.  Es ergeben sich folgende Definitionen f\"ur Ober- und Unterseite des Profils. Die x-Koordinaten sind f\"ur beide Seiten gleich, daher gilt $x_U = x_L = x$. Die y-Koordinaten ebenfalls identisch, nur das diese f\"ur die Oberseite positiv ist $y_U = +y_t$ und f\"ur die Unterseite negativ $y_L = -y_t$
+
+
+
+
+
+
+
+Die einfachste Form der Naca Profile ist die symmetrische Vierer-Serie. Sie findet  Anwendung finden diese f\"ur 
+
+Eingesetzt wurden und werden Profile dieser Serie vorzugsweise für Tragfl\"achen bei Flugzeugen der Allgemeinen Luftfahrt. Symmetrische Profile der Vierer-Serie werden für H\"ohenruder, Rotorbl\"atter für Hubschrauber, Tragflächen für \"Uberschallflugzeuge und Stabilisierungsfl\"ugel für Raketen verwendet
+
+
 text \cite{bib:naca_docu}
+\subsubsection{Naca5}
+
+\subsubsection{Skelettlinie}
+\begin{algorithm}[H]
+ \KwData{bottom profile, top profile, trailing edge, leading edge}
+ \KwResult{camber line }
+ chord = line from trailing edge to leading edge\;
+ \ForEach{p in chord}{
+	perp1 = determine perpendicular of chord through point p\;
+	\ForEach{p$\_$b in bottom profile}{
+		perp2 = determine perpendicular of perp1 through point p$\_$b\;
+		determine intersection point of perp1 and perp2\;
+		determine distance from intersection point to p$\_$b\;
+	}
+	dist$\_$b = minimum distance from intersection point to p$\_$b\;
+	\ForEach{p$\_$t in top profile}{
+		perp2 = determine perpendicular of perp1 through point p$\_$t\;
+		determine intersection point of perp1 and perp2\;
+		determine distance from intersection point to p$\_$t\;
+	}
+	dist$\_$t = minimum distance from intersection point to p$\_$t\;	
+	get center of dist$\_$t and dist$\_$b
+ }
+ \caption{Berechnung der Skelettlinie}
+\end{algorithm}
+
+\input{tikz/airfoil_chamber_algorithm}
+
+
+
+\subsubsection{Sonstiges}
+
+\input{tikz/airfoil}
+
+\subsection{Rumpfprofile}
+\blindtext
+
+
+
+
+
