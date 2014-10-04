@@ -288,7 +288,7 @@ class ProfileWidget(Profile):
 
     def createCambered_Naca5(self, liftCoeff, posMaxCamber, thickness, pcnt=10):
         c      = 1.0 # c = maxChord ; length
-        p      = 0.5 * posMaxCamber/10.0
+        p      = posMaxCamber/100.0
         t      = thickness/100.0
         cl    = liftCoeff*(3.0/2.0) / 10.0        
         m , k1 = self.__setConstantsOfP(posMaxCamber, cl) # constant values 

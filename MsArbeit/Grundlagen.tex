@@ -50,30 +50,85 @@ Ein symmetrisches NACA 4 Profil kann mit Gleichung \ref{eq:symyt} konstruiert we
 	\item[$c$ :] L\"ange der Profilsehne
 	\item[$x$ :] Position entlang der Profilsehne auf der Abszissenachse von 0 to c, 
 	\item[$y_t$ :] Entfernung der Skelettlinie zur jeweiligen Profilseite an Position x
-	\item[$t$ :] Maximale Dicke des Profils
+	\item[$t$ :] Maximale Dicke des Profils multipliziert mit $\frac{1}{100}$
 \end{itemize}
-
 
 \begin{multline}\label{eq:symyt}
 y_t= \frac{t}{0.2}c\left[0.2969 \sqrt{\frac{x}{c}} + (-0.1260) \left(\frac{x}{c}\right) + (-0.3516) \left(\frac{x}{c}\right)^2 + 0.2842 \left(\frac{x}{c}\right)^3 \right. \\\left. + (-1.015) \left(\frac{x}{c}\right)^4 \right]
 \end{multline}
 
 
-Sie die trailing edge geschlossen sein, also das Profil an dieser Position eine Dicke gleich Null haben, wird als Koeffizient an der letzen Stelle statt $-1.015$ ein Wert von $-0.1036$ gew\"ahlt.  Es ergeben sich folgende Definitionen f\"ur Ober- und Unterseite des Profils. Die x-Koordinaten sind f\"ur beide Seiten gleich, daher gilt $x_U = x_L = x$. Die y-Koordinaten ebenfalls identisch, nur das diese f\"ur die Oberseite positiv ist $y_U = +y_t$ und f\"ur die Unterseite negativ $y_L = -y_t$
+Soll die trailing edge geschlossen sein, also das Profil an dieser Position eine Dicke gleich Null haben, wird als Koeffizient an der letzen Stelle statt $-1.015$ ein Wert von $-0.1036$ gew\"ahlt.  Es ergeben sich folgende Definitionen f\"ur Ober- und Unterseite des Profils. Die x-Koordinaten sind f\"ur beide Seiten gleich, daher gilt $x_U = x_L = x$. Die y-Koordinaten ebenfalls identisch, nur das diese f\"ur die Oberseite positiv: $y_U = +y_t$ und f\"ur die Unterseite negativ sind: $y_L = -y_t$.\\
+Die Generierung eines asymmetrischen NACA 4 Profils braucht zus\"atzlich zu Gleichung \ref{eq:symyt} noch die maximale Profilw\"olbung und die W\"olbungsr\"ucklage, also den Abstand der Profilnase zur maximalen Profilw\"olbung. 
+
+\begin{itemize}
+	\item[$m$ :] Maximale W\"olbung multipliziert mit $\frac{1}{100}$
+	\item[$p$ :] Position der maximalen W\"olbung multipliziert mit $\frac{1}{10}$ 
+	\item[$t$ :] Maximale Dicke des Profils multipliziert mit $\frac{1}{100}$	
+\end{itemize}
+
+Mit Gleichung \ref{eq:camber} wird die y-Koordinate der Skelettlinie an einer gegebenen x-Koordinate berechnet. 
+
+\begin{equation}\label{eq:camber}
+     y_c = \left\{ \begin{array}{ll} 
+     					m \frac{x}{p^2} \left(2p - \frac{x}{c}\right), & 0 \leq x \leq pc \\[0.5cm]
+         				m \frac{c-x}{(1-p)^2}\left(1+\frac{x}{c}-2p\right), & pc \leq x \leq c
+         			\end{array}\right.
+\end{equation}
+
+\vspace{0.5cm}
+Die Dicke des gekr\"ummten Fl\"ugelprofils ist senkrecht zur Skelettlinie festgelegt womit f�r Ober- und Unterseite des Profils folgendes gilt:
+
+\begin{equation}
+x_U = x - y_t \sin \theta \qquad , \qquad y_U = y_c + y_t \cos \theta
+\end{equation}
+\begin{equation}
+x_L = x + y_t \sin \theta \qquad , \qquad y_L = y_c +-y_t \cos \theta
+\end{equation}
 
 
+$\theta = \arctan \left(\frac{dy_c}{dx}\right)$
 
+\begin{equation}\label{eq:camber}
+     \frac{dy_c}{dx} = \left\{ \begin{array}{ll} 
+     					\frac{2m}{p^2} \left(p - \frac{x}{c}\right), & 0 \leq x \leq pc \\[0.5cm]
+         				\frac{2m}{(1-p)^2}\left(p - \frac{x}{c}\right), & pc \leq x \leq c
+         			\end{array}\right.
+\end{equation}
 
-
-
-
-Die einfachste Form der Naca Profile ist die symmetrische Vierer-Serie. Sie findet  Anwendung finden diese f\"ur 
-
-Eingesetzt wurden und werden Profile dieser Serie vorzugsweise für Tragfl\"achen bei Flugzeugen der Allgemeinen Luftfahrt. Symmetrische Profile der Vierer-Serie werden für H\"ohenruder, Rotorbl\"atter für Hubschrauber, Tragflächen für \"Uberschallflugzeuge und Stabilisierungsfl\"ugel für Raketen verwendet
 
 
 text \cite{bib:naca_docu}
 \subsubsection{Naca5}
+
+
+\begin{equation}\label{eq:camber}
+     y_c = \left\{ \begin{array}{ll} 
+     					\frac{k_1}{6} \left\{x^3 - 3mx^2 + m^2 (3-m)x\right\}, & 0 \leq x \leq p \\[0.5cm]
+         				\frac{k_1m^3}{6}\left(1-x\right), & p \leq x \leq 1
+         			\end{array}\right.
+\end{equation}
+
+
+
+\begin{table}
+\taburowcolors[2]{white .. black!20}
+\centering
+\sffamily\footnotesize
+\tabulinesep=6pt
+\begin{tabu}{|c|c|c|}
+\hline
+\rowcolor{RoyalBlue}\color{white}Position max W\"olbung (p) & \color{white}m & \color{white}k1\\
+0.05 & 0.0580 & 361.400 \\
+0.10 & 0.1260 &  51.640 \\
+0.15 & 0.2025 &  15.957 \\
+0.20 & 0.2900 &   6.643 \\
+0.25 & 0.3910 &   3.230 \\
+\hline
+\end{tabu}
+\caption{NACA 5 Konstanten f\"ur Auftriebskoeffizient von 0.3}
+\end{table}
+
 
 \subsubsection{Skelettlinie}
 \begin{algorithm}[H]
