@@ -7,6 +7,7 @@ from Xtest.Open_GL import profileDetectorWidget, utility
 from Xtest.Open_GL.profile import Profile
 import logging
 import datetime
+from numpy import gradient
 '''
 Created on Jul 30, 2014
 
@@ -272,7 +273,7 @@ class ProfileWidget(Profile):
     
         c = length
         t = thickness
-        plist = self.__createXcoords(c, pcnt)
+        plist = self.__createXcoordsCosineSpacing(c, pcnt)
     
         for x in plist:
             y = self.__computeY_t(x, c, t) 
@@ -286,26 +287,47 @@ class ProfileWidget(Profile):
 
 
 
-    def createCambered_Naca5(self, liftCoeff, posMaxCamber, thickness, pcnt=10):
+    def createCambered_Naca5(self, liftCoeff, posMaxCamber, reflex, thickness, pcnt=10):
         c      = 1.0 # c = maxChord ; length
-        p      = posMaxCamber/100.0
+        p      = posMaxCamber*5/100.0
         t      = thickness/100.0
         cl    = liftCoeff*(3.0/2.0) / 10.0        
-        m , k1 = self.__setConstantsOfP(posMaxCamber, cl) # constant values 
+        m , k1, k2_k1 = self.__setConstantsOfP(p, reflex) # constant values 
 
         
         res_top , res_bot , res_camber = [] , [] , []
-        plist = self.__createXcoords(1.0, pcnt)
+        plist = self.__createXcoordsLinear(1.0, pcnt)
         
         for x in plist :
             y_t = self.__computeY_t(x, c, t)
             
-            if x >= 0 and x <= p :
-                y_c = k1 / 6 * ( x*x*x - 3*m*x*x + m*m*(3-m) * x)
-            elif x >= p and x <= c :
-                y_c = (k1 * m * m * m) / 6 * (1-x)  
+            if reflex: 
+                if x >= 0 and x < m :
+                    y_c = k1 / 6 * ((x-m)*(x-m)*(x-m) - k2_k1*(1-m)*(1-m)*(1-m)*x - m*m*m*x + m*m*m) 
+                elif x >= m and x <= c :
+                    y_c = k1 / 6 * (k2_k1*(x-m)*(x-m)*(x-m) - k2_k1*(1-m)*(1-m)*(1-m)*x - m*m*m*x + m*m*m)
+            else :         
+                if x >= 0 and x < m :
+                    y_c = k1 / 6 * ( x*x*x - 3*m*x*x + m*m*(3-m) * x)
+                elif x >= m and x <= c :
+                    y_c = (k1 * m * m * m) / 6 * (1-x)  
             
-            theta = self.__computeCamber(x, c, m, p)
+            # table for various positions of the maximum camber at a coefficient of lift value of 0.3. 
+            # The camber and gradient can be scaled linearly to the required Cl value.            
+            y_c = y_c * cl / 0.3
+            
+            if reflex :
+                if x >= 0 and x < m :
+                    gradient = k1/6 * (3*(x-m)*(x-m) - k2_k1*(1-m)*(1-m)*(1-m) - m*m*m)
+                elif x >= m and x <= c :
+                    gradient = k1/6 * (3*k2_k1*(x-m)*(x-m) - k2_k1*(1-m)*(1-m)*(1-m) - m*m*m)
+            else:
+                if x >= 0 and x < m :
+                    gradient = k1/6 * (3*x*x - 6*m*x + m*m*(3-m) )
+                elif x >= m and x <= c :
+                    gradient = - k1*m*m*m/6
+            
+            theta = math.atan(gradient)
             
             x_u = x - y_t * math.sin(theta)
             x_l = x + y_t * math.sin(theta)
@@ -323,17 +345,22 @@ class ProfileWidget(Profile):
         self.dataSet.updateThickness()        
         self.updateGL()
 
-    def __setConstantsOfP(self, p, cl):
-        print cl
-        # table for various positions of the maximum camber at a coefficient of lift value of 0.3. 
-        # The camber and gradient can be scaled linearly to the required Cl value.
-        cl_default = 0.3
-        P = [0.05,0.1,0.15,0.2,0.25]
-        M = [0.0580,0.1260,0.2025,0.2900,0.3910]
-        K = [361.4,51.64,15.957,6.643,3.230]
-        for i in range(0, len(P)) :
-            if utility.equalFloats(p, P[i]):
-                return M[i] * cl / cl_default , K[i] * cl / cl_default
+    def __setConstantsOfP(self, p, reflex):
+        if reflex :
+            P = [0.1,0.15,0.2,0.25]
+            M = [0.1300,0.2170,0.3180,0.4410]
+            K = [51.990, 15.793,6.520,3.191]           
+            K1_K2 = [0.000764, 0.00677, 0.0303, 0.1355]
+            for i in range(0, len(P)) :
+                if utility.equalFloats(p, P[i]):
+                    return M[i] , K[i], K1_K2[i]            
+        else :
+            P = [0.05,0.1,0.15,0.2,0.25]
+            M = [0.0580,0.1260,0.2025,0.2900,0.3910]
+            K = [361.4,51.64,15.957,6.643,3.230]
+            for i in range(0, len(P)) :
+                if utility.equalFloats(p, P[i]):
+                    return M[i] , K[i], None
         print "nix gefunden"
 
     def createCambered_Naca(self, length, maxCamber, posMaxCamber, thickness, pcnt=10):
@@ -341,11 +368,11 @@ class ProfileWidget(Profile):
         res_bot = []     
         res_camber = []   
         
-        plist = self.__createXcoords(length, pcnt)
+        plist = self.__createXcoordsLinear(length, pcnt)
         for x in plist :
             y_t = self.__computeY_t(x, length, thickness)
             y_c = self.__computeY_c(x, length, maxCamber, posMaxCamber)
-            theta = self.__computeCamber(x, length, maxCamber, posMaxCamber)
+            theta = math.atan(self.__computeCamber(x, length, maxCamber, posMaxCamber))
             
             x_u = x - y_t * math.sin(theta)
             x_l = x + y_t * math.sin(theta)
@@ -374,7 +401,7 @@ class ProfileWidget(Profile):
             res = 2*m / ((1-p)*(1-p)) * (p - x/c)
         else :
             return None
-        return math.atan(res)
+        return res
     
     def __computeY_c(self, x, length, maxCamber, posMaxCamber):
         m = maxCamber
@@ -396,7 +423,7 @@ class ProfileWidget(Profile):
                         (tmp)     * math.pow(x/c, 4)) )        
         return y
 
-    def __createXcoords(self, dist=1.0, point_cnt=35):
+    def __createXcoordsLinear(self, dist=1.0, point_cnt=35):
         interval = dist/ point_cnt
         
         res = [0]
@@ -410,6 +437,16 @@ class ProfileWidget(Profile):
             else :
                 break
         res.append(dist)
+        return res         
+
+    '''
+    @param c: length chord
+    '''
+    def __createXcoordsCosineSpacing(self, c=1.0, point_cnt=35):
+        res = []
+        for j in range(0,point_cnt):
+            x = 0.5 * (1.0-math.cos((j * math.pi)/(point_cnt-1)))        
+            res.append(x/c)
         return res         
 
 
@@ -548,25 +585,34 @@ class Naca5Tab(QtGui.QWidget):
         label1 = QtGui.QLabel("Name")
         label2 = QtGui.QLabel("Design coefficient of lift")
         label3 = QtGui.QLabel("Pos. max. Camber")
-        label4 = QtGui.QLabel("Thickness")
-        label5 = QtGui.QLabel("Number of points")
+        label4 = QtGui.QLabel("Reflex")
+        label5 = QtGui.QLabel("Thickness")
+        label6 = QtGui.QLabel("Number of points")
         
-        label2_1 = QtGui.QLabel("First digit = Cl * 20/3. %s to %s%%:" % ("0", "9"))
+        label2_1 = QtGui.QLabel("First digit: %s to %s:" % ("0", "9"))
         label3_1 = QtGui.QLabel("Second & third digits.")
-        label4_1 = QtGui.QLabel("Fourth & fifth digits. %d to %d%%:" % (1, 30))
-        label5_1 = QtGui.QLabel("%d to %d" % (20, 200))
+        label5_1 = QtGui.QLabel("Fourth & fifth digits. %d to %d%%:" % (1, 30))
+        label6_1 = QtGui.QLabel("%d to %d" % (20, 200))
         
         self.text1Name = QtGui.QLineEdit()
         self.text1Name.setText('NACA xxxxx')
         self.text1Name.setReadOnly(True)
+        
         self.text2Cl = QtGui.QLineEdit()
-        self.text2Cl.setText('0.05')        
+        clvalidator = QtGui.QIntValidator(1,9 ,self)
+        self.text2Cl.setValidator(clvalidator)
+        self.text2Cl.setText('1')        
+        
+        self.combosCamberReflex = QtGui.QComboBox()
+        self.combosCamberReflex.addItem("0")
+        self.combosCamberReflex.addItem("1")
+        
         self.combosCamberPos = QtGui.QComboBox()
-        self.combosCamberPos.addItem("0.05")
-        self.combosCamberPos.addItem("0.10")
-        self.combosCamberPos.addItem("0.15")
-        self.combosCamberPos.addItem("0.20")
-        self.combosCamberPos.addItem("0.25")
+        self.combosCamberPos.addItem("1")
+        self.combosCamberPos.addItem("2")
+        self.combosCamberPos.addItem("3")
+        self.combosCamberPos.addItem("4")
+        self.combosCamberPos.addItem("5")
         
         self.text4Thickness = QtGui.QLineEdit()
         self.text4Thickness.setText('12')
@@ -587,23 +633,26 @@ class Naca5Tab(QtGui.QWidget):
         grid.addWidget(label3, 3, 1)
         grid.addWidget(label4, 4, 1)
         grid.addWidget(label5, 5, 1)
+        grid.addWidget(label6, 6, 1)
         grid.addWidget(self.text1Name,      1, 3)
         grid.addWidget(self.text2Cl,        2, 3)        
         grid.addWidget(self.combosCamberPos, 3, 3)
-        grid.addWidget(self.text4Thickness, 4, 3)        
-        grid.addWidget(self.countSpinBox,   5, 3)
+        grid.addWidget(self.combosCamberReflex, 4, 3)
+        grid.addWidget(self.text4Thickness, 5, 3)        
+        grid.addWidget(self.countSpinBox,   6, 3)
         grid.addWidget(label2_1, 2, 4)
         grid.addWidget(label3_1, 3, 4)
-        grid.addWidget(label4_1, 4, 4)
         grid.addWidget(label5_1, 5, 4)
+        grid.addWidget(label6_1, 6, 4)
         
-        grid.addWidget(self.butCreate, 6, 1)
+        grid.addWidget(self.butCreate, 7, 1)
         self.setLayout(grid)        
 
     def fireButtonCreate(self):
         
         cl          = self.text2Cl.text()
-        posCamber   = self.combosCamberPos.currentText()        
+        posCamber   = self.combosCamberPos.currentText()  
+        reflex      = self.combosCamberReflex.currentText()      
         thick       = self.text4Thickness.text()
         pcnt        = self.countSpinBox.value()
         
@@ -611,11 +660,19 @@ class Naca5Tab(QtGui.QWidget):
             cl          = float(cl)
             posCamber   = float(posCamber)
             thick       = float(thick)
+            reflex      = reflex == "1"
+            if posCamber == 1 and reflex:
+                # reflex not possible at posCamber 1
+                self.reflex = False           
+            elif thick > 30 or thick < 1 : 
+                self.text5Thickness.selectAll()
+                return            
+            
         except ValueError:
             print "Exception fireButtonCreate in profileWidget (NACA Creator)" ,  thick
             return
         
-        self.ogl_widget.createCambered_Naca5(cl, posCamber, thick, pcnt)        
+        self.ogl_widget.createCambered_Naca5(cl, posCamber, reflex, thick, pcnt)        
         self.ogl_widget.setName(self.text1Name.text())
 
 
@@ -651,6 +708,9 @@ class ProfileDetectWidget(QtGui.QWidget):
         self.ogl_detector_widget = profileDetectorWidget.ProfileDetectorWidget()
         #self.ogl_widget.setFixedSize(200,200)
         
+        # space between menu and widgets
+        space = QtGui.QSpacerItem(0,10)
+        grid.addItem(space)
         grid.addWidget(label2,                       1,1)
         grid.addWidget(self.sizeImgSpinBox,          1,2)
         grid.addWidget(label3,                       1,3)

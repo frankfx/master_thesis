@@ -5,6 +5,19 @@ Created on Sep 29, 2014
 '''
 import math
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 def createLineFunction(p1,p2):
     # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
     m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )

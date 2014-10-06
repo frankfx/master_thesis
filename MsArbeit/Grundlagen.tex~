@@ -130,25 +130,6 @@ text \cite{bib:naca_docu}
 \end{table}
 
 
-\rowcolor{RoyalBlue}\color{white}Beschreibung &Position max W\"olbung (p) & \color{white}m & \color{white}k1 & \color{white}k2/k1 \\
-5\% normal &  0.05 & 0.0580 & 361.400 & \\
-10\% normal & 0.10 & 0.1260 &  51.640 &\\
-15\% normal & 0.15 & 0.2025 &  15.957 & \\
-20\% normal & 0.20 & 0.2900 &   6.643 & \\
-25\% normal & 0.25 & 0.3910 &   3.230 & \\
-10\% gespiegelt & 0.10 & 0.1300 &   51.990 & 0.000764 \\
-15\% gespiegelt & 0.15 & 0.2170 &   15.793 & 0.00677 \\
-20\% gespiegelt & 0.20 & 0.3180 &   6.520  & 0.0303 \\
-25\% gespiegelt & 0.25 & 0.4410 &   3.191 & 0.1355 \\
-\hline
-\end{tabu}
-
-
-
-
-
-
-
 \subsubsection{Skelettlinie}
 \begin{algorithm}[H]
  \KwData{bottom profile, top profile, trailing edge, leading edge}
