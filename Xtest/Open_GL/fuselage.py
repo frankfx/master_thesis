@@ -4,7 +4,6 @@ Created on Oct 8, 2014
 @author: fran_re
 '''
 import sys
-import math
 from PySide import QtGui
 from profile import Profile
 

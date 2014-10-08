@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  4 OCT 2014 19:40
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  8 OCT 2014 18:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1654,6 +1654,9 @@ File: microtype.cfg 2013/05/23 v2.5a microtype main configuration file (RS)
 LaTeX Warning: File `cpuAnno.dat' already exists on the system.
                Not generating it from this source.
 
+\c@defi=\count199
+\c@satz=\count200
+\c@bsp=\count201
 (./main.aux
 
 LaTeX Warning: Label `sec:CPACS' multiply defined.
@@ -1661,65 +1664,62 @@ LaTeX Warning: Label `sec:CPACS' multiply defined.
 
 LaTeX Warning: Label `eq:camber' multiply defined.
 
-
-LaTeX Warning: Label `eq:camber' multiply defined.
-
 )
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/jkp/m/it on input line 207.
-LaTeX Font Info:    Try loading font information for OML+jkp on input line 207.
+LaTeX Font Info:    Checking defaults for OML/jkp/m/it on input line 211.
+LaTeX Font Info:    Try loading font information for OML+jkp on input line 211.
 
  (/usr/share/texmf/tex/latex/kpfonts/omljkp.fd
 File: omljkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 207.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 207.
-LaTeX Font Info:    ... okay on input line 207.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 207.
-LaTeX Font Info:    ... okay on input line 207.
-LaTeX Font Info:    Checking defaults for OMS/jkp/m/n on input line 207.
-LaTeX Font Info:    Try loading font information for OMS+jkp on input line 207.
+LaTeX Font Info:    ... okay on input line 211.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 211.
+LaTeX Font Info:    ... okay on input line 211.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 211.
+LaTeX Font Info:    ... okay on input line 211.
+LaTeX Font Info:    Checking defaults for OMS/jkp/m/n on input line 211.
+LaTeX Font Info:    Try loading font information for OMS+jkp on input line 211.
 
 
 (/usr/share/texmf/tex/latex/kpfonts/omsjkp.fd
 File: omsjkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 207.
-LaTeX Font Info:    Checking defaults for OMX/jkp/m/n on input line 207.
-LaTeX Font Info:    Try loading font information for OMX+jkp on input line 207.
+LaTeX Font Info:    ... okay on input line 211.
+LaTeX Font Info:    Checking defaults for OMX/jkp/m/n on input line 211.
+LaTeX Font Info:    Try loading font information for OMX+jkp on input line 211.
 
 
 (/usr/share/texmf/tex/latex/kpfonts/omxjkp.fd
 File: omxjkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 207.
-LaTeX Font Info:    Checking defaults for U/jkpexa/m/n on input line 207.
-LaTeX Font Info:    Try loading font information for U+jkpexa on input line 207
+LaTeX Font Info:    ... okay on input line 211.
+LaTeX Font Info:    Checking defaults for U/jkpexa/m/n on input line 211.
+LaTeX Font Info:    Try loading font information for U+jkpexa on input line 211
 .
 
 (/usr/share/texmf/tex/latex/kpfonts/ujkpexa.fd
 File: ujkpexa.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 207.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 207.
-LaTeX Font Info:    ... okay on input line 207.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 207.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 207.
+LaTeX Font Info:    ... okay on input line 211.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 211.
+LaTeX Font Info:    ... okay on input line 211.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 211.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 211.
 
 
 (/usr/share/texmf/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 207.
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 207.
+LaTeX Font Info:    ... okay on input line 211.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 211.
 
 
 (/usr/share/texmf/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 \AtBeginShipoutBox=\box58
-Package hyperref Info: Link coloring OFF on input line 207.
+Package hyperref Info: Link coloring OFF on input line 211.
 
 (/usr/share/texmf/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -1727,11 +1727,11 @@ Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 (/usr/share/texmf/tex/generic/oberdiek/gettitlestring.sty
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
-\c@section@level=\count199
+\c@section@level=\count202
 )
-LaTeX Info: Redefining \ref on input line 207.
-LaTeX Info: Redefining \pageref on input line 207.
-LaTeX Info: Redefining \nameref on input line 207.
+LaTeX Info: Redefining \ref on input line 211.
+LaTeX Info: Redefining \pageref on input line 211.
+LaTeX Info: Redefining \nameref on input line 211.
  (./main.out)
 (./main.out)
 \@outlinefile=\write5
@@ -1739,16 +1739,16 @@ LaTeX Info: Redefining \nameref on input line 207.
 
  (/usr/share/texmf/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count200
+\scratchcounter=\count203
 \scratchdimen=\dimen224
 \scratchbox=\box59
-\nofMPsegments=\count201
-\nofMParguments=\count202
+\nofMPsegments=\count204
+\nofMParguments=\count205
 \everyMPshowfont=\toks40
-\MPscratchCnt=\count203
+\MPscratchCnt=\count206
 \MPscratchDim=\dimen225
-\MPnumerator=\count204
-\makeMPintoPDFobject=\count205
+\MPnumerator=\count207
+\makeMPintoPDFobject=\count208
 \everyMPtoPDFconversion=\toks41
 ) (/usr/share/texmf/tex/latex/oberdiek/epstopdf-base.sty
 Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
@@ -1765,7 +1765,7 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-\c@lstlisting=\count206
+\c@lstlisting=\count209
 
 ABD: EveryShipout initializing macros
 Package caption Info: Begin \AtBeginDocument code.
@@ -1775,8 +1775,8 @@ Package caption Info: longtable package is loaded.
 Package: ltcaption 2013/02/03 v1.3-62 longtable captions (AR)
 )
 Package caption Info: End \AtBeginDocument code.
-LaTeX Info: Redefining \dots on input line 207.
-LaTeX Info: Redefining \microtypecontext on input line 207.
+LaTeX Info: Redefining \dots on input line 211.
+LaTeX Info: Redefining \microtypecontext on input line 211.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -1990,7 +1990,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 16--17
  []
 
 (./tikz/airfoil_general.tex
-\c@y=\count207
+\c@y=\count210
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <10> on input line 22.
@@ -2009,19 +2009,37 @@ l.27
 
 LaTeX Warning: Citation `bib:naca_docu' on page 7 undefined on input line 101.
 
+
+Underfull \hbox (badness 10000) in paragraph at lines 137--138
+
+ []
+
+[7]
+
+Package caption Warning: \label without proper \caption on input line 189.
+See the caption package documentation for explanation.
+
+
+LaTeX Warning: Reference `tab:naca5' on page 8 undefined on input line 178.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 178--179
+
+ []
+
 (./tikz/airfoil_chamber_algorithm.tex
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <8> on input line 14.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <6.8> on input line 14.
- [7]) (./tikz/airfoil.tex) [8] [9])
-(./Ergebnisse.tex [10]
+ [8]) (./tikz/airfoil.tex) [9] [10])
+(./Ergebnisse.tex [11]
 Kapitel 3.
-) (./ZusammenfassungAusblick.tex [11
+) (./ZusammenfassungAusblick.tex [12
 
 ]
 Kapitel 4.
-) [12
+) [13
 
 ]
 No file main.bbl.
@@ -2093,11 +2111,11 @@ LaTeX Warning: There were multiply-defined labels.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 61.
  ) 
 Here is how much of TeX's memory you used:
- 27668 strings out of 493315
- 477436 string characters out of 6145893
- 617088 words of memory out of 5000000
- 30294 multiletter control sequences out of 15000+600000
- 106456 words of font info for 147 fonts, out of 8000000 for 9000
+ 27715 strings out of 493315
+ 477825 string characters out of 6145893
+ 625427 words of memory out of 5000000
+ 30327 multiletter control sequences out of 15000+600000
+ 106630 words of font info for 149 fonts, out of 8000000 for 9000
  958 hyphenation exceptions out of 8191
  67i,17n,73p,1717b,829s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{Hfootnote.2} has been referenced but does not exi
@@ -2120,10 +2138,10 @@ nts/type1/public/lm/lmss12.pfb></usr/share/texmf/fonts/type1/public/lm/lmss17.p
 fb></usr/share/texmf/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf/fonts/ty
 pe1/public/lm/lmssbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb><
 /usr/share/texmf/fonts/type1/public/lm/lmsy9.pfb>
-Output written on main.pdf (31 pages, 423882 bytes).
+Output written on main.pdf (32 pages, 436505 bytes).
 PDF statistics:
- 444 PDF objects out of 1000 (max. 8388607)
- 368 compressed objects within 4 object streams
- 99 named destinations out of 1000 (max. 500000)
+ 461 PDF objects out of 1000 (max. 8388607)
+ 384 compressed objects within 4 object streams
+ 109 named destinations out of 1000 (max. 500000)
  28442 words of extra memory for PDF output out of 29859 (max. 10000000)
 

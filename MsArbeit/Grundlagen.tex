@@ -101,36 +101,99 @@ $\theta = \arctan \left(\frac{dy_c}{dx}\right)$
 text \cite{bib:naca_docu}
 \subsubsection{Naca5}
 
+Um den maximalen Auftrieb von Tragfl\"achenprofilen zu erh\"ohen, wurde zus\"atzlich die 5er Naca Serie entwickelt. Ein NACA 5 Profil hat die Form LPQXX (beispielsweise NACA 23009) und wird wie im Folgenden definiert. Hierbei ist zu beachten, dass die ersten beiden Ziffern zur sp\"ateren Berechnung umgrechnet werden.
 
-\begin{equation}\label{eq:camber}
-     y_c = \left\{ \begin{array}{ll} 
-     					\frac{k_1}{6} \left\{x^3 - 3mx^2 + m^2 (3-m)x\right\}, & 0 \leq x \leq p \\[0.5cm]
-         				\frac{k_1m^3}{6}\left(1-x\right), & p \leq x \leq 1
+\begin{enumerate}
+	\item Ziffer: Wert zur Berechnung des optimalen Auftriebskoeffizienten bei optimalem Anstellwinkel
+		\begin{itemize}
+			\item $cl = L * 0.15 $
+		\end{itemize}	
+	\item Ziffer: Position der gr\"o\ss ten W\"olbung entlang der Sehnenlinie, beginnend bei der leading edge
+		\begin{itemize}
+			\item $p = P * 5 $
+		\end{itemize}
+	\item Ziffer: einfache oder gespiegelte Kr\"ummung
+		\begin{itemize}
+			\item $0$ oder $1$
+		\end{itemize}
+	\item Ziffer und 5. Ziffer: maximale Dicke in \% zur Sehnenl\"ange
+		\begin{itemize}
+			\item $t = XX$
+		\end{itemize}	
+\end{enumerate}
+
+\noindent F\"ur das obige NACA 23009 w\"urde dies folgendes bedeuten: 
+
+\begin{bsp}
+NACA 23009
+\begin{itemize}
+	\item[L] = 2 $\rightarrow$ 2 * 0.15 $\rightarrow$  Auftriebskoeffizient = 0.3
+	\item[P] = 3 $\rightarrow$ 3 * 5.0 $\rightarrow$  Position bei = 15\%
+	\item[Q] = 0 $\rightarrow$ normale W\"olbung
+	\item[XX] = 09 $\rightarrow$ Dicke = 9 \%
+\end{itemize}
+\end{bsp}
+
+Die Konstruktion eines NACA 5 Profils sieht zwei F\"alle vor. Die ersten beiden Gleichungen beschreiben werden verwendet, wenn das Q gleich 0 ist, also ein Profil mit normaler W\"olbung kontruiert werden soll. Die letzten bewirken im Fall, dass Q gleich 1 ist, eine gespiegelte W\"olbung.\\
+
+W\"olbung (normal)
+
+\begin{equation}
+     y_c = \left\{ \begin{array}{ll}
+			\frac{k_1}{6}(x^3 - 3mx^2 + m^2 (3-m)x), & 0 \leq x \le m \\[0.5cm]
+         		\frac{k_1m^3}{6}(1-x), & m \leq x \leq 1
+         	\end{array}\right.
+\end{equation}
+
+Anstieg (normal)
+
+\begin{equation}
+     \frac{dy_c}{dx} = \left\{ \begin{array}{ll}
+					\frac{k_1}{6}(3x^2 - 6mx + m^2 (3-m)), & 0 \leq x \le m \\[0.5cm]
+         				-\frac{k_1m^3}{6}, & m \leq x \leq 1
+         			\end{array}\right.
+\end{equation}
+
+W\"olbung (gespiegelt)
+
+\begin{equation}
+     y_c = \left\{ \begin{array}{ll}
+			\frac{k_1}{6}\left((x-m)^3 - \frac{k_2}{k_1} (1-m)^3x-m^3x+m^3\right), & 0 \leq x \le m \\[0.5cm]
+         		\frac{k_1}{6}\left(\frac{k_2}{k_1}(x-m)^3 - \frac{k_2}{k_1} (1-m)^3 x -m^3x + m^3\right), & m \leq x \leq 1
+         	\end{array}\right.
+\end{equation}
+
+Anstieg (gespiegelt)
+
+\begin{equation}
+     \frac{dy_c}{dx} = \left\{ \begin{array}{ll}
+					\frac{k_1}{6}\left(3(x-m)^2 - \frac{k_2}{k_1} (1-m)^3 - m^3\right), & 0 \leq x \le m \\[0.5cm]
+         				\frac{k_1}{6}\left(3 \frac{k_2}{k_1} (x-m)^2 - \frac{k_2}{k_1}(1-m)^3 -m^3\right), & m \leq x \leq 1
          			\end{array}\right.
 \end{equation}
 
 
 
-\begin{table}
+
+In Tabelle \ref{tab:naca5} sind die Konstanten m, k1 und k1/k2 definiert. Diese wurden an der Position der maximale W\"olbung bei einem Auftriebsbeiwert von 0.3 bestimmt. Die Ergebnisse f\"ur Anstieg und W\"olbung k\"onnen linear bez\"uglich des gew\"unschten Auftriebsbeitwertes skaliert werden.\\
+
+
+Das Plotten geschieht mit cosinus
+\begin{equation}
+     \frac{x_i}{c} = \frac{1}{2} \left[ 1 - \cos \left( \frac{i * \pi}{N-1} \right) \right]
+\end{equation}
+
+
+
+
+\begin{table}\label{tab:naca5}
 \taburowcolors[2]{white .. black!20}
 \centering
 \sffamily\footnotesize
 \tabulinesep=6pt
-\begin{tabu}{|c|c|c|}
+\begin{tabu}{|c|c|c|c|c|}
 \hline
-\rowcolor{RoyalBlue}\color{white}Position max W\"olbung (p) & \color{white}m & \color{white}k1\\
-0.05 & 0.0580 & 361.400 \\
-0.10 & 0.1260 &  51.640 \\
-0.15 & 0.2025 &  15.957 \\
-0.20 & 0.2900 &   6.643 \\
-0.25 & 0.3910 &   3.230 \\
-\hline
-\end{tabu}
-\caption{NACA 5 Konstanten f\"ur Auftriebskoeffizient von 0.3}
-\end{table}
-
-
-\rowcolor{RoyalBlue}\color{white}Beschreibung &Position max W\"olbung (p) & \color{white}m & \color{white}k1 & \color{white}k2/k1 \\
+\rowcolor{RoyalBlue}\color{white}Beschreibung & \color{white}Position max W\"olbung (p) & \color{white}m & \color{white}k1& \color{white}k2/k1 \\
 5\% normal &  0.05 & 0.0580 & 361.400 & \\
 10\% normal & 0.10 & 0.1260 &  51.640 &\\
 15\% normal & 0.15 & 0.2025 &  15.957 & \\
@@ -142,6 +205,9 @@ text \cite{bib:naca_docu}
 25\% gespiegelt & 0.25 & 0.4410 &   3.191 & 0.1355 \\
 \hline
 \end{tabu}
+\caption{NACA 5 Konstanten f\"ur Auftriebskoeffizient von 0.3}
+\end{table}
+
 
 
 

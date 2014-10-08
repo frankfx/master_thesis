@@ -98,15 +98,14 @@ class AirfoilWidget(Airfoil):
 
 
     def createCambered_Naca5(self, liftCoeff, posMaxCamber, reflex, thickness, pcnt=10):
-        c      = 1.0 # c = maxChord ; length
-        p      = posMaxCamber*5/100.0
-        t      = thickness/100.0
-        cl    = liftCoeff*(3.0/2.0) / 10.0        
-        m , k1, k2_k1 = self.__setConstantsOfP(p, reflex) # constant values 
+        c  = 1.0
+        p  = posMaxCamber*5/100.0
+        t  = thickness/100.0
+        cl = liftCoeff*(3.0/2.0) / 10.0        
+        m , k1 , k2_k1 = self.__setConstantsOfP(p, reflex) # constant values 
 
-        
         res_top , res_bot , res_camber = [] , [] , []
-        plist = utility.createXcoordsCosineSpacing(1.0, pcnt)
+        plist = self.__createXcoordsCosineSpacing(c, pcnt)
         
         for x in plist :
             y_t = self.__computeY_t(x, c, t)
@@ -122,7 +121,7 @@ class AirfoilWidget(Airfoil):
                 elif x >= m and x <= c :
                     y_c = (k1 * m * m * m) / 6 * (1-x)  
             
-            # table for various positions of the maximum camber at a coefficient of lift value of 0.3. 
+            # constant values of the maximum camber at a coefficient for lift value at 0.3. 
             # The camber and gradient can be scaled linearly to the required Cl value.            
             y_c = y_c * cl / 0.3
             
@@ -137,7 +136,7 @@ class AirfoilWidget(Airfoil):
                 elif x >= m and x <= c :
                     gradient = - k1*m*m*m/6
             
-            theta = math.atan(gradient)
+            theta = math.atan(gradient*cl/0.3)
             
             x_u = x - y_t * math.sin(theta)
             x_l = x + y_t * math.sin(theta)
@@ -151,27 +150,26 @@ class AirfoilWidget(Airfoil):
 
         self.setPointList(res_bot + res_top[1:])      
         self.setPointListCamber(res_camber)
-        self.updatePointListsForNaca()
-        self.updateThickness()        
+        self.dataSet.updatePointListsForNaca()
+        self.dataSet.updateThickness()        
         self.updateGL()
 
-    def __setConstantsOfP(self, p, reflex):
+    def __setConstantsOfP(self, p, reflex):       
         if reflex :
             P = [0.1,0.15,0.2,0.25]
             M = [0.1300,0.2170,0.3180,0.4410]
             K = [51.990, 15.793,6.520,3.191]           
-            K1_K2 = [0.000764, 0.00677, 0.0303, 0.1355]
-            for i in range(0, len(P)) :
-                if utility.equalFloats(p, P[i]):
-                    return M[i] , K[i], K1_K2[i]            
+            K1_K2 = [0.000764, 0.00677, 0.0303, 0.1355]          
         else :
             P = [0.05,0.1,0.15,0.2,0.25]
             M = [0.0580,0.1260,0.2025,0.2900,0.3910]
             K = [361.4,51.64,15.957,6.643,3.230]
-            for i in range(0, len(P)) :
-                if utility.equalFloats(p, P[i]):
-                    return M[i] , K[i], None
+            K1_K2 = [None, None, None, None, None] 
+        for i in range(0, len(P)) :
+            if utility.equalFloats(p, P[i]):
+                return M[i] , K[i], K1_K2[i]                  
         print "nix gefunden"
+
 
     def createCambered_Naca(self, length, maxCamber, posMaxCamber, thickness, pcnt=10):
         res_top = []
