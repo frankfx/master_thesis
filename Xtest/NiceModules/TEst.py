@@ -29,9 +29,9 @@ class TestWidget(QtGui.QWidget):
         
         self.setLayout(grid) 
 
-class Profile(QtOpenGL.QGLWidget):
+class Airfoil(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(Profile, self).__init__(parent)
+        super(Airfoil, self).__init__(parent)
            
     def initializeGL(self):
         GL.glClearColor(1.0, 1.0 , 1.0, 1.0)
@@ -46,7 +46,7 @@ class ProfileDetectWidget(QtGui.QWidget):
     def __init__(self, parent = None):
         super(ProfileDetectWidget, self).__init__(parent)
       
-        self.ogl_widget = Profile() 
+        self.ogl_widget = Airfoil() 
         # self.ogl_widget = TestWidget() 
  
         grid = QtGui.QGridLayout()

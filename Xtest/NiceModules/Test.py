@@ -4,7 +4,7 @@ import math
 from PySide import QtOpenGL, QtGui, QtCore
 #from cpacsHandler import CPACS_Handler
 from Xtest.Open_GL.configuration.config import Config
-from Xtest.Open_GL.profile import Profile
+from Xtest.Open_GL.airfoil import Airfoil
 try:
     from OpenGL import GL, GLU
 except ImportError:
@@ -15,9 +15,9 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class Profile(QtOpenGL.QGLWidget):
+class Airfoil(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(Profile, self).__init__(parent)
+        super(Airfoil, self).__init__(parent)
 
     def initializeGL(self):
         GL.glClearColor(1.0, 1.0 , 1.0, 1.0)
@@ -42,7 +42,7 @@ class ProfileDetectWidget(QtGui.QWidget):
     def __init__(self, parent = None):
         super(ProfileDetectWidget, self).__init__(parent)
 
-        self.ogl_widget = Profile()
+        self.ogl_widget = Airfoil()
         # self.ogl_widget = TestWidget() 
 
         space = QtGui.QSpacerItem(0,15)

@@ -5,7 +5,7 @@ Created on Sep 23, 2014
 '''
 import sys
 from PySide import QtOpenGL, QtGui, QtCore
-from Xtest.Splines.chaikin_spline import Chaikin_Spline
+from Xtest.Splines.chaikin_spline import Chaikin
 
 try:
     from OpenGL import GL, GLU
@@ -24,7 +24,7 @@ class Renderer:
         pntX = [1.0, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.075, 0.05, 0.025, 0.0125, 0.005, 0.0, 0.005, 0.0125, 0.025, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]
         pntZ = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         pntY = [0.00095, 0.00605, 0.01086, 0.01967, 0.02748, 0.03423, 0.03971, 0.04352, 0.04501, 0.04456, 0.04303, 0.04009, 0.03512, 0.0315, 0.02666, 0.01961, 0.0142, 0.0089, 0.0, -0.0089, -0.0142, -0.01961, -0.02666, -0.0315, -0.03512, -0.04009, -0.04303, -0.04456, -0.04501, -0.04352, -0.03971]        
-        self.curve = Chaikin_Spline.initPLists(pntX, pntY, pntZ)
+        self.curve = Chaikin.initPLists(pntX, pntY, pntZ)
         self.width = -1.0
         self.height = -1.0     
         self.scale = 0.5
@@ -73,9 +73,9 @@ class Renderer:
         GL.glLoadIdentity()
         GLU.gluPerspective (self.fovy * self.scale, w*1.0/h, 0.0, 10.0)
 
-class ProfileDetectorWidget(QtOpenGL.QGLWidget):
+class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(ProfileDetectorWidget, self).__init__(parent)
+        super(AirfoilDetectorWidget, self).__init__(parent)
         self.resize(620,620)
         self.setWindowTitle("Rene Test")
 
@@ -109,6 +109,6 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
             
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = ProfileDetectorWidget()
+    widget = AirfoilDetectorWidget()
     widget.show()
     app.exec_()             

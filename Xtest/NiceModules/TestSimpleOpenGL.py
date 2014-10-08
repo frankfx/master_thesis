@@ -4,7 +4,7 @@ Created on Aug 22, 2014
 
 @author: rene
 '''
-from Xtest.Open_GL import profileDetectorWidget
+from Xtest.Open_GL import airfoilDetectWidget
 
 '''
 Created on Jul 30, 2014
@@ -189,9 +189,9 @@ class Renderer():
         GL.glEnd()
                
 
-class ProfileDetectorWidget(QtOpenGL.QGLWidget):
+class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(ProfileDetectorWidget, self).__init__(parent)
+        super(AirfoilDetectorWidget, self).__init__(parent)
         self.width = 320
         self.height = 302
         self.resize(self.width ,self.height)
@@ -251,6 +251,6 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = ProfileDetectorWidget()
+    widget = AirfoilDetectorWidget()
     widget.show()
     app.exec_()    

@@ -73,14 +73,14 @@ class Test():
                 res = p
             else:
                 y = fct_perpendicular (p[0])
-                print y, p, " ==== " , self.abs(y - p[1])
-                if self.abs(y - p[1]) < self.abs(y-res[1]) :
+                print y, p, " ==== " , self.absolut(y - p[1])
+                if self.absolut(y - p[1]) < self.absolut(y-res[1]) :
                     res = p
         print "intersect Point" , res
         return res     
 
 
-    def abs(self, value):
+    def absolut(self, value):
         return -value if value < 0 else value
 
     '''

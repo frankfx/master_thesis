@@ -1,3 +1,26 @@
+'''
+Created on Oct 8, 2014
+
+@author: fran_re
+'''
+import sys
+import math
+import utility
+from airfoil import Airfoil
+from airfoilDetectWidget import AirfoilDetectWidget
+from PySide import QtGui, QtCore
+
+try:
+    from OpenGL import GL
+except ImportError:
+    app = QtGui.QApplication(sys.argv)
+    QtGui.QMessageBox.critical(None, "OpenGL hellogl",
+                              "PyOpenGL must be installed to run this example.",
+                            QtGui.QMessageBox.Ok | QtGui.QMessageBox.Default,
+                            QtGui.QMessageBox.NoButton)
+    sys.exit(1)
+
+
 class AirfoilNacaWidget(QtGui.QWidget):
     def __init__(self, ogl_main_widget, parent = None):
         super(AirfoilNacaWidget, self).__init__(parent)
@@ -15,7 +38,7 @@ class AirfoilNacaWidget(QtGui.QWidget):
         self.setWindowTitle(self.tr("Tab Dialog"))        
         
 class Naca4Tab(QtGui.QWidget):
-    def __init__(self, ogl_main_widget, parent = None):        
+    def __init__(self, ogl_widget, parent = None):        
         QtGui.QWidget.__init__(self, parent)
         
         grid = QtGui.QGridLayout()
@@ -54,7 +77,7 @@ class Naca4Tab(QtGui.QWidget):
         
         self.butCreate = QtGui.QPushButton("create")
         self.butCreate.clicked.connect(self.fireButtonCreate)
-        self.ogl_widget = ogl_main_widget
+        self.ogl_widget = ogl_widget
         
         grid.addWidget(label1, 1, 1)
         grid.addWidget(label2, 2, 1)
@@ -125,7 +148,7 @@ class Naca4Tab(QtGui.QWidget):
 
 
 class Naca5Tab(QtGui.QWidget):
-    def __init__(self, ogl_main_widget, parent = None):        
+    def __init__(self, ogl_widget, parent = None):        
         QtGui.QWidget.__init__(self, parent)
         
         grid = QtGui.QGridLayout()
@@ -174,7 +197,7 @@ class Naca5Tab(QtGui.QWidget):
         
         self.butCreate = QtGui.QPushButton("create")
         self.butCreate.clicked.connect(self.fireButtonCreate)
-        self.ogl_widget = ogl_main_widget
+        self.ogl_widget = ogl_widget
         
         grid.addWidget(label1, 1, 1)
         grid.addWidget(label2, 2, 1)

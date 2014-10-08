@@ -36,7 +36,7 @@ class Point :
 
 
 ''' a dynamic array of all points in the curve'''
-class Chaikin_Spline:
+class Chaikin:
     # ctor
     def __init__(self, plist):
         self.pList = plist   

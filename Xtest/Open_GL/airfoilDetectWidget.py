@@ -15,7 +15,7 @@ import utility
 from PySide import QtOpenGL, QtGui, QtCore
 #from cpacsHandler import CPACS_Handler
 from Xtest.Open_GL.configuration.config import Config
-from Xtest.Open_GL.profile import Profile
+from Xtest.Open_GL.airfoil import Airfoil
 try:
     from OpenGL import GL, GLU
 except ImportError:
@@ -27,9 +27,134 @@ except ImportError:
     sys.exit(1)
 
 
-class ProfileDetectorWidget(Profile):
-    def __init__(self,parent = None):
-        Profile.__init__(self)
+class AirfoilDetectWidget(QtGui.QWidget): 
+    def __init__(self, ogl_main_widget, parent = None):
+        super(AirfoilDetectWidget, self).__init__(parent)
+        
+        grid                     = QtGui.QGridLayout()
+        
+        label1                   = QtGui.QLabel("Name")
+        self.text1Name           = QtGui.QLineEdit()
+        self.butCreate           = QtGui.QPushButton("create")
+        self.butDetect           = QtGui.QPushButton("detect")
+        self.butCancel           = QtGui.QPushButton("cancel")
+        self.butDelPnt           = QtGui.QPushButton("reduce")
+        self.checkCent           = QtGui.QCheckBox("center")
+
+        label2              = QtGui.QLabel("Image size")
+        self.sizeImgSpinBox = QtGui.QSpinBox()
+        self.sizeImgSpinBox.setRange(1, 100)
+        self.sizeImgSpinBox.setSingleStep(5)
+        self.sizeImgSpinBox.setSuffix('%')
+        self.sizeImgSpinBox.setValue(50)
+
+        label3              = QtGui.QLabel("Airfoil size")
+        self.sizeProSpinBox = QtGui.QSpinBox()
+        self.sizeProSpinBox.setRange(1, 100)
+        self.sizeProSpinBox.setSingleStep(5)
+        self.sizeProSpinBox.setSuffix('%')
+        self.sizeProSpinBox.setValue(50)
+
+        self.ogl_main_widget          = ogl_main_widget
+        self.ogl_detector_widget = AirfoilDetectOglWidget()
+        #self.ogl_widget.setFixedSize(200,200)
+        
+        # space between menu and widgets
+        space = QtGui.QSpacerItem(0,10)
+        grid.addItem(space)
+        grid.addWidget(label2,                       1,1)
+        grid.addWidget(self.sizeImgSpinBox,          1,2)
+        grid.addWidget(label3,                       1,3)
+        grid.addWidget(self.sizeProSpinBox,          1,4)
+        grid.addWidget(self.butDelPnt,               1,5)
+        grid.addWidget(self.checkCent,               1,6)
+        grid.addWidget(self.ogl_detector_widget, 2,1,1,6)
+        grid.addWidget(label1,                       3,1)
+        grid.addWidget(self.text1Name,               3,2)
+        grid.addWidget(self.butCreate,               3,3)
+        grid.addWidget(self.butDetect,               3,4)
+        grid.addWidget(self.butCancel,               3,5)
+        
+        self.butCreate.clicked.connect(self.fireButtonCreate)
+        self.butDetect.clicked.connect(self.fireButtonDetect)
+        self.butDelPnt.clicked.connect(self.fireButtonReduce)
+        self.butCancel.clicked.connect(self.fireButtonClose)
+        
+        self.sizeImgSpinBox.valueChanged.connect(self.fireSetScaleImg)
+        self.sizeProSpinBox.valueChanged.connect(self.fireSetScale)
+        self.checkCent.toggled.connect(self.fireSetToCenter)
+        
+        self.createActions()
+        self.createMenus()
+        
+        self.setLayout(grid) 
+        self.resize(420,320)
+        
+        
+    def fireSetToCenter(self, value):
+        self.ogl_detector_widget.flag_setCenter = value  
+        self.ogl_detector_widget.updateGL() 
+        
+    def fireButtonReduce(self):
+        plist = self.ogl_detector_widget.getPointList()
+        if plist == None :
+            return
+
+        for i in range(1, len(plist)/2) : 
+            self.ogl_detector_widget.removeFromPointList(i)
+        self.ogl_detector_widget.updateGL()
+    
+    def fireSetScaleImg(self):
+        self.ogl_detector_widget.scaleImg = float(self.sizeImgSpinBox.value()) /50
+        self.ogl_detector_widget.updateGL()
+
+    def fireSetScale(self):
+        self.ogl_detector_widget.scale = float(self.sizeProSpinBox.value()) /25
+        self.ogl_detector_widget.updateGL()
+    
+    def fireButtonCreate(self):
+        name = self.text1Name.text() if self.text1Name.text() != "" else "untitled"
+        self.ogl_main_widget.setName(name)
+        self.ogl_main_widget.setPointList(self.ogl_detector_widget.getPointList())
+        self.ogl_main_widget.updateAll()
+        self.ogl_main_widget.updateGL()
+
+    def fireButtonDetect(self):
+        self.ogl_detector_widget.detectProfile()
+        self.ogl_detector_widget.updateGL()
+
+    def fireButtonClose(self):
+        self.ogl_detector_widget.cancelWidget()
+        self.close()
+
+    def open(self) :
+        (fileName, _) = QtGui.QFileDialog.getOpenFileName(self,
+                                     "Open File", QtCore.QDir.currentPath())
+        if (fileName) :
+            self.ogl_detector_widget.setFileName(fileName)
+            self.ogl_detector_widget.updateGL()
+
+    def createActions(self):
+        self.openAct = QtGui.QAction('Open...', self)
+        self.openAct.triggered.connect(self.open)    
+        
+        self.exitAct = QtGui.QAction("Exit", self);
+        self.exitAct.triggered.connect(self.close)
+        
+    def createMenus(self):
+        fileMenu = QtGui.QMenu("File", self)
+        fileMenu.addAction(self.openAct)
+        fileMenu.addSeparator()
+        fileMenu.addAction(self.exitAct)
+
+        menubar = QtGui.QMenuBar(self)
+        menubar.addMenu(fileMenu)
+
+
+
+class AirfoilDetectOglWidget(Airfoil):
+    def __init__(self, parent = None):
+        Airfoil.__init__(self, None)
         self.filename = ""
         self.img_width = -1
         self.img_height = -1
@@ -264,15 +389,15 @@ class ProfileDetectorWidget(Profile):
             if(event.button() == QtCore.Qt.RightButton) :
                 ()
             else : 
-                Profile.mousePressEvent(self, event)
+                Airfoil.mousePressEvent(self, event)
         
     def mouseMoveEvent(self, event):
         if self.__idxSelectedPoint >= 0 :
             p = self.__winPosTo3DPos(event.pos().x(), event.pos().y())
-            self.setPointListAtIdx(self.__idxSelectedPoint, p)
+            self.setPointToPointListAtIdx(self.__idxSelectedPoint, p)
             self.updateGL()
         else:
-            Profile.mouseMoveEvent(self, event)
+            Airfoil.mouseMoveEvent(self, event)
         
     def addPoint(self):
         idx = utility.computeIdxOfPointWithMinDistance(self.__selectedPoint, self.getPointList(), 1)[0]
@@ -319,6 +444,6 @@ class ProfileDetectorWidget(Profile):
         
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = ProfileDetectorWidget()
+    widget = AirfoilDetectWidget()
     widget.show()
     app.exec_()    

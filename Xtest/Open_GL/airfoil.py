@@ -1,20 +1,17 @@
 '''
-Created on Sep 11, 2014
+Created on Sep 3, 2014
 
 @author: rene
 '''
+
 import sys
 import math
 import utility
-from PySide import QtOpenGL, QtGui, QtCore
-from cpacsHandler import CPACS_Handler
-from Xtest.Open_GL.configuration.config import Config
-import logging
-import datetime
-from chaikin_spline import Chaikin_Spline
+from PySide import QtGui
+from profile import Profile
 
 try:
-    from OpenGL import GL, GLU, GLUT
+    from OpenGL import GL
 except ImportError:
     app = QtGui.QApplication(sys.argv)
     QtGui.QMessageBox.critical(None, "OpenGL hellogl",
@@ -23,40 +20,73 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
-logging.info('\n#####################################################\nstart\n#####################################################')
-logging.info(datetime.datetime.now().time())
-
-class DataSet() :
-    def __init__(self, uid, parent = None):
-
-        # ==========================================================
-        self.tixi = CPACS_Handler()
-        self.tixi.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
-        # ==========================================================        
+class Airfoil(Profile):
+    def __init__(self, plist, parent = None):
+        super(Airfoil, self).__init__(plist,parent)
         
-        self.pointList                          = self.__createPointList(uid)
+        if plist == None : return
+
         self.trailingEdge                       = self.__computeTrailingEdge(self.pointList)
-        self.leadingEdge                        = self.__computeLeadingEdge(self.pointList)
+        self.leadingEdge                        = self.__computeLeadingEdge(self.pointList )
         self.pointList_bot , self.pointList_top = self.__createPointList_bot_top(self.leadingEdge, self.pointList)
         self.pointList_chord                    = self.__createPointList_chord(self.leadingEdge, self.trailingEdge,len(self.pointList_bot))        
         self.pointList_camber, self.thickness   = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
-       
-    '''
-    @param: uid from cpacs
-    @return: lists for top and bottom profile in format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
-    '''       
-    def __createPointList(self, uid) :
-        vecX = self.tixi.getVectorX(uid)
-        vecY = self.tixi.getVectorZ(uid)
-        vecZ = self.tixi.getVectorY(uid)
+
+        self.flag_close_TrailingEdge = False
+        self.flag_draw_camber        = False
+        self.flag_draw_chord         = False
+
+    # ================================================================================================================
+    # drawing functions
+    # ================================================================================================================
+    def drawChord(self):
+        start, end = self.getEndPoints()
         
-        res = []
-        for i in range(0, len(vecX)) :
-            res.append([vecX[i], vecY[i], vecZ[i]])
-        return res        
+        GL.glBegin(GL.GL_LINES)
+        GL.glVertex3f(start[0], start[1], start[2]) # leftend (nose)
+        GL.glVertex3f(end[0], end[1], end[2]) # right end
+        GL.glEnd()
+
+    def drawCamber(self):
+        plist = self.getPointListCamber()
+        GL.glBegin(GL.GL_LINE_STRIP)
+        for i in range(0, len(plist)) :
+            GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])# left end == nose
+        GL.glEnd()
+
+    # ================================================================================================================
+    # computations
+    # ================================================================================================================
+    '''
+    @param list1: first list
+    @param list2: second list
+    @return: max distance between p1 of list1 and corresponding p2 of list2
+    '''   
+    def __computeAirfoilThickness(self, list1, list2):
+        dist = -1.0
+        for p in self.getPointListCamber() :
+            dist1 = utility.computeMinDistance(p, list1)
+            dist2 = utility.computeMinDistance(p, list2)
+            cur_dist = dist1 + dist2
+            if dist < 0.0 or cur_dist > dist : 
+                print "p" , p , dist1, dist2          
+                dist = cur_dist
+        return dist
+ 
+    '''
+    @param list1: first list
+    @param list2: second list
+    @return: distance between p1 of list1 and corresponding p2 of list2
+    '''   
+    def __computeAirfoilArch(self, list1, list2):
+        dist = -1.0
+        for p in list1 :
+            cur_dist = utility.computeMinDistance(p, list2)
+            if cur_dist > dist :
+                dist = cur_dist
+        return dist
 
     '''
     @param plist: point list
@@ -106,7 +136,7 @@ class DataSet() :
             p = utility.computePointOnLine(p1[0] + i*interval, p1, p2)
             res.append(p)
         
-        return res   
+        return res  
 
     '''
     @param plist_top: point list of top profile
@@ -117,11 +147,6 @@ class DataSet() :
         plist_top.reverse()
         axis0 = self.__createApproximateCamber(plist_bot, plist_top)
         axis1 = self.__createApproximateCamber(plist_top, plist_bot)
-        axis  = self.__createApproximateCamber(axis0, axis1)
-        print "d" , axis0
-        print "e" , axis1
-        print "f" , axis
-        
         return self.__createApproximateCamber(axis0, axis1) 
 
     def __createApproximateCamber(self, plist1, plist2):
@@ -185,7 +210,6 @@ class DataSet() :
                 point = p1
         return point  
 
-
     # ============================================================================================================
     # rotation functions
     # ============================================================================================================
@@ -203,94 +227,11 @@ class DataSet() :
         z_new = z
         return [x_new, y_new, z_new]
 
-    # ================================================================================================================
-    # getter and setter
-    # ================================================================================================================
-    def setPointList(self, plist):
-        self.pointList = plist
-
-    def setPointListAtIdx(self, idx, val):
-        self.pointList[idx] = val
-
-    def insertToPointList(self, idx, val):
-        self.pointList.insert(idx, val)
-   
-    def removeFromPointList(self, idx):
-        del self.pointList[idx]
-   
-    def setPointListTop(self, plist):
-        self.pointList_top = plist
-
-    def setPointListBot(self, plist):
-        self.pointList_bot = plist
-        
-    def setPointListChord(self, plist):
-        self.pointList_chord = plist
-        
-    def setPointListCamber(self, plist):
-        self.pointList_camber = plist        
-    
-    def setPointListTop_rot(self, plist):
-        self.pointList_top_rot = plist
-        
-    def setPointListBot_rot(self, plist):
-        self.pointList_bot_rot = plist
-   
-    def getCompletePointList(self):
-        return self.pointList
-    
-    def getPointList(self):
-        return self.pointList
-
-    def getPointListTop(self):
-        return self.pointList_top
-    
-    def getPointListBot(self):
-        return self.pointList_bot
-    
-    def getPointListChord(self):
-        return self.pointList_chord
-    
-    def getPointListCamber(self):
-        return self.pointList_camber
-
-    def getPointListTop_rot(self):
-        return self.pointList_top_rot
-        
-    def getPointListBot_rot(self):
-        return self.pointList_bot_rot    
-    
-    def getLenChord(self):
-        return utility.getDistanceBtwPoints(self.getTrailingEdge(), self.getLeadingEdge())   
-    
-    def getEndPoints(self):
-        return self.leadingEdge, self.trailingEdge
-    
-    def getTrailingEdge(self):
-        return self.trailingEdge
-  
-    def getLeadingEdge(self):
-        return self.leadingEdge
-  
-    # thickness will computed next to camber construction. For Naca we use a seperate inbuild camber 
-    # construction without thickness computing --> therefor call updateThickness
-    def getProfileThickness(self):
-        return 100.0 * self.thickness        
-
-    def getProfileArch(self):
-        return 100.0 * self.__computeProfileArch(self.pointList_chord, self.pointList_camber)  
-  
-    def getSplineCurve(self):
-        spline = Chaikin_Spline(self.getCompletePointList())
-        spline.IncreaseLod()
-        spline.IncreaseLod()
-        return spline.getPointList()
-      
     # ============================================================================================================
     # update functions
     # ============================================================================================================
     def updateThickness(self):
-        self.thickness = self.__computeProfileThickness(self.pointList_top, self.pointList_bot)
+        self.thickness = self.__computeAirfoilThickness(self.pointList_top, self.pointList_bot)
     
     def updateLeadingEdge(self):
         self.leadingEdge = self.__computeLeadingEdge(self.pointList)
@@ -329,77 +270,95 @@ class DataSet() :
         self.pointList_camber , self.thickness  = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
- 
-    # ================================================================================================================
-    # geometrie helper
-    # ================================================================================================================
-
-    
-           
-    '''
-    @param list1: first list
-    @param list2: second list
-    @return: max distance between p1 of list1 and corresponding p2 of list2
-    '''   
-    def __computeProfileThickness(self, list1, list2):
-        dist = -1.0
-        for p in self.getPointListCamber() :
-            dist1 = utility.computeMinDistance(p, list1)
-            dist2 = utility.computeMinDistance(p, list2)
-            cur_dist = dist1 + dist2
-            if dist < 0.0 or cur_dist > dist : 
-                print "p" , p , dist1, dist2          
-                dist = cur_dist
-        return dist
- 
-    '''
-    @param list1: first list
-    @param list2: second list
-    @return: distance between p1 of list1 and corresponding p2 of list2
-    '''   
-    def __computeProfileArch(self, list1, list2):
-        dist = -1.0
-        for p in list1 :
-            cur_dist = utility.computeMinDistance(p, list2)
-            if cur_dist > dist :
-                dist = cur_dist
-        return dist
- 
-
-    
-    # ============================================================================================================
-    # normal helper
-    # ============================================================================================================
-    '''
-    @param angle: angle in degrees
-    @return: angle in radians 
-    '''   
-    def degToRad(self, angle):
-        return angle/(180/math.pi)   
-    
-    '''
-    @param angle: angle in radians
-    @return: angle in degrees 
-    '''   
-    def radToDeg(self, angle):
-        return angle*(180/math.pi)
-    
-    '''
-    @param value: positive or negative number
-    @return: positive number 
-    '''     
-    def abs(self, value):
-        return -value if value < 0 else value 
-
 
     # ================================================================================================================
-    # debug helper
-    # ================================================================================================================    
-    def __debug(self, value):
-        logging.debug("#######################################################################")
-        logging.debug(str(value))
-        logging.debug("#######################################################################") 
-       
+    # getter and setter
+    # ================================================================================================================
+    def setPointListTop(self, plist):
+        self.pointList_top = plist
+    
+    def setPointListBot(self, plist):
+        self.pointList_bot = plist
 
+    def setPointListChord(self, plist):
+        self.pointList_chord = plist
 
+    def setPointListCamber(self, plist):
+        self.pointList_camber = plist
         
+    def setFlagDrawCamber(self, value):
+        self.flag_draw_camber = value
+        self.updateGL()      
+        
+    def setFlagDrawChord(self, value):
+        self.flag_draw_chord = value
+        self.updateGL()  
+
+    def setFlagCloseTrailingEdge(self, value):
+        self.flag_close_TrailingEdge = value
+        self.updateGL()
+
+    def getPointList(self):
+        return self.pointList
+
+    def getPointListTop(self):
+        return self.pointList_top
+
+    def getPointListBot(self):
+        return self.pointList_bot
+
+    def getPointListChord(self):
+        return self.pointList_chord
+
+    def getPointListCamber(self):
+        return self.pointList_camber
+
+    def getLenChord(self):
+        return utility.getDistanceBtwPoints(self.getTrailingEdge(), self.getLeadingEdge())   
+    
+    def getEndPoints(self):
+        return self.leadingEdge, self.trailingEdge
+    
+    def getTrailingEdge(self):
+        return self.trailingEdge
+  
+    def getLeadingEdge(self):
+        return self.leadingEdge
+
+    '''
+    thickness is defined as max circle diameter on camber line
+    '''
+    def getAirfoilThickness(self):
+        # thickness will computed by camber construction. For Naca we use a seperate inbuild camber 
+        # construction without thickness computing --> therefor call updateThickness
+        return 100.0 * self.thickness   
+
+    '''
+    maximum deviation from camber line to chord line
+    '''      
+    def getAirfoilArch(self):
+        return 100.0 * self.__computeAirfoilArch(self.pointList_chord, self.pointList_camber)  
+
+    '''
+    working angle of airfoil
+    '''
+    @utility.overrides(Profile)
+    def getWorkAngle (self):
+        # computes the the real rotation of the coordinates
+        ## sin(x) = a/c
+        start, _ = self.getEndPoints()
+        x = start[1] / self.getLenChord()
+        
+        # get the virtual openGL rotate and sum both
+        res = -self.getRotAngle() + math.sin(x)
+
+        return 0 if res == -0 else res
+  
+    def getFlagCloseTrailingEdge(self):
+        return self.flag_close_TrailingEdge
+    
+    def getFlagDrawCamber(self):
+        return self.flag_draw_camber
+    
+    def getFlagDrawChord(self):
+        return self.flag_draw_chord        

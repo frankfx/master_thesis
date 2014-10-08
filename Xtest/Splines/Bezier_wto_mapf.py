@@ -127,9 +127,9 @@ class Renderer:
 
 
 
-class ProfileDetectorWidget(QtOpenGL.QGLWidget):
+class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(ProfileDetectorWidget, self).__init__(parent)
+        super(AirfoilDetectorWidget, self).__init__(parent)
         self.resize(620,620)
         self.setWindowTitle("Rene Test")
 
@@ -147,7 +147,7 @@ class ProfileDetectorWidget(QtOpenGL.QGLWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = ProfileDetectorWidget()
+    widget = AirfoilDetectorWidget()
     widget.show()
     app.exec_()    
 

@@ -115,7 +115,7 @@ class PythonQtOpenGLDemo(QtGui.QMainWindow):
 
         self.setToolTip('This is a window, or <b>something</b>')
 
-        viewer3D = NewTest.ProfileDetectorWidget()
+        viewer3D = NewTest.AirfoilDetectorWidget()
         createButtons = True
         if createButtons:
             parentWidget = QtGui.QWidget()

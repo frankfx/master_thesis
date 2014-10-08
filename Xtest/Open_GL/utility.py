@@ -5,6 +5,42 @@ Created on Sep 29, 2014
 '''
 
 import math
+import logging
+import datetime
+
+
+'''
+@param c: length chord
+@param point_cnt: point count
+@return: x coordinates computed by cosine spacing
+'''
+def createXcoordsCosineSpacing(c=1.0, point_cnt=35):
+    res = []
+    for j in range(0,point_cnt):
+        x = 0.5 * (1.0-math.cos((j * math.pi)/(point_cnt-1)))        
+        res.append(x/c)
+    return res
+
+'''
+@param c: length chord
+@param point_cnt: point count
+@return: x coordinates computed by linear spacing
+'''
+def createXcoordsLinear(self, c=1.0, point_cnt=35):
+    dist = c
+    interval = dist/ point_cnt
+    
+    res = [0]
+    for i in range(0, point_cnt):
+        p = res[i] + interval
+        if p < dist : res.append(p)
+        elif equalFloats(p, dist) : 
+            res.append(p)
+            return res
+        else : break
+            
+    res.append(dist)
+    return res 
 
 '''
 @param p1: first point
@@ -51,6 +87,11 @@ def computeIdxOfPointWithMinDistance(p, plist, cnt = 1):
 @return: Point on Line (p1, p2)
 '''
 def computePointOnLine(x, p1, p2):
+    if equalFloats(p1[0], p2[0]):
+        if equalFloats(p1[0], x) :
+            return [x, 0.5*(p2[1]+p1[1]), p1[2]]
+        else :
+            raise ValueError(str(x) + ' not on line ' + str(p1) + ' to ' + str(p2))
     # m = (y2-y1) / (x2-x1) ;;; b = y2 - m-x2 
     m = ( p2[1] - p1[1] ) / ( p2[0] - p1[0] )
     b = p2[1] - m * p2[0]
@@ -148,7 +189,7 @@ def createPerpendicular(p1, p2, p3):
     
     return m_per , b
 
-    '''
+'''
 @param plist: format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
 @param dim: dimension e.g. 0==x, 1==y, 2==z 
 @return: minimum and maximum point compared by dim 
@@ -163,15 +204,64 @@ def get_min_max_of_List(plist, dim=0):
             id_min = i
     return plist[id_min], plist[id_max] 
 
-
+'''
+@param a: first float
+@param b: second float 
+@return: True if they are equal else False 
+'''
 def equalFloats(a, b):
-    return abs(a - b) <= 10**-9
+    return absolut(a - b) <= 10**-9
 
+'''
+@param a: first float
+@param b: second float 
+@return: True if they are equal else False 
+'''
 def equalFloats2(a, b):
     return str(a) == str(b)
 
+'''
+@param angle: angle in degrees
+@return: angle in radians 
+'''   
+def degToRad(angle):
+    return angle/(180/math.pi)   
+    
+'''
+@param angle: angle in radians
+@return: angle in degrees 
+'''   
+def radToDeg(angle):
+    return angle*(180/math.pi)
+    
+'''
+@param value: positive or negative number
+@return: positive number 
+'''     
+def absolut(value):
+    return -value if value < 0 else value 
 
+'''
+@param interface_class: super class
+@return: override annotation
+''' 
+def overrides(interface_class):
+    def overrider(method):
+        assert(method.__name__ in dir(interface_class))
+        return method
+    return overrider
 
+'''
+debug helper
+'''
+def debug(value):
+    logging.basicConfig(filename='example.log',level=logging.DEBUG)
+    logging.info('\n#####################################################\nstart\n#####################################################')
+    logging.info(datetime.datetime.now().time())  
+    
+    logging.debug("#######################################################################")
+    logging.debug(str(value))
+    logging.debug("#######################################################################") 
 
 plist = [[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], [0.0125, 0.0142, 0.0], [0.005, 0.0089, 0.0], [0.0, 0.0, 0.0], [0.005, -0.0089, 0.0], [0.0125, -0.0142, 0.0], [0.025, -0.01961, 0.0], [0.05, -0.02666, 0.0], [0.075, -0.0315, 0.0], [0.1, -0.03512, 0.0], [0.15, -0.04009, 0.0], [0.2, -0.04303, 0.0], [0.25, -0.04456, 0.0], [0.3, -0.04501, 0.0], [0.4, -0.04352, 0.0], [0.5, -0.03971, 0.0], [0.6, -0.03423, 0.0], [0.7, -0.02748, 0.0], [0.8, -0.01967, 0.0], [0.9, -0.01086, 0.0], [0.95, -0.00605, 0.0], [1.0, -0.00095, 0.0]]
 p = [1.0, 0.00095, 0.0]
