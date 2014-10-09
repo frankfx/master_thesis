@@ -190,10 +190,10 @@ class AirfoilDetectOglWidget(Airfoil):
         
         if self.filename != "" : 
             GL.glPushMatrix()
-            GL.glTranslatef(self.trans_x, self.trans_y, 0)
+            GL.glTranslatef(self.xTrans, self.yTrans, 0)
             GL.glScalef(self.scaleImg, self.scaleImg,1)
             self.drawBackgroundImg()
-            #GL.glTranslatef(-self.trans_x, -self.trans_y, 0)
+            #GL.glTranslatef(-self.xTrans, -self.yTrans, 0)
             GL.glPopMatrix()
         if self.flag_detected:
             GL.glScalef(self.scale, self.scale,1)
@@ -244,7 +244,7 @@ class AirfoilDetectOglWidget(Airfoil):
             #---------------------- py = 1.0*self.img_height/self.img_width * px
 #------------------------------------------------------------------------------ 
             #--------------------------------------- GL.glColor3f(1.0, 1.0, 1.0)
-            #------------------- # GL.glTranslatef(self.trans_x, self.trans_y,0)
+            #------------------- # GL.glTranslatef(self.xTrans, self.yTrans,0)
             #------------------------------------------- GL.glBegin(GL.GL_QUADS)
             #---------------------------------------------- GL.glTexCoord2f(0,0)
             #------------------------------------- GL.glVertex3f(-px, -py, -0.5)
@@ -274,7 +274,7 @@ class AirfoilDetectOglWidget(Airfoil):
                     py = 1.0 * (self.img_height / self.img_width) * (self.width / self.height)          
            
             GL.glColor3f(1.0, 1.0, 1.0)
-            # GL.glTranslatef(self.trans_x, self.trans_y,0)
+            # GL.glTranslatef(self.xTrans, self.yTrans,0)
             GL.glBegin(GL.GL_QUADS)
             GL.glTexCoord2f(0,0)
             GL.glVertex3f(-px, -py, -0.5)

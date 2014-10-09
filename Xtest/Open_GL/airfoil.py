@@ -8,7 +8,7 @@ import sys
 import math
 import utility
 from PySide import QtGui
-from profile import Profile
+from Xtest.Open_GL.profile_old import Profile
 
 try:
     from OpenGL import GL

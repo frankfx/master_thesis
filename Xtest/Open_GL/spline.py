@@ -14,7 +14,7 @@ class Chaikin:
     def initPLists(cls, plistX, plistY, pListZ):
         res = []
         for i in range(0, len(plistX), 1) :
-            res.append([plistX[i], plistY[i], pListZ[i]-0.5])
+            res.append([plistX[i], plistY[i], pListZ[i]])
         return cls(res)
 
 # IncreaseLod()
@@ -39,9 +39,6 @@ class Chaikin:
     def IncreaseLod(self) :
         new_pList = []
         len_pList = len(self.pList)
-
-        print "\n\n"
-        print self.pList
 
         #keep the first point
         new_pList.append(self.pList[0])

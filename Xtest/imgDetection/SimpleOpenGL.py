@@ -27,8 +27,8 @@ except ImportError:
 class Renderer():
     def __init__(self):
         self.scale = 1.0
-        self.trans_x = 0
-        self.trans_y = 0
+        self.xTrans = 0
+        self.yTrans = 0
         self.width = -1
         self.height = -1
         self.fovy = 166.0
@@ -62,7 +62,7 @@ class Renderer():
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
        
         
-        GL.glTranslatef(self.trans_x,self.trans_y,0)
+        GL.glTranslatef(self.xTrans,self.yTrans,0)
 
         #self.drawTriangle()
         self.drawProfile()
@@ -259,16 +259,16 @@ class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
             self.renderer.scale += offsetScl
             redraw = True
         elif event.key() == QtCore.Qt.Key_Left:
-            self.renderer.trans_x += offsetTrans
+            self.renderer.xTrans += offsetTrans
             redraw = True                         
         elif event.key() == QtCore.Qt.Key_Right:
-            self.renderer.trans_x -= offsetTrans
+            self.renderer.xTrans -= offsetTrans
             redraw = True
         elif event.key() == QtCore.Qt.Key_Up:
-            self.renderer.trans_y -= offsetTrans
+            self.renderer.yTrans -= offsetTrans
             redraw = True
         elif event.key() == QtCore.Qt.Key_Down:
-            self.renderer.trans_y += offsetTrans
+            self.renderer.yTrans += offsetTrans
             redraw = True                                
         
         if redraw :
@@ -285,8 +285,8 @@ class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
         self.lastPos_x += self.dx
         self.lastPos_y += self.dy
         
-        self.renderer.trans_x += (self.dx * 2.0 / self.width() * self.renderer.scale) 
-        self.renderer.trans_y -= (self.dy * 2.0 / self.height() * self.renderer.scale)
+        self.renderer.xTrans += (self.dx * 2.0 / self.width() * self.renderer.scale) 
+        self.renderer.yTrans -= (self.dy * 2.0 / self.height() * self.renderer.scale)
         self.updateGL()
 
     

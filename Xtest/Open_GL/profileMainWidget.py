@@ -8,6 +8,7 @@ from cpacsHandler import CPACS_Handler
 from Xtest.Open_GL.configuration.config import Config
 from Xtest.Open_GL.airfoilMainWidget import AirfoilMainWidget
 from Xtest.Open_GL.fuselageMainWidget import FuselageMainWidget
+from fuselage import Fuselage
 from PySide import QtGui
 
 class profileMainWidget(QtGui.QWidget):
@@ -19,17 +20,17 @@ class profileMainWidget(QtGui.QWidget):
         self.tixi.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
         # ==========================================================  
 
-        butAirfoil = QtGui.QPushButton("airfoil")
+        # butAirfoil = QtGui.QPushButton("airfoil")
         butFuselage = QtGui.QPushButton("fuselage")
 
         self.window = None
 
-        butAirfoil.clicked.connect(self.getAirfoilMainWidget)
+        # butAirfoil.clicked.connect(self.getAirfoilMainWidget)
         butFuselage.clicked.connect(self.getFuselageMainWidget)
 
         grid = QtGui.QGridLayout()
         
-        grid.addWidget(butAirfoil,0,0)
+        # grid.addWidget(butAirfoil,0,0)
         grid.addWidget(butFuselage, 0,1)
 
         self.setLayout(grid)
@@ -57,7 +58,8 @@ class profileMainWidget(QtGui.QWidget):
         self.window = AirfoilMainWidget(self.__createPointList(uid))
 
     def getFuselageMainWidget(self, uid='CircleProfile'):
-        self.window = FuselageMainWidget(self.__createPointList(uid))
+        fuselage = Fuselage(uid, self.__createPointList(uid))
+        self.window = FuselageMainWidget(fuselage)
 
     
 

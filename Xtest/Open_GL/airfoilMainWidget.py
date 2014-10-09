@@ -52,7 +52,7 @@ class AirfoilMainWidget(QtGui.QWidget):
     def createTopOfWidget(self):
         vboxLayout  = QtGui.QVBoxLayout()
         vboxLayout.addWidget(self.createEvalView())
-        vboxLayout.addWidget(self.createViewingElements())    
+        vboxLayout.addWidget(self.createViewElements())    
         return vboxLayout
         
     def createEvalView(self):
@@ -90,7 +90,7 @@ class AirfoilMainWidget(QtGui.QWidget):
         groupEval.setLayout(gridEval) 
         return groupEval    
         
-    def createViewingElements(self):    
+    def createViewElements(self):    
         groupView  = QtGui.QGroupBox("View") 
         gridView    = QtGui.QGridLayout()  
         
@@ -170,7 +170,7 @@ class AirfoilMainWidget(QtGui.QWidget):
         self.ogl_widget.setFlagCloseTrailingEdge(value)
     
     def fireChaikinCurve(self, value):
-        self.ogl_widget.setFlagChaikinCurve(value)
+        self.ogl_widget.setFlagSplineCurve(value)
     
     def fireDrawCamber(self, value):
         self.ogl_widget.setFlagDrawCamber(value)

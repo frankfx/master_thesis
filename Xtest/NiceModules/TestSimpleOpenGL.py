@@ -28,14 +28,11 @@ except ImportError:
 
 class Renderer():
     def __init__(self, width, height):
-        self.x = 0
-        self.y = 0
-        self.z = 1
-        self.rotX = 0
-        self.rotY = 0
-        self.width = width
-        self.height = height
-        
+        self.object = 0
+        self.xRot = 0
+        self.yRot = 0
+        self.zRot = 0   
+        self.scale = 1     
         
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
@@ -43,16 +40,15 @@ class Renderer():
         GL.glClearColor(0.0, 0.0 , 0.0, 1.0)
     
     def resize(self, w, h):
-        self.width = w
-        self.height = h
-        GL.glViewport(0,0,w,h) 
-                                   
+        side = min(w, h)
+        GL.glViewport(0,0,w,h)
+        #GL.glViewport((w - side) / 2, (h - side) / 2, side, side)
+
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
        
-        '''gluunproject vs gluperspective'''
-        GLU.gluPerspective (100.0, w*1.0/h, 0.001, 10.0)
-       # GL.glLoadIdentity()
+#        '''gluunproject vs gluperspective'''
+        GLU.gluPerspective (100.0, w*1.0/h, 0.00001, 20.0)
         
     def display(self):
         # Clear screen and Z-buffer
@@ -62,75 +58,38 @@ class Renderer():
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()
        
-        # Other Transformations
-        #GL.glTranslatef( 0.1, 0.0, 0.0 )      # Not included
-        #GL.glRotatef( 180, 0.0, 1.0, 0.0 )    # Not included       
-       
-       # GL.glTranslatef(0,0,-2.2)
-        # Rotate when user changes rotate_x and rotate_y
-      #  GL.glRotatef( self.rotX, 1.0, 0.0, 0.0 )
-       # GL.glRotatef( self.rotY, 0.0, 1.0, 0.0 )       
-       
-        # Other Transformations
-        #GL.glScalef( 2.0, 2.0, 0.0 )          # Not included
- 
-                    #GL.glTranslatef(-0.51,0,-1)
-                    #self.drawTriangle()
-        #Multi-colored side - FRONT
-       # GL.glTranslatef(1,0,0)
-        #self.drawCube()
+        GL.glTranslated(0.0, 0.0, -5.0)              
+        GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
+        GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
+        GL.glRotated(self.zRot, 0.0, 0.0, 1.0) 
+        GL.glScalef(self.scale,self.scale,self.scale)
+        
         self.drawTriangle()
 
         GL.glFlush()    
 
-    '''
-    get the world coordinates from the screen coordinates
-    '''
-    def __winPosTo3DPos(self, x, y):
-        point = [-1,-1,-1]                                      # result point
-        modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
-        projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
-        viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
- 
-        print projection
-        # in OpenGL y soars (steigt) from bottom (0) to top
-        y_new = viewport[3] - y     
- 
-        # read depth buffer at position (X/Y_new)
-        z = GL.glReadPixels(x, y_new, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT)
-        # winz should not be 0!!!
-        # error when projection matrix not identity (gluPerspective) 
-        point[0], point[1], point[2] = GLU.gluUnProject(x, y_new, z, modelview, projection, viewport)                         
-        
-        print "(",x,",",y,") = " , "(",point[0],",",point[1],",",point[2],")"
-        return point
-
-    '''
-    get the the screen coordinates from the world coordinates 
-    '''
-    def fkt_3DPosToWinPos(self, x, y, z):
-        point = [-1,-1,-1]                                      # result point
-        modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
-        projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
-        viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
-
-        # in OpenGL y soars (steigt) from bottom (0) to top
-        y_new = y 
- 
-        point[0], point[1], point[2]  = GLU.gluProject(x, y_new, z, modelview, projection, viewport)                         
-        point[1] = self.height -point[1]
-        
-        print "(",x,",",y,",",z,") = " , "(",point[0],",",point[1],")"
-        return point
-
 
     def drawTriangle(self):
-        GL.glColor3f(1.0, 1.0, 1.0)
-        GL.glBegin(GL.GL_TRIANGLES)
-        GL.glVertex3f(-0.5 + self.x, -0.5 + self.y, -0.5)
-        GL.glVertex3f( 0.5 + self.x, -0.5 + self.y, -0.5)
-        GL.glVertex3f( 0.0 + self.x,  0.5 + self.y, -0.5)
-        GL.glEnd()            
+        plist = [[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], \
+                           [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], \
+                           [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], \
+                           [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], \
+                           [0.0125, 0.0142, 0.0], [0.005, 0.0089, 0.0], [0.0, 0.0, 0.0], [0.005, -0.0089, 0.0], \
+                           [0.0125, -0.0142, 0.0], [0.025, -0.01961, 0.0], [0.05, -0.02666, 0.0], [0.075, -0.0315, 0.0], \
+                           [0.1, -0.03512, 0.0], [0.15, -0.04009, 0.0], [0.2, -0.04303, 0.0], [0.25, -0.04456, 0.0], \
+                           [0.3, -0.04501, 0.0], [0.4, -0.04352, 0.0], [0.5, -0.03971, 0.0], [0.6, -0.03423, 0.0], \
+                           [0.7, -0.02748, 0.0], [0.8, -0.01967, 0.0], [0.9, -0.01086, 0.0], [0.95, -0.00605, 0.0], \
+                           [1.0, -0.00095, 0.0]]
+
+        GL.glLineWidth(2)
+        GL.glColor3f(0.0, 0.0, 1.0)
+        GL.glBegin(GL.GL_LINE_STRIP) 
+        for p in plist :
+            GL.glVertex3f(p[0], p[1], p[2])              
+        GL.glEnd()
+
+        
+  
               
     def drawCube(self):
         # Multi-colored side - FRONT
@@ -187,11 +146,10 @@ class Renderer():
         GL.glVertex3f( -0.5, -0.5,  0.5 )
         GL.glVertex3f( -0.5, -0.5, -0.5 )
         GL.glEnd()
-               
 
-class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
+class Widget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
-        super(AirfoilDetectorWidget, self).__init__(parent)
+        super(Widget, self).__init__(parent)
         self.width = 320
         self.height = 302
         self.resize(self.width ,self.height)
@@ -199,8 +157,6 @@ class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
         #self.setFixedSize(QtCore.QSize(400,400))
         self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.renderer = Renderer(self.width ,self.height)    
-        
-        
     
     def initializeGL(self):
         self.renderer.init()
@@ -213,8 +169,6 @@ class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
 
     def mousePressEvent(self, event):
         self.lastPos = QtCore.QPoint(event.pos())
-        p = self.renderer.__winPosTo3DPos(event.x(), event.y())
-        self.renderer.fkt_3DPosToWinPos(p[0], p[1], p[2])
 
     def mouseMoveEvent(self, event):
         
@@ -229,28 +183,35 @@ class AirfoilDetectorWidget(QtOpenGL.QGLWidget):
 
     def keyPressEvent(self, event):
         redraw = False
+        offset_rot   = 5
+        offset_scale = 1
         # Right arrow - increase rotation by 5 degree
         if event.key() == QtCore.Qt.Key_Right :
-            self.renderer.rotY += 5
+            self.renderer.yRot += offset_rot
             redraw = True
         # Left arrow - decrease rotation by 5 degree
         elif event.key() == QtCore.Qt.Key_Left :
-            self.renderer.rotY -= 5
+            self.renderer.yRot -= offset_rot
             redraw = True
         elif event.key() == QtCore.Qt.Key_Up :
-            self.renderer.rotX += 5
+            self.renderer.xRot += offset_rot
             redraw = True
         elif event.key() == QtCore.Qt.Key_Down :
-            self.renderer.rotX -= 5  
+            self.renderer.xRot -= offset_rot 
+            redraw = True
+        elif event.key() == QtCore.Qt.Key_Plus :
+            self.renderer.scale += offset_scale
+            redraw = True
+        elif event.key() == QtCore.Qt.Key_Minus :
+            self.renderer.scale -= offset_scale 
             redraw = True
   
         # Request display update
         if redraw :
             self.updateGL()
-
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    widget = AirfoilDetectorWidget()
+    widget = Widget()
     widget.show()
     app.exec_()    

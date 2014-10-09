@@ -31,10 +31,14 @@ class AirfoilWidget(Airfoil):
     def drawProfile(self):
         trX, _ = self.norm_vec_list(self.getPointList())
         
-        GL.glTranslatef(-trX, 0, 0) 
-        GL.glTranslatef(1,0,0)
-        GL.glRotate(self.getRotAngle(), 0,0,1)
-        GL.glTranslatef(-1,0,0)
+      #  GL.glTranslatef(-trX, 0, 0) 
+      #  GL.glTranslatef(1,0,0)
+      #  GL.glRotate(self.getRotAngle(), 0,0,1)
+      #  GL.glTranslatef(-1,0,0)
+        
+        GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
+        GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
+        GL.glRotated(self.zRot, 0.0, 0.0, 1.0)         
         
         GL.glColor3f(0, 0, 1)
         
