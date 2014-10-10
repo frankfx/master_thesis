@@ -5,7 +5,7 @@ Created on Oct 8, 2014
 '''
 
 from fuselageWidget import FuselageWidget
-from PySide import QtGui, QtCore
+from PySide import QtGui
 
 
 class FuselageMainWidget(QtGui.QWidget):
@@ -19,7 +19,7 @@ class FuselageMainWidget(QtGui.QWidget):
         grid.addWidget(self.ogl_widget,1,0)
         
         self.setLayout(grid)
-        self.setWindowTitle('Airfoil-Widget')    
+        self.setWindowTitle('Fuselage-Widget')    
         self.resize(560,520)
         self.show()    
  
@@ -31,7 +31,7 @@ class FuselageMainWidget(QtGui.QWidget):
         
         checkShowPoints   = QtGui.QCheckBox("Show points")
         checkFitToPage    = QtGui.QCheckBox("Fit to page")
-        checkChaikinCurve = QtGui.QCheckBox("Chaikin curve ")
+        checkSplineCurve = QtGui.QCheckBox("Chaikin curve ")
         
         self.spin_zoom = QtGui.QSpinBox()
         self.spin_zoom.setRange(1, 100)
@@ -39,7 +39,7 @@ class FuselageMainWidget(QtGui.QWidget):
         self.spin_zoom.setSuffix('%')
         self.spin_zoom.setValue(50)        
         
-        gridView.addWidget(checkChaikinCurve, 0, 0)                
+        gridView.addWidget(checkSplineCurve, 0, 0)                
         gridView.addWidget(checkShowPoints  , 0, 1)
         gridView.addWidget(checkFitToPage   , 0, 2)
         gridView.addWidget(self.spin_zoom   , 1, 0)
@@ -47,7 +47,7 @@ class FuselageMainWidget(QtGui.QWidget):
 
         checkShowPoints.toggled.connect(self.fireShowPoints)
         checkFitToPage.toggled.connect(self.fireFitToPage)
-        checkChaikinCurve.toggled.connect(self.fireChaikinCurve)
+        checkSplineCurve.toggled.connect(self.fireSplineCurve)
         self.spin_zoom.valueChanged[int].connect(self.fireScaleProfile) 
         
         groupView.setLayout(gridView)     
@@ -70,6 +70,6 @@ class FuselageMainWidget(QtGui.QWidget):
         self.ogl_widget.fitToPage(value)  
         self.ogl_widget.updateGL()
     
-    def fireChaikinCurve(self, value):
+    def fireSplineCurve(self, value):
         self.ogl_widget.setFlagSplineCurve(value)
         self.ogl_widget.updateGL()

@@ -68,7 +68,7 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         GL.glOrtho(-0.5 * self.aspect * self.scale, +0.5 * self.aspect * self.scale, +0.5 * self.scale, -0.5 * self.scale, 0.0, 15.0)
-       # GLU.gluPerspective (self.fovy * self.scale, w*1.0/h, 0.0, 10.0)
+        # GLU.gluPerspective (self.fovy * self.scale, w*1.0/h, 0.0, 10.0)
 
     def paintGL(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
@@ -89,10 +89,6 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     def drawProfile(self):
         return NotImplemented
     
-    '''abstract method'''
-    def getWorkAngle(self):
-        return NotImplemented
-
     def drawGrid(self, x_fr = -1.0, x_to = 1.0, y_fr = -1.0, y_to = 1.0, no_lines = 5):
         GL.glColor3f(1, 0.85, 0.55)
         GL.glBegin(GL.GL_LINES)

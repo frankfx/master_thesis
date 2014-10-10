@@ -6,6 +6,7 @@ Created on Oct 8, 2014
 import sys
 import math
 import utility
+from profileWidget import ProfileWidget
 from airfoil import Airfoil
 from PySide import QtGui
 
@@ -19,31 +20,36 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class AirfoilWidget(Airfoil):
-    def __init__(self, plist):
-        Airfoil.__init__(self, plist)
+class AirfoilWidget(ProfileWidget):
+    def __init__(self, profile):
+        ProfileWidget.__init__(self, profile)
+
+        self.flag_close_TrailingEdge = False
+        self.flag_draw_camber        = False
+        self.flag_draw_chord         = False        
         
-        self.resize(320,320)
-        self.setMinimumHeight(200)
-        self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-    
+        
     @utility.overrides(Airfoil)
     def drawProfile(self):
-        trX, _ = self.norm_vec_list(self.getPointList())
+        trX, _ = self.norm_vec_list(self.profile.getPointList())
+        plist  = self.getSplineCurve() if self.getFlagSplineCurve() else self.profile.getPointList()         
         
-      #  GL.glTranslatef(-trX, 0, 0) 
-      #  GL.glTranslatef(1,0,0)
-      #  GL.glRotate(self.getRotAngle(), 0,0,1)
-      #  GL.glTranslatef(-1,0,0)
+        GL.glColor3f(0, 0, 1)  
+        # rotate profile in space
+        GL.glRotatef(self.xRot, 1.0, 0.0, 0.0)
+        GL.glRotatef(self.yRot, 0.0, 1.0, 0.0)       
         
-        GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
-        GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
-        GL.glRotated(self.zRot, 0.0, 0.0, 1.0)         
-        
-        GL.glColor3f(0, 0, 1)
-        
-        plist = self.getSplineCurve() if self.getFlagSplineCurve() else self.getPointList()  
-        
+        # translate to center point
+        GL.glTranslatef(-trX, 0, 0) 
+
+        # rotate around user given angle                  
+        GL.glTranslatef(1,0,0)
+        GL.glRotate(self.getRotAngle(), 0,0,1)
+        GL.glTranslatef(-1,0,0)  
+       
+        # rotate around x to see the profile
+        GL.glRotatef(90,1,0,0)       
+     
         GL.glBegin(GL.GL_LINE_STRIP) 
         for p in plist :
             GL.glVertex3f(p[0], p[1], p[2])              
@@ -55,16 +61,24 @@ class AirfoilWidget(Airfoil):
         if self.getFlagDrawChord() :
             self.drawChord()
 
-        #The Trailing edge
+        # The Trailing edge
         if self.getFlagCloseTrailingEdge() :
-            self.drawTrailingEdge(self.getTrailingEdge())
+            self.drawTrailingEdge(self.profile.getTrailingEdge())
 
-        #The following code displays the control points as dots.
+        # draw profile points
         if self.getFlagDrawPoints() :
             self.drawPoints(plist)
             
+    def drawPoints(self, plist):
+        GL.glColor3f(1.0, 0.0, 0.0)
+        GL.glPointSize(5)
+        GL.glBegin(GL.GL_POINTS)    
+        for p in plist :
+            GL.glVertex3f(p[0], p[1], p[2])              
+        GL.glEnd()             
+            
     def drawTrailingEdge(self, p):
-        plist = self.getPointList()
+        plist = self.profile.getPointList()
         p1 = plist[0]
         p2 = plist[len(plist)-1]
         GL.glBegin(GL.GL_LINE_STRIP)
@@ -73,15 +87,46 @@ class AirfoilWidget(Airfoil):
         GL.glVertex3f(p2[0], p2[1], p2[2])
         GL.glEnd()               
             
+    def drawChord(self):
+        start, end = self.profile.getEndPoints()
+        
+        GL.glBegin(GL.GL_LINES)
+        GL.glVertex3f(start[0], start[1], start[2]) # leftend (nose)
+        GL.glVertex3f(end[0], end[1], end[2]) # right end
+        GL.glEnd()
+
+    def drawCamber(self):
+        GL.glBegin(GL.GL_LINE_STRIP)
+        for p in self.profile.getPointListCamber() :
+            GL.glVertex3f(p[0], p[1], p[2])# left end == nose
+        GL.glEnd()            
+            
+    def setFlagDrawCamber(self, value):
+        self.flag_draw_camber = value
+        
+    def setFlagDrawChord(self, value):
+        self.flag_draw_chord = value
+
+    def setFlagCloseTrailingEdge(self, value):
+        self.flag_close_TrailingEdge = value
+            
+    def getFlagCloseTrailingEdge(self):
+        return self.flag_close_TrailingEdge
+    
+    def getFlagDrawCamber(self):
+        return self.flag_draw_camber
+    
+    def getFlagDrawChord(self):
+        return self.flag_draw_chord  
 
     # ================================================================================================================
     # profile generator
     # ================================================================================================================
     '''
-    @summary: generating naca airfoils, based on http://en.wikipedia.org/wiki/NACA_airfoil    
+    @summary: generating naca airfoils, based on http://en.wikipedia.org/wiki/NACA_airfoil
+    NACA4  
     '''
     def createSym_Naca(self, length, thickness, pcnt=10):
-        
         res_top = []
         res_bot = []
     
@@ -99,8 +144,57 @@ class AirfoilWidget(Airfoil):
         self.updateAll()
         self.updateGL()
 
+    def createCambered_Naca(self, length, maxCamber, posMaxCamber, thickness, pcnt=10):
+        res_top = []
+        res_bot = []     
+        res_camber = []   
+        
+        plist = utility.createXcoordsCosineSpacing(length, pcnt)
+        for x in plist :
+            y_t = self.__computeY_t(x, length, thickness)
+            y_c = self.__computeY_c(x, length, maxCamber, posMaxCamber)
+            theta = math.atan(self.__computeCamber(x, length, maxCamber, posMaxCamber))
+            
+            x_u = x - y_t * math.sin(theta)
+            x_l = x + y_t * math.sin(theta)
+            y_u = y_c + y_t * math.cos(theta)
+            y_l = y_c - y_t * math.cos(theta)
+            
+            res_top.append([x_u, y_u, 0])
+            res_bot.append([x_l, y_l, 0])
+            res_camber.append([x, y_c, 0])
+        res_bot.reverse()
 
+        self.setPointList(res_bot + res_top[1:])      
+        self.setPointListCamber(res_camber)
+        self.updatePointListsForNaca()
+        self.updateThickness()
+        self.updateGL()
 
+    def __computeY_c(self, x, length, maxCamber, posMaxCamber):
+        m = maxCamber
+        p = posMaxCamber
+        c = length
+        
+        if x >= 0 and x < p*c :
+            y = m * (x / (p*p)) * (2 * p - x / c) 
+        elif x >= p*c and x <= c :
+            y = m * ((c-x) / ((1-p)*(1-p))) * (1 + x/c - 2*p)
+        return y
+    
+    def __computeY_t(self, x, c, t):
+        tmp = -0.1036 if utility.equalFloats((x/c), 1) else -0.1015
+        y = t/0.2 * c * math.fabs( ( 0.2969  * math.sqrt(x/c)   +
+                        (-0.1260) * (x/c)            +
+                        (-0.3516) * math.pow(x/c, 2) +
+                        ( 0.2843) * math.pow(x/c, 3) +
+                        (tmp)     * math.pow(x/c, 4)) )        
+        return y
+
+    '''
+    @summary: generating naca airfoils, based on http://en.wikipedia.org/wiki/NACA_airfoil
+    NACA5  
+    '''
     def createCambered_Naca5(self, liftCoeff, posMaxCamber, reflex, thickness, pcnt=10):
         c  = 1.0
         p  = posMaxCamber*5/100.0
@@ -173,34 +267,6 @@ class AirfoilWidget(Airfoil):
             if utility.equalFloats(p, P[i]):
                 return M[i] , K[i], K1_K2[i]                  
         print "nix gefunden"
-
-
-    def createCambered_Naca(self, length, maxCamber, posMaxCamber, thickness, pcnt=10):
-        res_top = []
-        res_bot = []     
-        res_camber = []   
-        
-        plist = utility.createXcoordsCosineSpacing(length, pcnt)
-        for x in plist :
-            y_t = self.__computeY_t(x, length, thickness)
-            y_c = self.__computeY_c(x, length, maxCamber, posMaxCamber)
-            theta = math.atan(self.__computeCamber(x, length, maxCamber, posMaxCamber))
-            
-            x_u = x - y_t * math.sin(theta)
-            x_l = x + y_t * math.sin(theta)
-            y_u = y_c + y_t * math.cos(theta)
-            y_l = y_c - y_t * math.cos(theta)
-            
-            res_top.append([x_u, y_u, 0])
-            res_bot.append([x_l, y_l, 0])
-            res_camber.append([x, y_c, 0])
-        res_bot.reverse()
-
-        self.setPointList(res_bot + res_top[1:])      
-        self.setPointListCamber(res_camber)
-        self.updatePointListsForNaca()
-        self.updateThickness()
-        self.updateGL()
            
     def __computeCamber(self, x, length, maxCamber, posMaxCamber):
         p = posMaxCamber
@@ -214,23 +280,3 @@ class AirfoilWidget(Airfoil):
         else :
             return None
         return res
-    
-    def __computeY_c(self, x, length, maxCamber, posMaxCamber):
-        m = maxCamber
-        p = posMaxCamber
-        c = length
-        
-        if x >= 0 and x < p*c :
-            y = m * (x / (p*p)) * (2 * p - x / c) 
-        elif x >= p*c and x <= c :
-            y = m * ((c-x) / ((1-p)*(1-p))) * (1 + x/c - 2*p)
-        return y
-    
-    def __computeY_t(self, x, c, t):
-        tmp = -0.1036 if utility.equalFloats((x/c), 1) else -0.1015
-        y = t/0.2 * c * math.fabs( ( 0.2969  * math.sqrt(x/c)   +
-                        (-0.1260) * (x/c)            +
-                        (-0.3516) * math.pow(x/c, 2) +
-                        ( 0.2843) * math.pow(x/c, 3) +
-                        (tmp)     * math.pow(x/c, 4)) )        
-        return y

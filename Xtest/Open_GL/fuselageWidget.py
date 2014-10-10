@@ -4,10 +4,9 @@ Created on Oct 8, 2014
 @author: fran_re
 '''
 import sys
-import math
 import utility
 from fuselage import Fuselage
-from PySide import QtGui, QtCore
+from PySide import QtGui
 from profileWidget import ProfileWidget
 
 try:
@@ -45,8 +44,8 @@ class FuselageWidget(ProfileWidget):
 
         # draw profile points
         if self.getFlagDrawPoints() :
-            self.drawPoints(plist)           
-        
+            self.drawPoints(plist)
+            
     def drawPoints(self, plist):
         GL.glColor3f(1.0, 0.0, 0.0)
         GL.glPointSize(5)
@@ -54,5 +53,3 @@ class FuselageWidget(ProfileWidget):
         for p in plist :
             GL.glVertex3f(p[0], p[1], p[2])              
         GL.glEnd() 
-        
- 

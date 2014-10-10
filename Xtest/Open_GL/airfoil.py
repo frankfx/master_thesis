@@ -34,28 +34,6 @@ class Airfoil(Profile):
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
 
-        self.flag_close_TrailingEdge = False
-        self.flag_draw_camber        = False
-        self.flag_draw_chord         = False
-
-    # ================================================================================================================
-    # drawing functions
-    # ================================================================================================================
-    def drawChord(self):
-        start, end = self.getEndPoints()
-        
-        GL.glBegin(GL.GL_LINES)
-        GL.glVertex3f(start[0], start[1], start[2]) # leftend (nose)
-        GL.glVertex3f(end[0], end[1], end[2]) # right end
-        GL.glEnd()
-
-    def drawCamber(self):
-        plist = self.getPointListCamber()
-        GL.glBegin(GL.GL_LINE_STRIP)
-        for i in range(0, len(plist)) :
-            GL.glVertex3f(plist[i][0], plist[i][1], plist[i][2])# left end == nose
-        GL.glEnd()
-
     # ================================================================================================================
     # computations
     # ================================================================================================================
@@ -71,7 +49,6 @@ class Airfoil(Profile):
             dist2 = utility.computeMinDistance(p, list2)
             cur_dist = dist1 + dist2
             if dist < 0.0 or cur_dist > dist : 
-                print "p" , p , dist1, dist2          
                 dist = cur_dist
         return dist
  
@@ -213,7 +190,7 @@ class Airfoil(Profile):
     # ============================================================================================================
     # rotation functions
     # ============================================================================================================
-    def __createRotPointList(self, plist, angle, curTransX = 1):
+    def __createPointList_rot(self, plist, angle, curTransX = 1):
         res = []
         for p in plist :
             rotP = self.__getRotPoint(p[0]-curTransX, p[1], p[2], self.degToRad(angle))
@@ -254,9 +231,9 @@ class Airfoil(Profile):
     def updateRotationLists(self, angle):
         #print "warning, depends on updated pointList_chord and pointList"
         length = self.getLenChord()       
-        self.pointList = self.__createRotPointList(self.getPointList(), angle, length)
-        #self.pointList_top = self.__createRotPointList(self.pointList_top_rot, angle, length)
-        #self.pointList_bot = self.__createRotPointList(self.pointList_bot_rot, angle, length)
+        self.pointList = self.__createPointList_rot(self.getPointList(), angle, length)
+        #self.pointList_top = self.__createPointList_rot(self.pointList_top_rot, angle, length)
+        #self.pointList_bot = self.__createPointList_rot(self.pointList_bot_rot, angle, length)
         self.updatePointLists()
 
     def updatePointListsForNaca(self):
@@ -286,18 +263,6 @@ class Airfoil(Profile):
     def setPointListCamber(self, plist):
         self.pointList_camber = plist
         
-    def setFlagDrawCamber(self, value):
-        self.flag_draw_camber = value
-        self.updateGL()      
-        
-    def setFlagDrawChord(self, value):
-        self.flag_draw_chord = value
-        self.updateGL()  
-
-    def setFlagCloseTrailingEdge(self, value):
-        self.flag_close_TrailingEdge = value
-        self.updateGL()
-
     def getPointList(self):
         return self.pointList
 
@@ -342,7 +307,6 @@ class Airfoil(Profile):
     '''
     working angle of airfoil
     '''
-    @utility.overrides(Profile)
     def getWorkAngle (self):
         # computes the the real rotation of the coordinates
         ## sin(x) = a/c
@@ -352,13 +316,4 @@ class Airfoil(Profile):
         # get the virtual openGL rotate and sum both
         res = -self.getRotAngle() + math.sin(x)
 
-        return 0 if res == -0 else res
-  
-    def getFlagCloseTrailingEdge(self):
-        return self.flag_close_TrailingEdge
-    
-    def getFlagDrawCamber(self):
-        return self.flag_draw_camber
-    
-    def getFlagDrawChord(self):
-        return self.flag_draw_chord        
+        return 0 if res == -0 else res      

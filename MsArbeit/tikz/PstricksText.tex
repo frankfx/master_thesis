@@ -1,0 +1,39 @@
+\documentclass[12pt]{scrreprt}
+\usepackage{etex}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[ngerman]{babel}
+
+%\usepackage{pst-solides3d}
+\usepackage{pstricks,pstricks-add, pst-plot, pst-3dplot,pstricks-add}
+
+\newtheorem{defi}{Definition}[chapter]
+\newtheorem{satz}{Satz}[chapter]
+\newtheorem{bsp}{Beispiel}[chapter]
+
+\begin{document}
+\chapter{Einleitung}
+
+
+\begin{pspicture}(-6,-3)(6,10)
+\psset{xunit=9.0cm,yunit=9.0cm, Alpha=135, Beta=40} % Alpha: rotate around y in the right, Beta: rotate around x in the front
+\pstThreeDCoor[xMin=-0.5,xMax=1.2,yMin=-0.5,yMax=0.5,zMin=-0.5,zMax=0.5, linecolor=black, linewidth=1.0pt]
+\fileplotThreeD[plotstyle=line, linewidth=1.5pt, linecolor=red]{data3DProfileAirfoil.dat}
+\end{pspicture}%
+
+\begin{pspicture}(-6,-3)(6,10)
+\psset{xunit=5.0cm,yunit=5.0cm, Alpha=135, Beta=40} % Alpha: rotate around y in the right, Beta: rotate around x in the front
+\pstThreeDCoor[xMin=-1.0,xMax=1.0,yMin=-1.2,yMax=1.2,zMin=-1.2,zMax=1.2, linecolor=black, linewidth=1.2pt]
+\fileplotThreeD[plotstyle=line, linewidth=1.5pt, linecolor=red]{data3DProfileFuselage.dat}
+%\pstThreeDDot[drawCoor=true](-0.5,1,1)
+% line to hide circle
+\pstThreeDLine[plotstyle=line, linewidth=1.2pt, linecolor=black](0.60, 0.0, 0.0)(0.70, 0.0, 0.0)
+\end{pspicture}%
+
+
+\begin{pspicture}(-3,-2.5)(3,4)
+\pstThreeDCoor[linecolor=black,IIIDticks,xMin=-2,yMin=-2,zMin=-2]
+\end{pspicture}
+
+
+\end{document}

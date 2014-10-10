@@ -31,4 +31,4 @@ class Profile:
         del self.__pointList[idx] 
 
     def __str__(self):
-        return #str(self.__name) + " --> " + str(self.__pointList)
+        return str(self.__name) + " --> " + str(self.__pointList)
