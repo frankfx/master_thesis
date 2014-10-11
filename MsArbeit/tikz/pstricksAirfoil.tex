@@ -1,0 +1,15 @@
+\documentclass{scrartcl}
+\usepackage{pst-3dplot}
+\begin{document}
+\pagestyle{empty}
+\begin{pspicture}(-3,-2.5)(3,4)
+\psset{xunit=8.0cm,yunit=8.0cm}
+\pstThreeDCoor[	unit=1.6cm, IIIDticks, IIIDlabels, % 1.6 because 8 cm divide by 5 ticks gives 1.6 cm distance btw ticks 
+				xMin=-3.0,xMax=3.0,yMin=-3.0,yMax=7.0,zMin=-3.0,zMax=3.0,nameX = $z$, nameY = $x$, nameZ = $y$,
+				Dx=0.2,Dy=0.2,Dz=0.2,linecolor=black]
+\fileplotThreeD[plotstyle=line, linewidth=1.5pt, linecolor=red]{data/data3DProfileAirfoil.dat}
+\end{pspicture}
+\end{document}
+
+
+
