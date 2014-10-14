@@ -32,6 +32,9 @@ class FuselageWidget(ProfileWidget):
         GL.glColor3f(0, 0, 1)  
         GL.glRotatef(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotatef(self.yRot, 0.0, 1.0, 0.0)
+        GL.glRotatef(self.zRot, 0.0, 0.0, 1.0)
+
+        print self.xRot , self.yRot , self.zRot
 
         # rotate around y to see the profile
         GL.glRotatef(90,0,1,0)      
@@ -52,4 +55,9 @@ class FuselageWidget(ProfileWidget):
         GL.glBegin(GL.GL_POINTS)    
         for p in plist :
             GL.glVertex3f(p[0], p[1], p[2])              
+        GL.glEnd() 
+        
+        GL.glColor3f(0.0, 0.0, 1.0)
+        GL.glBegin(GL.GL_POINTS)
+        GL.glVertex3f(plist[0][0], plist[0][1], plist[0][2])  
         GL.glEnd() 

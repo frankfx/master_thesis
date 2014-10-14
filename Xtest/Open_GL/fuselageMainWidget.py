@@ -5,7 +5,7 @@ Created on Oct 8, 2014
 '''
 
 from fuselageWidget import FuselageWidget
-from PySide import QtGui
+from PySide import QtGui, QtCore
 
 
 class FuselageMainWidget(QtGui.QWidget):
@@ -32,6 +32,14 @@ class FuselageMainWidget(QtGui.QWidget):
         checkShowPoints   = QtGui.QCheckBox("Show points")
         checkFitToPage    = QtGui.QCheckBox("Fit to page")
         checkSplineCurve = QtGui.QCheckBox("Chaikin curve ")
+    
+        self.xSlider = self.createSlider(QtCore.SIGNAL("xRotationChanged(int)"),
+                                         self.ogl_widget.setXRotation)
+        self.ySlider = self.createSlider(QtCore.SIGNAL("yRotationChanged(int)"),
+                                         self.ogl_widget.setYRotation)
+        self.zSlider = self.createSlider(QtCore.SIGNAL("zRotationChanged(int)"),
+                                         self.ogl_widget.setZRotation)    
+    
         
         self.spin_zoom = QtGui.QSpinBox()
         self.spin_zoom.setRange(1, 100)
@@ -44,6 +52,9 @@ class FuselageMainWidget(QtGui.QWidget):
         gridView.addWidget(checkFitToPage   , 0, 2)
         gridView.addWidget(self.spin_zoom   , 1, 0)
         gridView.addWidget(labelSpin_zoom   , 1, 1)
+        gridView.addWidget(self.xSlider     , 2, 0)
+        gridView.addWidget(self.ySlider     , 2, 1)
+        gridView.addWidget(self.zSlider     , 2, 2)
 
         checkShowPoints.toggled.connect(self.fireShowPoints)
         checkFitToPage.toggled.connect(self.fireFitToPage)
@@ -52,6 +63,21 @@ class FuselageMainWidget(QtGui.QWidget):
         
         groupView.setLayout(gridView)     
         return groupView
+
+    def createSlider(self, changedSignal, setterSlot):
+        slider = QtGui.QSlider(QtCore.Qt.Horizontal)
+
+        slider.setRange(0, 360 * 2)
+        slider.setSingleStep(2)
+        slider.setPageStep(15 * 2)
+        slider.setTickInterval(15 * 2)
+        slider.setTickPosition(QtGui.QSlider.TicksRight)
+
+        self.ogl_widget.connect(slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
+        self.connect(self.ogl_widget, changedSignal, slider, QtCore.SLOT("setValue(int)"))
+
+        return slider
+    
 
     def fireScaleProfile(self, value):
         self.ogl_widget.setScale(value)

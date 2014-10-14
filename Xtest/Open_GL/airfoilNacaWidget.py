@@ -143,7 +143,7 @@ class Naca4Tab(QtGui.QWidget):
         else :
             self.ogl_widget.createSym_Naca(length, thick/100.0, pcnt)
         
-        self.ogl_widget.setName(self.text1Name.text())
+        self.ogl_widget.profile.setName(self.text1Name.text())
 
 
 

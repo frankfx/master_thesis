@@ -32,7 +32,7 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         self.xRot = 0.0
         self.yRot = 0.0
         self.zRot = 0.0 
-
+        
         # profile rotation
         self.rotate = 0.0
         
@@ -159,9 +159,31 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         self.yTrans = yTrans
         
     def setXYTRot(self, xRot, yRot, zRot):
-        self.xRot = xRot
-        self.yRot = yRot
-        self.zRot = zRot
+        self.setXRotation(xRot)
+        self.setYRotation(yRot)
+        self.setZRotation(zRot)
+        
+    def setXRotation(self, angle):
+        angle = self.normalizeAngle(angle)
+        if angle != self.xRot:
+            self.xRot = angle
+            self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
+            self.updateGL()
+
+    def setYRotation(self, angle):
+        angle = self.normalizeAngle(angle)
+        if angle != self.yRot:
+            self.yRot = angle
+            self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
+            self.updateGL()
+
+    def setZRotation(self, angle):
+        angle = self.normalizeAngle(angle)
+        if angle != self.zRot:
+            self.zRot = angle
+            self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
+            self.updateGL()
+        
         
     def setDrawPointsOption(self, value):
         self.flag_draw_points = value 
@@ -184,6 +206,15 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     def getRotAngle(self):
         return self.rotate
     
+    def xRotation(self):
+        return self.xRot
+
+    def yRotation(self):
+        return self.yRot
+
+    def zRotation(self):
+        return self.zRot
+    
     '''
     @return: chaikin spline of point list
     '''  
@@ -192,6 +223,13 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         spline.IncreaseLod()
         spline.IncreaseLod()
         return spline.getPointList()    
+
+    def normalizeAngle(self, angle):
+        while angle < 0:
+            angle += 360 * 2
+        while angle > 360 * 2:
+            angle -= 360 * 2
+        return angle
 
     # ============================================================================================================
     # mouse and key events
@@ -222,18 +260,19 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         
         if redraw :
             self.updateGL()
+                       
             
     def mousePressEvent(self, event):  
         self.lastPos_x = event.pos().x()
         self.lastPos_y = event.pos().y()
                 
     def mouseMoveEvent(self, event):
-        dx = (event.pos().x() - self.lastPos_x ) 
-        dy =  (event.pos().y() - self.lastPos_y ) 
+        dx = (event.x() - self.lastPos_x ) 
+        dy = (event.y() - self.lastPos_y ) 
         
         self.lastPos_x += dx
         self.lastPos_y += dy
-        
+
         #Betrachtsfeld = -1 bis 1
         
         #print self.width 

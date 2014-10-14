@@ -140,8 +140,8 @@ class AirfoilWidget(ProfileWidget):
             res_bot.append([x, -y, 0])
         
         res_bot.reverse()    
-        self.setPointList(res_bot + res_top[1:])
-        self.updateAll()
+        self.profile.setPointList(res_bot + res_top[1:])
+        self.profile.updateAll()
         self.updateGL()
 
     def createCambered_Naca(self, length, maxCamber, posMaxCamber, thickness, pcnt=10):
@@ -165,10 +165,10 @@ class AirfoilWidget(ProfileWidget):
             res_camber.append([x, y_c, 0])
         res_bot.reverse()
 
-        self.setPointList(res_bot + res_top[1:])      
-        self.setPointListCamber(res_camber)
-        self.updatePointListsForNaca()
-        self.updateThickness()
+        self.profile.setPointList(res_bot + res_top[1:])      
+        self.profile.setPointListCamber(res_camber)
+        self.profile.updatePointListsForNaca()
+        self.profile.updateThickness()
         self.updateGL()
 
     def __computeY_c(self, x, length, maxCamber, posMaxCamber):
@@ -246,10 +246,10 @@ class AirfoilWidget(ProfileWidget):
             res_camber.append([x, y_c, 0])
         res_bot.reverse()
 
-        self.setPointList(res_bot + res_top[1:])      
-        self.setPointListCamber(res_camber)
-        self.dataSet.updatePointListsForNaca()
-        self.dataSet.updateThickness()        
+        self.profile.setPointList(res_bot + res_top[1:])      
+        self.profile.setPointListCamber(res_camber)
+        self.profile.updatePointListsForNaca()
+        self.profile.updateThickness()        
         self.updateGL()
 
     def __setConstantsOfP(self, p, reflex):       

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  11 OCT 2014 23:55
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  12 OCT 2014 13:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -2075,7 +2075,7 @@ Package microtype Info: Loading generic settings for font family
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    Font shape `OT1/lmss/b/n' in size <17.28> not available
-(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 67.
+(Font)              Font shape `OT1/lmss/bx/n' tried instead on input line 56.
  [1
 
 
@@ -2366,7 +2366,7 @@ onts/type1/public/lm/lmssbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy1
 0.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy9.pfb></usr/share/texmf/fonts
 /type1/public/lm/lmtt12.pfb></usr/share/texmf/fonts/type1/public/amsfonts/symbo
 ls/msbm10.pfb>
-Output written on main.pdf (29 pages, 2121832 bytes).
+Output written on main.pdf (29 pages, 2121837 bytes).
 PDF statistics:
  515 PDF objects out of 1000 (max. 8388607)
  423 compressed objects within 5 object streams

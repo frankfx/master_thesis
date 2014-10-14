@@ -5,10 +5,10 @@ Created on Aug 5, 2014
 '''
 import sys
 from PySide.QtGui import QTextDocument, QMainWindow, QTextEdit, QApplication
-from cpacsPy.tixi import tixiwrapper
-from cpacsPy.tigl import tiglwrapper
-#import tiglwrapper
-#import tixiwrapper
+#from cpacsPy.tixi import tixiwrapper
+#from cpacsPy.tigl import tiglwrapper
+import tiglwrapper
+import tixiwrapper
 from Xtest.Open_GL.configuration.config import Config
 import re
 

@@ -402,7 +402,7 @@ class AirfoilDetectOglWidget(QtOpenGL.QGLWidget):
             self.setPointToPointListAtIdx(self.__idxSelectedPoint, p)
             self.updateGL()
         else:
-            Airfoil.mouseMoveEvent(self, event)
+            self.p.mouseMoveEvent(self, event)
         
     def addPoint(self):
         idx = utility.computeIdxOfPointWithMinDistance(self.__selectedPoint, self.getPointList(), 1)[0]
