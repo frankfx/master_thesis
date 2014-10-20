@@ -32,9 +32,9 @@ class FuselageGeneratorWidget(QtGui.QWidget):
         super(FuselageGeneratorWidget, self).__init__(parent)
         self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         
-        self.widget1 = SuperEllipse(ogl_main_widget)
+        widget1 = SuperEllipse(ogl_main_widget)
         tabWidget = QtGui.QTabWidget()
-        tabWidget.addTab(self.naca4, self.tr("SuperEllipse"))
+        tabWidget.addTab(widget1, self.tr("SuperEllipse"))
         
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addWidget(tabWidget)
@@ -75,7 +75,7 @@ class SuperEllipse(QtGui.QWidget):
         grid.addWidget(self.curveSpinBox_t, 1,2)
         grid.addWidget(self.pcntSpinBox_t, 1,3)   
 
-        grid.addWidget(horizontalLine,1, 0, 2, 2)
+    #    grid.addWidget(horizontalLine,1, 0, 2, 2)
 
         grid.addWidget(labelBotSide,3,0)
         grid.addWidget(self.widthSpinBox_b, 4,0)
@@ -87,11 +87,11 @@ class SuperEllipse(QtGui.QWidget):
         grid.addWidget(self.textName, 5,1) 
         grid.addWidget(butCreate, 5,2) 
         
-        grid.addWidget(self.butCreate, 7, 1)
+        grid.addWidget(butCreate, 7, 1)
         self.setLayout(grid)        
 
 
-    def __createSpinBox(self, start=20, end=200, step=5, suffix='pts', value=10):
+    def __createSpinBox(self, start=0, end=10, step=1, suffix='pts', value=4):
         spinBox = QtGui.QDoubleSpinBox()
         spinBox.setRange(start, end)
         spinBox.setSingleStep(step)
@@ -99,7 +99,7 @@ class SuperEllipse(QtGui.QWidget):
         spinBox.setValue(value)   
         return spinBox 
     
-    def __createDoubleSpinBox(self, start=20, end=200, step=5, suffix='pts', value=10):
+    def __createDoubleSpinBox(self, start=0, end=10, step=1, suffix='pts', value=4):
         spinBox = QtGui.QDoubleSpinBox()
         spinBox.setRange(start, end)
         spinBox.setSingleStep(step)
@@ -114,6 +114,6 @@ class SuperEllipse(QtGui.QWidget):
 
         self.ogl_widget.createSuperEllipse(topSide, botSide)
 
-        self.ogl_widget.profile.setName(self.text1Name.text())
+        self.ogl_widget.profile.setName(self.textName.text())
 
 

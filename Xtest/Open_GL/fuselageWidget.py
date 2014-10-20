@@ -49,9 +49,6 @@ class FuselageWidget(ProfileWidget):
         # draw profile points
         if self.getFlagDrawPoints() :
             self.drawPoints(plist)
-  
-        self.drawSuperEllipse_Top(4.0, 4.0, 3.0, 10.0)
-        self.drawSuperEllipse_Bot(4.0, 4.0, 1.0, 10.0)
 
         GL.glFlush()    
 

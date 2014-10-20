@@ -6,6 +6,7 @@ Created on Oct 8, 2014
 
 from fuselageWidget import FuselageWidget
 from PySide import QtGui, QtCore
+from Xtest.Open_GL.fuselageGeneratorWidget import FuselageGeneratorWidget
 
 
 class FuselageMainWidget(QtGui.QWidget):
@@ -13,6 +14,7 @@ class FuselageMainWidget(QtGui.QWidget):
         super(FuselageMainWidget, self).__init__(parent)
 
         self.ogl_widget = FuselageWidget(profile)
+        self.ogl_widget_SuperEllipse = FuselageGeneratorWidget(self.ogl_widget)
 
         grid = QtGui.QGridLayout() 
         grid.addWidget(self.createViewElements(), 0,0)       
@@ -41,6 +43,8 @@ class FuselageMainWidget(QtGui.QWidget):
                                          self.ogl_widget.setZRotation)    
     
         
+        butGenerator = QtGui.QPushButton("SuperEllipse")
+        
         self.spin_zoom = QtGui.QSpinBox()
         self.spin_zoom.setRange(1, 100)
         self.spin_zoom.setSingleStep(5)
@@ -55,11 +59,14 @@ class FuselageMainWidget(QtGui.QWidget):
         gridView.addWidget(self.xSlider     , 2, 0)
         gridView.addWidget(self.ySlider     , 2, 1)
         gridView.addWidget(self.zSlider     , 2, 2)
+        gridView.addWidget(butGenerator, 3, 2)
 
+        butGenerator.clicked.connect(self.fireSuperEllipseWidget)
         checkShowPoints.toggled.connect(self.fireShowPoints)
         checkFitToPage.toggled.connect(self.fireFitToPage)
         checkSplineCurve.toggled.connect(self.fireSplineCurve)
         self.spin_zoom.valueChanged[int].connect(self.fireScaleProfile) 
+        
         
         groupView.setLayout(gridView)     
         return groupView
@@ -77,7 +84,9 @@ class FuselageMainWidget(QtGui.QWidget):
         self.connect(self.ogl_widget, changedSignal, slider, QtCore.SLOT("setValue(int)"))
 
         return slider
-    
+
+    def fireSuperEllipseWidget(self):
+        self.ogl_widget_SuperEllipse.show()
 
     def fireScaleProfile(self, value):
         self.ogl_widget.setScale(value)
