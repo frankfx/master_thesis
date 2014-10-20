@@ -4,6 +4,7 @@ Created on Oct 8, 2014
 @author: fran_re
 '''
 import sys
+import math
 import utility
 from fuselage import Fuselage
 from PySide import QtGui
@@ -48,6 +49,31 @@ class FuselageWidget(ProfileWidget):
         # draw profile points
         if self.getFlagDrawPoints() :
             self.drawPoints(plist)
+  
+        self.drawSuperEllipse_Top(4.0, 4.0, 3.0, 10.0)
+        self.drawSuperEllipse_Bot(4.0, 4.0, 1.0, 10.0)
+
+        GL.glFlush()    
+
+    def createSuperEllipse(self, topSide, botSide):
+        plist_t = self.__createSuperEllipse(topSide[0], topSide[1], topSide[2], topSide[3], 0.5, True)
+        plist_b = self.__createSuperEllipse(botSide[0], botSide[1], botSide[2], botSide[3], 0.5, False)        
+        
+        self.profile.setPointList(plist_t + plist_b)
+        self.updateGL() 
+
+    def __createSuperEllipse(self, a=4.0, b=5.0, n=1.0, cnt=10, z=0.5, isTopSide=True):
+        plist = []
+        x = -a
+        dist = (2.0*a) / cnt
+        
+        while x < a or utility.equalFloats2(x, a) :
+            y = b * math.pow( utility.absolut(1 - math.pow( utility.absolut(x / a), 2/n) ), n/2 )
+            if isTopSide : plist.append([x, y, z])
+            else : plist.append([x, -y, z])
+            x += dist 
+        return plist
+
             
     def drawPoints(self, plist):
         GL.glColor3f(1.0, 0.0, 0.0)

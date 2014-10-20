@@ -4,7 +4,9 @@ Created on Aug 22, 2014
 
 @author: rene
 '''
-from Xtest.Open_GL import airfoilDetectWidget
+from Xtest.Open_GL import airfoilDetectWidget, utility
+import math
+import Xtest
 
 '''
 Created on Jul 30, 2014
@@ -12,6 +14,8 @@ Created on Jul 30, 2014
 @author: fran_re
 '''
 import sys
+import math
+import Xtest.Open_GL.utility 
 from PySide import QtOpenGL, QtGui, QtCore
 from Xtest.Open_GL.cpacsHandler import CPACS_Handler
 from Xtest.Open_GL.configuration.config import Config
@@ -28,11 +32,22 @@ except ImportError:
 
 class Renderer():
     def __init__(self, width, height):
+        self.plist = [[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], \
+                           [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], \
+                           [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], \
+                           [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], \
+                           [0.0125, 0.0142, 0.0], [0.005, 0.0089, 0.0], [0.0, 0.0, 0.0], [0.005, -0.0089, 0.0], \
+                           [0.0125, -0.0142, 0.0], [0.025, -0.01961, 0.0], [0.05, -0.02666, 0.0], [0.075, -0.0315, 0.0], \
+                           [0.1, -0.03512, 0.0], [0.15, -0.04009, 0.0], [0.2, -0.04303, 0.0], [0.25, -0.04456, 0.0], \
+                           [0.3, -0.04501, 0.0], [0.4, -0.04352, 0.0], [0.5, -0.03971, 0.0], [0.6, -0.03423, 0.0], \
+                           [0.7, -0.02748, 0.0], [0.8, -0.01967, 0.0], [0.9, -0.01086, 0.0], [0.95, -0.00605, 0.0], \
+                           [1.0, -0.00095, 0.0]]        
         self.object = 0
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0   
-        self.scale = 1     
+        self.scale = 1    
+        
         
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
@@ -59,32 +74,56 @@ class Renderer():
         GL.glLoadIdentity()
        
         GL.glTranslated(0.0, 0.0, -5.0)              
-        GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
-        GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
-        GL.glRotated(self.zRot, 0.0, 0.0, 1.0) 
-        GL.glScalef(self.scale,self.scale,self.scale)
+       # GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
+       # GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
+       # GL.glRotated(self.zRot, 0.0, 0.0, 1.0) 
+       # GL.glScalef(self.scale,self.scale,self.scale)
         
-        self.drawTriangle()
+        self.drawSuperEllipse_Top(4.0, 4.0, 3.0, 10.0)
+        self.drawSuperEllipse_Bot(7.0, 4.0, 1.0, 10.0)
 
         GL.glFlush()    
 
 
-    def drawTriangle(self):
-        plist = [[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], \
-                           [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], \
-                           [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], \
-                           [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], \
-                           [0.0125, 0.0142, 0.0], [0.005, 0.0089, 0.0], [0.0, 0.0, 0.0], [0.005, -0.0089, 0.0], \
-                           [0.0125, -0.0142, 0.0], [0.025, -0.01961, 0.0], [0.05, -0.02666, 0.0], [0.075, -0.0315, 0.0], \
-                           [0.1, -0.03512, 0.0], [0.15, -0.04009, 0.0], [0.2, -0.04303, 0.0], [0.25, -0.04456, 0.0], \
-                           [0.3, -0.04501, 0.0], [0.4, -0.04352, 0.0], [0.5, -0.03971, 0.0], [0.6, -0.03423, 0.0], \
-                           [0.7, -0.02748, 0.0], [0.8, -0.01967, 0.0], [0.9, -0.01086, 0.0], [0.95, -0.00605, 0.0], \
-                           [1.0, -0.00095, 0.0]]
-
+    def drawSuperEllipse_Top(self, a, b, n, cnt):
+        plist = self.__createSuperEllipse(a, b, n, cnt)
+        
         GL.glLineWidth(2)
         GL.glColor3f(0.0, 0.0, 1.0)
         GL.glBegin(GL.GL_LINE_STRIP) 
+        
         for p in plist :
+            GL.glVertex3f(p[0], p[1], p[2])              
+        GL.glEnd() 
+    
+    def drawSuperEllipse_Bot(self, a, b, n, cnt):
+        plist = self.__createSuperEllipse(a, b, n, cnt)
+        
+        GL.glLineWidth(2)
+        GL.glColor3f(0.0, 0.0, 1.0)
+        GL.glBegin(GL.GL_LINE_STRIP) 
+        
+        for p in plist :
+            GL.glVertex3f(p[0], -p[1], p[2])              
+        GL.glEnd() 
+        
+
+    def __createSuperEllipse(self, a=4.0, b=5.0, n=1.0, cnt=10, z=0.5):
+        plist = []
+        x = -a
+        dist = (2.0*a) / cnt
+        
+        while x < a or utility.equalFloats2(x, a) :
+            y = b * math.pow( utility.absolut(1 - math.pow( utility.absolut(x / a), 2/n) ), n/2 )
+            plist.append([x, y, z])
+            x += dist 
+        return plist
+
+    def drawTriangle(self):
+        GL.glLineWidth(2)
+        GL.glColor3f(0.0, 0.0, 1.0)
+        GL.glBegin(GL.GL_LINE_STRIP) 
+        for p in self.plist :
             GL.glVertex3f(p[0], p[1], p[2])              
         GL.glEnd()
 
@@ -154,6 +193,47 @@ class Widget(QtOpenGL.QGLWidget):
         self.height = 302
         self.resize(self.width ,self.height)
         self.setWindowTitle("Rene Test")
+      
+      
+        grid = QtGui.QGridLayout()
+      
+        self.widthSpinBox = QtGui.QDoubleSpinBox()
+        self.widthSpinBox.setRange(20, 200)
+        self.widthSpinBox.setSingleStep(5)
+        self.widthSpinBox.setSuffix('pts')
+        self.widthSpinBox.setValue(10)
+        
+        self.heightSpinBox = QtGui.QDoubleSpinBox()
+        self.heightSpinBox.setRange(20, 200)
+        self.heightSpinBox.setSingleStep(5)
+        self.heightSpinBox.setSuffix('pts')
+        self.heightSpinBox.setValue(10)        
+        
+        self.curveSpinBox = QtGui.QDoubleSpinBox()
+        self.curveSpinBox.setRange(20, 200)
+        self.curveSpinBox.setSingleStep(5)
+        self.curveSpinBox.setSuffix('pts')
+        self.curveSpinBox.setValue(10)       
+        
+        self.pcntSpinBox = QtGui.QDoubleSpinBox()
+        self.pcntSpinBox.setRange(20, 200)
+        self.pcntSpinBox.setSingleStep(5)
+        self.pcntSpinBox.setSuffix('pts')
+        self.pcntSpinBox.setValue(10)       
+        
+        
+        grid.addWidget(self.widthSpinBox, 0,0)
+        grid.addWidget(self.heightSpinBox, 0,1)
+        grid.addWidget(self.curveSpinBox, 0,2)
+        grid.addWidget(self.pcntSpinBox, 0,3)        
+        
+        self.setLayout(grid)
+        
+        
+        
+        
+        
+        
         #self.setFixedSize(QtCore.QSize(400,400))
         self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         self.renderer = Renderer(self.width ,self.height)    
