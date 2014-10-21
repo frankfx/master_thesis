@@ -9,8 +9,8 @@ from Xtest.XML_Editor.search_field import SearchField
 from numberBar import NumberBar
 from cpacsHandler import CPACS_Handler
 from config import Config
-import tixiwrapper
-#from cpacsPy.tixi import tixiwrapper
+#import tixiwrapper
+from cpacsPy.tixi import tixiwrapper
 
 from highlighter import Highlighter
 
