@@ -1,0 +1,21 @@
+#%Module -*- tcl -*-
+#
+# opencascade modulefile
+#
+
+proc ModulesHelp { } {
+  puts stderr "\tThis module adds opencascade to the PATH, LD_LIBRARY_PATH "
+}
+
+conflict opencascade
+
+module-whatis   "Sets up the environment for opencascade."
+
+set     version        0.15
+set     MODhome      /home/fran_re/software/oce/0.15
+
+
+# default opencascade environment variable
+prepend-path    CASROOT             $MODhome
+prepend-path    LD_LIBRARY_PATH     $MODhome/lib
+prepend-path    LIBRARY_PATH        $MODhome/lib

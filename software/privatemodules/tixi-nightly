@@ -1,0 +1,20 @@
+#%Module -*- tcl -*-
+#
+# tixi modulefile
+#
+
+proc ModulesHelp { } {
+  puts stderr "\tThis module adds tixi nightly builds to the PATH, LD_LIBRARY_PATH "
+}
+
+module-whatis   "Sets up the environment for tixi-nightly."
+
+set     version     nightly
+set     TIXIhome     /home/fran_re/software/tixi-nightly
+
+prepend-path    PATH            $TIXIhome/bin
+prepend-path    LD_LIBRARY_PATH $TIXIhome/lib
+prepend-path    LIBRARY_PATH    $TIXIhome/lib
+prepend-path    LIB             $TIXIhome/lib
+prepend-path    INCLUDE         $TIXIhome/include
+prepend-path    CPATH           $TIXIhome/include

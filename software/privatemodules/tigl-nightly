@@ -1,0 +1,23 @@
+#%Module -*- tcl -*-
+#
+# tigl modulefile
+#
+
+proc ModulesHelp { } {
+  puts stderr "\tThis module adds tigl-nightly to the PATH, LD_LIBRARY_PATH "
+}
+
+module-whatis   "Sets up the environment for tigl-nightly."
+
+set     version     nightly
+set     TIGLhome     /home/fran_re/software/tigl-nightly
+
+
+module load tixi-nightly oce-0.15
+
+prepend-path    PATH            $TIGLhome/bin
+prepend-path    LD_LIBRARY_PATH $TIGLhome/lib64
+prepend-path    LIBRARY_PATH    $TIGLhome/lib64
+prepend-path    LIB             $TIGLhome/lib64
+prepend-path    INCLUDE         $TIGLhome/include
+prepend-path    CPATH           $TIGLhome/include

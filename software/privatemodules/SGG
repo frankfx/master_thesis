@@ -1,0 +1,45 @@
+#%Module1.0#####################################################################
+##
+## Numpy modulefile
+##
+## @configure_input@
+##
+
+proc ModulesHelp { } {
+	global version
+
+	puts stderr "\tThis Module will prepare your environment for SGG Python 2.7"
+}
+
+# for Tcl script use only
+set     version      @VERSION@
+set machine [uname machine]
+
+module-whatis	"SGG Python 2.7"
+module load python/2.7.5
+module load libxslt
+
+# module load opencascade/opencascade-6.5.4
+module load tigl-nightly
+module load tixi-nightly
+# module load tixi
+# module load tigl/tigl-2.0.4
+
+
+set ENV_BASE /home/fran_re/workspace/TestRene/SGG-0.2-bin
+
+#Setting Environment Aliases
+prepend-path PYTHONPATH $ENV_BASE/lib/python2.7/site-packages/
+prepend-path PATH $ENV_BASE/bin
+append-path LD_LIBRARY_PATH $ENV_BASE/lib/python2.7/site-packages/PySide/
+append-path LD_LIBRARY_PATH $ENV_BASE/lib/python2.7/site-packages/clips
+
+if { [ module-info mode load ] } { 
+puts stderr "\t module: $ModulesCurrentModulefile loaded"
+}
+if { [ module-info mode remove ] } { 
+puts stderr "\t unloading  $ModulesCurrentModulefile" 
+}
+
+#Modules 3.1.6 set-alias is broken, replacing alias function by using shellscripts
+#append-path PATH /home_as/shared/modules/modulefiles/program/supportscripts
