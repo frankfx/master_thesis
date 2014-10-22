@@ -4,6 +4,8 @@ Created on Aug 22, 2014
 @author: rene
 '''
 from Xtest.Open_GL.profileWidget import ProfileWidget
+from Xtest.Open_GL.airfoilWidget import AirfoilWidget
+from profile import Profile
 
 '''
 Created on Jul 30, 2014
@@ -59,13 +61,13 @@ class AirfoilDetectWidget(QtGui.QWidget):
         space = QtGui.QSpacerItem(0,10)
         grid = QtGui.QGridLayout()
         grid.addItem(space)
-        grid.addWidget(label2,                       1,1)
-        grid.addWidget(self.spin_Img_zoom,          1,2)
-        grid.addWidget(label3,                       1,3)
-        grid.addWidget(self.spin_zoom,          1,4)
-        grid.addWidget(self.butDelPnt,               1,5)
-        grid.addWidget(self.checkCenter,               1,6)
-        grid.addWidget(self.ogl_detector_widget, 2,1,1,6)
+        grid.addWidget(label2,                          1,1)
+        grid.addWidget(self.spin_Img_zoom,              1,2)
+        grid.addWidget(label3,                          1,3)
+        grid.addWidget(self.spin_zoom,                  1,4)
+        grid.addWidget(self.butDelPnt,                  1,5)
+        grid.addWidget(self.checkCenter,                1,6)
+        grid.addWidget(self.ogl_detector_widget,    2,1,1,6)
         grid.addWidget(label1,                       3,1)
         grid.addWidget(self.text1Name,               3,2)
         grid.addWidget(self.butCreate,               3,3)
@@ -92,12 +94,12 @@ class AirfoilDetectWidget(QtGui.QWidget):
         self.ogl_detector_widget.updateGL() 
         
     def fireButtonReduce(self):
-        plist = self.ogl_detector_widget.getPointList()
+        plist = self.ogl_detector_widget.profile.getPointList()
         if plist == None :
             return
 
         for i in range(1, len(plist)/2) : 
-            self.ogl_detector_widget.removeFromPointList(i)
+            self.ogl_detector_widget.profile.removeFromPointList(i)
         self.ogl_detector_widget.updateGL()
     
     def fireSetScaleImg(self):
@@ -112,7 +114,7 @@ class AirfoilDetectWidget(QtGui.QWidget):
         name = self.text1Name.text() if self.text1Name.text() != "" else "untitled"
         self.ogl_widget.profile.setName(name)
         plist = []
-        for p in self.ogl_detector_widget.getPointList():
+        for p in self.ogl_detector_widget.profile.getPointList():
             plist.append([p[0], p[2], p[1]])
         self.ogl_widget.profile.setPointList(plist)
         self.ogl_widget.profile.updateAll()
@@ -151,10 +153,11 @@ class AirfoilDetectWidget(QtGui.QWidget):
 
 
 
-class AirfoilDetectOglWidget(QtOpenGL.QGLWidget):
-    def __init__(self, parent = None):
-        super(AirfoilDetectOglWidget, self).__init__()
-        self.pointList = []
+class AirfoilDetectOglWidget(ProfileWidget):
+    def __init__(self, profile = Profile("untitled", None, []), parent = None):
+        super(AirfoilDetectOglWidget, self).__init__(profile)
+        
+        
         self.filename = ""
         self.img_width = -1
         self.img_height = -1
@@ -205,18 +208,18 @@ class AirfoilDetectOglWidget(QtOpenGL.QGLWidget):
     # profile drawing
     # ================================================================================================================ 
     def drawProfile(self):
-        if self.getPointList() == [] :
+        if self.profile.getPointList() == [] :
             self.createDefaultProfile()
         
         if self.flag_setCenter :
-            trX, trY = self.norm_vec_list(self.getPointList())
+            trX, trY = self.norm_vec_list(self.profile.getPointList())
             GL.glTranslatef(-trX, trY, 0) 
 
         # draw profile by pointList        
         GL.glLineWidth(2)
         GL.glColor3f(0.0, 0.0, 0.0)
         GL.glBegin(GL.GL_LINE_STRIP) 
-        for p in self.getPointList() :
+        for p in self.profile.getPointList() :
             GL.glVertex3f(p[0], p[1], p[2])              
         GL.glEnd()    
         
@@ -224,7 +227,7 @@ class AirfoilDetectOglWidget(QtOpenGL.QGLWidget):
         GL.glColor3f(1.0, 0.0, 0.0)
         GL.glPointSize(10)
         GL.glBegin(GL.GL_POINTS) 
-        for p in self.getPointList() :
+        for p in self.profile.getPointList() :
             GL.glVertex3f(p[0], p[1], p[2])              
         GL.glEnd()         
         
@@ -292,7 +295,7 @@ class AirfoilDetectOglWidget(QtOpenGL.QGLWidget):
     # default Naca 0009 profile
     # ================================================================================================================   
     def createDefaultProfile(self):
-        self.setPointList([[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], \
+        self.profile.setPointList([[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], \
                            [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], \
                            [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], \
                            [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], \
@@ -352,7 +355,7 @@ class AirfoilDetectOglWidget(QtOpenGL.QGLWidget):
             ()
         else :
             QtGui.QMessageBox.about(self, "error", "create default profile" )
-            self.setPointList([])
+            self.profile.setPointList([])
         
         print "do something for detection" 
 
@@ -374,57 +377,53 @@ class AirfoilDetectOglWidget(QtOpenGL.QGLWidget):
                 return i
         return -1
     
-    def setPointList(self, plist):
-        self.pointList = plist
-    def getPointList(self):
-        return self.pointList
     # ================================================================================================================
     # mouse events and others
     # ================================================================================================================       
     def cancelWidget(self):
-        self.setPointList([])
+        self.profile.setPointList([])
         self.flag_detected = False
         self.setFileName("")    
     
     def mousePressEvent(self, event):
         self.updateGL() # important for __winPosTo3DPos
         self.__selectedPoint    = self.__winPosTo3DPos(event.pos().x(), event.pos().y())
-        self.__idxSelectedPoint = self.__getIdxOfSelectedPoint(self.__selectedPoint, self.getPointList()) 
+        self.__idxSelectedPoint = self.__getIdxOfSelectedPoint(self.__selectedPoint, self.profile.getPointList()) 
         if self.__idxSelectedPoint < 0 :
             if(event.button() == QtCore.Qt.RightButton) :
                 ()
             else : 
-                Airfoil.mousePressEvent(self, event)
+                super(AirfoilDetectOglWidget, self).mousePressEvent(event)
         
     def mouseMoveEvent(self, event):
         if self.__idxSelectedPoint >= 0 :
             p = self.__winPosTo3DPos(event.pos().x(), event.pos().y())
-            self.setPointToPointListAtIdx(self.__idxSelectedPoint, p)
+            self.profile.setPointToPointListAtIdx(self.__idxSelectedPoint, p)
             self.updateGL()
         else:
-            self.p.mouseMoveEvent(self, event)
+            super(AirfoilDetectOglWidget, self).mouseMoveEvent(event)
         
     def addPoint(self):
-        idx = utility.computeIdxOfPointWithMinDistance(self.__selectedPoint, self.getPointList(), 1)[0]
+        idx = utility.computeIdxOfPointWithMinDistance(self.__selectedPoint, self.profile.getPointList(), 1)[0]
         if idx == None :
-            self.insertToPointList(0, self.__selectedPoint)
+            self.profile.insertToPointList(0, self.__selectedPoint)
         else :
-            idx_l = len(self.getPointList()) - 1 if idx == 0 else idx - 1
-            idx_r = 0 if idx == len(self.getPointList()) - 1 else idx + 1
+            idx_l = len(self.profile.getPointList()) - 1 if idx == 0 else idx - 1
+            idx_r = 0 if idx == len(self.profile.getPointList()) - 1 else idx + 1
             
-            dist_l = utility.getDistanceBtwPoints(self.__selectedPoint, self.getPointList()[idx_l])
-            dist_r = utility.getDistanceBtwPoints(self.__selectedPoint, self.getPointList()[idx_r])
+            dist_l = utility.getDistanceBtwPoints(self.__selectedPoint, self.profile.getPointList()[idx_l])
+            dist_r = utility.getDistanceBtwPoints(self.__selectedPoint, self.profile.getPointList()[idx_r])
             
             if dist_l < dist_r :
-                self.insertToPointList(idx, self.__selectedPoint)
-            else : self.insertToPointList(idx_r, self.__selectedPoint)
+                self.profile.insertToPointList(idx, self.__selectedPoint)
+            else : self.profile.insertToPointList(idx_r, self.__selectedPoint)
         
         #self.insertToPointList(idx, self.__selectedPoint) if dist_l < dist_r else self.insertToPointList(idx_r, self.__selectedPoint)
         self.updateGL()
 
     def removePoint(self):
         if self.__idxSelectedPoint >= 0 :
-            self.removeFromPointList(self.__idxSelectedPoint)
+            self.profile.removeFromPointList(self.__idxSelectedPoint)
             self.updateGL()
 
     def contextMenuEvent(self, event):

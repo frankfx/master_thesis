@@ -5,10 +5,10 @@ Created on Aug 5, 2014
 '''
 import sys
 from PySide.QtGui import QTextDocument, QMainWindow, QTextEdit, QApplication
-from cpacsPy.tixi import tixiwrapper
-from cpacsPy.tigl import tiglwrapper
-#import tiglwrapper
-#import tixiwrapper
+#from cpacsPy.tixi import tixiwrapper
+#from cpacsPy.tigl import tiglwrapper
+import tiglwrapper
+import tixiwrapper
 from Xtest.Open_GL.configuration.config import Config
 import re
 
@@ -24,9 +24,19 @@ class CPACS_Handler():
             self.tixi.schemaValidateFromFile(cpacs_schema)
             #print self.tixi._handle.value
             #self.tigl.openCPACSConfiguration(self.tixi._handle.value, "")
-            
         except tixiwrapper.TixiException, e:  
             raise e
+
+        try:
+            self.tigl.open(self.tixi,"")
+        except tiglwrapper.TiglException as err:    
+            print 'Error opening tigl document: ', err.__str__()   
+
+    def getTigl(self):
+        return self.tigl
+    
+    def getTixi(self):
+        return self.tixi
 
     def getVectorX(self, prof_uid):
         xpath = self.tixi.uIDGetXPath(prof_uid)

@@ -24,11 +24,11 @@ class FuselageWidget(ProfileWidget):
     def __init__(self, profile):
         ProfileWidget.__init__(self, profile)
     
-    @utility.overrides(Fuselage)
+    @utility.overrides(ProfileWidget)
     def drawProfile(self):
         trX, _ = self.norm_vec_list(self.profile.getPointList())
         
-        plist  = self.getSplineCurve() if self.getFlagSplineCurve() else self.profile.getPointList() 
+        plist  = self.getChaikinSplineCurve() if self.getFlagChaikinSpline() else self.profile.getPointList() 
 
         GL.glColor3f(0, 0, 1)  
         GL.glRotatef(self.xRot, 1.0, 0.0, 0.0)

@@ -17,8 +17,8 @@ class profileMainWidget(QtGui.QWidget):
         super(profileMainWidget, self).__init__(parent)
         
         # ==========================================================
-        self.tixi = CPACS_Handler()
-        self.tixi.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
+        self.handler = CPACS_Handler()
+        self.handler.loadFile(Config.path_cpacs_A320_Fuse, Config.path_cpacs_21_schema)
         # ==========================================================  
 
         butAirfoil = QtGui.QPushButton("airfoil")
@@ -46,9 +46,9 @@ class profileMainWidget(QtGui.QWidget):
     @return: lists for top and bottom profile in format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
     '''       
     def __createPointList(self, uid) :
-        vecX = self.tixi.getVectorX(uid)
-        vecY = self.tixi.getVectorY(uid)
-        vecZ = self.tixi.getVectorZ(uid)
+        vecX = self.handler.getVectorX(uid)
+        vecY = self.handler.getVectorY(uid)
+        vecZ = self.handler.getVectorZ(uid)
         
         res = []
         for i in range(0, len(vecX)) :
@@ -57,14 +57,12 @@ class profileMainWidget(QtGui.QWidget):
         return res     
 
     def getAirfoilMainWidget(self, uid='NACA0009'):
-        airfoil = Airfoil(uid, self.__createPointList(uid))
+        airfoil = Airfoil(uid, self.handler.getTigl(), self.__createPointList(uid))
         self.window = AirfoilMainWidget(airfoil)
 
     def getFuselageMainWidget(self, uid='CircleProfile'):
-        fuselage = Fuselage(uid, self.__createPointList(uid))
+        fuselage = Fuselage(uid, self.handler.getTigl(), self.__createPointList(uid))
         self.window = FuselageMainWidget(fuselage)
-
-    
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])

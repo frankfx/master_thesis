@@ -146,7 +146,6 @@ class Naca4Tab(QtGui.QWidget):
         self.ogl_widget.profile.setName(self.text1Name.text())
 
 
-
 class Naca5Tab(QtGui.QWidget):
     def __init__(self, ogl_widget, parent = None):        
         QtGui.QWidget.__init__(self, parent)

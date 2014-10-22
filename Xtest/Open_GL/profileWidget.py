@@ -7,7 +7,8 @@ Created on Oct 9, 2014
 import sys
 import utility
 from PySide import QtOpenGL, QtGui, QtCore
-from Xtest.Open_GL.spline import Chaikin
+from Xtest.Open_GL.chaikinSpline import Chaikin
+from bSpline import BSpline 
 
 try:
     from OpenGL import GL, GLU
@@ -24,7 +25,8 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         super(ProfileWidget, self).__init__(parent)
 
         self.flag_draw_points  = False  
-        self.flag_spline_curve = False
+        self.flag_chaikin_spline = False
+        self.flag_b_spline = False
         
         self.profile = profile
         
@@ -188,8 +190,11 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     def setDrawPointsOption(self, value):
         self.flag_draw_points = value 
 
-    def setFlagSplineCurve(self, value):
-        self.flag_spline_curve = value
+    def setFlagChaikinSpline(self, value):
+        self.flag_chaikin_spline = value
+
+    def setFlagBSpline(self, value):
+        self.flag_b_spline = value
 
     def setProfile(self, profile):
         self.profile = profile
@@ -200,8 +205,11 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     def getFlagDrawPoints(self):
         return self.flag_draw_points    
         
-    def getFlagSplineCurve(self):
-        return self.flag_spline_curve
+    def getFlagChaikinSpline(self):
+        return self.flag_chaikin_spline
+
+    def getFlagBSpline(self):
+        return self.flag_b_spline
 
     def getRotAngle(self):
         return self.rotate
@@ -218,11 +226,15 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     '''
     @return: chaikin spline of point list
     '''  
-    def getSplineCurve(self):
+    def getChaikinSplineCurve(self):
         spline = Chaikin(self.profile.getPointList())
         spline.IncreaseLod()
         spline.IncreaseLod()
         return spline.getPointList()    
+
+    def getBSplineCurve(self):
+        spline = BSpline(self.profile.getName() ,self.profile.getTigl())
+        return spline.getSplineList()
 
     def normalizeAngle(self, angle):
         while angle < 0:

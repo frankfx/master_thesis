@@ -106,5 +106,5 @@ class FuselageMainWidget(QtGui.QWidget):
         self.ogl_widget.updateGL()
     
     def fireSplineCurve(self, value):
-        self.ogl_widget.setFlagSplineCurve(value)
+        self.ogl_widget.setFlagChaikinSpline(value)
         self.ogl_widget.updateGL()

@@ -5,7 +5,7 @@ Created on Oct 8, 2014
 '''
 import sys
 from PySide import QtGui
-from Xtest.Open_GL.profile_old import Profile
+from profile import Profile
 
 
 try:
@@ -18,6 +18,10 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
+#class Fuselage(Profile):
+#    def __init__(self, name, tigl, plist, parent = None):
+#        super(Fuselage, self).__init__(name, tigl, plist, parent)
+
 class Fuselage(Profile):
-    def __init__(self, name, plist, parent = None):
-        super(Fuselage, self).__init__(name, plist, parent)
+    def __init__(self, name, tigl, plist, parent = None):
+        super(Fuselage, self).__init__(name, tigl, plist, parent)

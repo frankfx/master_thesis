@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 import sys
 from PySide import QtOpenGL, QtGui, QtCore
-from Xtest.Open_GL.spline import Chaikin
+from Xtest.Open_GL.chaikinSpline import Chaikin
 
 try:
     from OpenGL import GL, GLU
@@ -199,8 +199,8 @@ class OGL_Widget(QtOpenGL.QGLWidget):
 
 
 class Window(QtGui.QWidget):
-    NumRows = 2
-    NumColumns = 3
+    NumRows = 1
+    NumColumns = 2
 
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)

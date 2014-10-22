@@ -8,7 +8,7 @@ import sys
 import math
 import utility
 from PySide import QtGui
-from Xtest.Open_GL.profile_old import Profile
+from profile import Profile
 
 try:
     from OpenGL import GL
@@ -21,8 +21,8 @@ except ImportError:
     sys.exit(1)
 
 class Airfoil(Profile):
-    def __init__(self, plist, parent = None):
-        super(Airfoil, self).__init__(plist,parent)
+    def __init__(self, name, tigl, plist, parent = None):
+        super(Airfoil, self).__init__(name, tigl, plist,parent)
         
         if plist == None : return
 
@@ -314,6 +314,7 @@ class Airfoil(Profile):
         x = start[1] / self.getLenChord()
         
         # get the virtual openGL rotate and sum both
-        res = -self.getRotAngle() + math.sin(x)
+        #res = -self.getRotAngle() + math.sin(x)
+        res = math.sin(x)
 
         return 0 if res == -0 else res      

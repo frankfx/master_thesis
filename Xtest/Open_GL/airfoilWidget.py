@@ -29,10 +29,15 @@ class AirfoilWidget(ProfileWidget):
         self.flag_draw_chord         = False        
         
         
-    @utility.overrides(Airfoil)
+    @utility.overrides(ProfileWidget)
     def drawProfile(self):
         trX, _ = self.norm_vec_list(self.profile.getPointList())
-        plist  = self.getSplineCurve() if self.getFlagSplineCurve() else self.profile.getPointList()         
+        if self.getFlagChaikinSpline() :
+            plist = self.getChaikinSplineCurve()
+        elif self.getFlagBSpline():
+            plist = self.getBSplineCurve()
+        else :
+            plist = self.profile.getPointList()
         
         GL.glColor3f(0, 0, 1)  
         # rotate profile in space

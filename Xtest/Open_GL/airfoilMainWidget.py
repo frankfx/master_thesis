@@ -81,7 +81,8 @@ class AirfoilMainWidget(QtGui.QWidget):
         checkShowPoints        = QtGui.QCheckBox("Show points")
         checkFitToPage         = QtGui.QCheckBox("Fit to page")
         checkCloseTrailingedge = QtGui.QCheckBox("Close Trailing edge")
-        checkChaikinCurve      = QtGui.QCheckBox("Chaikin curve ")
+        checkChaikinCurve      = QtGui.QCheckBox("Chaikin curve")
+        checkBSpline           = QtGui.QCheckBox("B-Spline")
         checkDrawCamber        = QtGui.QCheckBox("Camber")
         checkDrawChord         = QtGui.QCheckBox("Chord")
         
@@ -113,11 +114,14 @@ class AirfoilMainWidget(QtGui.QWidget):
         gridView.addWidget(labelSpin_rot         , 2, 3)         
         gridView.addWidget(self.butNaca          , 1, 4)
         gridView.addWidget(self.butImgDetect     , 2, 4)  
+        gridView.addWidget(checkBSpline          , 3, 4) 
+         
          
         checkShowPoints.toggled.connect(self.fireShowPoints)
         checkFitToPage.toggled.connect(self.fireFitToPage)
         checkCloseTrailingedge.toggled.connect(self.fireCloseTrailingEdge)
         checkChaikinCurve.toggled.connect(self.fireSplineCurve)
+        checkBSpline.toggled.connect(self.fireBSpline)
         checkDrawCamber.toggled.connect(self.fireDrawCamber)
         checkDrawChord.toggled.connect(self.fireDrawChord)
 
@@ -163,7 +167,11 @@ class AirfoilMainWidget(QtGui.QWidget):
         self.ogl_widget.updateGL()
     
     def fireSplineCurve(self, value):
-        self.ogl_widget.setFlagSplineCurve(value)
+        self.ogl_widget.setFlagChaikinSpline(value)
+        self.ogl_widget.updateGL()
+        
+    def fireBSpline(self, value):
+        self.ogl_widget.setFlagBSpline(value)
         self.ogl_widget.updateGL()
     
     def fireDrawCamber(self, value):
