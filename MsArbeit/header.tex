@@ -90,9 +90,7 @@
 
 
 
-\lstloadlanguages{C++}
 \lstset{%
-  language=Python,
   basicstyle=\small,
   commentstyle=\itshape\color{darkgreen},
   keywordstyle=\bfseries\color{darkblue},
@@ -109,6 +107,42 @@
   xleftmargin=1cm,
   basicstyle=\small
 }%
+\definecolor{myGray}{HTML}{999988}
+\definecolor{myPurple}{HTML}{945277}
+\definecolor{myGray2}{HTML}{999999}
+\definecolor{myOrange}{HTML}{DF5000}
+\definecolor{myBlue}{HTML}{0086B3}
+
+
+
+\lstdefinestyle{customc}{
+  basicstyle=\ttm,
+  morekeywords={def},
+  keywords=[2]{fakultaet,__computeLeadingEdge},
+  keywords=[3]{None,self}, 
+  keywords=[4]{super, range, len}, 
+  keywordstyle=\color{myPurple},
+  keywordstyle=[2]\bfseries\color{myPurple},
+  keywordstyle=[3]\color{myGray2},  
+  keywordstyle=[4]\color{myBlue},  
+  morecomment=[l][\itshape\color{myGray}]{\#},
+  morecomment=[s][\color{myOrange}]{'''}{'''},
+  literate={>}{{{$>$}}}1,
+  emph={MyClass,__init__},          % Custom highlighting
+  emphstyle=\ttb\color{red},    % Custom highlighting style
+  stringstyle=\color{darkred},
+  showspaces=false,
+  showtabs=false,
+  columns=fixed,
+  backgroundcolor=\color{white},
+  numbers=left,
+  frame=single,
+  numberstyle=\tiny,
+  breaklines=true,
+  showstringspaces=false,
+  xleftmargin=1cm,
+  basicstyle=\small  
+}
 
 \usepackage{amssymb}%Mathematische Symbole, wie R,N,Q,Z,...
 \setlength{\parindent}{0pt} %einrücken nach absatz verhindern

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  12 OCT 2014 13:07
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/TeX Live for SUSE Linux) (format=pdflatex 2014.8.10)  22 OCT 2014 22:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1474,13 +1474,7 @@ arkings.code.tex))
 \tikzuml@AC@xbrc=\skip100
 \tikzuml@AC@ybrc=\skip101
 \tikzuml@AC@middleArm=\skip102
-) (/usr/share/texmf/tex/latex/listings/lstlang1.sty
-File: lstlang1.sty 2004/09/05 1.3 listings language file
-)
-(/usr/share/texmf/tex/latex/listings/lstlang1.sty
-File: lstlang1.sty 2004/09/05 1.3 listings language file
-)
-(/usr/share/texmf/tex/latex/amsfonts/amssymb.sty
+) (/usr/share/texmf/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 
 (/usr/share/texmf/tex/latex/amsfonts/amsfonts.sty
@@ -1797,7 +1791,7 @@ Normal \count register pool exhausted, switching to extended pool.
 \c@LT@chunks=\count280
 \LT@p@ftn=\toks40
 )
-Class scrreprt Info: longtable captions redefined on input line 175.
+Class scrreprt Info: longtable captions redefined on input line 209.
 
 (/usr/share/texmf/tex/latex/lm/lmodern.sty
 Package: lmodern 2009/10/30 v1.6 Latin Modern Fonts
@@ -1862,62 +1856,66 @@ LaTeX Warning: File `cpuAnno.dat' already exists on the system.
 \c@defi=\count283
 \c@satz=\count284
 \c@bsp=\count285
-(./main.aux)
+(./main.aux
+
+LaTeX Warning: Label `lst:VBOkontrolle' multiply defined.
+
+)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/jkp/m/it on input line 215.
-LaTeX Font Info:    Try loading font information for OML+jkp on input line 215.
+LaTeX Font Info:    Checking defaults for OML/jkp/m/it on input line 249.
+LaTeX Font Info:    Try loading font information for OML+jkp on input line 249.
 
  (/usr/share/texmf/tex/latex/kpfonts/omljkp.fd
 File: omljkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 215.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 215.
-LaTeX Font Info:    ... okay on input line 215.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 215.
-LaTeX Font Info:    ... okay on input line 215.
-LaTeX Font Info:    Checking defaults for OMS/jkp/m/n on input line 215.
-LaTeX Font Info:    Try loading font information for OMS+jkp on input line 215.
+LaTeX Font Info:    ... okay on input line 249.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 249.
+LaTeX Font Info:    ... okay on input line 249.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 249.
+LaTeX Font Info:    ... okay on input line 249.
+LaTeX Font Info:    Checking defaults for OMS/jkp/m/n on input line 249.
+LaTeX Font Info:    Try loading font information for OMS+jkp on input line 249.
 
 
 (/usr/share/texmf/tex/latex/kpfonts/omsjkp.fd
 File: omsjkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 215.
-LaTeX Font Info:    Checking defaults for OMX/jkp/m/n on input line 215.
-LaTeX Font Info:    Try loading font information for OMX+jkp on input line 215.
+LaTeX Font Info:    ... okay on input line 249.
+LaTeX Font Info:    Checking defaults for OMX/jkp/m/n on input line 249.
+LaTeX Font Info:    Try loading font information for OMX+jkp on input line 249.
 
 
 (/usr/share/texmf/tex/latex/kpfonts/omxjkp.fd
 File: omxjkp.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 215.
-LaTeX Font Info:    Checking defaults for U/jkpexa/m/n on input line 215.
-LaTeX Font Info:    Try loading font information for U+jkpexa on input line 215
+LaTeX Font Info:    ... okay on input line 249.
+LaTeX Font Info:    Checking defaults for U/jkpexa/m/n on input line 249.
+LaTeX Font Info:    Try loading font information for U+jkpexa on input line 249
 .
 
 (/usr/share/texmf/tex/latex/kpfonts/ujkpexa.fd
 File: ujkpexa.fd 2006/08/15 v1.0
 )
-LaTeX Font Info:    ... okay on input line 215.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 215.
-LaTeX Font Info:    ... okay on input line 215.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 215.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 215.
+LaTeX Font Info:    ... okay on input line 249.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 249.
+LaTeX Font Info:    ... okay on input line 249.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 249.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 249.
 
 
 (/usr/share/texmf/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 215.
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 215.
+LaTeX Font Info:    ... okay on input line 249.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 249.
 
 
 (/usr/share/texmf/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 \AtBeginShipoutBox=\box120
-Package hyperref Info: Link coloring OFF on input line 215.
+Package hyperref Info: Link coloring OFF on input line 249.
 
 (/usr/share/texmf/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
@@ -1927,9 +1925,9 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count286
 )
-LaTeX Info: Redefining \ref on input line 215.
-LaTeX Info: Redefining \pageref on input line 215.
-LaTeX Info: Redefining \nameref on input line 215.
+LaTeX Info: Redefining \ref on input line 249.
+LaTeX Info: Redefining \pageref on input line 249.
+LaTeX Info: Redefining \nameref on input line 249.
  (./main.out)
 (./main.out)
 \@outlinefile=\write5
@@ -1973,8 +1971,8 @@ Package caption Info: longtable package is loaded.
 Package: ltcaption 2013/02/03 v1.3-62 longtable captions (AR)
 )
 Package caption Info: End \AtBeginDocument code.
-LaTeX Info: Redefining \dots on input line 215.
-LaTeX Info: Redefining \microtypecontext on input line 215.
+LaTeX Info: Redefining \dots on input line 249.
+LaTeX Info: Redefining \microtypecontext on input line 249.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -2231,30 +2229,39 @@ Package pdftex.def Info: fig/Buddha2.png used on input line 100.
 
 LaTeX Warning: Citation `bib:SCAN' on page 7 undefined on input line 124.
 
+(/usr/share/texmf/tex/latex/listings/lstlang1.sty
+File: lstlang1.sty 2004/09/05 1.3 listings language file
+)
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 133.
-LaTeX Font Info:    Try loading font information for OMS+lmr on input line 134.
+ (./code/test.py
+LaTeX Font Info:    Try loading font information for OML+lmr on input line 5.
 
-(/usr/share/texmf/tex/latex/lm/omslmr.fd
-File: omslmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+(/usr/share/texmf/tex/latex/lm/omllmr.fd
+File: omllmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Font shape `OMS/lmr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/lmsy/m/n' tried instead on input line 134.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10.95> on input line 146.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8.3> on input line 146.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 146.
+LaTeX Font Info:    Font shape `OML/lmr/m/n' in size <10.95> not available
+(Font)              Font shape `OML/lmm/m/it' tried instead on input line 5.
+LaTeX Font Info:    Try loading font information for TS1+lmr on input line 6.
 
-<tikz/Airfoil-crop.pdf, id=273, 344.28625pt x 258.9675pt>
+(/usr/share/texmf/tex/latex/lm/ts1lmr.fd
+File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
+)
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10.95> on input line 6.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <8.3> on input line 6.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <6> on input line 6.
+) (./code/test.py) (./code/test2.py)
+[7] [8] <tikz/Airfoil-crop.pdf, id=328, 344.28625pt x 258.9675pt>
 File: tikz/Airfoil-crop.pdf Graphic file (type pdf)
 
 <use tikz/Airfoil-crop.pdf>
 Package pdftex.def Info: tikz/Airfoil-crop.pdf used on input line 155.
 (pdftex.def)             Requested size: 313.69029pt x 235.95319pt.
- [7]
-<tikz/Fuselage-crop.pdf, id=292, 298.11375pt x 366.36874pt>
+
+<tikz/Fuselage-crop.pdf, id=329, 298.11375pt x 366.36874pt>
 File: tikz/Fuselage-crop.pdf Graphic file (type pdf)
 
 <use tikz/Fuselage-crop.pdf>
@@ -2264,10 +2271,10 @@ Package pdftex.def Info: tikz/Fuselage-crop.pdf used on input line 161.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-) (./ZusammenfassungAusblick.tex [8 <./tikz/Airfoil-crop.pdf>] [9 <./tikz/Fusel
-age-crop.pdf>]
+) (./ZusammenfassungAusblick.tex [9 <./tikz/Airfoil-crop.pdf>] [10 <./tikz/Fuse
+lage-crop.pdf>]
 Kapitel 3.
-) [10
+) [11
 
 ]
 No file main.bbl.
@@ -2331,45 +2338,68 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 61.
  (./main.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 61.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 61.
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: B94F0DE142CF94FC605BB0B13C1B1848;1675.
 
+
+Package rerunfilecheck Warning: File `main.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `main.out':
+(rerunfilecheck)             Before: 0275B49042179BFE750EBDD6059147C2;1675
+(rerunfilecheck)             After:  D3D710512DC3B2BE05310803086D931B;1675.
 
 LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: There were multiply-defined labels.
 
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 61.
  ) 
 Here is how much of TeX's memory you used:
- 30109 strings out of 493315
- 537732 string characters out of 6145893
- 779466 words of memory out of 5000000
- 32673 multiletter control sequences out of 15000+600000
- 110951 words of font info for 139 fonts, out of 8000000 for 9000
+ 30272 strings out of 493315
+ 540334 string characters out of 6145893
+ 858942 words of memory out of 5000000
+ 32788 multiletter control sequences out of 15000+600000
+ 115788 words of font info for 143 fonts, out of 8000000 for 9000
  958 hyphenation exceptions out of 8191
- 67i,17n,73p,1314b,1462s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/texmf/fonts/enc/dv
-ips/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/base/8r.enc}{/usr/share/
-texmf/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-
-mathex.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-rmtt.enc}</usr/share/texmf/f
-onts/type1/public/kpfonts/jkpmia.pfb></usr/share/texmf/fonts/type1/public/kpfon
-ts/jkpmn8a.pfb></usr/share/texmf/fonts/type1/public/lm/lmb10.pfb></usr/share/te
-xmf/fonts/type1/public/lm/lmbx12.pfb></usr/share/texmf/fonts/type1/public/lm/lm
-ex10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi12.pfb></usr/share/texmf/f
-onts/type1/public/lm/lmmi9.pfb></usr/share/texmf/fonts/type1/public/lm/lmr10.pf
-b></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/share/texmf/fonts/typ
-e1/public/lm/lmr6.pfb></usr/share/texmf/fonts/type1/public/lm/lmr9.pfb></usr/sh
-are/texmf/fonts/type1/public/lm/lmri12.pfb></usr/share/texmf/fonts/type1/public
-/lm/lmro12.pfb></usr/share/texmf/fonts/type1/public/lm/lmss10.pfb></usr/share/t
-exmf/fonts/type1/public/lm/lmss12.pfb></usr/share/texmf/fonts/type1/public/lm/l
-mss17.pfb></usr/share/texmf/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf/f
-onts/type1/public/lm/lmssbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy1
-0.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy9.pfb></usr/share/texmf/fonts
-/type1/public/lm/lmtt12.pfb></usr/share/texmf/fonts/type1/public/amsfonts/symbo
-ls/msbm10.pfb>
-Output written on main.pdf (29 pages, 2121837 bytes).
+ 67i,17n,73p,1314b,1494s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{figure.caption.14} has been referenced but does n
+ot exist, replaced by a fixed one
+
+pdfTeX warning (dest): name{section*.21} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{section*.19} has been referenced but does not exist
+, replaced by a fixed one
+
+pdfTeX warning (dest): name{chapter*.16} has been referenced but does not exist
+, replaced by a fixed one
+
+{/usr/share/texmf/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/share/texmf/fonts/enc/dvi
+ps/lm/lm-mathit.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-rm.enc}{/usr/share/
+texmf/fonts/enc/dvips/base/8r.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-maths
+y.enc}{/usr/share/texmf/fonts/enc/dvips/lm/lm-mathex.enc}{/usr/share/texmf/font
+s/enc/dvips/lm/lm-rmtt.enc}</usr/share/texmf/fonts/type1/public/kpfonts/jkpmia.
+pfb></usr/share/texmf/fonts/type1/public/kpfonts/jkpmn8a.pfb></usr/share/texmf/
+fonts/type1/public/lm/lmb10.pfb></usr/share/texmf/fonts/type1/public/lm/lmbx12.
+pfb></usr/share/texmf/fonts/type1/public/lm/lmex10.pfb></usr/share/texmf/fonts/
+type1/public/lm/lmmi10.pfb></usr/share/texmf/fonts/type1/public/lm/lmmi12.pfb><
+/usr/share/texmf/fonts/type1/public/lm/lmmi9.pfb></usr/share/texmf/fonts/type1/
+public/lm/lmr10.pfb></usr/share/texmf/fonts/type1/public/lm/lmr12.pfb></usr/sha
+re/texmf/fonts/type1/public/lm/lmr6.pfb></usr/share/texmf/fonts/type1/public/lm
+/lmr9.pfb></usr/share/texmf/fonts/type1/public/lm/lmri10.pfb></usr/share/texmf/
+fonts/type1/public/lm/lmri12.pfb></usr/share/texmf/fonts/type1/public/lm/lmro12
+.pfb></usr/share/texmf/fonts/type1/public/lm/lmss10.pfb></usr/share/texmf/fonts
+/type1/public/lm/lmss12.pfb></usr/share/texmf/fonts/type1/public/lm/lmss17.pfb>
+</usr/share/texmf/fonts/type1/public/lm/lmss8.pfb></usr/share/texmf/fonts/type1
+/public/lm/lmssbx10.pfb></usr/share/texmf/fonts/type1/public/lm/lmsy10.pfb></us
+r/share/texmf/fonts/type1/public/lm/lmsy9.pfb></usr/share/texmf/fonts/type1/pub
+lic/lm/lmtt12.pfb></usr/share/texmf/fonts/type1/public/amsfonts/symbols/msbm10.
+pfb>
+Output written on main.pdf (30 pages, 2148839 bytes).
 PDF statistics:
- 515 PDF objects out of 1000 (max. 8388607)
- 423 compressed objects within 5 object streams
- 103 named destinations out of 1000 (max. 500000)
- 33112 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 570 PDF objects out of 1000 (max. 8388607)
+ 475 compressed objects within 5 object streams
+ 135 named destinations out of 1000 (max. 500000)
+ 35672 words of extra memory for PDF output out of 35830 (max. 10000000)
 

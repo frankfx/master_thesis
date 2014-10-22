@@ -18,13 +18,13 @@
 \contentsline {section}{\numberline {2.6}Beispiel f\"ur eine Rastergrafik}{6}{section.2.6}
 \contentsline {section}{\numberline {2.7}Beispiel f\"ur die Darstellung von Algorithmen}{7}{section.2.7}
 \contentsline {section}{\numberline {2.8}Beispiel f\"ur die Darstellung von Quellcode-Ausz\"ugen}{7}{section.2.8}
-\contentsline {section}{\numberline {2.9}Hier ein uml diagramm}{7}{section.2.9}
-\contentsline {section}{\numberline {2.10}hier kommt pstricks}{8}{section.2.10}
-\contentsline {chapter}{\numberline {3}Zusammenfassung und Ausblick}{10}{chapter.3}
-\contentsline {chapter}{Abk\"urzungsverzeichnis}{II}{chapter*.15}
-\contentsline {chapter}{Abbildungsverzeichnis}{IV}{chapter*.16}
-\contentsline {chapter}{Tabellenverzeichnis}{V}{chapter*.17}
-\contentsline {chapter}{Liste der Algorithmen}{VII}{section*.18}
-\contentsline {chapter}{Listings}{IX}{section*.20}
+\contentsline {section}{\numberline {2.9}Hier ein uml diagramm}{9}{section.2.9}
+\contentsline {section}{\numberline {2.10}hier kommt pstricks}{9}{section.2.10}
+\contentsline {chapter}{\numberline {3}Zusammenfassung und Ausblick}{11}{chapter.3}
+\contentsline {chapter}{Abk\"urzungsverzeichnis}{II}{chapter*.17}
+\contentsline {chapter}{Abbildungsverzeichnis}{IV}{chapter*.18}
+\contentsline {chapter}{Tabellenverzeichnis}{V}{chapter*.19}
+\contentsline {chapter}{Liste der Algorithmen}{VII}{section*.20}
+\contentsline {chapter}{Listings}{IX}{section*.22}
 \contentsline {chapter}{\numberline {A}Anhang}{XI}{appendix.A}
-\contentsline {chapter}{Danksagung}{XII}{section*.23}
+\contentsline {chapter}{Danksagung}{XII}{section*.25}
