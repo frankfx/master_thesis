@@ -93,7 +93,7 @@ class FuselageMainWidget(QtGui.QWidget):
         self.ogl_widget.updateGL()
 
     def fireShowPoints(self, value):
-        self.ogl_widget.setDrawPointsOption(value)   
+        self.ogl_widget.setFlagDrawPoints(value)   
         self.ogl_widget.updateGL()
 
     def fireFitToPage(self, value):

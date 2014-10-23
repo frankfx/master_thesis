@@ -6,7 +6,6 @@ Created on Oct 8, 2014
 import sys
 import math
 import utility
-from fuselage import Fuselage
 from PySide import QtGui
 from profileWidget import ProfileWidget
 

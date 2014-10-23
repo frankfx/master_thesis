@@ -38,8 +38,8 @@ class Airfoil(Profile):
     # computations
     # ================================================================================================================
     '''
-    @param list1: first list
-    @param list2: second list
+    @param list1: first list (bottom side)
+    @param list2: second list (top side)
     @return: max distance between p1 of list1 and corresponding p2 of list2
     '''   
     def __computeAirfoilThickness(self, list1, list2):
@@ -48,13 +48,13 @@ class Airfoil(Profile):
             dist1 = utility.computeMinDistance(p, list1)
             dist2 = utility.computeMinDistance(p, list2)
             cur_dist = dist1 + dist2
-            if dist < 0.0 or cur_dist > dist : 
+            if cur_dist > dist : 
                 dist = cur_dist
         return dist
  
     '''
-    @param list1: first list
-    @param list2: second list
+    @param list1: first list (chord)
+    @param list2: second list (camber)
     @return: distance between p1 of list1 and corresponding p2 of list2
     '''   
     def __computeAirfoilArch(self, list1, list2):
@@ -66,7 +66,7 @@ class Airfoil(Profile):
         return dist
 
     '''
-    @param plist: point list
+    @param plist: complete point list
     @return: the trailing edge ; the center of the first and the last point of plist
     ''' 
     def __computeTrailingEdge(self, plist):
@@ -91,7 +91,7 @@ class Airfoil(Profile):
     
     '''
     @param leadingEdge: the leading edge of the profile
-    @param plist: the complete profile point list
+    @param plist: the complete point list
     @return: bottom list and top list of the profile
     '''         
     def __createPointList_bot_top(self, leadingEdge, plist):
@@ -112,7 +112,6 @@ class Airfoil(Profile):
         for i in range(1, point_cnt+1):
             p = utility.computePointOnLine(p1[0] + i*interval, p1, p2)
             res.append(p)
-        
         return res  
 
     '''
@@ -171,9 +170,8 @@ class Airfoil(Profile):
       
     def __hasNeighborsAtIdx (self, i, val, plist, dim):      
         if i == 0 or i == len(plist) : return False
-        elif plist[i-1][dim] > val and plist[i][dim] < val or \
-             plist[i-1][dim] < val and plist[i][dim] > val :
-            return True
+        return plist[i-1][dim] > val and plist[i][dim] < val or \
+               plist[i-1][dim] < val and plist[i][dim] > val 
             
     def __getPointWithMinDistanceToChordPerpendicular(self, m_per, b_per, plist):
         dist = -1.0

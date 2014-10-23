@@ -7,11 +7,9 @@ Created on Oct 9, 2014
 import sys
 import utility
 from PySide import QtOpenGL, QtGui, QtCore
-from Xtest.Open_GL.chaikinSpline import Chaikin
-from bSpline import BSpline 
 
 try:
-    from OpenGL import GL, GLU
+    from OpenGL import GL
 except ImportError:
     app = QtGui.QApplication(sys.argv)
     QtGui.QMessageBox.critical(None, "OpenGL hellogl",
@@ -43,7 +41,6 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         self.yTrans = 0.0
         self.width  = -1.0
         self.height = -1.0
-        self.fovy   = 64.0
         self.aspect = 0.0
         
         # helper
@@ -65,24 +62,22 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     def resizeGL(self, w, h):
         self.aspect = 1.0 * w / h
         self.width , self.height = w , h
+        
         GL.glViewport(0,0,w,h)
-
-        GL.glMatrixMode(GL.GL_PROJECTION)
-        GL.glLoadIdentity()
-        GL.glOrtho(-0.5 * self.aspect * self.scale, +0.5 * self.aspect * self.scale, +0.5 * self.scale, -0.5 * self.scale, 0.0, 15.0)
-        # GLU.gluPerspective (self.fovy * self.scale, w*1.0/h, 0.0, 10.0)
+        self.__setRendermodus()
 
     def paintGL(self):
-        GL.glMatrixMode(GL.GL_PROJECTION)
-        GL.glLoadIdentity()        
-        GL.glOrtho(-0.5 * self.aspect * self.scale, +0.5 * self.aspect * self.scale, +0.5 * self.scale, -0.5 * self.scale, 0.0, 15.0)
-
+        self.__setRendermodus()
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
         self.drawGrid()
         self.drawProfile()
-
         GL.glFlush()
+    
+    def __setRendermodus(self):
+        GL.glMatrixMode(GL.GL_PROJECTION)
+        GL.glLoadIdentity()
+        GL.glOrtho(-0.5 * self.aspect * self.scale, +0.5 * self.aspect * self.scale, +0.5 * self.scale, -0.5 * self.scale, 0.0, 15.0)
 
     # ================================================================================================================
     # drawing functions
@@ -185,9 +180,15 @@ class ProfileWidget(QtOpenGL.QGLWidget):
             self.zRot = angle
             self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
             self.updateGL()
+    
+    def normalizeAngle(self, angle):
+        while angle < 0:
+            angle += 360 * 2
+        while angle > 360 * 2:
+            angle -= 360 * 2
+        return angle    
         
-        
-    def setDrawPointsOption(self, value):
+    def setFlagDrawPoints(self, value):
         self.flag_draw_points = value 
 
     def setFlagChaikinSpline(self, value):
@@ -214,34 +215,24 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     def getRotAngle(self):
         return self.rotate
     
-    def xRotation(self):
+    def getXRotation(self):
         return self.xRot
 
-    def yRotation(self):
+    def getYRotation(self):
         return self.yRot
 
-    def zRotation(self):
+    def getZRotation(self):
         return self.zRot
     
     '''
     @return: chaikin spline of point list
     '''  
     def getChaikinSplineCurve(self):
-        spline = Chaikin(self.profile.getPointList())
-        spline.IncreaseLod()
-        spline.IncreaseLod()
-        return spline.getPointList()    
-
+        return self.profile.computeChaikinSplineCurve()
+    
     def getBSplineCurve(self):
-        spline = BSpline(self.profile.getName() ,self.profile.getTigl())
-        return spline.getSplineList()
+        return self.profile.computeBSplineCurve()
 
-    def normalizeAngle(self, angle):
-        while angle < 0:
-            angle += 360 * 2
-        while angle > 360 * 2:
-            angle -= 360 * 2
-        return angle
 
     # ============================================================================================================
     # mouse and key events
@@ -258,16 +249,16 @@ class ProfileWidget(QtOpenGL.QGLWidget):
             self.scale += offset_scale
             redraw = True
         elif event.key() == QtCore.Qt.Key_Left:
-            self.yRot += offset_rot
+            self.setYRotation(self.yRot + offset_rot)
             redraw = True                         
         elif event.key() == QtCore.Qt.Key_Right:
-            self.yRot -= offset_rot
+            self.setYRotation(self.yRot - offset_rot)
             redraw = True
         elif event.key() == QtCore.Qt.Key_Up:
-            self.xRot += offset_rot
+            self.setXRotation(self.xRot + offset_rot)
             redraw = True
         elif event.key() == QtCore.Qt.Key_Down:
-            self.xRot -= offset_rot
+            self.setXRotation(self.xRot - offset_rot)
             redraw = True                                
         
         if redraw :

@@ -72,13 +72,13 @@ class GLWidget(QtOpenGL.QGLWidget):
         self.trolltechGreen = QtGui.QColor.fromCmykF(0.40, 0.0, 1.0, 0.0)
         self.trolltechPurple = QtGui.QColor.fromCmykF(0.39, 0.39, 0.0, 0.0)
 
-    def xRotation(self):
+    def getXRotation(self):
         return self.xRot
 
-    def yRotation(self):
+    def getYRotation(self):
         return self.yRot
 
-    def zRotation(self):
+    def getZRotation(self):
         return self.zRot
 
     def minimumSizeHint(self):
