@@ -7,5 +7,3 @@ ps2pdf grafik.ps
 
 pdfcrop grafik.pdf grafik-crop.pdf % <--- cuts white border
 pdflatex dokument.tex
-
-#test commit#
