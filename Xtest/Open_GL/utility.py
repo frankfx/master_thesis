@@ -27,6 +27,7 @@ def createXcoordsCosineSpacing(c=1.0, point_cnt=35):
 @return: x coordinates computed by linear spacing
 '''
 def createXcoordsLinear(c=1.0, point_cnt=35):
+    if point_cnt == 0 : return [0.0]
     interval = c/ (point_cnt*1.0)
     print c , point_cnt
     print "interval" , interval
@@ -35,7 +36,7 @@ def createXcoordsLinear(c=1.0, point_cnt=35):
         p = res[i] + interval
         if p < c : res.append(p)
         elif equalFloats(p, c) : 
-            res.append(p)
+            res.append(c)
             return res
         else : break
             
