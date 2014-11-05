@@ -47,8 +47,23 @@ class Renderer():
 
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glEnable(GL.GL_LIGHTING)
+        GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_COLOR_MATERIAL)
         GL.glClearColor(0.0, 0.0 , 0.0, 1.0)
+
+        # set lighting intensity and color
+        qaAbientLight = [0.2, 0.2, 0.2, 1.0]
+        qaDiffuseLight = [0.8, 0.8, 0.8, 1.0]
+        qaSpecularLight = [1.0, 1.0, 1.0, 1.0]
+        GL.glLightf(GL.GL_LIGHT0, GL.GL_AMBIENT, qaAbientLight)
+        GL.glLightf(GL.GL_LIGHT0, GL.GL_DIFFUSE, qaDiffuseLight)
+        GL.glLightf(GL.GL_LIGHT0, GL.GL_SPECULAR, qaSpecularLight)
+    
+        # set the light position
+        qaLightPosition = [0.0, 0.0, 0.0, 1.0]
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, qaLightPosition)
+    
     
     def resize(self, w, h):
         #GL.glViewport(0,0,w,h)
@@ -85,20 +100,21 @@ class Renderer():
         #GL.glLineWidth(2)
         GL.glPointSize(8)
         GL.glColor3f(0.0, 1.0, 0.0)
-        GL.glEnable(GL.GL_BLEND)
-        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_SRC_ALPHA)
+        #GL.glEnable(GL.GL_BLEND)
+        #GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_SRC_ALPHA)
         # draw upper
-        #self.drawShape(self.pList_wing_up, [0.0, 1.0, 0.0])
+        self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67])
         # draw lower
-        #self.drawShape(self.pList_wing_lo, [0.0, 1.0, 0.0])
+        self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67])
 
         # draw reflect upper
-        #self.drawShape(self.pList_wing_up, [1.0, 1.0, 0.0], -1)
+        self.drawShape(self.pList_wing_up, [0.76, 0.79, 0.50], -1)
         # draw reflect lower
-        #self.drawShape(self.pList_wing_lo, [1.0, 1.0, 0.0], -1)
+        self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50], -1)
         self.createComponent()
         # draw fuselage
-        self.drawShape(self.pList_fuselage, [0.0, 0.0, 1.0])
+        self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67])
+
 
 
     def drawShape(self, pList, color, reflect= 1):
@@ -143,7 +159,8 @@ class Renderer():
                 for eta in eta_List :
                     for xsi in xsi_List :
                         _,_,eta_s, xsi_s = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, eta, xsi)
-                        self.tigl.wing
+                        #self.tigl.wing
+                        print eta_s , "m" , xsi_s
 
     def createFuselage(self, point_cnt_eta = 6, point_cnt_zeta = 20):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
