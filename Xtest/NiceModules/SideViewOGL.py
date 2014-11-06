@@ -53,14 +53,14 @@ class Renderer():
     def init(self):
         mat_specular   = [1.0, 1.0, 1.0, 1.0]
         mat_shininess  = [50.0]
-        light_position = [0.75, 0.0, 1.0, 0.0]
+        self.light_position = [0.75, 0.0, 1.0, 0.0]
    
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
         GL.glShadeModel (GL.GL_SMOOTH)
 
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, self.light_position)
 
         #GL.glEnable(GL.GL_COLOR_MATERIAL)
         GL.glEnable(GL.GL_LIGHTING)
@@ -79,7 +79,6 @@ class Renderer():
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()
         
-        
 
     def __setRendermodus(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
@@ -94,18 +93,28 @@ class Renderer():
         # Clear screen and Z-buffer
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
+
+        
 #        GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
+        #-------------------------------- GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
+        #-------------------------------- GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
+        #-------------------------------- GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
+        
+        GL.glPushMatrix()
+        GL.glTranslatef(0.0, 0.0, -5.0)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
-        GL.glRotated(self.zRot, 0.0, 0.0, 1.0) 
+        GL.glRotated(self.zRot, 0.0, 0.0, 1.0)  
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, self.light_position)
+        GLUT.glutInit()
+        GLUT.glutSolidSphere (1.0, 20, 16)
+        GL.glPopMatrix()
         
-        self.init()
         #self.draw()
 
 
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-        GLUT.glutInit()
-        GLUT.glutSolidSphere (1.0, 20, 16)
+        
+
         GL.glFlush() 
 
 
