@@ -39,9 +39,10 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         self.scale  = 3.0
         self.xTrans = 0.0
         self.yTrans = 0.0
-        self.width  = -1.0
-        self.height = -1.0
-        self.aspect = 0.0
+
+        self.aspect = 0.5
+        self.viewwidth = 0.0
+        self.viewheight = 0.0
         
         # helper
         self.lastPos_x = 0.0
@@ -60,10 +61,11 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         GL.glShadeModel(GL.GL_FLAT)
 
     def resizeGL(self, w, h):
-        self.aspect = 1.0 * w / h
-        self.width , self.height = w , h
+        side = min(w, h)
+        self.viewwidth = side
+        self.viewheight = side
         
-        GL.glViewport(0,0,w,h)
+        GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
         self.__setRendermodus()
 
     def paintGL(self):
@@ -77,8 +79,8 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     def __setRendermodus(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-        GL.glOrtho(-0.5 * self.aspect * self.scale, +0.5 * self.aspect * self.scale, +0.5 * self.scale, -0.5 * self.scale, 0.0, 15.0)
-
+        GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
+                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, 0.0, 12.0)
     # ================================================================================================================
     # drawing functions
     # ================================================================================================================
@@ -241,7 +243,7 @@ class ProfileWidget(QtOpenGL.QGLWidget):
     def keyPressEvent(self, event):
         redraw = False
         offset_rot   = 2.0
-        offset_scale = 0.002       
+        offset_scale = 0.1       
         if event.key() == QtCore.Qt.Key_Plus:
             self.scale -= offset_scale
             redraw = True
@@ -276,12 +278,16 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         self.lastPos_x += dx
         self.lastPos_y += dy
 
-        #Betrachtsfeld = -1 bis 1
+        #Betrachtsfeld = -aspect bis aspect
         
-        #print self.width 
-        #print self.height 
+        oglXunit = 2.0 * self.aspect * self.scale
+        oglYunit = oglXunit
         
-        self.xTrans += (2*dx / (self.width*1.0)) 
-        self.yTrans += (2*dy / (self.height*1.0))
+        # pixel real world to Pixel ogl world 
+        oglXTrans = oglXunit * 1.0 / self.viewwidth
+        oglYTrans = oglYunit * 1.0 / self.viewheight
+        
+        self.xTrans += (dx * oglXTrans) 
+        self.yTrans += (dy * oglYTrans)
 
         self.updateGL()

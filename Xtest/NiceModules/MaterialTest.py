@@ -1,4 +1,9 @@
 '''
+Created on Nov 6, 2014
+
+@author: fran_re
+'''
+'''
 Created on Jul 30, 2014
 
 @author: fran_re
@@ -29,6 +34,7 @@ class Renderer():
 
         self.tixi = Tixi()
         self.tixi.open('simpletest.cpacs.xml')
+        #self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -50,7 +56,41 @@ class Renderer():
         self.viewwidth = 0.0
         self.viewheight = 0.0
         
+        
+        
+        # =====================================
+        self.angle = 0.0
+
+        self.redDiffuseMaterial = [1.0, 0.0, 0.0]
+        # set the material to white
+        self.whiteSpecularMaterial = [1.0, 1.0, 1.0]
+        # set the material to green
+        self.greenEmissiveMaterial = [0.0, 1.0, 0.0]
+
+        # set the light specular to white
+        self.whiteSpecularLight = [1.0, 1.0, 1.0]
+        # set the light ambient to black
+        self.blackAmbientLight = [0.0, 0.0, 0.0]
+        #set the diffuse light to white
+        self.whiteDiffuseLight = [1.0, 1.0, 1.0]
+        
+        # set the diffuse light to white
+        self.blankMaterial = [0.0, 0.0, 0.0] 
+        # set the shininess of the material
+        self.mShininess = [128]        
+        
+        
+        self.diffuse = False
+        self.emissive = False
+        self.specular = False        
+        
+        # =====================================
+        
+        
+        
     def init(self):
+        # GL.glEnable(GL.GL_COLOR_MATERIAL)
+          
         mat_specular   = [1.0, 1.0, 1.0, 1.0]
         mat_shininess  = [50.0]
         light_position = [0.75, 0.0, 1.0, 0.0]
@@ -67,46 +107,93 @@ class Renderer():
         GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_DEPTH_TEST)        
         
-    def resize(self, w, h):
-        side = min(w, h)
-        self.viewwidth = side
-        self.viewheight = side
         
-        GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
+       # GL.glClearColor(1.0, 1.0 , 1.0, 1.0)
 
-        self.__setRendermodus()        
-        
-        GL.glMatrixMode(GL.GL_MODELVIEW)
+    def light(self):
+        # Now I am just assigning the colours to the current light       
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, self.whiteSpecularLight)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, self.blackAmbientLight)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, self.whiteDiffuseLight)
+
+    def resize(self, w, h):
+        GL.glViewport(0,0,w,h)
+        GL.glMatrixMode (GL.GL_PROJECTION)
         GL.glLoadIdentity()
+        GLU.gluPerspective (60, w / h, 1.0, 100.0)
+        GL.glMatrixMode (GL.GL_MODELVIEW)
         
         
+        #side = min(w, h)
+        #self.viewwidth = side
+        #self.viewheight = side
+        
+       # GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
+
+       # self.__setRendermodus()
 
     def __setRendermodus(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
        
         GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
-                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 12.0)
-
+                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, 0.0, 12.0)
         
+        #http://devernay.free.fr/cours/opengl/materials.html
+        mat = []
+        mat[0] = 0.24725
+        mat[1] = 0.1995 
+        mat[2] = 0.0745 
+        mat[3] = 1.0
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, mat)
+        mat[0] = 0.75164
+        mat[1] = 0.60648
+        mat[2] = 0.22648
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, mat)
+        mat[0] = 0.628281 
+        mat[1] = 0.555802 
+        mat[2] = 0.366065
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat)
+        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, 0.4 * 128.0)
+
+
+
+
+
+
+
+
     def display(self):
-        self.__setRendermodus()
+       # self.__setRendermodus()
+        
+      #  GL.glClearColor (0.0,0.0,0.0,1.0)
         # Clear screen and Z-buffer
-        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
+        #GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
-#        GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
-        GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
-        GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
-        GL.glRotated(self.zRot, 0.0, 0.0, 1.0) 
+       # GL.glLoadIdentity()
+       # self.light()
+       # GL.glTranslatef(0,0,-5)
+    
+       # GL.glRotatef(self.angle,1,1,1)
         
-        self.init()
-        #self.draw()
-
-
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GLUT.glutInit()
         GLUT.glutSolidSphere (1.0, 20, 16)
-        GL.glFlush() 
+        GL.glFlush()        
+        
+        
+       # GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
+       # GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
+       # GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
+       # GL.glRotated(self.zRot, 0.0, 0.0, 1.0) 
+
+        # rotate around x to see the profile
+        #GL.glRotatef(90,1,0,0)    
+        GLUT.glutInit()
+        GLUT.glutSolidTeapot(2)
+        self.angle+=1
+        #self.draw()
+        GL.glFlush()    
 
 
     def draw(self):
@@ -143,8 +230,9 @@ class Renderer():
     '''
     def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
        # GL.glColor4f(color[0], color[1], color[2], color[3])
-     #   GL.glColor3f(color[0], color[1], color[2])
+        GL.glColor3f(color[0], color[1], color[2])
         
+        GL.glTexGeni(GL.GL_S, GL.GL_TEXTURE_GEN_MODE, GL.GL_SPHERE_MAP)
         GL.glBegin(glMode)
         for shape in pList :
             for i in range (0, len(shape)-1, 1):
@@ -280,33 +368,68 @@ class Widget(QtOpenGL.QGLWidget):
         self.updateGL()
 
     def keyPressEvent(self, event):
-        redraw = False
-        offset_rot   = 2.0
-        offset_scale = 0.1
+        #-------------------------------------------------------- redraw = False
+        #---------------------------------------------------- offset_rot   = 1.0
+        #---------------------------------------------------- offset_scale = 0.1
         # Right arrow - increase rotation by 5 degree
-        if event.key() == QtCore.Qt.Key_Right :
-            self.renderer.yRot += offset_rot
-            redraw = True
-        # Left arrow - decrease rotation by 5 degree
-        elif event.key() == QtCore.Qt.Key_Left :
-            self.renderer.yRot -= offset_rot
-            redraw = True
-        elif event.key() == QtCore.Qt.Key_Up :
-            self.renderer.xRot += offset_rot
-            redraw = True
-        elif event.key() == QtCore.Qt.Key_Down :
-            self.renderer.xRot -= offset_rot
-            redraw = True
-        elif event.key() == QtCore.Qt.Key_Plus :
-            self.renderer.scale += offset_scale
-            redraw = True
-        elif event.key() == QtCore.Qt.Key_Minus :
-            self.renderer.scale -= offset_scale
-            redraw = True
+        #------------------------------- if event.key() == QtCore.Qt.Key_Right :
+            #---------------------------------- self.renderer.yRot += offset_rot
+            #----------------------------------------------------- redraw = True
+        #-------------------------- # Left arrow - decrease rotation by 5 degree
+        #------------------------------ elif event.key() == QtCore.Qt.Key_Left :
+            #---------------------------------- self.renderer.yRot -= offset_rot
+            #----------------------------------------------------- redraw = True
+        #-------------------------------- elif event.key() == QtCore.Qt.Key_Up :
+            #---------------------------------- self.renderer.xRot += offset_rot
+            #----------------------------------------------------- redraw = True
+        #------------------------------ elif event.key() == QtCore.Qt.Key_Down :
+            #---------------------------------- self.renderer.xRot -= offset_rot
+            #----------------------------------------------------- redraw = True
+        #------------------------------ elif event.key() == QtCore.Qt.Key_Plus :
+            #------------------------------- self.renderer.scale += offset_scale
+            #----------------------------------------------------- redraw = True
+        #----------------------------- elif event.key() == QtCore.Qt.Key_Minus :
+            #------------------------------- self.renderer.scale -= offset_scale
+            #----------------------------------------------------- redraw = True
+  
+        if event.key() == QtCore.Qt.Key_S :
+            if self.renderer.specular==False :
+                # If specular is enabled then set the specular material to the white material,
+                # and the shininess to our shininess value
+                self.renderer.specular = True
+                GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, self.renderer.whiteSpecularMaterial)
+                GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, self.renderer.mShininess)
+            elif self.renderer.specular == True :
+                # If specular is not enabled then set the specular material to the blank material,
+                # and the shininess value to our blank material
+                self.renderer.specular = False
+                GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, self.renderer.blankMaterial)
+                GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, self.renderer.blankMaterial)
+
+        if event.key() == QtCore.Qt.Key_D :
+            if self.renderer.diffuse == False :
+                #If diffuse is enabled then set the diffuse material to the red material
+                self.renderer.diffuse = True
+                GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, self.renderer.redDiffuseMaterial)
+            elif self.renderer.diffuse==True :
+                #If diffuse is not enabled then set the diffuse material to the blank material
+                self.renderer.diffuse = False
+                GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, self.renderer.blankMaterial)
+
+        if event.key() == QtCore.Qt.Key_E :
+            if self.renderer.emissive == False :
+                # If emissive is enabled then set the emissive material to the green material
+                self.renderer.emissive = True
+                GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_EMISSION, self.renderer.greenEmissiveMaterial)
+            elif self.renderer.emissive == True :
+                # If emissive is not enabled then set the emissive material to the blank material
+                self.renderer.emissive = False
+                GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_EMISSION, self.renderer.blankMaterial)
+  
   
         # Request display update
-        if redraw :
-            self.updateGL()
+       # if redraw :
+        self.updateGL()
     
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
