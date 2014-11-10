@@ -45,28 +45,28 @@ class Renderer():
         self.zRot = 0
         self.xTrans = 0
         self.yTrans = 0  
-        self.scale = 6.0 
+        self.scale = 5.0 
         self.aspect= 0.5  
         self.viewwidth = 0.0
         self.viewheight = 0.0
         
+        self.highShininess    = False # Whether the shininess parameter is high
+        self.lowSpecularity   = False # Whether the specularity parameter is high
+        self.emission         = False # Whether the emission parameter is turned on        
+          
+
     def init(self):
-        mat_specular   = [1.0, 1.0, 1.0, 1.0]
-        mat_shininess  = [50.0]
-        self.light_position = [0.75, 0.0, 1.0, 0.0]
-   
-        GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-        GL.glShadeModel (GL.GL_SMOOTH)
-
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, self.light_position)
-
-        #GL.glEnable(GL.GL_COLOR_MATERIAL)
+        GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glEnable(GL.GL_LIGHTING)
         GL.glEnable(GL.GL_LIGHT0)
-        GL.glEnable(GL.GL_DEPTH_TEST)        
-        
+        GL.glEnable(GL.GL_NORMALIZE)
+       # GL.glEnable(GL.GL_AUTO_NORMAL)
+        #GL.glShadeModel(GL.GL_SMOOTH)
+       # GL.glDisable(GL.GL_COLOR_MATERIAL)         
+#    def init(self):
+#        GL.glClearColor (1.0, 1.0, 1.0, 0.0)
+#        GL.glShadeModel (GL.GL_SMOOTH)
+
     def resize(self, w, h):
         side = min(w, h)
         self.viewwidth = side
@@ -76,10 +76,6 @@ class Renderer():
 
         self.__setRendermodus()        
         
-        GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()
-        
-
     def __setRendermodus(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
@@ -90,38 +86,39 @@ class Renderer():
         
     def display(self):
         self.__setRendermodus()
+ 
         # Clear screen and Z-buffer
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
-
-        
-#        GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
-        #-------------------------------- GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
-        #-------------------------------- GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
-        #-------------------------------- GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
+        GL.glMatrixMode(GL.GL_MODELVIEW)
+        GL.glLoadIdentity()         
         
         GL.glPushMatrix()
-        GL.glTranslatef(0.0, 0.0, -5.0)
+        GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
-        GL.glRotated(self.zRot, 0.0, 0.0, 1.0)  
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, self.light_position)
-        GLUT.glutInit()
-        GLUT.glutSolidSphere (1.0, 20, 16)
-        GL.glPopMatrix()
+        GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
         
         #self.draw()
+        self.drawCube()
+        GLUT.glutInit()
+        GLUT.glutSolidCone(1.0,1.0,150,80)
+        #GLUT.glutSolidTeapot(1.4)        
+        GL.glPopMatrix()
 
+        #self.initMaterial()        
+        self.initLight()
 
-        
 
         GL.glFlush() 
+
+
 
 
     def draw(self):
         #GL.glLineWidth(2)
         GL.glPointSize(8)
-        GL.glColor3f(0.0, 1.0, 0.0)
+       # GL.glColor3f(0.0, 1.0, 0.0)
         #GL.glEnable(GL.GL_BLEND)
         #GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_SRC_ALPHA)
         # draw upper
@@ -135,7 +132,8 @@ class Renderer():
         #self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1)
         
         # draw fuselage
-        self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"])
+        
+       # self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"])
 
         # draw ComponentSegment
        # GL.glLineWidth(9)
@@ -146,13 +144,126 @@ class Renderer():
         # GL.glColor3f(1, 0, 1)
        #self.drawShape(self.pList_wing_up, [1.0, 0.0, 1.0], Renderer.glMode["GL_POINTS"])
 
+
+
+    #------------------------------------------------------ def initLight(self):
+#------------------------------------------------------------------------------ 
+        #------------------------------ #Farben der Lichtquelle setzen (r,g,b,a)
+        #--------------------------------------- ambient  = [0.1, 0.0, 0.0, 1.0]
+        #--------------------------------------- diffuse  = [0.6, 0.4, 0.2, 1.0]
+        #--------------------------------------- specular = [0.6, 0.6, 0.4, 1.0]
+#------------------------------------------------------------------------------ 
+        #--------------------------------------------- GL.glEnable(GL.GL_LIGHT0)
+        #------------------- GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT,  ambient)
+        #------------------- GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE,  diffuse)
+        #------------------ GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, specular)
+#------------------------------------------------------------------------------ 
+    #--------------------------------------------------- def initMaterial(self):
+        #------------------------------------- # Materialfarben setzen (r,g,b,a)
+        #---------------------------------- globalAmbient = [0.0, 0.0, 0.0, 1.0]
+        #---------------------------------- ambient       = [1.0, 1.0, 1.0, 1.0]
+        #---------------------------------- diffuse       = [1.0, 1.0, 1.0, 1.0]
+        #---------------------------------- specular      = [1.0, 1.0, 1.0, 1.0]
+#------------------------------------------------------------------------------ 
+        #---------------------------------------- # Globale ambiente Beleuchtung
+        #--------------------------------------------- # komplett herunternehmen
+        #----------- GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, globalAmbient)
+#------------------------------------------------------------------------------ 
+        #-------------------------------------------- # Materialparameter setzen
+        #----------- GL.glMaterialfv(GL.GL_FRONT_AND_BACK,GL.GL_AMBIENT,ambient)
+        #----------- GL.glMaterialfv(GL.GL_FRONT_AND_BACK,GL.GL_DIFFUSE,diffuse)
+        #--------- GL.glMaterialfv(GL.GL_FRONT_AND_BACK,GL.GL_SPECULAR,specular)
+        #------------ GL.glMaterialf (GL.GL_FRONT_AND_BACK,GL.GL_SHININESS,16.0)
+       
+
+    def drawCube(self):
+        GL.glBegin(GL.GL_QUADS)    # Begin drawing the color cube with 6 quads
+        val = 0.5
+        
+        # Front
+        GL.glNormal3f(0.0, 0.0, 1.0)
+        GL.glVertex3f(-1.5, -1.0, 1.5)
+        GL.glVertex3f(1.5, -1.0, 1.5)
+        GL.glVertex3f(1.5, 1.0, 1.5)
+        GL.glVertex3f(-1.5, 1.0, 1.5)
+        
+        # Right
+        GL.glNormal3f(1.0, 0.0, 0.0)
+        GL.glVertex3f(1.5, -1.0, -1.5)
+        GL.glVertex3f(1.5, 1.0, -1.5)
+        GL.glVertex3f(1.5, 1.0, 1.5)
+        GL.glVertex3f(1.5, -1.0, 1.5)
+        
+        # Back
+        GL.glNormal3f(0.0, 0.0, -1.0)
+        GL.glVertex3f(-1.5, -1.0, -1.5)
+        GL.glVertex3f(-1.5, 1.0, -1.5)
+        GL.glVertex3f(1.5, 1.0, -1.5)
+        GL.glVertex3f(1.5, -1.0, -1.5)
+        
+        # Left
+        GL.glNormal3f(-1.0, 0.0, 0.0)
+        GL.glVertex3f(-1.5, -1.0, -1.5)
+        GL.glVertex3f(-1.5, -1.0, 1.5)
+        GL.glVertex3f(-1.5, 1.0, 1.5)
+        GL.glVertex3f(-1.5, 1.0, -1.5)      
+        GL.glEnd()
+    
+    def initLight(self):
+
+        ambientLight = [0.2, 0.2, 0.2, 1.0]
+        GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, ambientLight)
+
+        lightColor  = [0.6, 0.6, 0.6, 1.0]
+        lightPos    = [1.5, 2, 1.5, 1.0]
+        # Diffuse (non-shiny) light component
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, lightColor)
+        # Specular (shiny) light component
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, lightColor)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, lightPos)
+
+        specularity = 0.0
+        emissivity  = 0.0
+        shininess   = 0.0
+
+        if self.lowSpecularity :
+            specularity = 0.3
+        else :
+            specularity = 1.0
+
+        if self.emission :
+            emissivity = 0.05
+        else :
+            emissivity = 0
+
+        if self.highShininess :
+            shininess = 25
+        else :
+            shininess = 12
+
+        # The color of the sphere
+        materialColor = [0.2, 0.2, 1.0, 1.0]
+        # The specular (shiny) component of the material
+        materialSpecular = [specularity, specularity, specularity, 1.0]
+        # The color emitted by the material
+        materialEmission = [emissivity, emissivity, emissivity, 1.0]
+
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, materialColor)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, materialSpecular)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, materialEmission)
+        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, shininess) #The shininess parameter
+    
+    
+    
+    
+    
     '''
     @param reflect: normal mode set 1 , reflect mode set -1
     @param flag_strip: strip mode set True , not strip set False
     '''
     def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
        # GL.glColor4f(color[0], color[1], color[2], color[3])
-     #   GL.glColor3f(color[0], color[1], color[2])
+       # GL.glColor3f(color[0], color[1], color[2])
         
         GL.glBegin(glMode)
         for shape in pList :
@@ -312,6 +423,17 @@ class Widget(QtOpenGL.QGLWidget):
         elif event.key() == QtCore.Qt.Key_Minus :
             self.renderer.scale -= offset_scale
             redraw = True
+        elif event.key() == QtCore.Qt.Key_Escape :
+            sys.exit()
+        elif event.key() == QtCore.Qt.Key_S :
+            self.renderer.highShininess = not self.renderer.highShininess
+            redraw = True
+        elif event.key() == QtCore.Qt.Key_P :
+            self.renderer.lowSpecularity = not self.renderer.lowSpecularity
+            redraw = True
+        elif event.key() == QtCore.Qt.Key_E :
+            self.renderer.emission = not self.renderer.emission
+            redraw = True    
   
         # Request display update
         if redraw :
