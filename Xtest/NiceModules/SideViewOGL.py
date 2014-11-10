@@ -10,6 +10,7 @@ from tiglwrapper import Tigl, TiglException
 from tixiwrapper import Tixi
 from PySide import QtOpenGL, QtGui, QtCore
 from Xtest.Open_GL import utility
+from _curses import noraw
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -23,12 +24,13 @@ except ImportError:
 
 class Renderer():
 
-    glMode = {"GL_POINTS" : GL.GL_POINTS , "GL_QUADS" : GL.GL_QUADS, "GL_QUAD_STRIP" : GL.GL_QUAD_STRIP}
+    glMode = {"GL_POINTS" : GL.GL_POINTS, "GL_LINES" : GL.GL_LINES, "GL_LINE_STRIP" : GL.GL_LINE_STRIP, "GL_LINE_LOOP" : GL.GL_LINE_LOOP , "GL_QUADS" : GL.GL_QUADS, "GL_QUAD_STRIP" : GL.GL_QUAD_STRIP}
     
     def __init__(self, width, height):
 
         self.tixi = Tixi()
         self.tixi.open('simpletest.cpacs.xml')
+        #self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -45,27 +47,18 @@ class Renderer():
         self.zRot = 0
         self.xTrans = 0
         self.yTrans = 0  
-        self.scale = 5.0 
+        self.scale = 10.0 
         self.aspect= 0.5  
         self.viewwidth = 0.0
         self.viewheight = 0.0
         
-        self.highShininess    = False # Whether the shininess parameter is high
-        self.lowSpecularity   = False # Whether the specularity parameter is high
-        self.emission         = False # Whether the emission parameter is turned on        
-          
-
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glEnable(GL.GL_LIGHTING)
         GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_NORMALIZE)
-       # GL.glEnable(GL.GL_AUTO_NORMAL)
-        #GL.glShadeModel(GL.GL_SMOOTH)
-       # GL.glDisable(GL.GL_COLOR_MATERIAL)         
-#    def init(self):
-#        GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-#        GL.glShadeModel (GL.GL_SMOOTH)
+        GL.glShadeModel(GL.GL_SMOOTH)
+        GL.glClearColor (1.0, 1.0, 1.0, 0.0)
 
     def resize(self, w, h):
         side = min(w, h)
@@ -83,7 +76,6 @@ class Renderer():
         GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
                     +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 12.0)
 
-        
     def display(self):
         self.__setRendermodus()
  
@@ -93,22 +85,20 @@ class Renderer():
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()         
         
+        self.initLight()        
+        
         GL.glPushMatrix()
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
+        GL.glShadeModel(GL.GL_FLAT)
         
-        #self.draw()
-        self.drawCube()
-        GLUT.glutInit()
-        GLUT.glutSolidCone(1.0,1.0,150,80)
-        #GLUT.glutSolidTeapot(1.4)        
+        self.draw()
+        # GLUT.glutInit()#
+        # GLUT.glutSolidTeapot(1.0)
+        
         GL.glPopMatrix()
-
-        #self.initMaterial()        
-        self.initLight()
-
 
         GL.glFlush() 
 
@@ -116,15 +106,10 @@ class Renderer():
 
 
     def draw(self):
-        #GL.glLineWidth(2)
-        GL.glPointSize(8)
-       # GL.glColor3f(0.0, 1.0, 0.0)
-        #GL.glEnable(GL.GL_BLEND)
-        #GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_SRC_ALPHA)
         # draw upper
-        #self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"])
+        self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUAD_STRIP"], 1, True)
         # draw lower
-        #self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"])
+        self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"], 1, False)
 
         # draw reflect upper
         #self.drawShape(self.pList_wing_up, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1)
@@ -132,129 +117,75 @@ class Renderer():
         #self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1)
         
         # draw fuselage
-        
-       # self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"])
+        #self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"])
 
         # draw ComponentSegment
-       # GL.glLineWidth(9)
-       # self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0])
+        #self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_POINTS"], 1, False)
+#        self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_LINES"], 1, True)
+#        self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_QUAD_STRIP"], 1, True)
 
         # draw Points
-        # GL.glPointSize(6)
-        # GL.glColor3f(1, 0, 1)
-       #self.drawShape(self.pList_wing_up, [1.0, 0.0, 1.0], Renderer.glMode["GL_POINTS"])
+        GL.glPointSize(6)
+        GL.glColor3f(1, 0, 1)
+        #self.drawShape(self.pList_wing_up, [1.0, 0.0, 1.0], Renderer.glMode["GL_POINTS"])
+
+      
 
 
+    def calculateSurfaceNormal(self, polynom):
+        normal = [0.0, 0.0, 0.0]
+        for i in range (len(polynom)) :
+            cur = polynom[i]
+            nxt = polynom[(i+1) % len(polynom)]
+            
+            normal[0] = normal[0] + ( (cur[1] - nxt[1]) * (cur[2] + nxt[2])) 
+            normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
+            normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
+            
+        return normal
+    
+    # normal in p1
+    def calculateVertexNormal(self, p1, p2, p3):
+        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
+        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
+        v = [0.0, 0.0, 0.0]
+        v[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
+        v[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2]
+        v[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0]
+        
+        return v
+    
 
-    #------------------------------------------------------ def initLight(self):
-#------------------------------------------------------------------------------ 
-        #------------------------------ #Farben der Lichtquelle setzen (r,g,b,a)
-        #--------------------------------------- ambient  = [0.1, 0.0, 0.0, 1.0]
-        #--------------------------------------- diffuse  = [0.6, 0.4, 0.2, 1.0]
-        #--------------------------------------- specular = [0.6, 0.6, 0.4, 1.0]
-#------------------------------------------------------------------------------ 
-        #--------------------------------------------- GL.glEnable(GL.GL_LIGHT0)
-        #------------------- GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT,  ambient)
-        #------------------- GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE,  diffuse)
-        #------------------ GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, specular)
-#------------------------------------------------------------------------------ 
-    #--------------------------------------------------- def initMaterial(self):
-        #------------------------------------- # Materialfarben setzen (r,g,b,a)
-        #---------------------------------- globalAmbient = [0.0, 0.0, 0.0, 1.0]
-        #---------------------------------- ambient       = [1.0, 1.0, 1.0, 1.0]
-        #---------------------------------- diffuse       = [1.0, 1.0, 1.0, 1.0]
-        #---------------------------------- specular      = [1.0, 1.0, 1.0, 1.0]
-#------------------------------------------------------------------------------ 
-        #---------------------------------------- # Globale ambiente Beleuchtung
-        #--------------------------------------------- # komplett herunternehmen
-        #----------- GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, globalAmbient)
-#------------------------------------------------------------------------------ 
-        #-------------------------------------------- # Materialparameter setzen
-        #----------- GL.glMaterialfv(GL.GL_FRONT_AND_BACK,GL.GL_AMBIENT,ambient)
-        #----------- GL.glMaterialfv(GL.GL_FRONT_AND_BACK,GL.GL_DIFFUSE,diffuse)
-        #--------- GL.glMaterialfv(GL.GL_FRONT_AND_BACK,GL.GL_SPECULAR,specular)
-        #------------ GL.glMaterialf (GL.GL_FRONT_AND_BACK,GL.GL_SHININESS,16.0)
-       
-
-    def drawCube(self):
-        GL.glBegin(GL.GL_QUADS)    # Begin drawing the color cube with 6 quads
-        val = 0.5
-        
-        # Front
-        GL.glNormal3f(0.0, 0.0, 1.0)
-        GL.glVertex3f(-1.5, -1.0, 1.5)
-        GL.glVertex3f(1.5, -1.0, 1.5)
-        GL.glVertex3f(1.5, 1.0, 1.5)
-        GL.glVertex3f(-1.5, 1.0, 1.5)
-        
-        # Right
-        GL.glNormal3f(1.0, 0.0, 0.0)
-        GL.glVertex3f(1.5, -1.0, -1.5)
-        GL.glVertex3f(1.5, 1.0, -1.5)
-        GL.glVertex3f(1.5, 1.0, 1.5)
-        GL.glVertex3f(1.5, -1.0, 1.5)
-        
-        # Back
-        GL.glNormal3f(0.0, 0.0, -1.0)
-        GL.glVertex3f(-1.5, -1.0, -1.5)
-        GL.glVertex3f(-1.5, 1.0, -1.5)
-        GL.glVertex3f(1.5, 1.0, -1.5)
-        GL.glVertex3f(1.5, -1.0, -1.5)
-        
-        # Left
-        GL.glNormal3f(-1.0, 0.0, 0.0)
-        GL.glVertex3f(-1.5, -1.0, -1.5)
-        GL.glVertex3f(-1.5, -1.0, 1.5)
-        GL.glVertex3f(-1.5, 1.0, 1.5)
-        GL.glVertex3f(-1.5, 1.0, -1.5)      
-        GL.glEnd()
     
     def initLight(self):
+        # mat_ambient   = [0.4, 0.4, 0.4, 1.0] 
+        mat_ambient    = [0.6, 0.6, 0.6, 1.0]
+        mat_diffuse    = [0.4, 0.8, 0.4, 1.0] 
+        mat_specular   = [1.0, 1.0, 1.0, 1.0]
+        light_position = [0.0, 0.0, 0.0, 1.0]        
 
-        ambientLight = [0.2, 0.2, 0.2, 1.0]
-        GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, ambientLight)
-
-        lightColor  = [0.6, 0.6, 0.6, 1.0]
-        lightPos    = [1.5, 2, 1.5, 1.0]
+        # GL_LIGHT_MODEL_AMBIENT, GL_LIGHT_MODEL_LOCAL_VIEWER,' GL_LIGHT_MODEL_TWO_SIDE und GL_LIGHT_MODEL_COLOR_CONTROL
+        GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
         # Diffuse (non-shiny) light component
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, lightColor)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
         # Specular (shiny) light component
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, lightColor)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, lightPos)
-
-        specularity = 0.0
-        emissivity  = 0.0
-        shininess   = 0.0
-
-        if self.lowSpecularity :
-            specularity = 0.3
-        else :
-            specularity = 1.0
-
-        if self.emission :
-            emissivity = 0.05
-        else :
-            emissivity = 0
-
-        if self.highShininess :
-            shininess = 25
-        else :
-            shininess = 12
-
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
+        
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
+        
         # The color of the sphere
-        materialColor = [0.2, 0.2, 1.0, 1.0]
+        mat_materialColor = [0.2, 0.2, 1.0, 1.0]
         # The specular (shiny) component of the material
-        materialSpecular = [specularity, specularity, specularity, 1.0]
+        mat_materialSpecular = [1.0, 1.0, 1.0, 1.0]
         # The color emitted by the material
-        materialEmission = [emissivity, emissivity, emissivity, 1.0]
+        mat_materialEmission = [0, 0, 0, 1.0]
+        #The shininess parameter
+        mat_shininess  = 50.0 
 
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, materialColor)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, materialSpecular)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, materialEmission)
-        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, shininess) #The shininess parameter
-    
-    
-    
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, mat_materialColor)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_materialSpecular)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
+        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
     
     
     '''
@@ -262,8 +193,9 @@ class Renderer():
     @param flag_strip: strip mode set True , not strip set False
     '''
     def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
-       # GL.glColor4f(color[0], color[1], color[2], color[3])
-       # GL.glColor3f(color[0], color[1], color[2])
+        #GL.glColor3f(color[0], color[1], color[2])
+        
+        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
         
         GL.glBegin(glMode)
         for shape in pList :
@@ -271,16 +203,66 @@ class Renderer():
                 seg1 = shape[i] 
                 seg2 = shape[i+1]
                 for j in range(0, len(seg1)-1, 1) :
-                    GL.glVertex3f(seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2])                     
-                    GL.glVertex3f(seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2])
+                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
+                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
                     if(flag_Strip):
-                        GL.glVertex3f(seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2])                     
-                        GL.glVertex3f(seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2])
+                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
+                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
                     else :
-                        GL.glVertex3f(seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2])
-                        GL.glVertex3f(seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2])
+                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
+                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
+
+                    vec = self.calculateSurfaceNormal(quad)
+                    GL.glNormal3f(vec[0], vec[1], vec[2])
+                    GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
+                    GL.glNormal3f(vec[0], vec[1], vec[2])                     
+                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
+                    GL.glNormal3f(vec[0], vec[1], vec[2])
+                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
+                    GL.glNormal3f(vec[0], vec[1], vec[2])
+                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])                     
         GL.glEnd() 
-   
+
+
+
+    '''
+    @param reflect: normal mode set 1 , reflect mode set -1
+    @param flag_strip: strip mode set True , not strip set False
+    '''
+    def drawShape2(self, pList, color, glMode, reflect=1, flag_Strip=False):
+        #GL.glColor3f(color[0], color[1], color[2])
+        
+        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        
+        GL.glBegin(glMode)
+        for shape in pList :
+            for i in range (0, len(shape)-1, 1):
+                seg1 = shape[i] 
+                seg2 = shape[i+1]
+                for j in range(0, len(seg1)-1, 1) :
+                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
+                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
+                    if(flag_Strip):
+                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
+                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
+                    else :
+                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
+                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
+
+                    vec = self.calculateSurfaceNormal(quad)
+                    GL.glNormal3f(vec[0], vec[1], vec[2])
+                    GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
+                    GL.glNormal3f(vec[0], vec[1], vec[2])                     
+                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
+                    GL.glNormal3f(vec[0], vec[1], vec[2])
+                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
+                    GL.glNormal3f(vec[0], vec[1], vec[2])
+                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])                     
+        GL.glEnd() 
+
+
+
+
 
 
     def createComponent(self, point_cnt_eta = 6, point_cnt_xsi = 20):
@@ -296,9 +278,6 @@ class Renderer():
                 for eta in eta_List :
                     p_tmp = []
                     for xsi in xsi_List :
-                      #  _,_,eta_s, xsi_s = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, eta, xsi)
-                     #   print "eta = " , eta , " ; xsi = " , xsi , " ------>  " ,  "eta_s = " , eta_s , " ; xsi_s = " , xsi_s
-                        
                         x, y, z = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, eta, xsi)
                         p_tmp.append([x,y,z])
                     plistSeg.append(p_tmp)
@@ -423,18 +402,7 @@ class Widget(QtOpenGL.QGLWidget):
         elif event.key() == QtCore.Qt.Key_Minus :
             self.renderer.scale -= offset_scale
             redraw = True
-        elif event.key() == QtCore.Qt.Key_Escape :
-            sys.exit()
-        elif event.key() == QtCore.Qt.Key_S :
-            self.renderer.highShininess = not self.renderer.highShininess
-            redraw = True
-        elif event.key() == QtCore.Qt.Key_P :
-            self.renderer.lowSpecularity = not self.renderer.lowSpecularity
-            redraw = True
-        elif event.key() == QtCore.Qt.Key_E :
-            self.renderer.emission = not self.renderer.emission
-            redraw = True    
-  
+
         # Request display update
         if redraw :
             self.updateGL()
