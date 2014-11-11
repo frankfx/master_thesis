@@ -10,7 +10,6 @@ Created on Jul 30, 2014
 @author: fran_re
 '''
 import numpy as np
-import cv2
 import sys
 from PySide import QtOpenGL, QtGui, QtCore
 try:

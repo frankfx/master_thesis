@@ -130,9 +130,9 @@ class Renderer():
         
        # GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
 
-       # self.__setRendermodus()
+       # self.__setProjection()
 
-    def __setRendermodus(self):
+    def __setProjection(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
        
@@ -164,7 +164,7 @@ class Renderer():
 
 
     def display(self):
-       # self.__setRendermodus()
+       # self.__setProjection()
         
       #  GL.glClearColor (0.0,0.0,0.0,1.0)
         # Clear screen and Z-buffer

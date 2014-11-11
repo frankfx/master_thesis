@@ -10,7 +10,6 @@ from tiglwrapper import Tigl, TiglException
 from tixiwrapper import Tixi
 from PySide import QtOpenGL, QtGui, QtCore
 from Xtest.Open_GL import utility
-from _curses import noraw
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -41,7 +40,7 @@ class Renderer():
         self.pList_fuselage = self.createFuselage() 
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
         self.pList_component_segment = self.createComponent()
-
+        
         self.xRot = 0
         self.yRot = 0
         self.zRot = 0
@@ -55,10 +54,12 @@ class Renderer():
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
         GL.glEnable(GL.GL_LIGHTING)
+        
         GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glShadeModel(GL.GL_SMOOTH)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
+        self.initLight()
 
     def resize(self, w, h):
         side = min(w, h)
@@ -67,9 +68,9 @@ class Renderer():
         
         GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
 
-        self.__setRendermodus()        
+        self.__setProjection()        
         
-    def __setRendermodus(self):
+    def __setProjection(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
        
@@ -77,47 +78,43 @@ class Renderer():
                     +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 12.0)
 
     def display(self):
-        self.__setRendermodus()
+        self.__setProjection()
  
         # Clear screen and Z-buffer
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()         
-        
-        self.initLight()        
-        
-        GL.glPushMatrix()
+      
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
-        GL.glShadeModel(GL.GL_FLAT)
         
-        self.draw()
-        # GLUT.glutInit()#
-        # GLUT.glutSolidTeapot(1.0)
-        
-        GL.glPopMatrix()
+       # self.initLight()
+        self.drawTestObject()
 
+        #GL.glShadeModel(GL.GL_FLAT)
+        # self.draw()
+        #GLUT.glutInit()#
+        #GLUT.glutSolidSphere(0.5,40,40)
+        
         GL.glFlush() 
-
-
 
 
     def draw(self):
         # draw upper
-        self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUAD_STRIP"], 1, True)
+        self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"], 1, False)
         # draw lower
         self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"], 1, False)
 
         # draw reflect upper
-        #self.drawShape(self.pList_wing_up, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1)
+        #self.drawShape(self.pList_wing_up, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1, False)
         # draw reflect lower
-        #self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1)
+       # self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1, False)
         
         # draw fuselage
-        #self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"])
+       # self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"], 1, False)
 
         # draw ComponentSegment
         #self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_POINTS"], 1, False)
@@ -129,7 +126,75 @@ class Renderer():
         GL.glColor3f(1, 0, 1)
         #self.drawShape(self.pList_wing_up, [1.0, 0.0, 1.0], Renderer.glMode["GL_POINTS"])
 
-      
+
+    '''
+    @param reflect: normal mode set 1 , reflect mode set -1
+    @param flag_strip: strip mode set True , not strip set False
+    '''
+    def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
+        #GL.glColor3f(color[0], color[1], color[2])
+        
+        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        
+        GL.glBegin(glMode)
+        for shape in pList :
+            normals = self.calculateNormal(shape)
+            for i in range (0, len(shape)-1, 1):
+                seg1 = shape[i] 
+                seg2 = shape[i+1]
+                for j in range(0, len(seg1)-1, 1) :
+                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
+                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
+                    if(flag_Strip):
+                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
+                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
+                    else :
+                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
+                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
+                    
+                    #GL.glNormal3f(normals[i][j+1][0], normals[i][j+1][1], normals[i][j+1][2])
+                    GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
+
+                    GL.glNormal3f(normals[i][j][0], reflect * normals[i][j][1], normals[i][j][2])
+                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
+                   
+                    #GL.glNormal3f(normals[i+1][j+1][0], normals[i+1][j+1][1], normals[i+1][j+1][2])
+                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
+                    
+                   # GL.glNormal3f(normals[i][j][0], reflect * normals[i][j][1], normals[i][j][2])
+                    #GL.glNormal3f(0.0, -1.0, 0.0)
+                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])     
+                #break                
+        GL.glEnd() 
+
+
+
+
+
+    def calculateNormal(self, plist):
+        n = len(plist)
+        m = len(plist[0])
+        plist_n = []
+        for i in range(n) :
+            normal_tmp = []
+            for j in range(m):
+                n1 = [0.0, 0.0, 0.0] if j<=0   or i<=0   else self.calculateVertexNormal(plist[i][j], plist[i][j-1], plist[i-1][j])
+                n2 = [0.0, 0.0, 0.0] if j+1>=m or i<=0   else self.calculateVertexNormal(plist[i][j], plist[i-1][j], plist[i][j+1])
+                n3 = [0.0, 0.0, 0.0] if j+1>=m or i+1>=n else self.calculateVertexNormal(plist[i][j], plist[i][j+1], plist[i+1][j])
+                n4 = [0.0, 0.0, 0.0] if j<=0   or i+1>=n else self.calculateVertexNormal(plist[i][j], plist[i+1][j], plist[i][j-1])
+                
+                n1 = self.normalised(n1)
+                n2 = self.normalised(n2)
+                n3 = self.normalised(n3)
+                n4 = self.normalised(n4)
+                
+                
+                
+                
+                normal = [n1[0] + n2[0] + n3[0] + n4[0] , n1[1] + n2[1] + n3[1] + n4[1] , n1[2] + n2[2] + n3[2] + n4[2]]
+                normal_tmp.append(normal)
+            plist_n.append(normal_tmp)
+        return plist_n
 
 
     def calculateSurfaceNormal(self, polynom):
@@ -155,6 +220,17 @@ class Renderer():
         
         return v
     
+    
+    def lenVector(self, v):
+        import math
+        return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+    
+    def normalised(self, v):
+        l = self.lenVector(v)
+        if l == 0.0 :
+            return [0.0, 0.0, 0.0]
+        else :
+            return [v[0] / l, v[1] / l, v[2] / l]
 
     
     def initLight(self):
@@ -164,12 +240,13 @@ class Renderer():
         mat_specular   = [1.0, 1.0, 1.0, 1.0]
         light_position = [0.0, 0.0, 0.0, 1.0]        
 
+
         # GL_LIGHT_MODEL_AMBIENT, GL_LIGHT_MODEL_LOCAL_VIEWER,' GL_LIGHT_MODEL_TWO_SIDE und GL_LIGHT_MODEL_COLOR_CONTROL
         GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
         # Diffuse (non-shiny) light component
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
+       # GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
         # Specular (shiny) light component
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
+        #GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
         
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
         
@@ -180,84 +257,76 @@ class Renderer():
         # The color emitted by the material
         mat_materialEmission = [0, 0, 0, 1.0]
         #The shininess parameter
-        mat_shininess  = 50.0 
+        mat_shininess  = 0.4 
 
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE, mat_materialColor)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_materialSpecular)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
-        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
+        mat_ambient    = [0.24725,  0.1995, 0.0745, 1.0]
+        mat_diffuse    = [0.75164, 0.60648, 0.22648, 1.0] 
+        mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
+
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
+       # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
+        GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
     
     
-    '''
-    @param reflect: normal mode set 1 , reflect mode set -1
-    @param flag_strip: strip mode set True , not strip set False
-    '''
-    def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
-        #GL.glColor3f(color[0], color[1], color[2])
+    
+    def drawTestObject(self):
+
+        plist1 = [[0.0, 0.0, 0.0], [0.030153689607045786, 0.0, 0.02844221322094448], 
+                 [0.116977778440511, 0.0, 0.04945887299475936], [0.24999999999999994, 0.0, 0.059412421875], 
+                 [0.4131759111665348, 0.0, 0.05751322692417564], [0.5868240888334652, 0.0, 0.046701524680852695], 
+                 [0.7499999999999999, 0.0, 0.0316030623052], [0.883022221559489, 0.0, 0.01657043903018468], 
+                 [0.9698463103929542, 0.0, 0.005413502659613883], [1.0, 0.0, 0.0]] 
+        plist2 = [[0.0, 0.25, 0.0], [0.030153689607045786, 0.25, 0.02844221322094448], 
+                  [0.116977778440511, 0.25, 0.04945887299475936], [0.24999999999999994, 0.25, 0.059412421875], 
+                  [0.4131759111665348, 0.25, 0.05751322692417564], [0.5868240888334652, 0.25, 0.046701524680852695], 
+                  [0.7499999999999999, 0.25, 0.0316030623052], [0.883022221559489, 0.25, 0.01657043903018468], 
+                  [0.9698463103929542, 0.25, 0.005413502659613883], [1.0, 0.25, 0.0]]
+
         
-        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-        
-        GL.glBegin(glMode)
-        for shape in pList :
-            for i in range (0, len(shape)-1, 1):
-                seg1 = shape[i] 
-                seg2 = shape[i+1]
-                for j in range(0, len(seg1)-1, 1) :
-                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
-                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
-                    if(flag_Strip):
-                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
-                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
-                    else :
-                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
-                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
-
-                    vec = self.calculateSurfaceNormal(quad)
-                    GL.glNormal3f(vec[0], vec[1], vec[2])
-                    GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
-                    GL.glNormal3f(vec[0], vec[1], vec[2])                     
-                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
-                    GL.glNormal3f(vec[0], vec[1], vec[2])
-                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
-                    GL.glNormal3f(vec[0], vec[1], vec[2])
-                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])                     
-        GL.glEnd() 
+        GL.glBegin(GL.GL_QUADS)
+        for i in range(len(plist1)-1) :
+            s = self.calculateSurfaceNormal([plist1[i+1], plist1[i], plist2[i], plist2[i+1]])
+            GL.glNormal3fv(s)
+            GL.glVertex3f(plist1[i+1][0], plist1[i+1][1], plist1[i+1][2])
+            GL.glVertex3f(plist1[i][0]  , plist1[i][1]  , plist1[i][2])
+            GL.glVertex3f(plist2[i][0]  , plist2[i][1]  , plist2[i][2])
+            GL.glVertex3f(plist2[i+1][0], plist2[i+1][1] , plist2[i+1][2])
+        GL.glEnd()
+    
+    
 
 
 
-    '''
-    @param reflect: normal mode set 1 , reflect mode set -1
-    @param flag_strip: strip mode set True , not strip set False
-    '''
+
     def drawShape2(self, pList, color, glMode, reflect=1, flag_Strip=False):
         #GL.glColor3f(color[0], color[1], color[2])
-        
-        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-        
+        print "sdf"
         GL.glBegin(glMode)
         for shape in pList :
+            normals = self.calculateNormal(shape)
             for i in range (0, len(shape)-1, 1):
                 seg1 = shape[i] 
                 seg2 = shape[i+1]
                 for j in range(0, len(seg1)-1, 1) :
-                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
-                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
-                    if(flag_Strip):
-                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
-                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
-                    else :
-                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
-                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
+                    #   GL.glNormal3f(normals[i][j+1][0], normals[i][j+1][1], normals[i][j+1][2])
+                    GL.glVertex3f(seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]) 
+                   
+                  #  GL.glNormal3f(normals[i][j][0], normals[i][j][1], normals[i][j][2])
+                    GL.glVertex3f(seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]) 
+           
+                  #  GL.glNormal3f(normals[i+1][j+1][0], normals[i+1][j+1][1], normals[i+1][j+1][2])
+                    GL.glVertex3f(seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2])             
+           
+                   
+                   # GL.glNormal3f(normals[i][j][0], normals[i][j][1], normals[i][j][2])
+                    GL.glVertex3f(seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2])                   
+                    
 
-                    vec = self.calculateSurfaceNormal(quad)
-                    GL.glNormal3f(vec[0], vec[1], vec[2])
-                    GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
-                    GL.glNormal3f(vec[0], vec[1], vec[2])                     
-                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
-                    GL.glNormal3f(vec[0], vec[1], vec[2])
-                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
-                    GL.glNormal3f(vec[0], vec[1], vec[2])
-                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])                     
+                    
+
+               # break     
         GL.glEnd() 
 
 
@@ -265,7 +334,7 @@ class Renderer():
 
 
 
-    def createComponent(self, point_cnt_eta = 6, point_cnt_xsi = 20):
+    def createComponent(self, point_cnt_eta = 40, point_cnt_xsi = 40):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
              
@@ -285,7 +354,7 @@ class Renderer():
 
         return plistComp
         
-    def createFuselage(self, point_cnt_eta = 6, point_cnt_zeta = 20):
+    def createFuselage(self, point_cnt_eta = 6, point_cnt_zeta = 30):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta) 
         
@@ -304,7 +373,7 @@ class Renderer():
         
         return plistFuse 
 
-    def createWing(self, point_cnt_eta = 4, point_cnt_xsi = 20):
+    def createWing(self, point_cnt_eta = 6, point_cnt_xsi = 50):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
         
@@ -381,7 +450,7 @@ class Widget(QtOpenGL.QGLWidget):
     def keyPressEvent(self, event):
         redraw = False
         offset_rot   = 2.0
-        offset_scale = 0.1
+        offset_scale = 0.2
         # Right arrow - increase rotation by 5 degree
         if event.key() == QtCore.Qt.Key_Right :
             self.renderer.yRot += offset_rot

@@ -66,17 +66,17 @@ class ProfileWidget(QtOpenGL.QGLWidget):
         self.viewheight = side
         
         GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
-        self.__setRendermodus()
+        self.__setProjection()
 
     def paintGL(self):
-        self.__setRendermodus()
+        self.__setProjection()
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
         self.drawGrid()
         self.drawProfile()
         GL.glFlush()
     
-    def __setRendermodus(self):
+    def __setProjection(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
         GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
