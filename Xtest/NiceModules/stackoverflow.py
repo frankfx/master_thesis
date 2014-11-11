@@ -1,3 +1,9 @@
+'''
+Created on Nov 11, 2014
+
+@author: rene
+'''
+
 import sys
 from PySide import QtOpenGL, QtGui, QtCore
 
@@ -33,13 +39,31 @@ class Renderer():
         self.initLight()
 
     def initLight(self):
+        # mat_ambient   = [0.4, 0.4, 0.4, 1.0] 
         mat_ambient    = [0.6, 0.6, 0.6, 1.0]
+        mat_diffuse    = [0.4, 0.8, 0.4, 1.0] 
+        mat_specular   = [1.0, 1.0, 1.0, 1.0]
         light_position = [0.0, 0.0, 0.0, 1.0]        
 
+
+        # GL_LIGHT_MODEL_AMBIENT, GL_LIGHT_MODEL_LOCAL_VIEWER,' GL_LIGHT_MODEL_TWO_SIDE und GL_LIGHT_MODEL_COLOR_CONTROL
         GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
+        # Diffuse (non-shiny) light component
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
+        # Specular (shiny) light component
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
+        
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
         
+        # The color of the sphere
+        mat_materialColor = [0.2, 0.2, 1.0, 1.0]
+        # The specular (shiny) component of the material
+        mat_materialSpecular = [1.0, 1.0, 1.0, 1.0]
+        # The color emitted by the material
+        mat_materialEmission = [0, 0, 0, 1.0]
+        #The shininess parameter
         mat_shininess  = 0.4 
+
         mat_ambient    = [0.24725,  0.1995, 0.0745, 1.0]
         mat_diffuse    = [0.75164, 0.60648, 0.22648, 1.0] 
         mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
@@ -47,7 +71,9 @@ class Renderer():
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
+       # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
         GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
+    
     
     def resize(self, w, h):
         side = min(w, h)
@@ -71,17 +97,117 @@ class Renderer():
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
         GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()         
-      
+        GL.glLoadIdentity()                
+
+        light_position = [0.0, 0.0, 0.0, 1.0]        
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)         
+  
+
+
+        GL.glPushMatrix() 
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
-        
-        self.drawTestObject()
+        #self.drawTestObject()
+        self.drawTriangle()
+        GL.glPopMatrix()
+
+
+
         #GLUT.glutInit()#
         #GLUT.glutSolidSphere(0.5,40,40)
         GL.glFlush() 
+
+    def calculateSurfaceNormal (self,p1, p2, p3) :
+ 
+        u = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
+        v = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
+        n = [0.0,0.0,0.0]
+        n[0] = u[1] * v[2] - u[2] * v[1]
+        n[1] = u[2] * v[0] - u[0] * v[2]
+        n[2] = u[0] * v[1] - u[1] * v[0]
+
+        return n
+
+
+    def lenVector(self, v):
+        import math
+        return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+    
+    def normalised(self, v):
+        l = self.lenVector(v)
+        if l == 0.0 :
+            return [0.0, 0.0, 0.0]
+        else :
+            return [v[0] / l, v[1] / l, v[2] / l]
+
+
+    # normal in p1
+    def calculateVertexNormal(self, p1, p2, p3):
+        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
+        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
+        v = [0.0, 0.0, 0.0]
+        v[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
+        v[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2]
+        v[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0]
+        
+        return v
+
+    def drawTriangle(self):
+  
+        n = self.normalised(self.calculateVertexNormal([-0.5, -0.5, -1], [0.5, -0.5, -1], [0.0,  0.5, -1]))
+        m = self.normalised(self.calculateVertexNormal([0.5, -0.5, -1], [-0.5, -0.5, -1], [0.0,  0.5, -1]))
+        k = self.normalised(self.calculateVertexNormal([0.0,  0.5, -1], [0.5, -0.5, -1], [-0.5, -0.5, -1]))
+        
+    
+        k[2] = 1
+        k[1] = 0.5
+        k[0] = 0.0
+        m[2] = 1
+        m[1] = -0.5
+        m[0] = 0.5
+        n[0] = -0.5
+        n[1] = -0.5
+        
+        plist = [[-0.5, -0.5, -1], [0.5, -0.5, -1], [0.0,  0.5, -1]]
+        GL.glBegin(GL.GL_TRIANGLES)
+ 
+        
+        GL.glNormal3fv(n)
+        GL.glVertex3f(-0.5, -0.5, -1)
+
+        GL.glNormal3fv(m)
+        GL.glVertex3f(0.5, -0.5, -1)        
+
+        GL.glNormal3fv(k)
+        GL.glVertex3f(0.0,  0.5, -1)        
+        GL.glEnd()
+    
+        GL.glBegin(GL.GL_LINES) 
+        GL.glColor3f(1,0,0)
+        GL.glVertex3fv(k)
+        GL.glVertex3f(0.0,  0.5, -1)         
+        GL.glVertex3f(-0.5, -0.5, -1)
+        GL.glVertex3fv(n)
+        GL.glVertex3f(0.5, -0.5, -1)  
+        GL.glVertex3fv(m)               
+        GL.glEnd()
+
+
+        k[2] = -3
+        m[2] = -3
+        n[2] = -3
+        print "dsf" ,k
+        GL.glBegin(GL.GL_LINES) 
+        GL.glColor3f(0,1,0)
+        GL.glVertex3fv(k)
+        GL.glVertex3f(0.0,  0.5, -1)         
+        GL.glVertex3f(-0.5, -0.5, -1)
+        GL.glVertex3fv(n)
+        GL.glVertex3f(0.5, -0.5, -1)  
+        GL.glVertex3fv(m)               
+        GL.glEnd()
 
     
     def drawTestObject(self):
@@ -96,17 +222,13 @@ class Renderer():
                   [0.4131759111665348, 0.25, 0.05751322692417564], [0.5868240888334652, 0.25, 0.046701524680852695], 
                   [0.7499999999999999, 0.25, 0.0316030623052], [0.883022221559489, 0.25, 0.01657043903018468], 
                   [0.9698463103929542, 0.25, 0.005413502659613883], [1.0, 0.25, 0.0]]
-
-        GL.glPointSize(6)        
-        GL.glBegin(GL.GL_POINTS)
+        
+        GL.glBegin(GL.GL_QUADS)
+        GL.glNormal3d(1, 0, 0)
         for i in range(len(plist1)-1) :
-            GL.glNormal3f(0,1,0)
             GL.glVertex3f(plist1[i+1][0], plist1[i+1][1], plist1[i+1][2])
-            GL.glNormal3f(0,-1,0)
             GL.glVertex3f(plist1[i][0]  , plist1[i][1]  , plist1[i][2])
-            GL.glNormal3f(0,-1,0)
             GL.glVertex3f(plist2[i][0]  , plist2[i][1]  , plist2[i][2])
-            GL.glNormal3f(0,-1,0)
             GL.glVertex3f(plist2[i+1][0], plist2[i+1][1] , plist2[i+1][2])
         GL.glEnd()
     
