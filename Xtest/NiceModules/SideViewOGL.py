@@ -29,7 +29,7 @@ class Renderer():
 
         self.tixi = Tixi()
         self.tixi.open('simpletest.cpacs.xml')
-        #self.tixi.open('D150_CPACS2.0_valid.xml')
+        self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -40,6 +40,7 @@ class Renderer():
         self.pList_fuselage = self.createFuselage() 
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
         self.pList_component_segment = self.createComponent()
+        self.pList_flaps = self.createFlaps()
         
         self.xRot = 0
         self.yRot = 0
@@ -53,9 +54,9 @@ class Renderer():
         
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glEnable(GL.GL_LIGHTING)
+       # GL.glEnable(GL.GL_LIGHTING)
         
-        GL.glEnable(GL.GL_LIGHT0)
+       # GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glShadeModel(GL.GL_SMOOTH)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
@@ -75,27 +76,30 @@ class Renderer():
         GL.glLoadIdentity()
        
         GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
-                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 12.0)
+                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 30.0)
 
     def display(self):
         self.__setProjection()
- 
+        #GL.glMatrixMode(GL.GL_PROJECTION)
+        #GL.glLoadIdentity()
         # Clear screen and Z-buffer
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()         
-      
+        #self.initLight()
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
+       # GL.glPushMatrix()
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
         
-       # self.initLight()
-        self.drawTestObject()
-
+        self.draw()
+        #GL.glPopMatrix()
+        
+        #self.initLight()
+        #self.drawTestObject()
         #GL.glShadeModel(GL.GL_FLAT)
-        # self.draw()
         #GLUT.glutInit()#
         #GLUT.glutSolidSphere(0.5,40,40)
         
@@ -106,20 +110,24 @@ class Renderer():
         # draw upper
         self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"], 1, False)
         # draw lower
-        self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"], 1, False)
+        #self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"], 1, False)
 
         # draw reflect upper
         #self.drawShape(self.pList_wing_up, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1, False)
         # draw reflect lower
-       # self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1, False)
+        #self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1, False)
         
         # draw fuselage
-       # self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"], 1, False)
+        #self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"], 1, False)
 
         # draw ComponentSegment
         #self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_POINTS"], 1, False)
-#        self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_LINES"], 1, True)
+        #self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_LINES"], 1, True)
 #        self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_QUAD_STRIP"], 1, True)
+
+        # draw Flaps
+        self.drawFlaps(self.pList_flaps)
+        #self.drawShape(self.pList_flaps, [1.0,0.0,0.2], Renderer.glMode["GL_POINTS"], 1, False)
 
         # draw Points
         GL.glPointSize(6)
@@ -132,7 +140,7 @@ class Renderer():
     @param flag_strip: strip mode set True , not strip set False
     '''
     def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
-        #GL.glColor3f(color[0], color[1], color[2])
+        GL.glColor3f(color[0], color[1], color[2])
         
         quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
         
@@ -161,14 +169,12 @@ class Renderer():
                     #GL.glNormal3f(normals[i+1][j+1][0], normals[i+1][j+1][1], normals[i+1][j+1][2])
                     GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
                     
-                   # GL.glNormal3f(normals[i][j][0], reflect * normals[i][j][1], normals[i][j][2])
+                    # GL.glNormal3f(normals[i][j][0], reflect * normals[i][j][1], normals[i][j][2])
                     #GL.glNormal3f(0.0, -1.0, 0.0)
                     GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])     
-                #break                
+                #break 
+            #break               
         GL.glEnd() 
-
-
-
 
 
     def calculateNormal(self, plist):
@@ -187,9 +193,6 @@ class Renderer():
                 n2 = self.normalised(n2)
                 n3 = self.normalised(n3)
                 n4 = self.normalised(n4)
-                
-                
-                
                 
                 normal = [n1[0] + n2[0] + n3[0] + n4[0] , n1[1] + n2[1] + n3[1] + n4[1] , n1[2] + n2[2] + n3[2] + n4[2]]
                 normal_tmp.append(normal)
@@ -240,11 +243,10 @@ class Renderer():
         mat_specular   = [1.0, 1.0, 1.0, 1.0]
         light_position = [0.0, 0.0, 0.0, 1.0]        
 
-
         # GL_LIGHT_MODEL_AMBIENT, GL_LIGHT_MODEL_LOCAL_VIEWER,' GL_LIGHT_MODEL_TWO_SIDE und GL_LIGHT_MODEL_COLOR_CONTROL
         GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
         # Diffuse (non-shiny) light component
-       # GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
+        # GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
         # Specular (shiny) light component
         #GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
         
@@ -266,75 +268,49 @@ class Renderer():
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
-       # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
+        # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
         GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
     
     
-    
-    def drawTestObject(self):
 
-        plist1 = [[0.0, 0.0, 0.0], [0.030153689607045786, 0.0, 0.02844221322094448], 
-                 [0.116977778440511, 0.0, 0.04945887299475936], [0.24999999999999994, 0.0, 0.059412421875], 
-                 [0.4131759111665348, 0.0, 0.05751322692417564], [0.5868240888334652, 0.0, 0.046701524680852695], 
-                 [0.7499999999999999, 0.0, 0.0316030623052], [0.883022221559489, 0.0, 0.01657043903018468], 
-                 [0.9698463103929542, 0.0, 0.005413502659613883], [1.0, 0.0, 0.0]] 
-        plist2 = [[0.0, 0.25, 0.0], [0.030153689607045786, 0.25, 0.02844221322094448], 
-                  [0.116977778440511, 0.25, 0.04945887299475936], [0.24999999999999994, 0.25, 0.059412421875], 
-                  [0.4131759111665348, 0.25, 0.05751322692417564], [0.5868240888334652, 0.25, 0.046701524680852695], 
-                  [0.7499999999999999, 0.25, 0.0316030623052], [0.883022221559489, 0.25, 0.01657043903018468], 
-                  [0.9698463103929542, 0.25, 0.005413502659613883], [1.0, 0.25, 0.0]]
-
-        
+    def drawFlaps(self, pList):
+        GL.glColor3f(1.0,0.0,0.0)
         GL.glBegin(GL.GL_QUADS)
-        for i in range(len(plist1)-1) :
-            s = self.calculateSurfaceNormal([plist1[i+1], plist1[i], plist2[i], plist2[i+1]])
-            GL.glNormal3fv(s)
-            GL.glVertex3f(plist1[i+1][0], plist1[i+1][1], plist1[i+1][2])
-            GL.glVertex3f(plist1[i][0]  , plist1[i][1]  , plist1[i][2])
-            GL.glVertex3f(plist2[i][0]  , plist2[i][1]  , plist2[i][2])
-            GL.glVertex3f(plist2[i+1][0], plist2[i+1][1] , plist2[i+1][2])
-        GL.glEnd()
-    
-    
-
-
-
-
-    def drawShape2(self, pList, color, glMode, reflect=1, flag_Strip=False):
-        #GL.glColor3f(color[0], color[1], color[2])
-        print "sdf"
-        GL.glBegin(glMode)
+        
+   #[[17.68372701659183, 1.8765691482297777, -1.3069431052896983], [17.662468281759608, 5.527072040668436, -0.9866284398469685]], [[17.662468281759608, 5.527072040668436, -0.9866284398469685], [20.15654040781586, 12.86990035947941, -0.4309175416085875]], [[20.224287216747996, 13.070573928438826, -0.41571594839042747], [21.414546358878717, 16.22662187664191, -0.18099399010930795]]]], [[[[34.02616147364511, 0.9959919678379325, 0.7842753561486957], [36.076928226508294, 5.9137023090377285, 1.2145192615078817]]]], [[[[33.59940406560077, -0.0020029219731199674, 1.8052095077496109], [36.26958618318385, -0.00200292197312204, 7.219940415966675]]
+        
+        a = 0.2
+        b = 0.2
+        c = 0.2
+        
         for shape in pList :
-            normals = self.calculateNormal(shape)
-            for i in range (0, len(shape)-1, 1):
-                seg1 = shape[i] 
-                seg2 = shape[i+1]
-                for j in range(0, len(seg1)-1, 1) :
-                    #   GL.glNormal3f(normals[i][j+1][0], normals[i][j+1][1], normals[i][j+1][2])
-                    GL.glVertex3f(seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]) 
-                   
-                  #  GL.glNormal3f(normals[i][j][0], normals[i][j][1], normals[i][j][2])
-                    GL.glVertex3f(seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]) 
-           
-                  #  GL.glNormal3f(normals[i+1][j+1][0], normals[i+1][j+1][1], normals[i+1][j+1][2])
-                    GL.glVertex3f(seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2])             
-           
-                   
-                   # GL.glNormal3f(normals[i][j][0], normals[i][j][1], normals[i][j][2])
-                    GL.glVertex3f(seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2])                   
+            for segments in shape :
+                for flaps in segments :
+                    list1 = flaps[0]
+                    list2 = flaps[1]
+                    list3 = flaps[2]
+                    list4 = flaps[3]
+                    GL.glColor(a,b,c)
+                    print list1
+                    print list2
+                    print list3
+                    print list4
+                    GL.glVertex3fv(list1)
+                    GL.glVertex3fv(list2)
+                    GL.glVertex3fv(list4)
+                    GL.glVertex3fv(list3)
                     
+                    if a >= 1.0:
+                        b += 0.2
+                    else :
+                        a += 0.2
+        GL.glEnd()
+        
+        
+   
 
-                    
 
-               # break     
-        GL.glEnd() 
-
-
-
-
-
-
-    def createComponent(self, point_cnt_eta = 40, point_cnt_xsi = 40):
+    def createComponent(self, point_cnt_eta = 10, point_cnt_xsi = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
              
@@ -351,10 +327,75 @@ class Renderer():
                         p_tmp.append([x,y,z])
                     plistSeg.append(p_tmp)
             plistComp.append(plistSeg)
-
+            print "ComponentList:"
+            print plistComp
         return plistComp
         
-    def createFuselage(self, point_cnt_eta = 6, point_cnt_zeta = 30):
+        
+    def createFlaps(self, point_cnt_eta = 10, point_cnt_xsi = 10):    
+        plistWing = []
+        for wingIndex in range(1, self.tigl.getWingCount()+1) :
+            plistSeg = []
+            for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) : 
+                componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
+                flapList = self.__createFlaps(wingIndex, compSegmentIndex)
+                plistFlaps = []
+                for flap in flapList : 
+                    x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[0], flap[2])       
+                    x2, y2, z2 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[1],     1.0) 
+                    x3, y3, z3 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[3], flap[5]) 
+                    x4, y4, z4 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[4],     1.0) 
+                    plistFlap = [[x1, y1, z1], [x2, y2, z2], [x3, y3, z3], [x4, y4, z4]]
+                    plistFlaps.append(plistFlap)
+                plistSeg.append(plistFlaps)
+            plistWing.append(plistSeg)      
+            
+        print "FlapList:"
+        print   plistWing  
+        return plistWing           
+        
+    def __createFlaps(self, wingIndex, compSegmentIndex):
+        path_TE_Devices = '/cpacs/vehicles/aircraft/model/wings/wing['+str(wingIndex)+']/componentSegments/componentSegment['+str(compSegmentIndex)+']/controlSurfaces/trailingEdgeDevices'
+        te_devices = []
+        for _TE_Devices_Idx in range(1, self.tixi.getNumberOfChilds(path_TE_Devices)+1) :
+            path_in  = path_TE_Devices + '/trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/innerBorder'
+            path_out = path_TE_Devices + '/trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/outerBorder'
+                    
+            etaLE_in = self.tixi.getDoubleElement(path_in + '/etaLE')
+            etaTE_in = self.tixi.getDoubleElement(path_in + '/etaTE')
+            xsiLE_in = self.tixi.getDoubleElement(path_in + '/xsiLE')
+                    
+            etaLE_out = self.tixi.getDoubleElement(path_out + '/etaLE')
+            etaTE_out = self.tixi.getDoubleElement(path_out + '/etaTE')
+            xsiLE_out = self.tixi.getDoubleElement(path_out + '/xsiLE')
+                    
+            te_devices.append([etaLE_in, etaTE_in, xsiLE_in, etaLE_out, etaTE_out, xsiLE_out])
+        return te_devices
+    
+    
+    def __createFlaps2(self):
+        plistWing = []
+        for wingIndex in range(1, self.tigl.getWingCount()+1) :
+            plistCompSeg = []
+            for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) : 
+                path_TE_Devices = '/cpacs/vehicles/aircraft/model/wings/wing['+str(wingIndex)+']/componentSegments/componentSegment['+str(compSegmentIndex)+']/controlSurfaces/trailingEdgeDevices'
+                for _TE_Devices_Idx in range(1, self.tixi.getNumberOfChilds(path_TE_Devices)+1) :
+                    path_in  = path_TE_Devices + '/trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/innerBorder'
+                    path_out = path_TE_Devices + '/trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/outerBorder'
+                    
+                    etaLE_in = self.tixi.getDoubleElement(path_in + '/etaLE')
+                    etaTE_in = self.tixi.getDoubleElement(path_in + '/etaTE')
+                    xsiLE_in = self.tixi.getDoubleElement(path_in + '/xsiLE')
+                    
+                    etaLE_out = self.tixi.getDoubleElement(path_out + '/etaLE')
+                    etaTE_out = self.tixi.getDoubleElement(path_out + '/etaTE')
+                    xsiLE_out = self.tixi.getDoubleElement(path_out + '/xsiLE')
+                    
+                    plistCompSeg.append([etaLE_in, etaTE_in, xsiLE_in, etaLE_out, etaTE_out, xsiLE_out])
+            plistWing.append(plistCompSeg)           
+        
+        
+    def createFuselage(self, point_cnt_eta = 2, point_cnt_zeta = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta) 
         
@@ -373,10 +414,11 @@ class Renderer():
         
         return plistFuse 
 
-    def createWing(self, point_cnt_eta = 6, point_cnt_xsi = 50):
+
+    def createWing(self, point_cnt_eta = 3, point_cnt_xsi = 20):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
-        
+                    
         plistWing_up = []
         plistWing_lo = []
         

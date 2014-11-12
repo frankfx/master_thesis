@@ -39,10 +39,11 @@ class Renderer():
         self.initLight()
 
     def initLight(self):
-        # mat_ambient   = [0.4, 0.4, 0.4, 1.0] 
+        # mat_ambient   = [0.4, 0.4, 0.4, 1.0]
+        mat_specular   = [1.0, 1.0, 1.0, 1.0] 
         mat_ambient    = [0.6, 0.6, 0.6, 1.0]
         mat_diffuse    = [0.4, 0.8, 0.4, 1.0] 
-        mat_specular   = [1.0, 1.0, 1.0, 1.0]
+        
         light_position = [0.0, 0.0, 0.0, 1.0]        
 
 
@@ -71,7 +72,7 @@ class Renderer():
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
-       # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
         GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
     
     
@@ -99,25 +100,31 @@ class Renderer():
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()                
 
-        light_position = [0.0, 0.0, 0.0, 1.0]        
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)         
-  
+        self.initLight()
 
-
-        GL.glPushMatrix() 
+        #GL.glPushMatrix() 
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
         #self.drawTestObject()
-        self.drawTriangle()
-        GL.glPopMatrix()
+        self.drawTriangle2()
+        
+       # GL.glPopMatrix()
+
+       # GL.glPushMatrix()
+       # light_position = [0.0, 0.0, 0.0, 1.0]        
+       # GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)         
+        #GL.glPopMatrix()
 
 
 
         #GLUT.glutInit()#
         #GLUT.glutSolidSphere(0.5,40,40)
         GL.glFlush() 
+
+    
+
 
     def calculateSurfaceNormal (self,p1, p2, p3) :
  
@@ -154,6 +161,29 @@ class Renderer():
         
         return v
 
+
+    def drawTriangle2(self):
+        GL.glBegin(GL.GL_TRIANGLES)
+        GL.glNormal3f(0,0,1)
+        GL.glVertex3f(0,0,0)
+        GL.glNormal3f(0,0,1)
+        GL.glVertex3f(1,0,0)
+        GL.glNormal3f(0,0,1)
+        GL.glVertex3f(0,1,0)
+        GL.glEnd()       
+
+
+        GL.glBegin(GL.GL_LINES) 
+        GL.glVertex3f(0,0,1)
+        GL.glVertex3f(0,0,0)         
+        GL.glVertex3f(0,0,1)
+        GL.glVertex3f(1,0,0)
+        GL.glVertex3f(0,0,1)  
+        GL.glVertex3f(0,1,0)               
+        GL.glEnd()
+
+
+
     def drawTriangle(self):
   
         n = self.normalised(self.calculateVertexNormal([-0.5, -0.5, -1], [0.5, -0.5, -1], [0.0,  0.5, -1]))
@@ -162,25 +192,32 @@ class Renderer():
         
     
         k[2] = 1
-        k[1] = 0.5
-        k[0] = 0.0
+        #k[1] = 0.5
+       # k[0] = 0.0
         m[2] = 1
-        m[1] = -0.5
-        m[0] = 0.5
-        n[0] = -0.5
-        n[1] = -0.5
+       # m[1] = -0.5
+      #  m[0] = 0.5
+        n[2] = 1
+       # n[0] = -0.5
+       # n[1] = -0.5
         
         plist = [[-0.5, -0.5, -1], [0.5, -0.5, -1], [0.0,  0.5, -1]]
         GL.glBegin(GL.GL_TRIANGLES)
  
         
         GL.glNormal3fv(n)
+        #n[2] = -7
+        #GL.glNormal3fv(n)
         GL.glVertex3f(-0.5, -0.5, -1)
 
         GL.glNormal3fv(m)
+        #m[2] = -7
+        #GL.glNormal3fv(m)
         GL.glVertex3f(0.5, -0.5, -1)        
 
         GL.glNormal3fv(k)
+        #k[2] = -7
+        #GL.glNormal3fv(k)
         GL.glVertex3f(0.0,  0.5, -1)        
         GL.glEnd()
     

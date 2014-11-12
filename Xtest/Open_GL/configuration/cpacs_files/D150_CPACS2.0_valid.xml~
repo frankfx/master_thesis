@@ -1,4 +1,4 @@
-<!--<cpacs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cpacs_schema.xsd"> -->
+<cpacs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cpacs_schema.xsd">
 	<header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="headerType">
 		<name>VAMP D150 CPACS 2.0</name>
 		<description>D150_reference_VAMP, outer geometry reshapedP2C'ed from PrADO A320-200, CPACS 2.0</description>
