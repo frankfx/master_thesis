@@ -40,7 +40,11 @@ class Renderer():
         self.pList_fuselage = self.createFuselage() 
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
         self.pList_component_segment = self.createComponent()
-        self.pList_flaps = self.createFlaps()
+        self.pList_flaps_TEDevice = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
+        self.pList_flaps_LEDevice = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
+        self.pList_flaps_Spoiler = self.createFlaps(("spoilers", "spoiler"))
+        self.plist_ribs = []
+        self.pList_spares = self.createSpars()
         
         self.xRot = 0
         self.yRot = 0
@@ -52,11 +56,34 @@ class Renderer():
         self.viewwidth = 0.0
         self.viewheight = 0.0
         
+        # helper
+        self.r_color = 0.0
+        self.g_color = 0.0
+        self.b_color = 0.0
+       
+       
+    def newColorVec(self):   
+        color = [self.r_color, self.g_color, self.b_color]
+        
+        offset = 0.2
+        self.b_color += offset
+        
+        if self.b_color >= 1.0 : 
+            self.g_color += offset ; self.b_color = 0.0
+        if self.g_color >= 1.0 :
+            self.r_color += offset ; self.g_color = 0.0
+        if self.r_color >= 1.0 :
+            self.r_color = 0.0 ; self.g_color = 0.0 ; self.b_color = 0.0
+            
+        return color
+                     
+       
+        
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
-       # GL.glEnable(GL.GL_LIGHTING)
+        # GL.glEnable(GL.GL_LIGHTING)
         
-       # GL.glEnable(GL.GL_LIGHT0)
+        # GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glShadeModel(GL.GL_SMOOTH)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
@@ -76,7 +103,7 @@ class Renderer():
         GL.glLoadIdentity()
        
         GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
-                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 30.0)
+                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 10.0)
 
     def display(self):
         self.__setProjection()
@@ -126,9 +153,12 @@ class Renderer():
 #        self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_QUAD_STRIP"], 1, True)
 
         # draw Flaps
-        self.drawFlaps(self.pList_flaps)
+        self.drawFlaps(self.pList_flaps_TEDevice)
+        self.drawFlaps(self.pList_flaps_LEDevice)
+        self.drawFlaps(self.pList_flaps_Spoiler)
         #self.drawShape(self.pList_flaps, [1.0,0.0,0.2], Renderer.glMode["GL_POINTS"], 1, False)
-
+        self.drawSpars(self.pList_spares)
+        
         # draw Points
         GL.glPointSize(6)
         GL.glColor3f(1, 0, 1)
@@ -272,44 +302,28 @@ class Renderer():
         GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
     
     
+    def drawSpars(self, pList):
+        for shape in pList :
+            for segments in shape :
+                for spares in segments :  
+                    GL.glColor3fv(self.newColorVec())      
+                    GL.glBegin(GL.GL_LINE_STRIP)       
+                    for vert in spares :
+                        GL.glVertex3fv(vert) 
+                    GL.glEnd()
 
     def drawFlaps(self, pList):
         GL.glColor3f(1.0,0.0,0.0)
         GL.glBegin(GL.GL_QUADS)
-        
-   #[[17.68372701659183, 1.8765691482297777, -1.3069431052896983], [17.662468281759608, 5.527072040668436, -0.9866284398469685]], [[17.662468281759608, 5.527072040668436, -0.9866284398469685], [20.15654040781586, 12.86990035947941, -0.4309175416085875]], [[20.224287216747996, 13.070573928438826, -0.41571594839042747], [21.414546358878717, 16.22662187664191, -0.18099399010930795]]]], [[[[34.02616147364511, 0.9959919678379325, 0.7842753561486957], [36.076928226508294, 5.9137023090377285, 1.2145192615078817]]]], [[[[33.59940406560077, -0.0020029219731199674, 1.8052095077496109], [36.26958618318385, -0.00200292197312204, 7.219940415966675]]
-        
-        a = 0.2
-        b = 0.2
-        c = 0.2
-        
         for shape in pList :
             for segments in shape :
                 for flaps in segments :
-                    list1 = flaps[0]
-                    list2 = flaps[1]
-                    list3 = flaps[2]
-                    list4 = flaps[3]
-                    GL.glColor(a,b,c)
-                    print list1
-                    print list2
-                    print list3
-                    print list4
-                    GL.glVertex3fv(list1)
-                    GL.glVertex3fv(list2)
-                    GL.glVertex3fv(list4)
-                    GL.glVertex3fv(list3)
-                    
-                    if a >= 1.0:
-                        b += 0.2
-                    else :
-                        a += 0.2
+                    GL.glVertex3fv(flaps[0])
+                    GL.glVertex3fv(flaps[1])
+                    GL.glVertex3fv(flaps[2])
+                    GL.glVertex3fv(flaps[3])
         GL.glEnd()
         
-        
-   
-
-
     def createComponent(self, point_cnt_eta = 10, point_cnt_xsi = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
@@ -327,73 +341,163 @@ class Renderer():
                         p_tmp.append([x,y,z])
                     plistSeg.append(p_tmp)
             plistComp.append(plistSeg)
-            print "ComponentList:"
-            print plistComp
         return plistComp
         
-        
-    def createFlaps(self, point_cnt_eta = 10, point_cnt_xsi = 10):    
+    
+    def createSpars(self):
         plistWing = []
         for wingIndex in range(1, self.tigl.getWingCount()+1) :
             plistSeg = []
-            for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) : 
+            for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) :         
+                try :
+                    sparList = self.__createSpars(wingIndex, compSegmentIndex)
+                except:
+                    print "no spar for wing " + str(wingIndex) + " found." ; break
+                
                 componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
-                flapList = self.__createFlaps(wingIndex, compSegmentIndex)
+                plistSparSeg = []
+                for sparSegment in sparList : 
+                    plistSpar = []
+                    for spar in sparSegment :
+                        x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, spar[0], spar[1])       
+                        plistSpar.append([x1, y1, z1])
+                    plistSparSeg.append(plistSpar)
+                plistSeg.append(plistSparSeg)
+            plistWing.append(plistSeg)      
+            
+        return plistWing   
+                
+    def __createSpars(self, wingIndex, compSegmentIndex):
+        path_sparSegments = '/cpacs/vehicles/aircraft/model/wings/wing['\
+                                +str(wingIndex)+']/componentSegments/componentSegment['\
+                                +str(compSegmentIndex)+']/structure/spars/sparSegments/'
+
+        sparSegmentList = []
+        for sparSegmentIdx in range(1, self.tixi.getNumberOfChilds(path_sparSegments)+1) :
+            path = path_sparSegments + 'sparSegment[' + str(sparSegmentIdx) + ']/sparPositionUIDs/' 
+            sparPositionUIDsList = []
+            for sparPositionUIDIdx in range(1, self.tixi.getNumberOfChilds(path)+1) :
+                sparPositionUIDsList.append(self.tixi.getTextElement(path + 'sparPositionUID[' + str(sparPositionUIDIdx) + ']'))
+            sparSegmentList.append(sparPositionUIDsList)
+        
+        sparList = []
+        for sparSegment in sparSegmentList :
+            plist = []
+            for uid in sparSegment :
+                path = self.tixi.uIDGetXPath(uid)
+                eta = self.tixi.getDoubleElement(path + '/eta')
+                xsi = self.tixi.getDoubleElement(path + '/xsi')
+                plist.append([eta, xsi])
+            sparList.append(plist)
+            
+        return sparList
+    
+    
+    '''
+    @param flapType: (parent, child)-String-Tuple of flap types, eg. ("trailingEdgeDevices","trailingEdgeDevice")
+    '''
+    def createFlaps(self, flapType, point_cnt_eta = 10, point_cnt_xsi = 10):    
+        plistWing = []
+        (flapParent, _) = flapType
+        
+        for wingIndex in range(1, self.tigl.getWingCount()+1) :
+            plistSeg = []
+            for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) : 
+                try :
+                    if flapParent == 'trailingEdgeDevices' : 
+                        flapList = self.__createFlapsTE(wingIndex, compSegmentIndex)
+                    elif flapParent == 'leadingEdgeDevices' :
+                        flapList = self.__createFlapsLE(wingIndex, compSegmentIndex)
+                    elif flapParent == 'spoilers' :
+                        flapList = self.__createFlaps_Spoiler(wingIndex, compSegmentIndex)
+                    else : print "unexpected behaviour in createFlaps" ; sys.exit()
+                except:
+                    print "no " + str(flapType) + " for wing " + str(wingIndex) + " found." ; break
+
+                componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
                 plistFlaps = []
                 for flap in flapList : 
                     x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[0], flap[2])       
-                    x2, y2, z2 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[1],     1.0) 
-                    x3, y3, z3 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[3], flap[5]) 
-                    x4, y4, z4 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[4],     1.0) 
-                    plistFlap = [[x1, y1, z1], [x2, y2, z2], [x3, y3, z3], [x4, y4, z4]]
-                    plistFlaps.append(plistFlap)
+                    x2, y2, z2 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[1], flap[3]) 
+                    x3, y3, z3 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[4], flap[6]) 
+                    x4, y4, z4 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[5], flap[7]) 
+                    plistFlaps.append([[x1, y1, z1], [x2, y2, z2], [x3, y3, z3], [x4, y4, z4]])
                 plistSeg.append(plistFlaps)
             plistWing.append(plistSeg)      
-            
-        print "FlapList:"
-        print   plistWing  
-        return plistWing           
-        
-    def __createFlaps(self, wingIndex, compSegmentIndex):
-        path_TE_Devices = '/cpacs/vehicles/aircraft/model/wings/wing['+str(wingIndex)+']/componentSegments/componentSegment['+str(compSegmentIndex)+']/controlSurfaces/trailingEdgeDevices'
-        te_devices = []
+        return plistWing             
+    
+    def __createFlapsTE(self, wingIndex, compSegmentIndex):
+        path_TE_Devices = '/cpacs/vehicles/aircraft/model/wings/wing['\
+                                +str(wingIndex)+']/componentSegments/componentSegment['\
+                                +str(compSegmentIndex)+']/controlSurfaces/trailingEdgeDevices/'
+                                
+        plistTE = []
         for _TE_Devices_Idx in range(1, self.tixi.getNumberOfChilds(path_TE_Devices)+1) :
-            path_in  = path_TE_Devices + '/trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/innerBorder'
-            path_out = path_TE_Devices + '/trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/outerBorder'
+            path_in  = path_TE_Devices + 'trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/innerBorder/'
+            path_out = path_TE_Devices + 'trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/outerBorder/'
+                    
+            etaLE_in = self.tixi.getDoubleElement(path_in + 'etaLE')
+            etaTE_in = self.tixi.getDoubleElement(path_in + 'etaTE')
+            xsiLE_in = self.tixi.getDoubleElement(path_in + 'xsiLE')
+            xsiTE_in = 1.0               
+                    
+            etaLE_out = self.tixi.getDoubleElement(path_out + 'etaLE')
+            etaTE_out = self.tixi.getDoubleElement(path_out + 'etaTE')
+            xsiLE_out = self.tixi.getDoubleElement(path_out + 'xsiLE')
+            xsiTE_out = 1.0
+                    
+            plistTE.append([etaLE_in, etaTE_in, xsiLE_in, xsiTE_in, etaLE_out, etaTE_out, xsiLE_out, xsiTE_out])
+        return plistTE     
+
+
+    def __createFlapsLE(self, wingIndex, compSegmentIndex):
+        path_LE_Devices = '/cpacs/vehicles/aircraft/model/wings/wing['\
+                                +str(wingIndex)+']/componentSegments/componentSegment['\
+                                +str(compSegmentIndex)+']/controlSurfaces/leadingEdgeDevices/'
+                                
+        plistLE = []
+        for _LE_Devices_Idx in range(1, self.tixi.getNumberOfChilds(path_LE_Devices)+1) :
+            path_in  = path_LE_Devices + 'leadingEdgeDevice[' + str(_LE_Devices_Idx) + ']/outerShape/innerBorder'
+            path_out = path_LE_Devices + 'leadingEdgeDevice[' + str(_LE_Devices_Idx) + ']/outerShape/outerBorder'
+                    
+            etaLE_in = self.tixi.getDoubleElement(path_in + '/etaLE')
+            etaTE_in = self.tixi.getDoubleElement(path_in + '/etaTE')
+            xsiLE_in = 0.0 
+            xsiTE_in = self.tixi.getDoubleElement(path_in + '/xsiTE')
+                    
+            etaLE_out = self.tixi.getDoubleElement(path_out + '/etaLE')
+            etaTE_out = self.tixi.getDoubleElement(path_out + '/etaTE')
+            xsiLE_out = 0.0
+            xsiTE_out = self.tixi.getDoubleElement(path_out + '/xsiTE')
+                    
+            plistLE.append([etaLE_in, etaTE_in, xsiLE_in, xsiTE_in, etaLE_out, etaTE_out, xsiLE_out, xsiTE_out])
+        return plistLE     
+
+
+    def __createFlaps_Spoiler(self, wingIndex, compSegmentIndex):
+        path_Spoiler = '/cpacs/vehicles/aircraft/model/wings/wing['\
+                                +str(wingIndex)+']/componentSegments/componentSegment['\
+                                +str(compSegmentIndex)+']/controlSurfaces/spoilers/'
+        
+        plistSpoiler = []
+        for spoiler_Idx in range(1, self.tixi.getNumberOfChilds(path_Spoiler)+1) :
+            path_in  = path_Spoiler + 'spoiler[' + str(spoiler_Idx) + ']/outerShape/innerBorder'
+            path_out = path_Spoiler + 'spoiler[' + str(spoiler_Idx) + ']/outerShape/outerBorder'
                     
             etaLE_in = self.tixi.getDoubleElement(path_in + '/etaLE')
             etaTE_in = self.tixi.getDoubleElement(path_in + '/etaTE')
             xsiLE_in = self.tixi.getDoubleElement(path_in + '/xsiLE')
+            xsiTE_in = self.tixi.getDoubleElement(path_in + '/xsiTE')
                     
             etaLE_out = self.tixi.getDoubleElement(path_out + '/etaLE')
             etaTE_out = self.tixi.getDoubleElement(path_out + '/etaTE')
             xsiLE_out = self.tixi.getDoubleElement(path_out + '/xsiLE')
+            xsiTE_out = self.tixi.getDoubleElement(path_out + '/xsiTE')
                     
-            te_devices.append([etaLE_in, etaTE_in, xsiLE_in, etaLE_out, etaTE_out, xsiLE_out])
-        return te_devices
-    
-    
-    def __createFlaps2(self):
-        plistWing = []
-        for wingIndex in range(1, self.tigl.getWingCount()+1) :
-            plistCompSeg = []
-            for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) : 
-                path_TE_Devices = '/cpacs/vehicles/aircraft/model/wings/wing['+str(wingIndex)+']/componentSegments/componentSegment['+str(compSegmentIndex)+']/controlSurfaces/trailingEdgeDevices'
-                for _TE_Devices_Idx in range(1, self.tixi.getNumberOfChilds(path_TE_Devices)+1) :
-                    path_in  = path_TE_Devices + '/trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/innerBorder'
-                    path_out = path_TE_Devices + '/trailingEdgeDevice[' + str(_TE_Devices_Idx) + ']/outerShape/outerBorder'
-                    
-                    etaLE_in = self.tixi.getDoubleElement(path_in + '/etaLE')
-                    etaTE_in = self.tixi.getDoubleElement(path_in + '/etaTE')
-                    xsiLE_in = self.tixi.getDoubleElement(path_in + '/xsiLE')
-                    
-                    etaLE_out = self.tixi.getDoubleElement(path_out + '/etaLE')
-                    etaTE_out = self.tixi.getDoubleElement(path_out + '/etaTE')
-                    xsiLE_out = self.tixi.getDoubleElement(path_out + '/xsiLE')
-                    
-                    plistCompSeg.append([etaLE_in, etaTE_in, xsiLE_in, etaLE_out, etaTE_out, xsiLE_out])
-            plistWing.append(plistCompSeg)           
-        
+            plistSpoiler.append([etaLE_in, etaTE_in, xsiLE_in, xsiTE_in, etaLE_out, etaTE_out, xsiLE_out, xsiTE_out])
+        return plistSpoiler  
+
+
         
     def createFuselage(self, point_cnt_eta = 2, point_cnt_zeta = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)

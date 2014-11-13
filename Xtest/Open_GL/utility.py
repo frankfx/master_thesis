@@ -251,6 +251,13 @@ def overrides(interface_class):
     return overrider
 
 '''
+represents aan enum
+''' 
+def enum(*sequential, **named):
+    enums = dict(zip(sequential, range(len(sequential))), **named)
+    return type('Enum', (), enums)
+
+'''
 debug helper
 '''
 def debug(value):
