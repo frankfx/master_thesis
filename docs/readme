@@ -1,0 +1,31 @@
+how to use pstrick with pdflatex
+================================
+latex grafik.tex
+dvips grafik.dvi
+ps2pdf grafik.ps
+
+pdfcrop grafik.pdf grafik-crop.pdf % <--- cuts white border
+pdflatex dokument.tex
+
+
+install tigl and tixi
+=====================
+go to https://code.google.com/p/tigl/wiki/Downloads?tm=2
+download Source Code for tigl (tixi included)
+extract ; go to misc
+run: ./get_tigl_tixi.sh openSUSE_13.1 x86_64
+the libs are created in .tar.gz file
+
+####################
+export TIXI_HOME="/home/rene/application/TIGL-2.1.2-openSUSE_13.1-x86_64"
+export PYTHONPATH=$PYTHONPATH:$TIXI_HOME/share/tixi/python/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TIXI_HOME/lib64
+
+
+export TIGL_HOME="/home/rene/application/TIGL-2.1.2-openSUSE_13.1-x86_64"
+export PYTHONPATH=$PYTHONPATH:$TIGL_HOME/share/tigl/python/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TIGL_HOME/lib64
+####################
+
+# got to: vi ~/.profile
+# copy above exports

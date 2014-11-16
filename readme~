@@ -1,9 +1,0 @@
-how to use pstrick with pdflatex
-================================
-
-latex grafik.tex
-dvips grafik.dvi
-ps2pdf grafik.ps
-
-pdfcrop grafik.pdf grafik-crop.pdf % <--- cuts white border
-pdflatex dokument.tex
