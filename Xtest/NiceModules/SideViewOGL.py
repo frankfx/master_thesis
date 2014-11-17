@@ -103,7 +103,7 @@ class Renderer():
         GL.glLoadIdentity()
        
         GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
-                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 10.0)
+                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 100.0)
 
     def display(self):
         self.__setProjection()
@@ -343,6 +343,14 @@ class Renderer():
             plistComp.append(plistSeg)
         return plistComp
         
+    def createRibs(self):
+        for wingIndex in range(1, self.tigl.getWingCount()+1) :
+            for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) :        
+                path_ribsDefinitions = '/cpacs/vehicles/aircraft/model/wings/wing['\
+                                +str(wingIndex)+']/componentSegments/componentSegment['\
+                                +str(compSegmentIndex)+']/structure/ribsDefinitions/ribsDefinition/'
+                for ribDefIdx in range(1, self.tixi.getNumberOfChilds(path_ribsDefinitions)+1) :    
+                    path = path_ribsDefinitions + '[' + str(ribDefIdx) + ']/' 
     
     def createSpars(self):
         plistWing = []
@@ -546,6 +554,9 @@ class Renderer():
         return plistWing_up , plistWing_lo
 
 
+
+                
+                
 class Widget(QtOpenGL.QGLWidget):
     def __init__(self, parent = None):
         super(Widget, self).__init__(parent)
