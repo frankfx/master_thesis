@@ -10,6 +10,7 @@ from tiglwrapper import Tigl, TiglException
 from tixiwrapper import Tixi
 from PySide import QtOpenGL, QtGui, QtCore
 from Xtest.Open_GL import utility
+import numpy as np
 
 try:
     from OpenGL import GL
@@ -30,7 +31,7 @@ class Renderer(QtOpenGL.QGLWidget):
         
         self.tixi = Tixi()
         self.tixi.open('simpletest.cpacs.xml')
-        # self.tixi.open('D150_CPACS2.0_valid.xml')
+        #self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -46,11 +47,6 @@ class Renderer(QtOpenGL.QGLWidget):
         self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
         self.plist_ribs                        = self.createRibs()
         self.pList_spares                      = self.createSpars()
-
-        # create ogl lists
-        self.theTorus = GL.glGenLists(9)
-        self.createOglList()
-        
         
         self.xRot = 0
         self.yRot = 0
@@ -81,8 +77,6 @@ class Renderer(QtOpenGL.QGLWidget):
         self.flag_show_ribs           = False
         self.flag_show_spars          = False 
            
-        
-       
     def newColorVec(self):   
         color = [self.r_color, self.g_color, self.b_color]
         
@@ -99,20 +93,27 @@ class Renderer(QtOpenGL.QGLWidget):
         return color 
                      
     def initializeGL(self):
-        GL.glEnable(GL.GL_DEPTH_TEST)
-        # GL.glEnable(GL.GL_LIGHTING)
-        # GL.glEnable(GL.GL_LIGHT0)
+        #GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glEnable(GL.GL_LIGHTING)
+        GL.glEnable(GL.GL_LIGHT0)
+        #GL.glEnable(GL.GL_COLOR_MATERIAL)
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)        
-       # GL.glShadeModel(GL.GL_SMOOTH)
+        #GL.glBlendFunc(GL.GL_DST_ALPHA, GL.GL_ONE_MINUS_DST_ALPHA)        
+        #GL.glBlendFunc(GL.GL_DST_COLOR, GL.GL_SRC_COLOR)        
+        #GL.glBlendFunc(GL.GL_DST_COLOR, GL.GL_SRC_ALPHA)        
+       # GL.glBlendFunc(GL.GL_ONE, GL.GL_ZERO)        
+       # GL.glBlendFunc(GL.GL_ONE_MINUS_DST_COLOR, GL.GL_ONE_MINUS_SRC_COLOR)  
+        
+                
+        GL.glShadeModel(GL.GL_SMOOTH)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-       # self.initLight()
+        self.initLight()
        
+        self.createOglLists()
         
         
-        
-
     def resizeGL(self, w, h):
         side = min(w, h)
         self.viewwidth = side
@@ -137,17 +138,18 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
         
         GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()         
-        #self.initLight()
+        GL.glLoadIdentity()   
+        
+        
+        
+        
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
-       # GL.glPushMatrix()
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
-        
-        self.draw()
-        #GL.glPopMatrix()
-        
+        self.initLight()
+
+        self.draw()        
         #self.initLight()
         #self.drawTestObject()
         #GL.glShadeModel(GL.GL_FLAT)
@@ -156,45 +158,75 @@ class Renderer(QtOpenGL.QGLWidget):
         
         GL.glFlush() 
 
-
-    def draw(self):
+    
+    def draw(self):      
         if self.flag_show_fuselage :
-            self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUAD_STRIP"], 1, True)            
-
+            GL.glCallList(self.index)
         if self.flag_show_wing1_up :        
-            self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
-        
+            GL.glCallList(self.index+1)
         if self.flag_show_wing1_lo :
-            self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
-
-        # draw reflect upper wing
+            GL.glCallList(self.index+2)
         if self.flag_show_wing2_up :
-            self.drawShape(self.pList_wing_up, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
-        
+            GL.glCallList(self.index+3)
         if self.flag_show_wing2_lo :
-            self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
-        
+            GL.glCallList(self.index+4)
         if self.flag_show_compnt :
-            #self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_POINTS"], 1, False)
-            self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_LINES"], 1, True)
-
+            GL.glCallList(self.index+5)
         if self.flag_show_flap_TE_Device :
-            self.drawFlaps(self.pList_flaps_TEDevice)
-        
+            GL.glCallList(self.index+6)
         if self.flag_show_flap_LE_Device :
-            self.drawFlaps(self.pList_flaps_LEDevice)
-        
+            GL.glCallList(self.index+7)
         if self.flag_show_flap_spoiler :
-            self.drawFlaps(self.pList_flaps_Spoiler)
-
+            GL.glCallList(self.index+8)
         if self.flag_show_spars :
-            self.drawSpars(self.pList_spares)
-        
+            GL.glCallList(self.index+9)
 
-    def createOglList(self, index, pList, glMode, color, flag_Strip, reflect):
-        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+    def createOglLists(self):
+        self.index = GL.glGenLists(10)
+        GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
+        self.createOglShape(self.pList_fuselage, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUAD_STRIP"], 1, True)
+        GL.glEndList()
+
+        GL.glNewList(self.index+1, GL.GL_COMPILE)
+        self.createOglShape(self.pList_wing_up, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
+        GL.glEndList()            
         
-        GL.glNewList(index, GL.GL_COMPILE)
+        GL.glNewList(self.index+2, GL.GL_COMPILE)
+        self.createOglShape(self.pList_wing_lo, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
+        GL.glEndList()  
+        
+        # draw reflect upper wing
+        GL.glNewList(self.index+3, GL.GL_COMPILE) 
+        self.createOglShape(self.pList_wing_up, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
+        GL.glEndList()  
+
+        GL.glNewList(self.index+4, GL.GL_COMPILE) 
+        self.createOglShape(self.pList_wing_lo, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
+        GL.glEndList()         
+
+        GL.glNewList(self.index+5, GL.GL_COMPILE) 
+        self.createOglShape(self.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_LINES"], 1, True)
+        GL.glEndList()        
+
+        GL.glNewList(self.index+6, GL.GL_COMPILE) 
+        self.createOglFlaps(self.pList_flaps_TEDevice)
+        GL.glEndList()        
+
+        GL.glNewList(self.index+7, GL.GL_COMPILE) 
+        self.createOglFlaps(self.pList_flaps_LEDevice)
+        GL.glEndList()     
+
+        GL.glNewList(self.index+8, GL.GL_COMPILE) 
+        self.createOglFlaps(self.pList_flaps_Spoiler)
+        GL.glEndList() 
+
+        GL.glNewList(self.index+9, GL.GL_COMPILE) 
+        self.createOglSpars(self.pList_spares)
+        GL.glEndList() 
+
+
+    def createOglShape(self, pList, color, glMode, reflect, flag_Strip):
+        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
         GL.glColor4fv(color)
         GL.glBegin(glMode)
         for shape in pList :
@@ -210,150 +242,36 @@ class Renderer(QtOpenGL.QGLWidget):
                     else :
                         quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
                         quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
-                    
                     GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
                     GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
                     GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
                     GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])     
         GL.glEnd() 
 
-        
-
-    '''
-    @param reflect: normal mode set 1 , reflect mode set -1
-    @param flag_strip: strip mode set True , not strip set False
-    '''
-    def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
-        #GL.glColor3f(color[0], color[1], color[2])
-        
-
-        GL.glNewList(self.theTorus,GL.GL_COMPILE)
-        GL.glColor4fv(color)
-        
-        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-        GL.glBegin(glMode)
+    def createOglFlaps(self, pList):
+        GL.glBegin(GL.GL_QUADS)
         for shape in pList :
-            normals = self.calculateNormal(shape)
-            for i in range (0, len(shape)-1, 1):
-                seg1 = shape[i] 
-                seg2 = shape[i+1]
-                for j in range(0, len(seg1)-1, 1) :
-                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
-                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
-                    if(flag_Strip):
-                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
-                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
-                    else :
-                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
-                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
-                    
-                    #GL.glNormal3f(normals[i][j+1][0], normals[i][j+1][1], normals[i][j+1][2])
-                    GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
-
-                    GL.glNormal3f(normals[i][j][0], reflect * normals[i][j][1], normals[i][j][2])
-                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
-                   
-                    #GL.glNormal3f(normals[i+1][j+1][0], normals[i+1][j+1][1], normals[i+1][j+1][2])
-                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
-                    
-                    # GL.glNormal3f(normals[i][j][0], reflect * normals[i][j][1], normals[i][j][2])
-                    #GL.glNormal3f(0.0, -1.0, 0.0)
-                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])     
-                #break 
-            #break               
-        GL.glEnd() 
-
-
-    #--- def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
-        #-------------------------------------------------- GL.glColor4fv(color)
-#------------------------------------------------------------------------------ 
-        #---------------------------------------------------- GL.glBegin(glMode)
-        #-------------------------------------------------- for shape in pList :
-            #-------------------------------------------- for segment in shape :
-                #------------------------------ for i in range(len(segment)-1) :
-                    #---------------------------------------- prof1 = segment[i]
-                    #-------------------------------------- prof2 = segment[i+1]
-                    #---------------------------- for j in range(len(prof1)-1) :
-                        #------------------------------ GL.glVertex3fv(prof2[j])
-                        #------------------------------ GL.glVertex3fv(prof1[j])
-                        #---------------------------- GL.glVertex3fv(prof1[j+1])
-                        #---------------------------- GL.glVertex3fv(prof2[j+1])
-        #------------------------------------------------------------ GL.glEnd()
-
-    #--- def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
-        #-------------------------------------------------- GL.glColor4fv(color)
-#------------------------------------------------------------------------------ 
-        #---------------------------------------------------- GL.glBegin(glMode)
-        #-------------------------------------------------- for shape in pList :
-            #-------------------------------------------- for segment in shape :
-                #------------------------------ for i in range(len(segment)-1) :
-                    #---------------------------------------- prof1 = segment[i]
-                    #-------------------------------------- prof2 = segment[i+1]
-                    #---------------------------- for j in range(len(prof1)-1) :
-                        #------------------------------ GL.glVertex3fv(prof2[j])
-                        #------------------------------ GL.glVertex3fv(prof1[j])
-                        #---------------------------- GL.glVertex3fv(prof1[j+1])
-                        #---------------------------- GL.glVertex3fv(prof2[j+1])
-        #------------------------------------------------------------ GL.glEnd()
-
-
-    def calculateNormal(self, plist):
-        n = len(plist)
-        m = len(plist[0])
-        plist_n = []
-        for i in range(n) :
-            normal_tmp = []
-            for j in range(m):
-                n1 = [0.0, 0.0, 0.0] if j<=0   or i<=0   else self.calculateVertexNormal(plist[i][j], plist[i][j-1], plist[i-1][j])
-                n2 = [0.0, 0.0, 0.0] if j+1>=m or i<=0   else self.calculateVertexNormal(plist[i][j], plist[i-1][j], plist[i][j+1])
-                n3 = [0.0, 0.0, 0.0] if j+1>=m or i+1>=n else self.calculateVertexNormal(plist[i][j], plist[i][j+1], plist[i+1][j])
-                n4 = [0.0, 0.0, 0.0] if j<=0   or i+1>=n else self.calculateVertexNormal(plist[i][j], plist[i+1][j], plist[i][j-1])
-                
-                n1 = self.normalised(n1)
-                n2 = self.normalised(n2)
-                n3 = self.normalised(n3)
-                n4 = self.normalised(n4)
-                
-                normal = [n1[0] + n2[0] + n3[0] + n4[0] , n1[1] + n2[1] + n3[1] + n4[1] , n1[2] + n2[2] + n3[2] + n4[2]]
-                normal_tmp.append(normal)
-            plist_n.append(normal_tmp)
-        return plist_n
-
-
-    def calculateSurfaceNormal(self, polynom):
-        normal = [0.0, 0.0, 0.0]
-        for i in range (len(polynom)) :
-            cur = polynom[i]
-            nxt = polynom[(i+1) % len(polynom)]
-            
-            normal[0] = normal[0] + ( (cur[1] - nxt[1]) * (cur[2] + nxt[2])) 
-            normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
-            normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
-            
-        return normal
-    
-    # normal in p1
-    def calculateVertexNormal(self, p1, p2, p3):
-        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
-        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
-        v = [0.0, 0.0, 0.0]
-        v[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
-        v[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2]
-        v[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0]
+            for segments in shape :
+                for flaps in segments :
+                    color = self.newColorVec()
+                    GL.glColor3fv(color)
+                    GL.glVertex3fv(flaps[0])
+                    GL.glVertex3fv(flaps[1])
+                    GL.glVertex3fv(flaps[3])
+                    GL.glVertex3fv(flaps[2])
+        GL.glEnd()
         
-        return v
-    
-    
-    def lenVector(self, v):
-        import math
-        return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
-    
-    def normalised(self, v):
-        l = self.lenVector(v)
-        if l == 0.0 :
-            return [0.0, 0.0, 0.0]
-        else :
-            return [v[0] / l, v[1] / l, v[2] / l]
+    def createOglSpars(self, pList):
+        for shape in pList :
+            for segments in shape :
+                for spares in segments :  
+                    GL.glColor3fv(self.newColorVec())      
+                    GL.glBegin(GL.GL_LINE_STRIP)       
+                    for vert in spares :
+                        GL.glVertex3fv(vert) 
+                    GL.glEnd()
+
+
 
     
     def initLight(self):
@@ -361,6 +279,7 @@ class Renderer(QtOpenGL.QGLWidget):
         mat_ambient    = [0.6, 0.6, 0.6, 1.0]
         mat_diffuse    = [0.4, 0.8, 0.4, 1.0] 
         mat_specular   = [1.0, 1.0, 1.0, 1.0]
+        
         light_position = [0.0, 0.0, 0.0, 1.0]        
 
         # GL_LIGHT_MODEL_AMBIENT, GL_LIGHT_MODEL_LOCAL_VIEWER,' GL_LIGHT_MODEL_TWO_SIDE und GL_LIGHT_MODEL_COLOR_CONTROL
@@ -371,6 +290,9 @@ class Renderer(QtOpenGL.QGLWidget):
         #GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
         
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
+        GL.glLightf(GL.GL_LIGHT0, GL.GL_CONSTANT_ATTENUATION, 1.0)
+        GL.glLightf(GL.GL_LIGHT0, GL.GL_LINEAR_ATTENUATION, 0.001)
+        GL.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.004)
         
         # The color of the sphere
         mat_materialColor = [0.2, 0.2, 1.0, 1.0]
@@ -386,36 +308,17 @@ class Renderer(QtOpenGL.QGLWidget):
         mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
 
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
-        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
+       # GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
         # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
         GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
     
-    
-    def drawSpars(self, pList):
-        for shape in pList :
-            for segments in shape :
-                for spares in segments :  
-                    GL.glColor3fv(self.newColorVec())      
-                    GL.glBegin(GL.GL_LINE_STRIP)       
-                    for vert in spares :
-                        GL.glVertex3fv(vert) 
-                    GL.glEnd()
+    # =========================================================================================================
+    # =========================================================================================================    
+    # create Point lists
+    # =========================================================================================================  
+    # =========================================================================================================
 
-    def drawFlaps(self, pList):
-        GL.glBegin(GL.GL_QUADS)
-        for shape in pList :
-            for segments in shape :
-                for flaps in segments :
-                    color = self.newColorVec()
-                    GL.glColor3fv(color)
-                    GL.glVertex3fv(flaps[0])
-                    GL.glVertex3fv(flaps[1])
-                    GL.glVertex3fv(flaps[3])
-                    GL.glVertex3fv(flaps[2])
-
-        GL.glEnd()
-        
     def createComponent(self, point_cnt_eta = 10, point_cnt_xsi = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
@@ -710,7 +613,63 @@ class Renderer(QtOpenGL.QGLWidget):
             
         return plistWing_up , plistWing_lo
 
+    def calculateNormal(self, plist):
+        n = len(plist)
+        m = len(plist[0])
+        plist_n = []
+        for i in range(n) :
+            normal_tmp = []
+            for j in range(m):
+                n1 = [0.0, 0.0, 0.0] if j<=0   or i<=0   else self.calculateVertexNormal(plist[i][j], plist[i][j-1], plist[i-1][j])
+                n2 = [0.0, 0.0, 0.0] if j+1>=m or i<=0   else self.calculateVertexNormal(plist[i][j], plist[i-1][j], plist[i][j+1])
+                n3 = [0.0, 0.0, 0.0] if j+1>=m or i+1>=n else self.calculateVertexNormal(plist[i][j], plist[i][j+1], plist[i+1][j])
+                n4 = [0.0, 0.0, 0.0] if j<=0   or i+1>=n else self.calculateVertexNormal(plist[i][j], plist[i+1][j], plist[i][j-1])
+                
+                n1 = self.normalised(n1)
+                n2 = self.normalised(n2)
+                n3 = self.normalised(n3)
+                n4 = self.normalised(n4)
+                
+                normal = [n1[0] + n2[0] + n3[0] + n4[0] , n1[1] + n2[1] + n3[1] + n4[1] , n1[2] + n2[2] + n3[2] + n4[2]]
+                normal_tmp.append(normal)
+            plist_n.append(normal_tmp)
+        return plist_n
 
+
+    def calculateSurfaceNormal(self, polynom):
+        normal = [0.0, 0.0, 0.0]
+        for i in range (len(polynom)) :
+            cur = polynom[i]
+            nxt = polynom[(i+1) % len(polynom)]
+            
+            normal[0] = normal[0] + ( (cur[1] - nxt[1]) * (cur[2] + nxt[2])) 
+            normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
+            normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
+            
+        return normal
+    
+    # normal in p1
+    def calculateVertexNormal(self, p1, p2, p3):
+        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
+        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
+        v = [0.0, 0.0, 0.0]
+        v[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
+        v[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2]
+        v[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0]
+        
+        return v
+    
+    
+    def lenVector(self, v):
+        import math
+        return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+    
+    def normalised(self, v):
+        l = self.lenVector(v)
+        if l == 0.0 :
+            return [0.0, 0.0, 0.0]
+        else :
+            return [v[0] / l, v[1] / l, v[2] / l]
 
                 
                 
@@ -841,6 +800,7 @@ class Widget(QtGui.QWidget):
     
     def setTransparency(self, value):
         self.renderer.alpha_rgb = 1.0 - value/100.0
+        self.renderer.initializeGL()
         self.renderer.updateGL()    
         
     def setShowFuse(self):
