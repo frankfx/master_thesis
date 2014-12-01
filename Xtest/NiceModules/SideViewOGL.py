@@ -12,7 +12,7 @@ from PySide import QtOpenGL, QtGui, QtCore
 from Xtest.Open_GL import utility
 
 try:
-    from OpenGL import GL, GLU, GLUT
+    from OpenGL import GL
 except ImportError:
     app = QtGui.QApplication(sys.argv)
     QtGui.QMessageBox.critical(None, "OpenGL hellogl",
@@ -21,15 +21,16 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class Renderer():
+class Renderer(QtOpenGL.QGLWidget):
 
     glMode = {"GL_POINTS" : GL.GL_POINTS, "GL_LINES" : GL.GL_LINES, "GL_LINE_STRIP" : GL.GL_LINE_STRIP, "GL_LINE_LOOP" : GL.GL_LINE_LOOP , "GL_QUADS" : GL.GL_QUADS, "GL_QUAD_STRIP" : GL.GL_QUAD_STRIP}
     
     def __init__(self, width, height):
-
+        super(Renderer, self).__init__()
+        
         self.tixi = Tixi()
         self.tixi.open('simpletest.cpacs.xml')
-        self.tixi.open('D150_CPACS2.0_valid.xml')
+        # self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -37,14 +38,19 @@ class Renderer():
         except TiglException as err:    
             print 'Error opening tigl document: ', err.__str__()
            
-        self.pList_fuselage = self.createFuselage() 
+        self.pList_fuselage                    = self.createFuselage() 
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
-        self.pList_component_segment = self.createComponent()
-        self.pList_flaps_TEDevice = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
-        self.pList_flaps_LEDevice = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
-        self.pList_flaps_Spoiler = self.createFlaps(("spoilers", "spoiler"))
-        self.plist_ribs = []
-        self.pList_spares = self.createSpars()
+        self.pList_component_segment           = self.createComponent()
+        self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
+        self.pList_flaps_LEDevice              = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
+        self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
+        self.plist_ribs                        = self.createRibs()
+        self.pList_spares                      = self.createSpars()
+
+        # create ogl lists
+        self.theTorus = GL.glGenLists(9)
+        self.createOglList()
+        
         
         self.xRot = 0
         self.yRot = 0
@@ -60,7 +66,22 @@ class Renderer():
         self.r_color = 0.0
         self.g_color = 0.0
         self.b_color = 0.0
+        self.alpha_rgb = 1.0
        
+        # viewing flags
+        self.flag_show_fuselage       = False
+        self.flag_show_wing1_up       = False
+        self.flag_show_wing1_lo       = False
+        self.flag_show_wing2_up       = False
+        self.flag_show_wing2_lo       = False
+        self.flag_show_compnt         = False
+        self.flag_show_flap_TE_Device = False
+        self.flag_show_flap_LE_Device = False
+        self.flag_show_flap_spoiler   = False
+        self.flag_show_ribs           = False
+        self.flag_show_spars          = False 
+           
+        
        
     def newColorVec(self):   
         color = [self.r_color, self.g_color, self.b_color]
@@ -75,21 +96,24 @@ class Renderer():
         if self.r_color >= 1.0 :
             self.r_color = 0.0 ; self.g_color = 0.0 ; self.b_color = 0.0
             
-        return color
+        return color 
                      
-       
-        
-    def init(self):
+    def initializeGL(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
         # GL.glEnable(GL.GL_LIGHTING)
-        
         # GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_NORMALIZE)
-        GL.glShadeModel(GL.GL_SMOOTH)
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)        
+       # GL.glShadeModel(GL.GL_SMOOTH)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-        self.initLight()
+       # self.initLight()
+       
+        
+        
+        
 
-    def resize(self, w, h):
+    def resizeGL(self, w, h):
         side = min(w, h)
         self.viewwidth = side
         self.viewheight = side
@@ -103,9 +127,9 @@ class Renderer():
         GL.glLoadIdentity()
        
         GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
-                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -10.0, 100.0)
+                    +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -100.0, 100.0)
 
-    def display(self):
+    def paintGL(self):
         self.__setProjection()
         #GL.glMatrixMode(GL.GL_PROJECTION)
         #GL.glLoadIdentity()
@@ -134,46 +158,79 @@ class Renderer():
 
 
     def draw(self):
-        # draw upper
-        self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"], 1, False)
-        # draw lower
-        #self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67, 0.5], Renderer.glMode["GL_QUADS"], 1, False)
+        if self.flag_show_fuselage :
+            self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUAD_STRIP"], 1, True)            
 
-        # draw reflect upper
-        #self.drawShape(self.pList_wing_up, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1, False)
-        # draw reflect lower
-        #self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, 0.5], Renderer.glMode["GL_QUADS"], -1, False)
+        if self.flag_show_wing1_up :        
+            self.drawShape(self.pList_wing_up, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
         
-        # draw fuselage
-        #self.drawShape(self.pList_fuselage, [0.0, 0.44, 0.67], Renderer.glMode["GL_QUADS"], 1, False)
+        if self.flag_show_wing1_lo :
+            self.drawShape(self.pList_wing_lo, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
 
-        # draw ComponentSegment
-        #self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_POINTS"], 1, False)
-        #self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_LINES"], 1, True)
-#        self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0], Renderer.glMode["GL_QUAD_STRIP"], 1, True)
-
-        # draw Flaps
-        self.drawFlaps(self.pList_flaps_TEDevice)
-        self.drawFlaps(self.pList_flaps_LEDevice)
-        self.drawFlaps(self.pList_flaps_Spoiler)
-        #self.drawShape(self.pList_flaps, [1.0,0.0,0.2], Renderer.glMode["GL_POINTS"], 1, False)
-        self.drawSpars(self.pList_spares)
+        # draw reflect upper wing
+        if self.flag_show_wing2_up :
+            self.drawShape(self.pList_wing_up, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
         
-        # draw Points
-        GL.glPointSize(6)
-        GL.glColor3f(1, 0, 1)
-        #self.drawShape(self.pList_wing_up, [1.0, 0.0, 1.0], Renderer.glMode["GL_POINTS"])
+        if self.flag_show_wing2_lo :
+            self.drawShape(self.pList_wing_lo, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
+        
+        if self.flag_show_compnt :
+            #self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_POINTS"], 1, False)
+            self.drawShape(self.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_LINES"], 1, True)
 
+        if self.flag_show_flap_TE_Device :
+            self.drawFlaps(self.pList_flaps_TEDevice)
+        
+        if self.flag_show_flap_LE_Device :
+            self.drawFlaps(self.pList_flaps_LEDevice)
+        
+        if self.flag_show_flap_spoiler :
+            self.drawFlaps(self.pList_flaps_Spoiler)
+
+        if self.flag_show_spars :
+            self.drawSpars(self.pList_spares)
+        
+
+    def createOglList(self, index, pList, glMode, color, flag_Strip, reflect):
+        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        
+        GL.glNewList(index, GL.GL_COMPILE)
+        GL.glColor4fv(color)
+        GL.glBegin(glMode)
+        for shape in pList :
+            for i in range (0, len(shape)-1, 1):
+                seg1 = shape[i] 
+                seg2 = shape[i+1]
+                for j in range(0, len(seg1)-1, 1) :
+                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
+                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
+                    if(flag_Strip):
+                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
+                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
+                    else :
+                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
+                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
+                    
+                    GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
+                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
+                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
+                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])     
+        GL.glEnd() 
+
+        
 
     '''
     @param reflect: normal mode set 1 , reflect mode set -1
     @param flag_strip: strip mode set True , not strip set False
     '''
     def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
-        GL.glColor3f(color[0], color[1], color[2])
+        #GL.glColor3f(color[0], color[1], color[2])
+        
+
+        GL.glNewList(self.theTorus,GL.GL_COMPILE)
+        GL.glColor4fv(color)
         
         quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-        
         GL.glBegin(glMode)
         for shape in pList :
             normals = self.calculateNormal(shape)
@@ -205,6 +262,39 @@ class Renderer():
                 #break 
             #break               
         GL.glEnd() 
+
+
+    #--- def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
+        #-------------------------------------------------- GL.glColor4fv(color)
+#------------------------------------------------------------------------------ 
+        #---------------------------------------------------- GL.glBegin(glMode)
+        #-------------------------------------------------- for shape in pList :
+            #-------------------------------------------- for segment in shape :
+                #------------------------------ for i in range(len(segment)-1) :
+                    #---------------------------------------- prof1 = segment[i]
+                    #-------------------------------------- prof2 = segment[i+1]
+                    #---------------------------- for j in range(len(prof1)-1) :
+                        #------------------------------ GL.glVertex3fv(prof2[j])
+                        #------------------------------ GL.glVertex3fv(prof1[j])
+                        #---------------------------- GL.glVertex3fv(prof1[j+1])
+                        #---------------------------- GL.glVertex3fv(prof2[j+1])
+        #------------------------------------------------------------ GL.glEnd()
+
+    #--- def drawShape(self, pList, color, glMode, reflect=1, flag_Strip=False):
+        #-------------------------------------------------- GL.glColor4fv(color)
+#------------------------------------------------------------------------------ 
+        #---------------------------------------------------- GL.glBegin(glMode)
+        #-------------------------------------------------- for shape in pList :
+            #-------------------------------------------- for segment in shape :
+                #------------------------------ for i in range(len(segment)-1) :
+                    #---------------------------------------- prof1 = segment[i]
+                    #-------------------------------------- prof2 = segment[i+1]
+                    #---------------------------- for j in range(len(prof1)-1) :
+                        #------------------------------ GL.glVertex3fv(prof2[j])
+                        #------------------------------ GL.glVertex3fv(prof1[j])
+                        #---------------------------- GL.glVertex3fv(prof1[j+1])
+                        #---------------------------- GL.glVertex3fv(prof2[j+1])
+        #------------------------------------------------------------ GL.glEnd()
 
 
     def calculateNormal(self, plist):
@@ -313,15 +403,17 @@ class Renderer():
                     GL.glEnd()
 
     def drawFlaps(self, pList):
-        GL.glColor3f(1.0,0.0,0.0)
         GL.glBegin(GL.GL_QUADS)
         for shape in pList :
             for segments in shape :
                 for flaps in segments :
+                    color = self.newColorVec()
+                    GL.glColor3fv(color)
                     GL.glVertex3fv(flaps[0])
                     GL.glVertex3fv(flaps[1])
-                    GL.glVertex3fv(flaps[2])
                     GL.glVertex3fv(flaps[3])
+                    GL.glVertex3fv(flaps[2])
+
         GL.glEnd()
         
     def createComponent(self, point_cnt_eta = 10, point_cnt_xsi = 10):
@@ -346,11 +438,72 @@ class Renderer():
     def createRibs(self):
         for wingIndex in range(1, self.tigl.getWingCount()+1) :
             for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) :        
-                path_ribsDefinitions = '/cpacs/vehicles/aircraft/model/wings/wing['\
+                try :
+                    ribList = self.__createRibs(wingIndex, compSegmentIndex)
+                except:
+                    print "no ribs for wing " + str(wingIndex) + " found." ; break
+                                
+        return[]           
+    
+    def __createRibs(self, wingIndex, compSegmentIndex):
+        path  = '/cpacs/vehicles/aircraft/model/wings/wing['+str(wingIndex)+']/componentSegments/componentSegment['\
+                                                                            +str(compSegmentIndex)+']/structure/'
+        for idx_ribDef in range(1, self.tixi.getNumberOfChilds(path + 'ribsDefinitions/')+1) :    
+            path_ribs_pos = path + 'ribsDefinitions/ribsDefinition[' + str(idx_ribDef) + ']/ribsPositioning/' 
+            
+            ribreference         = self.tixi.getTextElement(path_ribs_pos + "ribReference")
+            etaStart             = self.tixi.getTextElement(path_ribs_pos + "etaStart")
+            etaEnd               = self.tixi.getTextElement(path_ribs_pos + "etaEnd")
+            ribStart             = self.tixi.getTextElement(path_ribs_pos + "ribStart")
+            ribEnd               = self.tixi.getTextElement(path_ribs_pos + "ribEnd")
+            numberOfRibs         = self.tixi.getTextElement(path_ribs_pos + "numberOfRibs")
+            ribCrossingBehaviour = self.tixi.getTextElement(path_ribs_pos + "ribCrossingBehaviour")
+
+                
+            if ribStart == 'trailingEdge' :
+                xsiStart = 0.0 ; xsiEnd = 0.0
+            elif ribStart == 'leadingEdge' :
+                xsiStart = 1.0 ; xsiEnd = 1.0
+            elif ribStart in self.__getSparPositionUIDs(wingIndex, compSegmentIndex) :
+                print "unimplemented now"
+                pass
+
+            if ribEnd == 'trailingEdge' :
+                xsiStart = 0.0 ; xsiEnd = 0.0
+            elif ribEnd == 'leadingEdge' :
+                xsiStart = 1.0 ; xsiEnd = 1.0
+            elif ribreference in self.__getSparPositionUIDs(wingIndex, compSegmentIndex) :
+                path_spar_pos_uid = path + 'spars/sparSegments/sparSegment[' + ribreference +']/sparPositionUIDs/' 
+                sparPositionUIDs = []
+                for idx_spar_pos_uid in range(1, self.tixi.getNumberOfChilds(path_spar_pos_uid)+1) : 
+                    sparPositionUIDs.append(self.tixi.getTextElement(path_spar_pos_uid + "sparPositionUID["+idx_spar_pos_uid+"]"))
+
+                for idx_spar_pos in range(1, self.tixi.getNumberOfChilds(path + 'spars/sparPositions/')):
+                    uid = self.tixi.xPathExpressionGetTextByIndex(path + 'spars/sparPositions/sparPosition/@uID', idx_spar_pos)
+                    if uid in sparPositionUIDs :
+                        eta = self.tixi.getTextElement(path + "spars/sparPositions/sparPosition[" + uid +"]/eta/")
+                        xsi = self.tixi.getTextElement(path + "spars/sparPositions/sparPosition[" + uid +"]/xsi/")
+                xsiStart = xsi ; xsiEnd = xsi              
+                
+            # (b - a) / (count of Points - 1)    
+            spacing = (etaEnd - etaStart) / (numberOfRibs-1)
+                
+                    
+        return [] 
+
+
+    def __getSparPositionUIDs(self, wingIndex, compSegmentIndex):
+        path_sparSegments = '/cpacs/vehicles/aircraft/model/wings/wing['\
                                 +str(wingIndex)+']/componentSegments/componentSegment['\
-                                +str(compSegmentIndex)+']/structure/ribsDefinitions/ribsDefinition/'
-                for ribDefIdx in range(1, self.tixi.getNumberOfChilds(path_ribsDefinitions)+1) :    
-                    path = path_ribsDefinitions + '[' + str(ribDefIdx) + ']/' 
+                                +str(compSegmentIndex)+']/structure/spars/sparSegments/'
+        
+        path = path_sparSegments + 'sparSegment/@uID' 
+
+        uidList = []
+        for sparSegmentIdx in range(1, self.tixi.getNumberOfChilds(path_sparSegments)+1) :
+            uidList.append(self.tixi.xPathExpressionGetTextByIndex(path, sparSegmentIdx))
+        return uidList
+
     
     def createSpars(self):
         plistWing = []
@@ -399,7 +552,8 @@ class Renderer():
             sparList.append(plist)
             
         return sparList
-    
+
+
     
     '''
     @param flapType: (parent, child)-String-Tuple of flap types, eg. ("trailingEdgeDevices","trailingEdgeDevice")
@@ -507,7 +661,7 @@ class Renderer():
 
 
         
-    def createFuselage(self, point_cnt_eta = 2, point_cnt_zeta = 10):
+    def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 40):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta) 
         
@@ -516,12 +670,15 @@ class Renderer():
         for fuselageIndex in range(1, self.tigl.getFuselageCount()+1) :
             plistSeg = []
             for segmentIndex in range(1, self.tigl.fuselageGetSegmentCount(fuselageIndex)+1) :
+                #plistprofile = []
                 for eta in eta_List :
-                    p_tmp = []
+                    plist = []
                     for zeta in zeta_List :
                         x, y, z = self.tigl.fuselageGetPoint(fuselageIndex, segmentIndex, eta, zeta)
-                        p_tmp.append([x,y,z])
-                    plistSeg.append(p_tmp)    
+                        plist.append([x,y,z])
+                    #plistprofile.append(plist)
+                    plistSeg.append(plist)
+                #plistSeg.append(plistprofile)    
             plistFuse.append(plistSeg)        
         
         return plistFuse 
@@ -557,28 +714,73 @@ class Renderer():
 
                 
                 
-class Widget(QtOpenGL.QGLWidget):
+class Widget(QtGui.QWidget):
     def __init__(self, parent = None):
         super(Widget, self).__init__(parent)
         self.width = 800
         self.height = 800
         self.resize(self.width ,self.height)
+        
+        self.renderer = Renderer(self.width ,self.height)
+        
+        label1 = QtGui.QLabel("Transparency")
+        slide_transparency = QtGui.QSlider(QtCore.Qt.Horizontal)
+        slide_transparency.setRange(0, 100)
+        slide_transparency.setSingleStep(10)
+        slide_transparency.setPageStep(100)
+        slide_transparency.setTickInterval(10)
+        slide_transparency.setTickPosition(QtGui.QSlider.TicksRight)      
+      
+        slide_transparency.valueChanged.connect(self.setTransparency)
       
         grid = QtGui.QGridLayout()
+        grid.addWidget(label1, 1,1)
+        grid.addWidget(slide_transparency, 1,2)
+        grid.addWidget(self.renderer,2,1,1,2)
         self.setLayout(grid)
         
+        self.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.setSizePolicy ( QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        self.renderer = Renderer(self.width ,self.height)    
-    
-    def initializeGL(self):
-        self.renderer.init()
-    
-    def resizeGL(self, w, h):
-        self.renderer.resize(w, h)
- 
-    def paintGL(self):
-        self.renderer.display()
 
+        # set up context menu
+        self.showOptions = [QtGui.QAction("Show fuselage", self), QtGui.QAction("Show wing1up", self),
+                       QtGui.QAction("Show wing1lo", self), QtGui.QAction("Show wing2up", self),
+                       QtGui.QAction("Show wing2lo", self), QtGui.QAction("Show components", self),
+                       QtGui.QAction("Show TE_Device", self), QtGui.QAction("Show LE_Device", self),
+                       QtGui.QAction("Show spoiler", self), QtGui.QAction("Show ribs", self),
+                       QtGui.QAction("Show spars", self)]
+
+        self.menu = QtGui.QMenu(self)
+                
+        for i in range (len(self.showOptions)) :
+            self.showOptions[i].setCheckable(True)
+            self.menu.addAction(self.showOptions[i])
+         
+        self.showOptions[0].triggered.connect(self.setShowFuse) 
+        self.showOptions[1].triggered.connect(self.setShowWing1up) 
+        self.showOptions[2].triggered.connect(self.setShowWing1lo) 
+        self.showOptions[3].triggered.connect(self.setShowWing2up) 
+        self.showOptions[4].triggered.connect(self.setShowWing2lo) 
+        self.showOptions[5].triggered.connect(self.setShowCompnt) 
+        self.showOptions[6].triggered.connect(self.setShowFlapTE) 
+        self.showOptions[7].triggered.connect(self.setShowFlapLE) 
+        self.showOptions[8].triggered.connect(self.setShowFlapSpoiler) 
+        self.showOptions[9].triggered.connect(self.setShowRibs) 
+        self.showOptions[10].triggered.connect(self.setShowSpars)         
+        
+        self.showOptions[0].setChecked(self.renderer.flag_show_fuselage) 
+        self.showOptions[1].setChecked(self.renderer.flag_show_wing1_up) 
+        self.showOptions[2].setChecked(self.renderer.flag_show_wing1_lo) 
+        self.showOptions[3].setChecked(self.renderer.flag_show_wing2_up) 
+        self.showOptions[4].setChecked(self.renderer.flag_show_wing2_lo) 
+        self.showOptions[5].setChecked(self.renderer.flag_show_compnt) 
+        self.showOptions[6].setChecked(self.renderer.flag_show_flap_TE_Device) 
+        self.showOptions[7].setChecked(self.renderer.flag_show_flap_LE_Device) 
+        self.showOptions[8].setChecked(self.renderer.flag_show_flap_spoiler) 
+        self.showOptions[9].setChecked(self.renderer.flag_show_ribs) 
+        self.showOptions[10].setChecked(self.renderer.flag_show_spars)
+
+    
     def mousePressEvent(self, event):  
         self.lastPos_x = event.pos().x()
         self.lastPos_y = event.pos().y()
@@ -602,7 +804,7 @@ class Widget(QtOpenGL.QGLWidget):
         self.renderer.xTrans += (dx * oglXTrans) 
         self.renderer.yTrans += (dy * oglYTrans)
 
-        self.updateGL()
+        self.renderer.updateGL()
 
     def keyPressEvent(self, event):
         redraw = False
@@ -629,10 +831,52 @@ class Widget(QtOpenGL.QGLWidget):
             self.renderer.scale -= offset_scale
             redraw = True
 
-        # Request display update
+        # Request paintGL update
         if redraw :
-            self.updateGL()
+            self.renderer.updateGL()
     
+    def contextMenuEvent(self, event):
+        self.menu.exec_(event.globalPos())
+        self.renderer.updateGL()
+    
+    def setTransparency(self, value):
+        self.renderer.alpha_rgb = 1.0 - value/100.0
+        self.renderer.updateGL()    
+        
+    def setShowFuse(self):
+        self.renderer.flag_show_fuselage = not self.renderer.flag_show_fuselage
+
+    def setShowWing1up(self):
+        self.renderer.flag_show_wing1_up = not self.renderer.flag_show_wing1_up
+
+    def setShowWing1lo(self):
+        self.renderer.flag_show_wing1_lo = not self.renderer.flag_show_wing1_lo
+        
+    def setShowWing2up(self):
+        self.renderer.flag_show_wing2_up = not self.renderer.flag_show_wing2_up
+        
+    def setShowWing2lo(self):
+        self.renderer.flag_show_wing2_lo = not self.renderer.flag_show_wing2_lo
+        
+    def setShowCompnt(self):
+        self.renderer.flag_show_compnt = not self.renderer.flag_show_compnt
+    
+    def setShowFlapLE(self):
+        self.renderer.flag_show_flap_LE_Device = not self.renderer.flag_show_flap_LE_Device
+    
+    def setShowFlapTE(self):
+        self.renderer.flag_show_flap_TE_Device = not self.renderer.flag_show_flap_TE_Device
+    
+    def setShowFlapSpoiler(self):
+        self.renderer.flag_show_flap_spoiler = not self.renderer.flag_show_flap_spoiler
+        
+    def setShowSpars(self):
+        self.renderer.flag_show_spars = not self.renderer.flag_show_spars
+        
+    def setShowRibs(self):
+        self.renderer.flag_show_ribs = not self.renderer.flag_show_ribs
+
+
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
     widget = Widget()

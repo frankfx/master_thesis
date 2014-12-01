@@ -31,49 +31,34 @@ class Renderer():
         
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glEnable(GL.GL_LIGHTING)
-        GL.glEnable(GL.GL_LIGHT0)
+
         GL.glEnable(GL.GL_NORMALIZE)
+      #  GL.glEnable(GL.GL_BLEND)
+      #  GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
         GL.glShadeModel(GL.GL_SMOOTH)
-        GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-        self.initLight()
+        #GL.glClearColor (1.0, 1.0, 1.0, 0.0)
+        #self.initLight()
 
     def initLight(self):
-        # mat_ambient   = [0.4, 0.4, 0.4, 1.0]
+        mat_ambient    = [0.2, 0.2, 0.2, 1.0]
+        mat_diffuse    = [1.0, 1.0, 1.0, 1.0]
         mat_specular   = [1.0, 1.0, 1.0, 1.0] 
-        mat_ambient    = [0.6, 0.6, 0.6, 1.0]
-        mat_diffuse    = [0.4, 0.8, 0.4, 1.0] 
-        
-        light_position = [0.0, 0.0, 0.0, 1.0]        
 
+        light_position = [1.0, 1.0, 0.0, 1.0]        
 
-        # GL_LIGHT_MODEL_AMBIENT, GL_LIGHT_MODEL_LOCAL_VIEWER,' GL_LIGHT_MODEL_TWO_SIDE und GL_LIGHT_MODEL_COLOR_CONTROL
         GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
-        # Diffuse (non-shiny) light component
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
-        # Specular (shiny) light component
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
+       # GL.glEnable(GL.GL_LIGHTING)
+       # GL.glEnable(GL.GL_LIGHT0)
+        GL.glEnable(GL.GL_COLOR_MATERIAL)
         
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
-        
-        # The color of the sphere
-        mat_materialColor = [0.2, 0.2, 1.0, 1.0]
-        # The specular (shiny) component of the material
         mat_materialSpecular = [1.0, 1.0, 1.0, 1.0]
-        # The color emitted by the material
-        mat_materialEmission = [0, 0, 0, 1.0]
-        #The shininess parameter
-        mat_shininess  = 0.4 
-
-        mat_ambient    = [0.24725,  0.1995, 0.0745, 1.0]
-        mat_diffuse    = [0.75164, 0.60648, 0.22648, 1.0] 
-        mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
-
-        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
-        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
-        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
-        GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
+        mat_materialEmission = [0.0, 0.0, 0.0, 1.0]
+        
+        
+        GL.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_materialSpecular)
+        
+        GL.glColor4f(1.0, 0.0, 0.0, 0.2)
     
     
     def resize(self, w, h):
@@ -100,15 +85,22 @@ class Renderer():
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()                
 
-        self.initLight()
+       # self.initLight()
 
         #GL.glPushMatrix() 
-        GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
+        GL.glTranslatef(self.xTrans,self.yTrans,-6.5)
+        GL.glScalef(0.1, 0.1,1.0)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
         #self.drawTestObject()
-        self.drawTriangle2()
+        #self.drawTriangle2()
+        #self.drawQuad()
+        self.drawRec()
+        #GL.glPolygonMode(GL.GL_FRONT_AND_BACK,GL.GL_LINE)
+        GL.glPolygonMode(GL.GL_FRONT_AND_BACK,GL.GL_FILL)
+       # GL.glEnable(GL.GL_LIGHTING)
+        GL.glCallList(self.theTorus)
         
        # GL.glPopMatrix()
 
@@ -161,14 +153,51 @@ class Renderer():
         
         return v
 
+    def drawRec(self):
+        self.theTorus = GL.glGenLists (5)
+        print "df" , self.theTorus
+        GL.glNewList(self.theTorus,GL.GL_COMPILE)
+    
+        # Ground plane 
+        GL.glNormal3f(0.0,1.0,0.0)
+        for i in range(-10, 10, 1) :
+            GL.glColor3f(0.0,(i+10)/20.0,0.0)
+            GL.glBegin(GL.GL_QUAD_STRIP)
+            for j in range (-10, 10, 1) :
+                GL.glVertex3f(i,0.0,j)
+                GL.glVertex3f(i+1,0.0,j)
+          
+            GL.glEnd()
+        GL.glEndList()        
+
+    def drawQuad(self):
+        #GL.glTranslatef(0,0,2)
+        GL.glBegin(GL.GL_QUAD_STRIP)
+        GL.glColor4f(1.0, 0.0, 0.0, 1.5)
+        GL.glVertex3f(-1,-1,-5)        
+        GL.glVertex3f(-1, 1,-5) 
+        GL.glVertex3f( 1,-1,-5) 
+        GL.glVertex3f( 1, 1,-5) 
+
+        GL.glColor4f(0.0, 1.0, 0.0, 0.5)
+        GL.glVertex3f( 2, -1,-5)        
+        GL.glVertex3f( 2,  1,-5) 
+        
+      #  GL.glColor3f(0.0, 0.0, 1.0)        
+ 
+       # GL.glVertex3f( 1, 2,-5) 
+        #GL.glVertex3f(-1, 2,-5)
+        
+        GL.glEnd()
 
     def drawTriangle2(self):
+      #  
         GL.glBegin(GL.GL_TRIANGLES)
-        GL.glNormal3f(0,0,1)
+       # GL.glNormal3f(0,0,1)
         GL.glVertex3f(0,0,0)
-        GL.glNormal3f(0,0,1)
+       # GL.glNormal3f(0,0,1)
         GL.glVertex3f(1,0,0)
-        GL.glNormal3f(0,0,1)
+       # GL.glNormal3f(0,0,1)
         GL.glVertex3f(0,1,0)
         GL.glEnd()       
 
@@ -180,6 +209,15 @@ class Renderer():
         GL.glVertex3f(1,0,0)
         GL.glVertex3f(0,0,1)  
         GL.glVertex3f(0,1,0)               
+        GL.glEnd()
+
+        GL.glBegin(GL.GL_LINES) 
+        GL.glVertex3f(0,0,-1)
+        GL.glVertex3f(0,0,0)         
+        GL.glVertex3f(0,0,-1)
+        GL.glVertex3f(-1,0,0)
+        GL.glVertex3f(0,0,1)  
+        GL.glVertex3f(0,-1,0)               
         GL.glEnd()
 
 
