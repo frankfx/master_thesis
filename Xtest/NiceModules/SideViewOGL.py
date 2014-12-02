@@ -13,7 +13,8 @@ from Xtest.Open_GL import utility
 import numpy as np
 
 try:
-    from OpenGL import GL
+    from OpenGL import GL, GLU
+   # from OpenGL.GL import shaders
 except ImportError:
     app = QtGui.QApplication(sys.argv)
     QtGui.QMessageBox.critical(None, "OpenGL hellogl",
@@ -57,7 +58,7 @@ class Renderer(QtOpenGL.QGLWidget):
         self.aspect= 0.5  
         self.viewwidth = 0.0
         self.viewheight = 0.0
-        
+
         # helper
         self.r_color = 0.0
         self.g_color = 0.0
@@ -76,6 +77,10 @@ class Renderer(QtOpenGL.QGLWidget):
         self.flag_show_flap_spoiler   = False
         self.flag_show_ribs           = False
         self.flag_show_spars          = False 
+        self.flag_selection           = False
+           
+        # selection
+        self.selectedPoint = None
            
     def newColorVec(self):   
         color = [self.r_color, self.g_color, self.b_color]
@@ -94,22 +99,16 @@ class Renderer(QtOpenGL.QGLWidget):
                      
     def initializeGL(self):
         #GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glEnable(GL.GL_LIGHTING)
-        GL.glEnable(GL.GL_LIGHT0)
+        #GL.glEnable(GL.GL_LIGHTING)
+        #GL.glEnable(GL.GL_LIGHT0)
         #GL.glEnable(GL.GL_COLOR_MATERIAL)
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glEnable(GL.GL_BLEND)
-        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)        
-        #GL.glBlendFunc(GL.GL_DST_ALPHA, GL.GL_ONE_MINUS_DST_ALPHA)        
-        #GL.glBlendFunc(GL.GL_DST_COLOR, GL.GL_SRC_COLOR)        
-        #GL.glBlendFunc(GL.GL_DST_COLOR, GL.GL_SRC_ALPHA)        
-       # GL.glBlendFunc(GL.GL_ONE, GL.GL_ZERO)        
-       # GL.glBlendFunc(GL.GL_ONE_MINUS_DST_COLOR, GL.GL_ONE_MINUS_SRC_COLOR)  
-        
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)             
                 
-        GL.glShadeModel(GL.GL_SMOOTH)
+        #  GL.glShadeModel(GL.GL_SMOOTH)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-        self.initLight()
+        # self.initLight()
        
         self.createOglLists()
         
@@ -124,6 +123,9 @@ class Renderer(QtOpenGL.QGLWidget):
         self.__setProjection()        
         
     def __setProjection(self):
+        if self.alpha_rgb < 1.0 :
+            GL.glDisable(GL.GL_DEPTH_TEST)
+        
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
        
@@ -140,14 +142,13 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()   
         
-        
-        
-        
+
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
-        GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
-        GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
-        GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
-        self.initLight()
+        if not self.flag_selection :
+            GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
+            GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
+            GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
+            self.initLight()
 
         self.draw()        
         #self.initLight()
@@ -184,69 +185,74 @@ class Renderer(QtOpenGL.QGLWidget):
     def createOglLists(self):
         self.index = GL.glGenLists(10)
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
-        self.createOglShape(self.pList_fuselage, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUAD_STRIP"], 1, True)
+        self.createOglShape(self.pList_fuselage, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False, True)
         GL.glEndList()
 
         GL.glNewList(self.index+1, GL.GL_COMPILE)
         self.createOglShape(self.pList_wing_up, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
-        GL.glEndList()            
-        
+        GL.glEndList()
+
         GL.glNewList(self.index+2, GL.GL_COMPILE)
         self.createOglShape(self.pList_wing_lo, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
-        GL.glEndList()  
-        
+        GL.glEndList()
+
         # draw reflect upper wing
-        GL.glNewList(self.index+3, GL.GL_COMPILE) 
+        GL.glNewList(self.index+3, GL.GL_COMPILE)
         self.createOglShape(self.pList_wing_up, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
-        GL.glEndList()  
+        GL.glEndList()
 
-        GL.glNewList(self.index+4, GL.GL_COMPILE) 
+        GL.glNewList(self.index+4, GL.GL_COMPILE)
         self.createOglShape(self.pList_wing_lo, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
-        GL.glEndList()         
+        GL.glEndList()
 
-        GL.glNewList(self.index+5, GL.GL_COMPILE) 
+        GL.glNewList(self.index+5, GL.GL_COMPILE)
         self.createOglShape(self.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_LINES"], 1, True)
-        GL.glEndList()        
+        GL.glEndList()
 
-        GL.glNewList(self.index+6, GL.GL_COMPILE) 
+        GL.glNewList(self.index+6, GL.GL_COMPILE)
         self.createOglFlaps(self.pList_flaps_TEDevice)
-        GL.glEndList()        
+        GL.glEndList()
 
-        GL.glNewList(self.index+7, GL.GL_COMPILE) 
+        GL.glNewList(self.index+7, GL.GL_COMPILE)
         self.createOglFlaps(self.pList_flaps_LEDevice)
-        GL.glEndList()     
+        GL.glEndList()
 
-        GL.glNewList(self.index+8, GL.GL_COMPILE) 
+        GL.glNewList(self.index+8, GL.GL_COMPILE)
         self.createOglFlaps(self.pList_flaps_Spoiler)
-        GL.glEndList() 
+        GL.glEndList()
 
-        GL.glNewList(self.index+9, GL.GL_COMPILE) 
+        GL.glNewList(self.index+9, GL.GL_COMPILE)
         self.createOglSpars(self.pList_spares)
-        GL.glEndList() 
+        GL.glEndList()
 
 
-    def createOglShape(self, pList, color, glMode, reflect, flag_Strip):
+    def createOglShape(self, pList, color, glMode, reflect, flag_Strip, flag = False):
         quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        
+        if flag :
+            if self.flag_selection and self.selectedPoint is not None and self.isElementSelected(pList, reflect, flag_Strip, self.selectedPoint) :
+                color = [1.0, 0.0, 0.0, self.alpha_rgb]
+        
         GL.glColor4fv(color)
         GL.glBegin(glMode)
         for shape in pList :
             for i in range (0, len(shape)-1, 1):
-                seg1 = shape[i] 
+                seg1 = shape[i]
                 seg2 = shape[i+1]
                 for j in range(0, len(seg1)-1, 1) :
                     quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
                     quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
                     if(flag_Strip):
                         quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
-                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
+                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
                     else :
                         quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
-                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]  
+                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
                     GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
-                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])                     
-                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])                     
-                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])     
-        GL.glEnd() 
+                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])
+                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])
+                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])
+        GL.glEnd()
 
     def createOglFlaps(self, pList):
         GL.glBegin(GL.GL_QUADS)
@@ -394,6 +400,34 @@ class Renderer(QtOpenGL.QGLWidget):
                     
         return [] 
 
+    def isElementSelected(self, plist, reflect, flag_Strip, point):
+        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        for shape in plist :
+            for i in range (0, len(shape)-1, 1):
+                seg1 = shape[i] 
+                seg2 = shape[i+1]
+                for j in range(0, len(seg1)-1, 1) :
+                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
+                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
+                    if(flag_Strip):
+                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
+                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
+                    else :
+                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
+                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]          
+                    if(utility.isPinRectangle(quad, point)) :
+                        print "hier gehts los"            
+                        print plist
+                        print point
+                        print "IN List"
+                        return True
+        
+        print "hier gehts los"            
+        print plist
+        print point
+        print "NOT in List"
+        
+        return False
 
     def __getSparPositionUIDs(self, wingIndex, compSegmentIndex):
         path_sparSegments = '/cpacs/vehicles/aircraft/model/wings/wing['\
@@ -708,12 +742,17 @@ class Widget(QtGui.QWidget):
                        QtGui.QAction("Show TE_Device", self), QtGui.QAction("Show LE_Device", self),
                        QtGui.QAction("Show spoiler", self), QtGui.QAction("Show ribs", self),
                        QtGui.QAction("Show spars", self)]
+        selectAction = QtGui.QAction("select", self)
+
 
         self.menu = QtGui.QMenu(self)
-                
+
         for i in range (len(self.showOptions)) :
             self.showOptions[i].setCheckable(True)
             self.menu.addAction(self.showOptions[i])
+        self.menu.addSeparator()
+        selectAction.setCheckable(True)
+        self.menu.addAction(selectAction)
          
         self.showOptions[0].triggered.connect(self.setShowFuse) 
         self.showOptions[1].triggered.connect(self.setShowWing1up) 
@@ -726,6 +765,8 @@ class Widget(QtGui.QWidget):
         self.showOptions[8].triggered.connect(self.setShowFlapSpoiler) 
         self.showOptions[9].triggered.connect(self.setShowRibs) 
         self.showOptions[10].triggered.connect(self.setShowSpars)         
+        selectAction.triggered.connect(self.setFlagSelection) 
+        
         
         self.showOptions[0].setChecked(self.renderer.flag_show_fuselage) 
         self.showOptions[1].setChecked(self.renderer.flag_show_wing1_up) 
@@ -738,12 +779,56 @@ class Widget(QtGui.QWidget):
         self.showOptions[8].setChecked(self.renderer.flag_show_flap_spoiler) 
         self.showOptions[9].setChecked(self.renderer.flag_show_ribs) 
         self.showOptions[10].setChecked(self.renderer.flag_show_spars)
+        selectAction.setChecked(self.renderer.flag_selection)
+    
+    def __winPosTo3DPos(self, x, y):
+        point = [None, None, None]                                      # result point
+        modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
+        projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
+        viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
+ 
+        # in OpenGL y soars (steigt) from bottom (0) to top
+        y_new = viewport[3] - y     
+ 
+        # read depth buffer at position (X/Y_new)
+        z = GL.glReadPixels(x, y_new, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT)
+        # z should not be 0!!!
+        # error when projection matrix not identity (gluPerspective) 
+        point[0], point[1], point[2] = GLU.gluUnProject(x, y_new, z, modelview, projection, viewport)                         
+        
+        point[0] = round(point[0],2)
+        point[1] = round(point[1],2)
+        point[2] = round(point[2],2)
+        
+        return point
 
+    '''
+    get the the screen coordinates from the world coordinates 
+    '''
+    def fkt_3DPosToWinPos(self, x, y, z):
+        point = [None, None, None]                                      # result point
+        modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
+        projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
+        viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
+
+        # in OpenGL y soars (steigt) from bottom (0) to top
+        y_new = y 
+ 
+        point[0], point[1], point[2]  = GLU.gluProject(x, y_new, z, modelview, projection, viewport)                         
+        point[1] = self.height -point[1]
+        return point            
     
     def mousePressEvent(self, event):  
         self.lastPos_x = event.pos().x()
         self.lastPos_y = event.pos().y()
-                
+        
+        if self.renderer.flag_selection:
+            self.__selectedPoint    = self.__winPosTo3DPos(event.pos().x(), event.pos().y())
+            self.renderer.selectedPoint = self.__selectedPoint
+            print self.__selectedPoint
+            self.renderer.initializeGL()
+            self.renderer.updateGL()
+            
     def mouseMoveEvent(self, event):
         dx = (event.x() - self.lastPos_x ) 
         dy = (event.y() - self.lastPos_y ) 
@@ -801,7 +886,7 @@ class Widget(QtGui.QWidget):
     def setTransparency(self, value):
         self.renderer.alpha_rgb = 1.0 - value/100.0
         self.renderer.initializeGL()
-        self.renderer.updateGL()    
+        self.renderer.updateGL()   
         
     def setShowFuse(self):
         self.renderer.flag_show_fuselage = not self.renderer.flag_show_fuselage
@@ -835,6 +920,10 @@ class Widget(QtGui.QWidget):
         
     def setShowRibs(self):
         self.renderer.flag_show_ribs = not self.renderer.flag_show_ribs
+    
+    def setFlagSelection(self):
+        self.renderer.flag_selection = not self.renderer.flag_selection
+        self.renderer.selectedPoint = None
 
 
 if __name__ == '__main__':

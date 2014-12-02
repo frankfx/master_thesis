@@ -27,11 +27,11 @@ class Renderer():
         t =  glGetString(GL_SHADING_LANGUAGE_VERSION)
         print t
         
-        VERTEX_SHADER = shaders.compileShader("""#version 330 
+        VERTEX_SHADER = shaders.compileShader("""#version 130 
         void main() { 
             gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; 
         }""", GL_VERTEX_SHADER)
-        FRAGMENT_SHADER = shaders.compileShader("""#version 330 
+        FRAGMENT_SHADER = shaders.compileShader("""#version 130 
         void main() { 
             gl_FragColor = vec4( 0, 1, 0, 1 ); 
         }""", GL_FRAGMENT_SHADER)         

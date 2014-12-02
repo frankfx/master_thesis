@@ -257,6 +257,46 @@ def enum(*sequential, **named):
     enums = dict(zip(sequential, range(len(sequential))), **named)
     return type('Enum', (), enums)
 
+
+# formula http://martin-thoma.com/how-to-check-if-a-point-is-inside-a-rectangle/
+def isPinRectangle(r, P):
+    """ 
+        r: A list of four points, each has a x- and a y- coordinate
+        P: A point
+    """
+
+    areaRectangle = 0.5*abs(
+                        # p1.y     p3.y     p4.x     p2.x          
+                        (r[0][1]-r[2][1])*(r[3][0]-r[1][0]) 
+                        # p2.y     p4.y     p1.x     p3.x
+                      + (r[1][1]-r[3][1])*(r[0][0]-r[2][0])
+                    )
+
+    ABP = 0.5*abs(
+             r[0][0]*(r[1][1]-P[1])
+            +r[1][0]*(P[1]-r[0][1])
+            +P[0]*(r[0][1]-r[1][1])
+          )
+    BCP = 0.5*abs(
+             r[1][0]*(r[2][1]-P[1])
+            +r[2][0]*(P[1]-r[1][1])
+            +P[0]*(r[1][1]-r[2][1])
+          )
+    CDP = 0.5*abs(
+             r[2][0]*(r[3][1]-P[1])
+            +r[3][0]*(P[1]-r[2][1])
+            +P[0]*(r[2][1]-r[3][1])
+          )
+    DAP = 0.5*abs(
+             r[3][0]*(r[0][1]-P[1])
+            +r[0][0]*(P[1]-r[3][1])
+            +P[0]*(r[3][1]-r[0][1])
+          )
+    
+    return  equalFloats2(areaRectangle, ABP+BCP+CDP+DAP)
+
+
+
 '''
 debug helper
 '''
@@ -269,7 +309,24 @@ def debug(value):
     logging.debug(str(value))
     logging.debug("#######################################################################") 
 
+
+'''
+Test cases
+'''
 plist = [[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], [0.0125, 0.0142, 0.0], [0.005, 0.0089, 0.0], [0.0, 0.0, 0.0], [0.005, -0.0089, 0.0], [0.0125, -0.0142, 0.0], [0.025, -0.01961, 0.0], [0.05, -0.02666, 0.0], [0.075, -0.0315, 0.0], [0.1, -0.03512, 0.0], [0.15, -0.04009, 0.0], [0.2, -0.04303, 0.0], [0.25, -0.04456, 0.0], [0.3, -0.04501, 0.0], [0.4, -0.04352, 0.0], [0.5, -0.03971, 0.0], [0.6, -0.03423, 0.0], [0.7, -0.02748, 0.0], [0.8, -0.01967, 0.0], [0.9, -0.01086, 0.0], [0.95, -0.00605, 0.0], [1.0, -0.00095, 0.0]]
 p = [1.0, 0.00095, 0.0]
 assert(computeIdxOfPointWithMinDistance(p, plist, 10) == [0, 36, 1, 35, 2, 34, 3, 33, 4, 32])
 assert(computePointWithMinDistance(p, plist) == [1.0, 0.00095, 0.0])
+
+p1 = [0, 0]      # in
+p2 = [1, -1]     # in
+p3 = [0, -1.1]   # out
+p4 = [1.1, 0]    # out
+p5 = [-1.1, 1.1] # out
+rec = [[-1,1],[1,1],[1,-1],[-1,-1]]
+
+assert(isPinRectangle(rec,p1) == True)
+assert(isPinRectangle(rec,p2) == True)
+assert(isPinRectangle(rec,p3) == False)
+assert(isPinRectangle(rec,p4) == False)
+assert(isPinRectangle(rec,p5) == False)
