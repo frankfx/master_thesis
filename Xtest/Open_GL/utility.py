@@ -325,8 +325,13 @@ p4 = [1.1, 0]    # out
 p5 = [-1.1, 1.1] # out
 rec = [[-1,1],[1,1],[1,-1],[-1,-1]]
 
+point = [0.04021447661255388, -0.25469168521284125, -98.50000223517424] # in
+quad = [[-0.5, 0.46914034872830657, 0.14779439396326682], [-0.5, 9.571421747317374e-17, 0.5], [0.5, 0.0, 0.5], [0.5, 0.46914034872830646, 0.14779439396326682]]
+
+
 assert(isPinRectangle(rec,p1) == True)
 assert(isPinRectangle(rec,p2) == True)
 assert(isPinRectangle(rec,p3) == False)
 assert(isPinRectangle(rec,p4) == False)
 assert(isPinRectangle(rec,p5) == False)
+assert(isPinRectangle(quad, point) == False)
