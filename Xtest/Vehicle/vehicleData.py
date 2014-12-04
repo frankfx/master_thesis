@@ -13,8 +13,8 @@ class VehicleData():
     def __init__(self):
         
         self.tixi = Tixi()
-        self.tixi.open('simpletest.cpacs.xml')
-        #self.tixi.open('D150_CPACS2.0_valid.xml')
+       # self.tixi.open('simpletest.cpacs.xml')
+        self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -32,7 +32,6 @@ class VehicleData():
         self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
         self.plist_ribs                        = self.createRibs()
         self.pList_spares                      = self.createSpars()
-        
         
     # =========================================================================================================
     # =========================================================================================================    

@@ -31,35 +31,41 @@ class Renderer():
         
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
-
+        # GL_NEVER, GL_LESS, GL_EQUAL, GL_LEQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL und GL_ALWAYS. Voreingestellt ist GL_LESS
+        GL.glDepthFunc(GL.GL_LESS)
+        
+        GL.glEnable(GL.GL_LIGHTING)
+        GL.glEnable(GL.GL_LIGHT0)
+        #GL.glEnable(GL.GL_COLOR_MATERIAL)
         GL.glEnable(GL.GL_NORMALIZE)
-      #  GL.glEnable(GL.GL_BLEND)
-      #  GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
         GL.glShadeModel(GL.GL_SMOOTH)
-        #GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-        #self.initLight()
+        GL.glClearColor (1.0, 1.0, 1.0, 0.0)
+        self.initLight()   
+        
+        
+        
 
     def initLight(self):
-        mat_ambient    = [0.2, 0.2, 0.2, 1.0]
-        mat_diffuse    = [1.0, 1.0, 1.0, 1.0]
-        mat_specular   = [1.0, 1.0, 1.0, 1.0] 
+        light_ambient  = [0.0, 0.0, 0.0, 1.0]
+        light_diffuse  = [1.0, 1.0, 1.0, 1.0]
+        light_specular = [1.0, 1.0, 1.0, 1.0]
+        light_position =[0.0, 0.0, 0.0, 0.5]
 
-        light_position = [1.0, 1.0, 0.0, 1.0]        
-
-        GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
-       # GL.glEnable(GL.GL_LIGHTING)
-       # GL.glEnable(GL.GL_LIGHT0)
-        GL.glEnable(GL.GL_COLOR_MATERIAL)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, light_ambient)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, light_diffuse)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, light_specular)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)        
         
-        mat_materialSpecular = [1.0, 1.0, 1.0, 1.0]
-        mat_materialEmission = [0.0, 0.0, 0.0, 1.0]
+        mat_shininess  = 0.4 
+        mat_ambient    = [0.24725, 0.1995, 0.0745, 1.0]
+        mat_diffuse    = [0.75164, 0.60648, 0.22648, 1.0] 
+        mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
         
-        
-        GL.glColorMaterial(GL.GL_FRONT, GL.GL_AMBIENT_AND_DIFFUSE)
-        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_materialSpecular)
-        
-        GL.glColor4f(1.0, 0.0, 0.0, 0.2)
-    
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient)
+        # GL.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse)
+        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
+        # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
+        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess * 128)
     
     def resize(self, w, h):
         side = min(w, h)
@@ -87,36 +93,16 @@ class Renderer():
 
        # self.initLight()
 
-        #GL.glPushMatrix() 
         GL.glTranslatef(self.xTrans,self.yTrans,-6.5)
         GL.glScalef(0.1, 0.1,1.0)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
-        #self.drawTestObject()
-        #self.drawTriangle2()
-        #self.drawQuad()
-        self.drawRec()
-        #GL.glPolygonMode(GL.GL_FRONT_AND_BACK,GL.GL_LINE)
-        GL.glPolygonMode(GL.GL_FRONT_AND_BACK,GL.GL_FILL)
-       # GL.glEnable(GL.GL_LIGHTING)
-        GL.glCallList(self.theTorus)
-        
-       # GL.glPopMatrix()
 
-       # GL.glPushMatrix()
-       # light_position = [0.0, 0.0, 0.0, 1.0]        
-       # GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)         
-        #GL.glPopMatrix()
-
-
-
+        self.drawQuad()
         #GLUT.glutInit()#
         #GLUT.glutSolidSphere(0.5,40,40)
         GL.glFlush() 
-
-    
-
 
     def calculateSurfaceNormal (self,p1, p2, p3) :
  
@@ -129,7 +115,6 @@ class Renderer():
 
         return n
 
-
     def lenVector(self, v):
         import math
         return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
@@ -140,7 +125,6 @@ class Renderer():
             return [0.0, 0.0, 0.0]
         else :
             return [v[0] / l, v[1] / l, v[2] / l]
-
 
     # normal in p1
     def calculateVertexNormal(self, p1, p2, p3):
@@ -153,42 +137,25 @@ class Renderer():
         
         return v
 
-    def drawRec(self):
-        self.theTorus = GL.glGenLists (5)
-        print "df" , self.theTorus
-        GL.glNewList(self.theTorus,GL.GL_COMPILE)
-    
-        # Ground plane 
-        GL.glNormal3f(0.0,1.0,0.0)
-        for i in range(-10, 10, 1) :
-            GL.glColor3f(0.0,(i+10)/20.0,0.0)
-            GL.glBegin(GL.GL_QUAD_STRIP)
-            for j in range (-10, 10, 1) :
-                GL.glVertex3f(i,0.0,j)
-                GL.glVertex3f(i+1,0.0,j)
-          
-            GL.glEnd()
-        GL.glEndList()        
-
     def drawQuad(self):
-        #GL.glTranslatef(0,0,2)
         GL.glBegin(GL.GL_QUAD_STRIP)
-        GL.glColor4f(1.0, 0.0, 0.0, 1.5)
+        GL.glColor3f(1.0, 0.0, 0.0)
+       
         GL.glVertex3f(-1,-1,-5)        
         GL.glVertex3f(-1, 1,-5) 
         GL.glVertex3f( 1,-1,-5) 
         GL.glVertex3f( 1, 1,-5) 
 
-        GL.glColor4f(0.0, 1.0, 0.0, 0.5)
-        GL.glVertex3f( 2, -1,-5)        
-        GL.glVertex3f( 2,  1,-5) 
-        
-      #  GL.glColor3f(0.0, 0.0, 1.0)        
- 
-       # GL.glVertex3f( 1, 2,-5) 
-        #GL.glVertex3f(-1, 2,-5)
-        
         GL.glEnd()
+
+
+
+
+
+
+
+
+
 
     def drawTriangle2(self):
       #  
@@ -284,28 +251,6 @@ class Renderer():
         GL.glVertex3fv(m)               
         GL.glEnd()
 
-    
-    def drawTestObject(self):
-
-        plist1 = [[0.0, 0.0, 0.0], [0.030153689607045786, 0.0, 0.02844221322094448], 
-                 [0.116977778440511, 0.0, 0.04945887299475936], [0.24999999999999994, 0.0, 0.059412421875], 
-                 [0.4131759111665348, 0.0, 0.05751322692417564], [0.5868240888334652, 0.0, 0.046701524680852695], 
-                 [0.7499999999999999, 0.0, 0.0316030623052], [0.883022221559489, 0.0, 0.01657043903018468], 
-                 [0.9698463103929542, 0.0, 0.005413502659613883], [1.0, 0.0, 0.0]] 
-        plist2 = [[0.0, 0.25, 0.0], [0.030153689607045786, 0.25, 0.02844221322094448], 
-                  [0.116977778440511, 0.25, 0.04945887299475936], [0.24999999999999994, 0.25, 0.059412421875], 
-                  [0.4131759111665348, 0.25, 0.05751322692417564], [0.5868240888334652, 0.25, 0.046701524680852695], 
-                  [0.7499999999999999, 0.25, 0.0316030623052], [0.883022221559489, 0.25, 0.01657043903018468], 
-                  [0.9698463103929542, 0.25, 0.005413502659613883], [1.0, 0.25, 0.0]]
-        
-        GL.glBegin(GL.GL_QUADS)
-        GL.glNormal3d(1, 0, 0)
-        for i in range(len(plist1)-1) :
-            GL.glVertex3f(plist1[i+1][0], plist1[i+1][1], plist1[i+1][2])
-            GL.glVertex3f(plist1[i][0]  , plist1[i][1]  , plist1[i][2])
-            GL.glVertex3f(plist2[i][0]  , plist2[i][1]  , plist2[i][2])
-            GL.glVertex3f(plist2[i+1][0], plist2[i+1][1] , plist2[i+1][2])
-        GL.glEnd()
     
 
 class Widget(QtOpenGL.QGLWidget):
