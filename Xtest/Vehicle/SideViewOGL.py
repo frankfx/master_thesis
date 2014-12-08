@@ -179,6 +179,7 @@ class Renderer(QtOpenGL.QGLWidget):
     
     def draw(self):      
         if self.flag_show_fuselage :
+            GL.glColor3fv([1.0,0.4,0])
             GL.glCallList(self.index)
         if self.flag_show_wing1_up :        
             GL.glCallList(self.index+1)
@@ -201,31 +202,31 @@ class Renderer(QtOpenGL.QGLWidget):
 
     def createOglLists(self): 
         self.index = GL.glGenLists(10)
-
+        
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
-        self.createOglShape(self.data.pList_fuselage, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
+        self.createOglShape2(self.data.pList_fuselage, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
         GL.glEndList()
 
 
         GL.glNewList(self.index+1, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_up, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
+        self.createOglShape2(self.data.pList_wing_up, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
         GL.glEndList() 
 
         GL.glNewList(self.index+2, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_lo, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
+        self.createOglShape2(self.data.pList_wing_lo, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
         GL.glEndList()
  
         # draw reflect upper wing
         GL.glNewList(self.index+3, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_up, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
+        self.createOglShape2(self.data.pList_wing_up, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
         GL.glEndList()
 
         GL.glNewList(self.index+4, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_lo, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
+        self.createOglShape2(self.data.pList_wing_lo, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
         GL.glEndList()
 
         GL.glNewList(self.index+5, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_LINES"], 1, True)
+        self.createOglShape2(self.data.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_LINES"], 1, True)
         GL.glEndList()
 
         GL.glNewList(self.index+6, GL.GL_COMPILE)
@@ -258,6 +259,17 @@ class Renderer(QtOpenGL.QGLWidget):
             i += 0.25
         GL.glEnd()
 
+    def createOglShape2(self, pList, color, glMode, reflect, flag_Strip):
+
+        if self.flag_selection and self.selectedPoint is not None \
+                               and self.isElementSelected(pList, reflect, flag_Strip, self.selectedPoint) :
+                color = [1.0, 0.0, 0.0, self.alpha_rgb]
+
+       # GL.glColor4fv(color)
+        GL.glBegin(glMode)
+        for p in pList :
+            GL.glVertex3f(p[0], reflect * p[1], p[2])
+        GL.glEnd()
 
     def createOglShape(self, pList, color, glMode, reflect, flag_Strip):
         quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
@@ -266,7 +278,7 @@ class Renderer(QtOpenGL.QGLWidget):
                                and self.isElementSelected(pList, reflect, flag_Strip, self.selectedPoint) :
                 color = [1.0, 0.0, 0.0, self.alpha_rgb]
 
-        GL.glColor4fv(color)
+       # GL.glColor4fv(color)
         GL.glBegin(glMode)
         for shape in pList :
             for i in range (0, len(shape)-1, 1):

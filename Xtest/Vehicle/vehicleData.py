@@ -13,8 +13,8 @@ class VehicleData():
     def __init__(self):
         
         self.tixi = Tixi()
-       # self.tixi.open('simpletest.cpacs.xml')
-        self.tixi.open('D150_CPACS2.0_valid.xml')
+        self.tixi.open('simpletest.cpacs.xml')
+        #self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -40,27 +40,20 @@ class VehicleData():
     # =========================================================================================================
     def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 45):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
-        zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta) 
-        
-        plistFuse = []
-        
-        for fuselageIndex in range(1, self.tigl.getFuselageCount()+1) :
-            plistSeg = []
-            for segmentIndex in range(1, self.tigl.fuselageGetSegmentCount(fuselageIndex)+1) :
-                #plistprofile = []
-                for eta in eta_List :
-                    plist = []
-                    for zeta in zeta_List :
-                        x, y, z = self.tigl.fuselageGetPoint(fuselageIndex, segmentIndex, eta, zeta)
-                        plist.append([x,y,z])
-                    #plistprofile.append(plist)
-                    plistSeg.append(plist)
-                #plistSeg.append(plistprofile)    
-            plistFuse.append(plistSeg)        
-        
-        return plistFuse 
+        zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta)        
+        plist = []
 
-
+        for fuseIdx in range(1, self.tigl.getFuselageCount()+1) :
+            for segIdx in range(1, self.tigl.fuselageGetSegmentCount(fuseIdx)+1) :
+                for etaIdx in range(0, len(eta_List)-1,1) :
+                    for zetaIdx in range(0, len(zeta_List)-1,1) :
+                        x1, y1, z1 = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta_List[etaIdx], zeta_List[zetaIdx])
+                        x2, y2, z2 = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta_List[etaIdx], zeta_List[zetaIdx+1])
+                        x3, y3, z3 = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta_List[etaIdx+1], zeta_List[zetaIdx+1])
+                        x4, y4, z4 = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta_List[etaIdx+1], zeta_List[zetaIdx])
+                        plist.append([x1,y1,z1]) ; plist.append([x2,y2,z2]) ; plist.append([x3,y3,z3]) ; plist.append([x4,y4,z4])
+        return plist
+    
     def createWing(self, point_cnt_eta = 3, point_cnt_xsi = 20):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
@@ -68,23 +61,25 @@ class VehicleData():
         plistWing_up = []
         plistWing_lo = []
         
-        for wingIndex in range(1, self.tigl.getWingCount()+1) :
-            plistSeg_up = []
-            plistSeg_lo = []
-            for segmentIndex in range(1, self.tigl.wingGetSegmentCount(wingIndex)+1) :
-                for eta in eta_List :
-                    p_tmp_up = []
-                    p_tmp_lo = []
-                    for xsi in xsi_List :   
-                        xu, yu, zu = self.tigl.wingGetUpperPoint(wingIndex, segmentIndex, eta, xsi)
-                        xl, yl, zl = self.tigl.wingGetLowerPoint(wingIndex, segmentIndex, eta, xsi)
-                        p_tmp_up.append([xu,yu,zu])
-                        p_tmp_lo.append([xl,yl,zl])
-                    plistSeg_up.append(p_tmp_up)
-                    plistSeg_lo.append(p_tmp_lo)
-            plistWing_up.append(plistSeg_up)
-            plistWing_lo.append(plistSeg_lo)
-            
+        for wingIdx in range(1, self.tigl.getWingCount()+1) :
+            for segIdx in range(1, self.tigl.wingGetSegmentCount(wingIdx)+1) :
+                for etaIdx in range(0, len(eta_List)-1, 1) :
+                    for xsiIdx in range(0, len(xsi_List)-1, 1) :
+                        xu1, yu1, zu1 = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta_List[etaIdx], xsi_List[xsiIdx])
+                        xu2, yu2, zu2 = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta_List[etaIdx], xsi_List[xsiIdx+1])
+                        xu3, yu3, zu3 = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta_List[etaIdx+1], xsi_List[xsiIdx+1])
+                        xu4, yu4, zu4 = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta_List[etaIdx+1], xsi_List[xsiIdx])
+                        
+                        xl1, yl1, zl1 = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta_List[etaIdx], xsi_List[xsiIdx])
+                        xl2, yl2, zl2 = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta_List[etaIdx], xsi_List[xsiIdx+1])
+                        xl3, yl3, zl3 = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta_List[etaIdx+1], xsi_List[xsiIdx+1])
+                        xl4, yl4, zl4 = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta_List[etaIdx+1], xsi_List[xsiIdx])
+                        
+                        plistWing_up.append([xu1, yu1, zu1]) ; plistWing_up.append([xu2, yu2, zu2])
+                        plistWing_up.append([xu3, yu3, zu3]) ; plistWing_up.append([xu4, yu4, zu4])
+                        
+                        plistWing_lo.append([xl1, yl1, zl1]) ; plistWing_lo.append([xl2, yl2, zl2])
+                        plistWing_lo.append([xl3, yl3, zl3]) ; plistWing_lo.append([xl4, yl4, zl4])
         return plistWing_up , plistWing_lo
 
 
@@ -92,20 +87,40 @@ class VehicleData():
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
              
-        plistComp = []     
+        plist = []     
                     
-        for wingIndex in range(1, self.tigl.getWingCount()+1) :
-            plistSeg = []
-            for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) : 
-                componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
-                for eta in eta_List :
-                    p_tmp = []
-                    for xsi in xsi_List :
-                        x, y, z = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, eta, xsi)
-                        p_tmp.append([x,y,z])
-                    plistSeg.append(p_tmp)
-            plistComp.append(plistSeg)
-        return plistComp
+        for wingIdx in range(1, self.tigl.getWingCount()+1) :
+            for compSegIdx in range(1, self.tigl.wingGetComponentSegmentCount(wingIdx)+1) : 
+                compSegUID = self.tigl.wingGetComponentSegmentUID(wingIdx, compSegIdx)
+                for etaIdx in range(0, len(eta_List)-1,1) :
+                    for xsiIdx in range(0, len(xsi_List)-1, 1) :
+                        x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta_List[etaIdx], xsi_List[xsiIdx])
+                        x2, y2, z2 = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta_List[etaIdx], xsi_List[xsiIdx+1])
+                        x3, y3, z3 = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta_List[etaIdx+1], xsi_List[xsiIdx+1])
+                        x4, y4, z4 = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta_List[etaIdx+1], xsi_List[xsiIdx])
+                        plist.append([x1,y1,z1]) ; plist.append([x2,y2,z2]) ; plist.append([x3,y3,z3]) ; plist.append([x4,y4,z4])
+        return plist
+        
+
+    def __recreatePList(self, plist, point_cnt_eta, point_cnt_zeta):
+        segList = []
+        tmpList = []
+        
+        n = 0
+        max = (point_cnt_eta-1) * (point_cnt_zeta-1)
+        
+        for i in range(0, len(plist), 1) :
+            if n < max :
+                tmpList.append(plist[i])
+                n+=1
+            else:
+                segList.append(tmpList)
+                tmpList = []
+                n = 0
+
+        return segList
+
+        
         
         
     def createSpars(self):
