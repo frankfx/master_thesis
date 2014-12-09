@@ -116,17 +116,67 @@ class Renderer():
         #GLUT.glutSolidSphere(0.5,40,40)
         GL.glFlush() 
 
-    def calculateSurfaceNormal (self,p1, p2, p3) :
- 
-        u = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
-        v = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
-        n = [0.0,0.0,0.0]
-        n[0] = u[1] * v[2] - u[2] * v[1]
-        n[1] = u[2] * v[0] - u[0] * v[2]
-        n[2] = u[0] * v[1] - u[1] * v[0]
 
-        return n
+    '''
+    get surface noraml
+    '''
+    def calculateSurfaceNormal(self, polynom):
+        normal = [0.0, 0.0, 0.0]
+        for i in range (len(polynom)) :
+            cur = polynom[i]
+            nxt = polynom[(i+1) % len(polynom)]
+            
+            normal[0] = normal[0] + ( (cur[1] - nxt[1]) * (cur[2] + nxt[2])) 
+            normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
+            normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
+            
+        normal[0] = -normal[0]
+        normal[1] = -normal[1]
+        normal[2] = -normal[2]
+        return self.normalised(normal)
 
+
+
+
+        
+
+
+    def calculateNormal(self, plist):
+        n = len(plist)
+        m = len(plist[0])
+        plist_n = []
+        for i in range(n) :
+            normal_tmp = []
+            for j in range(m):
+                n1 = [0.0, 0.0, 0.0] if j<=0   or i<=0   else self.calculateVertexNormal(plist[i][j], plist[i][j-1], plist[i-1][j])
+                n2 = [0.0, 0.0, 0.0] if j+1>=m or i<=0   else self.calculateVertexNormal(plist[i][j], plist[i-1][j], plist[i][j+1])
+                n3 = [0.0, 0.0, 0.0] if j+1>=m or i+1>=n else self.calculateVertexNormal(plist[i][j], plist[i][j+1], plist[i+1][j])
+                n4 = [0.0, 0.0, 0.0] if j<=0   or i+1>=n else self.calculateVertexNormal(plist[i][j], plist[i+1][j], plist[i][j-1])
+                
+                n1 = self.normalised(n1)
+                n2 = self.normalised(n2)
+                n3 = self.normalised(n3)
+                n4 = self.normalised(n4)
+                
+                normal = [n1[0] + n2[0] + n3[0] + n4[0] , n1[1] + n2[1] + n3[1] + n4[1] , n1[2] + n2[2] + n3[2] + n4[2]]
+                normal_tmp.append(normal)
+            plist_n.append(normal_tmp)
+        return plist_n
+
+    def crossproduct(self, vec1, vec2):
+        x = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
+        y = vec1[2] * vec2[0] - vec1[0] * vec2[2] 
+        z = vec1[0] * vec2[1] - vec1[1] * vec2[0]
+        return [x, y, z] 
+    
+    # normal in p1
+    def calculateVertexNormal(self, p1, p2, p3):
+        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
+        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
+               
+        return self.crossproduct(vec1, vec2)
+    
+    
     def lenVector(self, v):
         import math
         return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
@@ -137,24 +187,14 @@ class Renderer():
             return [0.0, 0.0, 0.0]
         else :
             return [v[0] / l, v[1] / l, v[2] / l]
-
-    # normal in p1
-    def calculateVertexNormal(self, p1, p2, p3):
-        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
-        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
-        v = [0.0, 0.0, 0.0]
-        v[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
-        v[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2]
-        v[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0]
         
-        return v
 
     def drawQuad(self):
         GL.glBegin(GL.GL_QUADS)
         
         # richtig
         GL.glColor3f(0.0,1.0,0.0);    # Color Blue
-        GL.glNormal3f(0.0, -1.0, 0.0);
+        GL.glNormal3fv(self.calculateSurfaceNormal( [[1.0, 1.0,-1.0], [-1.0, 1.0,-1.0], [-1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]))
         GL.glVertex3f( 1.0, 1.0,-1.0);    # Top Right Of The Quad (Top)
         GL.glVertex3f(-1.0, 1.0,-1.0);    # Top Left Of The Quad (Top)
         GL.glVertex3f(-1.0, 1.0, 1.0);    # Bottom Left Of The Quad (Top)
@@ -162,20 +202,21 @@ class Renderer():
         
         # richtig
         GL.glColor3f(0.0,1.0,1.0);    # Color Orange
-        GL.glNormal3f(0.0, 1.0, 0.0);
+        GL.glNormal3fv(self.calculateSurfaceNormal( [[1.0, -1.0,1.0], [-1.0, -1.0, 1.0], [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0]]))
         GL.glVertex3f( 1.0,-1.0, 1.0);    # Top Right Of The Quad (Bottom)
         GL.glVertex3f(-1.0,-1.0, 1.0);    # Top Left Of The Quad (Bottom)
         GL.glVertex3f(-1.0,-1.0,-1.0);    # Bottom Left Of The Quad (Bottom)
         GL.glVertex3f( 1.0,-1.0,-1.0);    # Bottom Right Of The Quad (Bottom)
-        
+
         # richtig
         GL.glColor3f(1.0,0.0,0.0);    # Color Red    
-        GL.glNormal3f(0.0, 0.0, -1.0);
+        GL.glNormal3fv(self.calculateSurfaceNormal( [[1.0, 1.0,1.0], [-1.0, 1.0, 1.0], [-1.0, -1.0, 1.0], [1.0, -1.0, 1.0]]))
         GL.glVertex3f( 1.0, 1.0, 1.0);    # Top Right Of The Quad (Front)
         GL.glVertex3f(-1.0, 1.0, 1.0);    # Top Left Of The Quad (Front)
         GL.glVertex3f(-1.0,-1.0, 1.0);    # Bottom Left Of The Quad (Front)
         GL.glVertex3f( 1.0,-1.0, 1.0);    # Bottom Right Of The Quad (Front)
-        
+
+
         # richtig
         GL.glColor3f(1.0,1.0,0.0);    # Color Yellow
         GL.glNormal3f( 0.0, 0.0, 1.0);
@@ -183,7 +224,7 @@ class Renderer():
         GL.glVertex3f(-1.0,-1.0,-1.0);    # Top Left Of The Quad (Back)
         GL.glVertex3f(-1.0, 1.0,-1.0);    # Bottom Left Of The Quad (Back)
         GL.glVertex3f( 1.0, 1.0,-1.0);    # Bottom Right Of The Quad (Back)
-       
+
         # fehler
         GL.glColor3f(1.0,0.0,1.0);    # Color Blue
         GL.glNormal3f( 1.0, 0.0, 0.0)
@@ -191,8 +232,8 @@ class Renderer():
         GL.glVertex3f(-1.0, 1.0,-1.0);    # Top Left Of The Quad (Left)
         GL.glVertex3f(-1.0,-1.0,-1.0);    # Bottom Left Of The Quad (Left)
         GL.glVertex3f(-1.0,-1.0, 1.0);    # Bottom Right Of The Quad (Left)
-        
-        
+
+
         # richtig
         GL.glColor3f(1.0,0.0,1.0);    # Color Violet
         GL.glNormal3f(-1.0, 0.0, 0.0)
