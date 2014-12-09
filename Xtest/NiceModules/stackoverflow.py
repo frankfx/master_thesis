@@ -36,7 +36,7 @@ class Renderer():
         
         GL.glEnable(GL.GL_LIGHTING)
         GL.glEnable(GL.GL_LIGHT0)
-        #GL.glEnable(GL.GL_COLOR_MATERIAL)
+        GL.glEnable(GL.GL_COLOR_MATERIAL)
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glShadeModel(GL.GL_SMOOTH)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
@@ -44,28 +44,40 @@ class Renderer():
         
         
         
-
     def initLight(self):
-        light_ambient  = [0.0, 0.0, 0.0, 1.0]
-        light_diffuse  = [1.0, 1.0, 1.0, 1.0]
-        light_specular = [1.0, 1.0, 1.0, 1.0]
-        light_position =[0.0, 0.0, 0.0, 0.5]
-
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, light_ambient)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, light_diffuse)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, light_specular)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)        
         
-        mat_shininess  = 0.4 
-        mat_ambient    = [0.24725, 0.1995, 0.0745, 1.0]
-        mat_diffuse    = [0.75164, 0.60648, 0.22648, 1.0] 
+        mat_ambient    = [0.25, 0.22, 0.06, 1.0]
+        mat_diffuse    = [0.35, 0.31, 0.09, 1.0] 
+        mat_specular   = [0.80, 0.72, 0.21, 1.0]
+        
+        light_position = [0.0, 0.0, 0.0, 1.0]        
+
+        GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
+        
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
+        
+        # GL.glLightf(GL.GL_LIGHT0, GL.GL_CONSTANT_ATTENUATION, 1.0)
+        # GL.glLightf(GL.GL_LIGHT0, GL.GL_LINEAR_ATTENUATION, 0.001)
+        # GL.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.004)
+        
+        # The color of the sphere
+        mat_materialColor = [0.2, 0.2, 1.0, 1.0]
+
+        mat_ambient    = [0.64725,  0.5995, 0.3745, 1.0]
         mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
+        
+        mat_shininess  = 111.2 
+        
+        
+        GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
         
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient)
         # GL.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse)
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
         # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
-        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess * 128)
+        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
     
     def resize(self, w, h):
         side = min(w, h)
@@ -138,14 +150,56 @@ class Renderer():
         return v
 
     def drawQuad(self):
-        GL.glBegin(GL.GL_QUAD_STRIP)
-        GL.glColor3f(1.0, 0.0, 0.0)
+        GL.glBegin(GL.GL_QUADS)
+        
+        # richtig
+        GL.glColor3f(0.0,1.0,0.0);    # Color Blue
+        GL.glNormal3f(0.0, -1.0, 0.0);
+        GL.glVertex3f( 1.0, 1.0,-1.0);    # Top Right Of The Quad (Top)
+        GL.glVertex3f(-1.0, 1.0,-1.0);    # Top Left Of The Quad (Top)
+        GL.glVertex3f(-1.0, 1.0, 1.0);    # Bottom Left Of The Quad (Top)
+        GL.glVertex3f( 1.0, 1.0, 1.0);    # Bottom Right Of The Quad (Top)
+        
+        # richtig
+        GL.glColor3f(0.0,1.0,1.0);    # Color Orange
+        GL.glNormal3f(0.0, 1.0, 0.0);
+        GL.glVertex3f( 1.0,-1.0, 1.0);    # Top Right Of The Quad (Bottom)
+        GL.glVertex3f(-1.0,-1.0, 1.0);    # Top Left Of The Quad (Bottom)
+        GL.glVertex3f(-1.0,-1.0,-1.0);    # Bottom Left Of The Quad (Bottom)
+        GL.glVertex3f( 1.0,-1.0,-1.0);    # Bottom Right Of The Quad (Bottom)
+        
+        # richtig
+        GL.glColor3f(1.0,0.0,0.0);    # Color Red    
+        GL.glNormal3f(0.0, 0.0, -1.0);
+        GL.glVertex3f( 1.0, 1.0, 1.0);    # Top Right Of The Quad (Front)
+        GL.glVertex3f(-1.0, 1.0, 1.0);    # Top Left Of The Quad (Front)
+        GL.glVertex3f(-1.0,-1.0, 1.0);    # Bottom Left Of The Quad (Front)
+        GL.glVertex3f( 1.0,-1.0, 1.0);    # Bottom Right Of The Quad (Front)
+        
+        # richtig
+        GL.glColor3f(1.0,1.0,0.0);    # Color Yellow
+        GL.glNormal3f( 0.0, 0.0, 1.0);
+        GL.glVertex3f( 1.0,-1.0,-1.0);    # Top Right Of The Quad (Back)
+        GL.glVertex3f(-1.0,-1.0,-1.0);    # Top Left Of The Quad (Back)
+        GL.glVertex3f(-1.0, 1.0,-1.0);    # Bottom Left Of The Quad (Back)
+        GL.glVertex3f( 1.0, 1.0,-1.0);    # Bottom Right Of The Quad (Back)
        
-        GL.glVertex3f(-1,-1,-5)        
-        GL.glVertex3f(-1, 1,-5) 
-        GL.glVertex3f( 1,-1,-5) 
-        GL.glVertex3f( 1, 1,-5) 
-
+        # fehler
+        GL.glColor3f(1.0,0.0,1.0);    # Color Blue
+        GL.glNormal3f( 1.0, 0.0, 0.0)
+        GL.glVertex3f(-1.0, 1.0, 1.0);    # Top Right Of The Quad (Left)
+        GL.glVertex3f(-1.0, 1.0,-1.0);    # Top Left Of The Quad (Left)
+        GL.glVertex3f(-1.0,-1.0,-1.0);    # Bottom Left Of The Quad (Left)
+        GL.glVertex3f(-1.0,-1.0, 1.0);    # Bottom Right Of The Quad (Left)
+        
+        
+        # richtig
+        GL.glColor3f(1.0,0.0,1.0);    # Color Violet
+        GL.glNormal3f(-1.0, 0.0, 0.0)
+        GL.glVertex3f( 1.0, 1.0,-1.0);    # Top Right Of The Quad (Right)
+        GL.glVertex3f( 1.0, 1.0, 1.0);    # Top Left Of The Quad (Right)
+        GL.glVertex3f( 1.0,-1.0, 1.0);    # Bottom Left Of The Quad (Right)
+        GL.glVertex3f( 1.0,-1.0,-1.0);    # Bottom Right Of The Quad (Right)
         GL.glEnd()
 
 

@@ -37,8 +37,8 @@ class Renderer(QtOpenGL.QGLWidget):
         self.zRot = 0
         self.xTrans = 0
         self.yTrans = 0  
-        self.scale = 5.0 
-        self.aspect= 0.5  
+        self.aspect= self.data.configurationGetLength / 1.5
+        self.scale = self.data.configurationGetLength / 1.5 # helper for setZoom
         self.viewwidth = 0.0
         self.viewheight = 0.0
 
@@ -63,7 +63,6 @@ class Renderer(QtOpenGL.QGLWidget):
         self.flag_show_grid           = False      
         self.flag_selection           = False
 
-        
         # view flags
         self.flag_view_3d             = False
         self.flag_view_side           = False
@@ -76,8 +75,6 @@ class Renderer(QtOpenGL.QGLWidget):
         # widget option
         self.setFocusPolicy(QtCore.Qt.ClickFocus)
 
-    
-    
 
     def setXRotation(self, angle):
         angle = self.normalizeAngle(angle)
@@ -113,15 +110,16 @@ class Renderer(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
-      #  GL.glEnable(GL.GL_LIGHTING)
-     #   GL.glEnable(GL.GL_LIGHT0)
-        #GL.glEnable(GL.GL_COLOR_MATERIAL)
+        GL.glEnable(GL.GL_LIGHTING)
+        GL.glEnable(GL.GL_LIGHT0)
+        GL.glEnable(GL.GL_COLOR_MATERIAL)
+        
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)             
         GL.glShadeModel(GL.GL_SMOOTH)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-     #   self.initLight()
+        self.initLight()
         
         self.createOglLists()
         
@@ -137,15 +135,13 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
        
-        GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
-                   +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -100.0, 100.0)
+#        GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
+ #                  +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -100.0, 100.0)
+        GL.glOrtho(-self.aspect, self.aspect,
+                   self.aspect, -self.aspect, -100.0, 100.0)
 
     def setTransparent(self, value):
         self.alpha_rgb = value
-       # if value < 1.0 :
-       #     GL.glDisable(GL.GL_DEPTH_TEST)
-       # else :
-       #     GL.glEnable(GL.GL_DEPTH_TEST)
 
     def paintGL(self):
         self.__setProjection()
@@ -155,48 +151,69 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()   
 
-        GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
+        # set to center and translate values
+        GL.glTranslatef(self.xTrans, self.yTrans, -1.5)
         
-        if not self.flag_selection :
-            GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
-            GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
-            GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
+        # GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
+        GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
+        GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
+        GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
+        # GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0)
+        GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0) 
+          
             #self.initLight()
-         
-       # GLUT.glutInit()
+        # GLUT.glutInit()
         #GLUT.glutSolidSphere(1,25,25)
-        #self.initLight()
+        self.initLight()
         self.draw()    
         if self.flag_show_grid:
-            self.drawGrid()    
+            GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
+            self.drawGrid(self.data.configurationGetLength, -self.data.configurationGetLength)    
        
         
         #GL.glShadeModel(GL.GL_FLAT)
         GL.glFlush() 
 
     
+    def __getColor4fv(self, plist, r, g, b):
+        if self.flag_selection and self.selectedPoint is not None and  self.isElementSelected(plist, self.selectedPoint) :
+            return [1.0, 0.0, 0.0, self.alpha_rgb]
+        else : return [r, g, b, self.alpha_rgb]
     
-    
-    def draw(self):      
+    def draw(self):
         if self.flag_show_fuselage :
-            GL.glColor3fv([1.0,0.4,0])
+            GL.glColor4fv(self.__getColor4fv(self.data.pList_fuselage, 0.0, 0.5, 0.8))
             GL.glCallList(self.index)
-        if self.flag_show_wing1_up :        
+        
+        if self.flag_show_wing1_up :  
+            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_up, 0.0, 0.5, 0.8))              
             GL.glCallList(self.index+1)
+            
         if self.flag_show_wing1_lo :
+            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_lo, 0.0, 0.5, 0.8))
             GL.glCallList(self.index+2)
+        
         if self.flag_show_wing2_up :
+            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_up_reflect, 0.0, 0.5, 0.8))
             GL.glCallList(self.index+3)
+            
         if self.flag_show_wing2_lo :
+            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_lo_reflect, 0.0, 0.5, 0.8))
             GL.glCallList(self.index+4)
+            
         if self.flag_show_compnt :
+            GL.glColor3fv([1.0, 0.0, 0.0])
             GL.glCallList(self.index+5)
+        
         if self.flag_show_flap_TE_Device :
             GL.glCallList(self.index+6)
+        
         if self.flag_show_flap_LE_Device :
             GL.glCallList(self.index+7)
+        
         if self.flag_show_flap_spoiler :
             GL.glCallList(self.index+8)
+        
         if self.flag_show_spars :
             GL.glCallList(self.index+9)
 
@@ -204,29 +221,28 @@ class Renderer(QtOpenGL.QGLWidget):
         self.index = GL.glGenLists(10)
         
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
-        self.createOglShape2(self.data.pList_fuselage, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
+        self.createOglShape(self.data.pList_fuselage, Renderer.glMode["GL_QUADS"])
         GL.glEndList()
 
-
         GL.glNewList(self.index+1, GL.GL_COMPILE)
-        self.createOglShape2(self.data.pList_wing_up, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
+        self.createOglShape(self.data.pList_wing_up, Renderer.glMode["GL_QUADS"])
         GL.glEndList() 
 
         GL.glNewList(self.index+2, GL.GL_COMPILE)
-        self.createOglShape2(self.data.pList_wing_lo, [0.0, 0.44, 0.67, self.alpha_rgb], Renderer.glMode["GL_QUADS"], 1, False)
+        self.createOglShape(self.data.pList_wing_lo, Renderer.glMode["GL_QUADS"])
         GL.glEndList()
  
         # draw reflect upper wing
         GL.glNewList(self.index+3, GL.GL_COMPILE)
-        self.createOglShape2(self.data.pList_wing_up, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
+        self.createOglShape(self.data.pList_wing_up_reflect, Renderer.glMode["GL_QUADS"])
         GL.glEndList()
 
         GL.glNewList(self.index+4, GL.GL_COMPILE)
-        self.createOglShape2(self.data.pList_wing_lo, [0.76, 0.79, 0.50, self.alpha_rgb], Renderer.glMode["GL_QUADS"], -1, False)
+        self.createOglShape(self.data.pList_wing_lo_reflect, Renderer.glMode["GL_QUADS"])
         GL.glEndList()
 
         GL.glNewList(self.index+5, GL.GL_COMPILE)
-        self.createOglShape2(self.data.pList_component_segment, [1.0, 0.0, 0.0, 1.0], Renderer.glMode["GL_LINES"], 1, True)
+        self.createOglShape(self.data.pList_component_segment, Renderer.glMode["GL_LINES"])
         GL.glEndList()
 
         GL.glNewList(self.index+6, GL.GL_COMPILE)
@@ -247,61 +263,28 @@ class Renderer(QtOpenGL.QGLWidget):
 
 
     def drawGrid(self, start = 2, end = -2):
-
-        # Draw a white grid "floor".
+        # Draw a grid "floor".
         GL.glColor3f(1.0, 0.0, 1.0);
         GL.glBegin(GL.GL_LINES)
-        i = -2.0
+        i = end
         
-        while i <= 2.0 :
+        while i <= start :
             GL.glVertex3f(i, start, 0); GL.glVertex3f(i, end, 0)
             GL.glVertex3f(start, i, 0); GL.glVertex3f(end, i, 0)
-            i += 0.25
+            i += start / 8.0
         GL.glEnd()
 
-    def createOglShape2(self, pList, color, glMode, reflect, flag_Strip):
 
-        if self.flag_selection and self.selectedPoint is not None \
-                               and self.isElementSelected(pList, reflect, flag_Strip, self.selectedPoint) :
-                color = [1.0, 0.0, 0.0, self.alpha_rgb]
-
-       # GL.glColor4fv(color)
-        GL.glBegin(glMode)
-        for p in pList :
-            GL.glVertex3f(p[0], reflect * p[1], p[2])
-        GL.glEnd()
-
-    def createOglShape(self, pList, color, glMode, reflect, flag_Strip):
-        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
-
-        if self.flag_selection and self.selectedPoint is not None \
-                               and self.isElementSelected(pList, reflect, flag_Strip, self.selectedPoint) :
-                color = [1.0, 0.0, 0.0, self.alpha_rgb]
-
-       # GL.glColor4fv(color)
+    def createOglShape(self, pList, glMode):
         GL.glBegin(glMode)
         for shape in pList :
-            for i in range (0, len(shape)-1, 1):
-                seg1 = shape[i]
-                seg2 = shape[i+1]
-                for j in range(0, len(seg1)-1, 1) :
-                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
-                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
-                    if(flag_Strip):
-                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
-                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
-                    else :
-                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
-                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
-                    GL.glNormal3fv([1,0,0])
-                    GL.glVertex3f(quad[0][0], quad[0][1], quad[0][2])
-                    GL.glNormal3fv([1,1,0])
-                    GL.glVertex3f(quad[1][0], quad[1][1], quad[1][2])
-                    GL.glNormal3fv([0,1,0])
-                    GL.glVertex3f(quad[2][0], quad[2][1], quad[2][2])
-                    GL.glNormal3fv([0,0,1])
-                    GL.glVertex3f(quad[3][0], quad[3][1], quad[3][2])
+            for seg in shape :
+                for p in seg :
+                    GL.glVertex3f(p[0], p[1], p[2])
         GL.glEnd()
+                
+
+
 
     def createOglFlaps(self, pList):
         GL.glBegin(GL.GL_QUADS)
@@ -328,17 +311,16 @@ class Renderer(QtOpenGL.QGLWidget):
 
 
     def initLight(self):
-        mat_ambient    = [0.4, 0.4, 0.4, 1.0]
-        mat_diffuse    = [0.4, 0.8, 0.4, 1.0] 
-        mat_specular   = [1.0, 1.0, 1.0, 1.0]
         
-        light_position = [0.0, 0.0, 1.0, 2.0]        
+        mat_ambient    = [0.25, 0.22, 0.06, 1.0]
+        mat_diffuse    = [0.35, 0.31, 0.09, 1.0] 
+        mat_specular   = [0.80, 0.72, 0.21, 1.0]
+        
+        light_position = [0.0, 0.0, 0.0, 1.0]        
 
         GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
-        # Diffuse (non-shiny) light component
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
-        # Specular (shiny) light component
-     #   GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
         
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
         
@@ -348,21 +330,20 @@ class Renderer(QtOpenGL.QGLWidget):
         
         # The color of the sphere
         mat_materialColor = [0.2, 0.2, 1.0, 1.0]
-        # The specular (shiny) component of the material
-        mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
-        # The color emitted by the material
-        mat_materialEmission = [0, 0, 0, 1.0]
-        #The shininess parameter
-        mat_shininess  = 0.5 
 
         mat_ambient    = [0.64725,  0.5995, 0.3745, 1.0]
-        mat_diffuse    = [0.75164, 0.60648, 0.52648, 1.0] 
+        mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
+        
+        mat_shininess  = 83.2 
+        
+        
+        GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
         
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient)
         # GL.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse)
         GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
         # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
-        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess * 128)
+        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
         
         #GL.glEnable(GL.GL_LIGHT1)
                     
@@ -371,22 +352,11 @@ class Renderer(QtOpenGL.QGLWidget):
     # code selection
     # =========================================================================================================  
     # =========================================================================================================                
-    def isElementSelected(self, plist, reflect, flag_Strip, point):
-        quad = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+    def isElementSelected(self, plist, point):
         for shape in plist :
-            for i in range (0, len(shape)-1, 1):
-                seg1 = shape[i] 
-                seg2 = shape[i+1]
-                for j in range(0, len(seg1)-1, 1) :
-                    quad[0] = [seg1[j+1][0], reflect * seg1[j+1][1], seg1[j+1][2]]
-                    quad[1] = [seg1[j][0]  , reflect * seg1[j][1]  , seg1[j][2]]
-                    if(flag_Strip):
-                        quad[2] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]
-                        quad[3] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]                        
-                    else :
-                        quad[2] = [seg2[j][0]  , reflect * seg2[j][1]  , seg2[j][2]]
-                        quad[3] = [seg2[j+1][0], reflect * seg2[j+1][1], seg2[j+1][2]]          
-                    if(utility.isPinRectangle(quad, point)) :
+            for seg in shape :     
+                for i in range(0, len(seg), 4) :   
+                    if(utility.isPinRectangle([seg[i], seg[i+1], seg[i+2], seg[i+3]], point)) :
                         return True
         return False
 
@@ -430,7 +400,7 @@ class Renderer(QtOpenGL.QGLWidget):
 
         #Betrachtsfeld = -aspect bis aspect
         
-        oglXunit = 2.0 * self.aspect * self.scale
+        oglXunit = 2.0 * self.aspect
         oglYunit = oglXunit
         
         # pixel real world to Pixel ogl world 
@@ -493,7 +463,7 @@ class Widget(QtGui.QWidget):
         transparency.valueChanged.connect(self.setTransparency)
       
         zoom = QtGui.QSpinBox()
-        zoom.setRange(1, 200)
+        zoom.setRange(1, 100)
         zoom.setSingleStep(5)
         zoom.setSuffix('%')
         zoom.setValue(50)        
@@ -591,7 +561,8 @@ class Widget(QtGui.QWidget):
         self.renderer.updateLists()
         
     def setZoom(self, value):
-        self.renderer.scale = value * 0.10
+        # slider range 1 to 100, therefor 50 is the center
+        self.renderer.aspect = self.renderer.scale * ( (50.0-value) * 9.0/500.0 +1.0 )
         self.renderer.updateGL()
     
     def setShowFuse(self):
@@ -644,9 +615,9 @@ class Widget(QtGui.QWidget):
         self.__setRotations(45, 0, 315)
 
     def __setRotations(self, xRot, yRot, zRot):
-        self.renderer.xRot = xRot
-        self.renderer.yRot = yRot
-        self.renderer.zRot = zRot        
+        self.renderer.setXRotation(xRot)
+        self.renderer.setYRotation(yRot)
+        self.renderer.setZRotation(zRot)
 
     def __setView(self, bool_top, bool_front, bool_side, bool_3d):
         self.renderer.flag_view_top   = bool_top
