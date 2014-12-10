@@ -13,8 +13,8 @@ class VehicleData():
     def __init__(self):
         
         self.tixi = Tixi()
-        self.tixi.open('simpletest.cpacs.xml')
-        #self.tixi.open('D150_CPACS2.0_valid.xml')
+        #self.tixi.open('simpletest.cpacs.xml')
+        self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -48,7 +48,7 @@ class VehicleData():
     '''
     create quad point list of fuselage for opengl 
     '''
-    def createFuselage(self, point_cnt_eta = 2, point_cnt_zeta = 10):
+    def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 120):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta)        
         fuseList = []
@@ -76,7 +76,7 @@ class VehicleData():
     '''
     create quad point list of wing upper and lower side for opengl 
     '''    
-    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 5):
+    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 25):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
                 
@@ -111,7 +111,7 @@ class VehicleData():
     '''
     create quad point list of component segment for opengl 
     '''
-    def createComponent(self, point_cnt_eta = 10, point_cnt_xsi = 10):
+    def createComponent(self, point_cnt_eta = 1, point_cnt_xsi = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
              

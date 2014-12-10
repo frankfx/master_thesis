@@ -122,7 +122,6 @@ class Renderer(QtOpenGL.QGLWidget):
         
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
         
-        
         self.createOglLists()
         
     def resizeGL(self, w, h):       
@@ -197,11 +196,11 @@ class Renderer(QtOpenGL.QGLWidget):
             GL.glCallList(self.index+2)
         
         if self.flag_show_wing2_up :
-            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_up_reflect, 0.0, 0.5, 0.8))
+            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_up_reflect, 0.24725, 0.1995, 0.0745))
             GL.glCallList(self.index+3)
             
         if self.flag_show_wing2_lo :
-            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_lo_reflect, 0.0, 0.5, 0.8))
+            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_lo_reflect, 0.24725, 0.1995, 0.0745))
             GL.glCallList(self.index+4)
             
         if self.flag_show_compnt :
@@ -224,24 +223,24 @@ class Renderer(QtOpenGL.QGLWidget):
         self.index = GL.glGenLists(10)
         
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
-        self.createOglShape(self.data.pList_fuselage, Renderer.glMode["GL_QUADS"])
+        self.createOglShape(self.data.pList_fuselage, Renderer.glMode["GL_QUADS"],1)
         GL.glEndList()
 
         GL.glNewList(self.index+1, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_up, Renderer.glMode["GL_QUADS"])
+        self.createOglShape(self.data.pList_wing_up, Renderer.glMode["GL_QUADS"],-1)
         GL.glEndList() 
 
         GL.glNewList(self.index+2, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_lo, Renderer.glMode["GL_QUADS"])
+        self.createOglShape(self.data.pList_wing_lo, Renderer.glMode["GL_QUADS"],1)
         GL.glEndList()
  
         # draw reflect upper wing
         GL.glNewList(self.index+3, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_up_reflect, Renderer.glMode["GL_QUADS"])
+        self.createOglShape(self.data.pList_wing_up_reflect, Renderer.glMode["GL_QUADS"],1)
         GL.glEndList()
 
         GL.glNewList(self.index+4, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_lo_reflect, Renderer.glMode["GL_QUADS"])
+        self.createOglShape(self.data.pList_wing_lo_reflect, Renderer.glMode["GL_QUADS"],-1)
         GL.glEndList()
 
         GL.glNewList(self.index+5, GL.GL_COMPILE)
@@ -278,19 +277,17 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glEnd()
 
 
-    def createOglShape(self, pList, glMode):
-        i = 0
+    '''
+    @param face_value: side of normal {1 or -1}
+    '''
+    def createOglShape(self, pList, glMode, face_value=1.0):
         GL.glBegin(glMode)
         for shape in pList :
             for seg in shape :
                 for pIdx in range(0, len(seg), 1) :
-                    #if i % 4 == 0 :
-                      #  print "hiiiiiiiiiiiii" , seg[pIdx] ,[seg[pIdx], seg[pIdx+1], seg[pIdx+2], seg[pIdx+3] ]
-                       # GL.glNormal3fv(self.calculateSurfaceNormal([seg[pIdx], seg[pIdx+1], seg[pIdx+2], seg[pIdx+3] ]))
-                    t = self.calculateVertexNormal(seg[pIdx], seg[pIdx-1 if i%4>0 else pIdx+3], seg[pIdx+1 if i%4 < 3 else pIdx-3])   
-                    GL.glNormal3fv(t)
+                   # t = self.calculateVertexNormal(seg[pIdx], seg[pIdx-1 if pIdx%4>0 else pIdx+3], seg[pIdx+1 if pIdx%4 < 3 else pIdx-3], face_value)   
+                   # GL.glNormal3fv(t)
                     GL.glVertex3f(seg[pIdx][0], seg[pIdx][1], seg[pIdx][2])
-                    i += 1
         GL.glEnd()
        
 #------------------------------------------------------------------------------ 
@@ -335,20 +332,20 @@ class Renderer(QtOpenGL.QGLWidget):
     '''
     get vertex normal in p1
     '''
-    def calculateVertexNormal(self, p1, p2, p3):
+    def calculateVertexNormal(self, p1, p2, p3, face_value):
         vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
         vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
         #vec1 = [p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2]]
         #vec2 = [p1[0] - p3[0], p1[1] - p3[1], p1[2] - p3[2]]
                
                
-        return self.normalised(self.__crossproduct(vec1, vec2))  #self.normalised(self.__crossproduct(vec1, vec2))
+        return self.__crossproduct(vec1, vec2, face_value)  #self.normalised(self.__crossproduct(vec1, vec2))
 
     
-    def __crossproduct(self, vec1, vec2):
-        x = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
-        y = vec1[2] * vec2[0] - vec1[0] * vec2[2] 
-        z = vec1[0] * vec2[1] - vec1[1] * vec2[0]
+    def __crossproduct(self, vec1, vec2, face_value):
+        x = face_value * (vec1[1] * vec2[2] - vec1[2] * vec2[1]) 
+        y = face_value * (vec1[2] * vec2[0] - vec1[0] * vec2[2]) 
+        z = face_value * (vec1[0] * vec2[1] - vec1[1] * vec2[0])
         
         return [x, y, z]         
 
@@ -381,15 +378,19 @@ class Renderer(QtOpenGL.QGLWidget):
 
     def initLight(self):
         
-        mat_ambient    = [0.45, 0.65, 0.95, 1.0]
-        mat_diffuse    = [0.35, 0.31, 0.09, 1.0] 
-        mat_specular   = [0.80, 0.72, 0.21, 1.0]
+       # mat_ambient  = [0.135, 0.2225, 0.1575, 1.0]
+       # mat_diffuse  = [0.54, 0.89, 0.63, 1.0]
+       # mat_specular = [0.316228, 0.316228, 0.316228, 1.0]
         
-        light_position = [0.0, 0.0, 5.0, 1.0]        
+        mat_ambient  = [0.24725, 0.1995, 0.0745, 1.0]
+        mat_diffuse  = [0.75164, 0.60648, 0.22648, 1.0]
+        mat_specular = [0.628281, 0.555802, 0.366065, 1.0]
+        
+        light_position = [0.0, 0.0, 0.0, 1.0]        
 
         GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
-       # GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
-        #GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
         
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
         
@@ -398,23 +399,20 @@ class Renderer(QtOpenGL.QGLWidget):
         # GL.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.004)
         
         # The color of the sphere
-       # mat_materialColor = [0.2, 0.2, 1.0, 1.0]
+        #mat_materialColor = [0.2, 0.2, 1.0, 1.0]
 
-       # mat_ambient    = [0.64725,  0.5995, 0.3745, 1.0]
-       # mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
+        mat_ambient  = [0.24725, 0.1995, 0.0745, 1.0]
+        mat_diffuse  = [0.75164, 0.60648, 0.22648, 1.0]
+        mat_specular = [0.628281, 0.555802, 0.366065, 1.0]
         
-       # mat_shininess  = 83.2 
-        
+        mat_shininess  = 0.4 
         
         #GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
-        
-        #GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient)
-        # GL.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse)
-       # GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
-        # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
-       # GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
-        
-        #GL.glEnable(GL.GL_LIGHT1)
+        GL.glColorMaterial(GL.GL_FRONT_AND_BACK,GL.GL_AMBIENT_AND_DIFFUSE)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
+        GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
                     
     # =========================================================================================================
     # =========================================================================================================    
