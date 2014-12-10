@@ -24,6 +24,9 @@ class VehicleData():
            
         self.pList_fuselage                    = self.createFuselage() 
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
+        
+        print self.pList_wing_lo
+        
         self.pList_wing_up_reflect, \
             self.pList_wing_lo_reflect         = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
             
@@ -45,7 +48,7 @@ class VehicleData():
     '''
     create quad point list of fuselage for opengl 
     '''
-    def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 3):
+    def createFuselage(self, point_cnt_eta = 2, point_cnt_zeta = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta)        
         fuseList = []
@@ -65,10 +68,15 @@ class VehicleData():
             fuseList.append(segList)
         return fuseList
 
+    
+    def createNormals(self, plist, point_cnt_eta, point_cnt_zeta):
+        pass
+        
+
     '''
     create quad point list of wing upper and lower side for opengl 
     '''    
-    def createWing(self, point_cnt_eta = 3, point_cnt_xsi = 20):
+    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 5):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
                 

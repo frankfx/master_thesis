@@ -113,13 +113,15 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glEnable(GL.GL_LIGHTING)
         GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_COLOR_MATERIAL)
-        
         GL.glEnable(GL.GL_NORMALIZE)
+        GL.glShadeModel(GL.GL_SMOOTH)
+        #GL.glShadeModel(GL.GL_FLAT)
+        self.initLight()
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)             
-        GL.glShadeModel(GL.GL_SMOOTH)
+        
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
-        self.initLight()
+        
         
         self.createOglLists()
         
@@ -151,6 +153,8 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()   
 
+        self.initLight()
+
         # set to center and translate values
         GL.glTranslatef(self.xTrans, self.yTrans, -1.5)
         
@@ -161,10 +165,9 @@ class Renderer(QtOpenGL.QGLWidget):
         # GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0)
         GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0) 
           
-            #self.initLight()
         # GLUT.glutInit()
         #GLUT.glutSolidSphere(1,25,25)
-        self.initLight()
+      #  self.initLight()
         self.draw()    
         if self.flag_show_grid:
             GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
@@ -276,13 +279,79 @@ class Renderer(QtOpenGL.QGLWidget):
 
 
     def createOglShape(self, pList, glMode):
+        i = 0
         GL.glBegin(glMode)
         for shape in pList :
             for seg in shape :
-                for p in seg :
-                    GL.glVertex3f(p[0], p[1], p[2])
+                for pIdx in range(0, len(seg), 1) :
+                    #if i % 4 == 0 :
+                      #  print "hiiiiiiiiiiiii" , seg[pIdx] ,[seg[pIdx], seg[pIdx+1], seg[pIdx+2], seg[pIdx+3] ]
+                       # GL.glNormal3fv(self.calculateSurfaceNormal([seg[pIdx], seg[pIdx+1], seg[pIdx+2], seg[pIdx+3] ]))
+                    t = self.calculateVertexNormal(seg[pIdx], seg[pIdx-1 if i%4>0 else pIdx+3], seg[pIdx+1 if i%4 < 3 else pIdx-3])   
+                    GL.glNormal3fv(t)
+                    GL.glVertex3f(seg[pIdx][0], seg[pIdx][1], seg[pIdx][2])
+                    i += 1
         GL.glEnd()
+       
+#------------------------------------------------------------------------------ 
+    #---------------------------------- def createOglShape(self, pList, glMode):
+        #---------------------------------------------------- GL.glBegin(glMode)
+        #-------------------------------------------------- for shape in pList :
+            #------------------------------------------------ for seg in shape :
+                #------------------------------------------------ for p in seg :
+                    #--------- GL.glNormal3fv(self.calculateSurfaceNormal(quad))
+                    #--------------------------- GL.glVertex3f(p[0], p[1], p[2])
+        #------------------------------------------------------------ GL.glEnd()
+       
+    def lenVector(self, v):
+        import math
+        return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+    
+    def normalised(self, v):
+        l = self.lenVector(v)
+        if l == 0.0 :
+            return [0.0, 0.0, 0.0]
+        else :
+            return [v[0] / l, v[1] / l, v[2] / l]       
                 
+    '''
+    get surface normal
+    '''
+    def calculateSurfaceNormal(self, polynom):
+        normal = [0.0, 0.0, 0.0]
+        for i in range (len(polynom)) :
+            cur = polynom[i]
+            nxt = polynom[(i+1) % len(polynom)]
+            
+            normal[0] = normal[0] + ( (cur[1] - nxt[1]) * (cur[2] + nxt[2])) 
+            normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
+            normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
+            
+        normal[0] = -normal[0]
+        normal[1] = -normal[1]
+        normal[2] = -normal[2]
+        return normal #self.normalised(normal)
+
+    '''
+    get vertex normal in p1
+    '''
+    def calculateVertexNormal(self, p1, p2, p3):
+        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
+        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
+        #vec1 = [p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2]]
+        #vec2 = [p1[0] - p3[0], p1[1] - p3[1], p1[2] - p3[2]]
+               
+               
+        return self.normalised(self.__crossproduct(vec1, vec2))  #self.normalised(self.__crossproduct(vec1, vec2))
+
+    
+    def __crossproduct(self, vec1, vec2):
+        x = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
+        y = vec1[2] * vec2[0] - vec1[0] * vec2[2] 
+        z = vec1[0] * vec2[1] - vec1[1] * vec2[0]
+        
+        return [x, y, z]         
+
 
 
 
@@ -312,15 +381,15 @@ class Renderer(QtOpenGL.QGLWidget):
 
     def initLight(self):
         
-        mat_ambient    = [0.25, 0.22, 0.06, 1.0]
+        mat_ambient    = [0.45, 0.65, 0.95, 1.0]
         mat_diffuse    = [0.35, 0.31, 0.09, 1.0] 
         mat_specular   = [0.80, 0.72, 0.21, 1.0]
         
-        light_position = [0.0, 0.0, 0.0, 1.0]        
+        light_position = [0.0, 0.0, 5.0, 1.0]        
 
         GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
+       # GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
+        #GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
         
         GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
         
@@ -329,21 +398,21 @@ class Renderer(QtOpenGL.QGLWidget):
         # GL.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.004)
         
         # The color of the sphere
-        mat_materialColor = [0.2, 0.2, 1.0, 1.0]
+       # mat_materialColor = [0.2, 0.2, 1.0, 1.0]
 
-        mat_ambient    = [0.64725,  0.5995, 0.3745, 1.0]
-        mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
+       # mat_ambient    = [0.64725,  0.5995, 0.3745, 1.0]
+       # mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
         
-        mat_shininess  = 83.2 
+       # mat_shininess  = 83.2 
         
         
-        GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
+        #GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
         
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient)
+        #GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient)
         # GL.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
+       # GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
         # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
-        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
+       # GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
         
         #GL.glEnable(GL.GL_LIGHT1)
                     
@@ -558,7 +627,7 @@ class Widget(QtGui.QWidget):
  
     def setTransparency(self, value):
         self.renderer.setTransparent(1.0 - value/100.0)
-        self.renderer.updateLists()
+        self.renderer.updateGL()
         
     def setZoom(self, value):
         # slider range 1 to 100, therefor 50 is the center

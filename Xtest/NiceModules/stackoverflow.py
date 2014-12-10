@@ -6,6 +6,7 @@ Created on Nov 11, 2014
 
 import sys
 from PySide import QtOpenGL, QtGui, QtCore
+import math
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -28,17 +29,37 @@ class Renderer():
         self.aspect  = 0.25  
         self.viewwidth  = 0.0
         self.viewheight = 0.0
+        self.plist = [
+                 [[0.1464466094067262, 0.0, -0.05308323560069057], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.1464466094067262, 1.0, -0.05308323560069057]],
+                 [[1.0, -1.0,1.0], [-1.0, -1.0, 1.0], [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0]],
+                 [[1.0, 1.0,1.0], [-1.0, 1.0, 1.0], [-1.0, -1.0, 1.0], [1.0, -1.0, 1.0]],
+                 [[1.0, -1.0,-1.0], [-1.0, -1.0, -1.0], [-1.0, 1.0, -1.0], [1.0, 1.0, -1.0]],
+                 [[-1.0, 1.0, 1.0], [-1.0, 1.0, -1.0], [-1.0, -1.0, -1.0], [-1.0, -1.0, 1.0]],
+                 [[1.0, 1.0, -1.0], [1.0, 1.0, 1.0], [1.0, -1.0, 1.0], [1.0, -1.0, -1.0]]
+                 ]
+        self.plist2 = [[[[0.1464466094067262, 0.0, -0.05308323560069057], [0.49999999999999994, 0.0, -0.05294025200059999], [0.49999999999999994, 1.0, -0.05294025200059999], [0.1464466094067262, 1.0, -0.05308323560069057], [0.49999999999999994, 0.0, -0.05294025200059999], [0.8535533905932737, 0.0, -0.02010727196643753], [0.8535533905932737, 1.0, -0.02010727196643753], [0.49999999999999994, 1.0, -0.05294025200059999], [0.8535533905932737, 0.0, -0.02010727196643753], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.8535533905932737, 1.0, -0.02010727196643753]], [[0.0, 1.0, 0.0], [0.1464466094067262, 1.0, -0.05308323560069057], [0.5732233047033631, 2.0, -0.026541617800345287], [0.5, 2.0, 0.0], [0.1464466094067262, 1.0, -0.05308323560069057], [0.49999999999999994, 1.0, -0.05294025200059999], [0.75, 2.0, -0.026470126000299996], [0.5732233047033631, 2.0, -0.026541617800345287], [0.49999999999999994, 1.0, -0.05294025200059999], [0.8535533905932737, 1.0, -0.02010727196643753], [0.9267766952966369, 2.0, -0.010053635983218765], [0.75, 2.0, -0.026470126000299996], [0.8535533905932737, 1.0, -0.02010727196643753], [1.0, 1.0, 0.0], [1.0, 2.0, 0.0], [0.9267766952966369, 2.0, -0.010053635983218765]]]]
+
+        
+        
+        
+        
+        #[1.0, 1.0,-1.0], [-1.0, 1.0,-1.0], [-1.0, 1.0, 1.0], [1.0, 1.0, 1.0]
+        
+        #[0.0, 0.0, 0.0], [0.1464466094067262, 0.0, -0.05308323560069057], [0.1464466094067262, 1.0, -0.05308323560069057], [0.0, 1.0, 0.0]
+        
+        
         
     def init(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
         # GL_NEVER, GL_LESS, GL_EQUAL, GL_LEQUAL, GL_GREATER, GL_NOTEQUAL, GL_GEQUAL und GL_ALWAYS. Voreingestellt ist GL_LESS
-        GL.glDepthFunc(GL.GL_LESS)
+      #  GL.glDepthFunc(GL.GL_LESS)
         
         GL.glEnable(GL.GL_LIGHTING)
         GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_COLOR_MATERIAL)
-        GL.glEnable(GL.GL_NORMALIZE)
+       # GL.glEnable(GL.GL_NORMALIZE)
         GL.glShadeModel(GL.GL_SMOOTH)
+        #GL.glEnable(GL.GL_CULL_FACE)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
         self.initLight()   
         
@@ -46,9 +67,9 @@ class Renderer():
         
     def initLight(self):
         
-        mat_ambient    = [0.25, 0.22, 0.06, 1.0]
-        mat_diffuse    = [0.35, 0.31, 0.09, 1.0] 
-        mat_specular   = [0.80, 0.72, 0.21, 1.0]
+        mat_ambient    = [0.75164, 0.60648, 0.22648, 1.0]  #[0.24725, 0.1995, 0.0745, 1.0]
+        mat_diffuse    =  [0.75164, 0.40648, 0.22648, 1.0] 
+        mat_specular   = [0.01, 0.99, 0.0, 1.0]
         
         light_position = [0.0, 0.0, 0.0, 1.0]        
 
@@ -63,21 +84,20 @@ class Renderer():
         # GL.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.004)
         
         # The color of the sphere
-        mat_materialColor = [0.2, 0.2, 1.0, 1.0]
+        #mat_materialColor = [0.2, 0.2, 1.0, 1.0]
 
-        mat_ambient    = [0.64725,  0.5995, 0.3745, 1.0]
-        mat_specular   = [0.628281, 0.555802, 0.366065, 1.0]
+        mat_ambient  = [0.24725, 0.1995, 0.0745, 1.0]
+        mat_diffuse  = [0.75164, 0.60648, 0.22648, 1.0]
+        mat_specular = [0.628281, 0.555802, 0.366065, 1.0]
         
-        mat_shininess  = 111.2 
+        mat_shininess  = 0.4 
         
-        
-        GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
-        
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_AMBIENT, mat_ambient)
-        # GL.glMaterialfv(GL.GL_FRONT, GL.GL_DIFFUSE, mat_diffuse)
-        GL.glMaterialfv(GL.GL_FRONT, GL.GL_SPECULAR, mat_specular)
-        # GL.glMaterialfv(GL.GL_FRONT, GL.GL_EMISSION, mat_materialEmission)
-        GL.glMaterialf(GL.GL_FRONT, GL.GL_SHININESS, mat_shininess)
+        #GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
+        GL.glColorMaterial(GL.GL_FRONT_AND_BACK,GL.GL_AMBIENT_AND_DIFFUSE)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
+        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
+        GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
     
     def resize(self, w, h):
         side = min(w, h)
@@ -103,7 +123,8 @@ class Renderer():
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()                
 
-       # self.initLight()
+        #GL.glCullFace(GL.GL_FRONT)
+        self.initLight()
 
         GL.glTranslatef(self.xTrans,self.yTrans,-6.5)
         GL.glScalef(0.1, 0.1,1.0)
@@ -111,14 +132,21 @@ class Renderer():
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
 
-        self.drawQuad()
+        
+        #self.drawQuad()
+      #  self.drawTriangle()
+        
+        self.createOglShape()
+        
+        #self.initLight()
+        
         #GLUT.glutInit()#
         #GLUT.glutSolidSphere(0.5,40,40)
         GL.glFlush() 
 
 
     '''
-    get surface noraml
+    get surface normal
     '''
     def calculateSurfaceNormal(self, polynom):
         normal = [0.0, 0.0, 0.0]
@@ -130,15 +158,32 @@ class Renderer():
             normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
             normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
             
-        normal[0] = -normal[0]
-        normal[1] = -normal[1]
-        normal[2] = -normal[2]
+        #normal[0] = -normal[0]
+        #normal[1] = -normal[1]
+       # normal[2] = -normal[2]
         return self.normalised(normal)
 
+    '''
+    get vertex normal in p1
+    '''
+    def calculateVertexNormal(self, p1, p2, p3):
+        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
+        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
+        #vec1 = [p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2]]
+        #vec2 = [p1[0] - p3[0], p1[1] - p3[1], p1[2] - p3[2]]
+               
+        print p1, p2, p3
+        print "normal" ,self.normalised(self.__crossproduct(vec1, vec2))       
+               
+        return (self.__crossproduct(vec1, vec2))  #self.normalised(self.__crossproduct(vec1, vec2))
 
-
-
+    
+    def __crossproduct(self, vec1, vec2):
+        x = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
+        y = vec1[2] * vec2[0] - vec1[0] * vec2[2] 
+        z = vec1[0] * vec2[1] - vec1[1] * vec2[0]
         
+        return [-x, -y, -z]         
 
 
     def calculateNormal(self, plist):
@@ -163,19 +208,7 @@ class Renderer():
             plist_n.append(normal_tmp)
         return plist_n
 
-    def crossproduct(self, vec1, vec2):
-        x = vec1[1] * vec2[2] - vec1[2] * vec2[1] 
-        y = vec1[2] * vec2[0] - vec1[0] * vec2[2] 
-        z = vec1[0] * vec2[1] - vec1[1] * vec2[0]
-        return [x, y, z] 
-    
-    # normal in p1
-    def calculateVertexNormal(self, p1, p2, p3):
-        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
-        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
-               
-        return self.crossproduct(vec1, vec2)
-    
+
     
     def lenVector(self, v):
         import math
@@ -189,99 +222,97 @@ class Renderer():
             return [v[0] / l, v[1] / l, v[2] / l]
         
 
+    def drawQuad4(self):
+        GL.glBegin(GL.GL_QUADS)
+      #  GL.glColor3f(1.0,0.0,0.0)    # Color Blue
+
+        for quad in self.plist :
+            GL.glNormal3fv(self.calculateSurfaceNormal(quad))
+            GL.glVertex3fv(quad[0])    # Top Right Of The Quad (Top)
+            GL.glVertex3fv(quad[1])    # Top Left Of The Quad (Top)
+            GL.glVertex3fv(quad[2])    # Bottom Left Of The Quad (Top)
+            GL.glVertex3fv(quad[3])    # Bottom Right Of The Quad (Top)
+        GL.glEnd()
+        
+        GL.glPointSize(8)
+        for quad in self.plist :
+            GL.glBegin(GL.GL_POINTS)
+            GL.glVertex3fv(self.calculateSurfaceNormal(quad))
+            GL.glEnd()
+        
+
     def drawQuad(self):
         GL.glBegin(GL.GL_QUADS)
+        #GL.glColor3f(0.0,1.0,0.0)    # Color Blue
+
+        for quad in self.plist :
+            GL.glNormal3fv(self.calculateVertexNormal(quad[0], quad[3], quad[1]))
+            GL.glVertex3fv(quad[0])    # Top Right Of The Quad (Top)
+            GL.glNormal3fv(self.calculateVertexNormal(quad[1], quad[2], quad[0]))
+            GL.glVertex3fv(quad[1])    # Top Left Of The Quad (Top)
+            GL.glNormal3fv(self.calculateVertexNormal(quad[2], quad[3], quad[1]))
+            GL.glVertex3fv(quad[2])    # Bottom Left Of The Quad (Top)
+            GL.glNormal3fv(self.calculateVertexNormal(quad[3], quad[2], quad[0]))
+            GL.glVertex3fv(quad[3])    # Bottom Right Of The Quad (Top)
+            #break
+        GL.glEnd()
+
+        GL.glBegin(GL.GL_LINES)
+        GL.glColor3f(0.0,1.0,0.0)
+        for quad in self.plist :
+            for i in range(0, len(quad), 1) :
+                t = self.calculateVertexNormal(quad[i], quad[len(quad)-1 if (i-1) < 0 else i-1], quad[0 if i+1 >= len(quad) else i+1])
+                GL.glVertex3fv(quad[i])
+                GL.glVertex3fv(t)
+          #  break
+        GL.glEnd()
+
+
+
+    def createOglShape(self):
+        i = 0
+        GL.glBegin(GL.GL_QUADS)
+        for shape in self.plist2 :
+            for seg in shape :
+                for pIdx in range(0, len(seg), 1) :
+                    
+                    snd = pIdx-1 if i%4>0 else pIdx+3
+                    thd = pIdx+1 if i%4 < 3 else pIdx-3
+                    
+                    #t = self.calculateVertexNormal(seg[pIdx], seg[snd], seg[thd])   
+                    
+                    t = self.calculateSurfaceNormal([seg[0],seg[1],seg[2],seg[3]])
+    
+                    GL.glNormal3fv(t)
+                    GL.glVertex3fv(seg[pIdx])
+                    i += 1
+                    if i == 4: break
+                break
+            break
+        GL.glEnd()
+
+        i=0
+        GL.glBegin(GL.GL_LINES)
+        GL.glColor3f(0.0,1.0,0.0)
+        for shape in self.plist2 :
+            for seg in shape :
+                for pIdx in range(0, len(seg), 1) :
+                    
+                    snd = pIdx-1 if i%4>0 else pIdx+3
+                    thd = pIdx+1 if i%4 < 3 else pIdx-3
+                    
+                    print "snd & thd" , snd , thd
+                    
+                    t = self.calculateVertexNormal(seg[pIdx], seg[snd], seg[thd])
+                    GL.glVertex3fv(t)
+                    GL.glVertex3fv(seg[pIdx])
+                    i += 1
+                    if i == 4: break
+                break
+            break
+        GL.glEnd()
         
-        # richtig
-        GL.glColor3f(0.0,1.0,0.0);    # Color Blue
-        GL.glNormal3fv(self.calculateSurfaceNormal( [[1.0, 1.0,-1.0], [-1.0, 1.0,-1.0], [-1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]))
-        GL.glVertex3f( 1.0, 1.0,-1.0);    # Top Right Of The Quad (Top)
-        GL.glVertex3f(-1.0, 1.0,-1.0);    # Top Left Of The Quad (Top)
-        GL.glVertex3f(-1.0, 1.0, 1.0);    # Bottom Left Of The Quad (Top)
-        GL.glVertex3f( 1.0, 1.0, 1.0);    # Bottom Right Of The Quad (Top)
         
-        # richtig
-        GL.glColor3f(0.0,1.0,1.0);    # Color Orange
-        GL.glNormal3fv(self.calculateSurfaceNormal( [[1.0, -1.0,1.0], [-1.0, -1.0, 1.0], [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0]]))
-        GL.glVertex3f( 1.0,-1.0, 1.0);    # Top Right Of The Quad (Bottom)
-        GL.glVertex3f(-1.0,-1.0, 1.0);    # Top Left Of The Quad (Bottom)
-        GL.glVertex3f(-1.0,-1.0,-1.0);    # Bottom Left Of The Quad (Bottom)
-        GL.glVertex3f( 1.0,-1.0,-1.0);    # Bottom Right Of The Quad (Bottom)
-
-        # richtig
-        GL.glColor3f(1.0,0.0,0.0);    # Color Red    
-        GL.glNormal3fv(self.calculateSurfaceNormal( [[1.0, 1.0,1.0], [-1.0, 1.0, 1.0], [-1.0, -1.0, 1.0], [1.0, -1.0, 1.0]]))
-        GL.glVertex3f( 1.0, 1.0, 1.0);    # Top Right Of The Quad (Front)
-        GL.glVertex3f(-1.0, 1.0, 1.0);    # Top Left Of The Quad (Front)
-        GL.glVertex3f(-1.0,-1.0, 1.0);    # Bottom Left Of The Quad (Front)
-        GL.glVertex3f( 1.0,-1.0, 1.0);    # Bottom Right Of The Quad (Front)
-
-
-        # richtig
-        GL.glColor3f(1.0,1.0,0.0);    # Color Yellow
-        GL.glNormal3f( 0.0, 0.0, 1.0);
-        GL.glVertex3f( 1.0,-1.0,-1.0);    # Top Right Of The Quad (Back)
-        GL.glVertex3f(-1.0,-1.0,-1.0);    # Top Left Of The Quad (Back)
-        GL.glVertex3f(-1.0, 1.0,-1.0);    # Bottom Left Of The Quad (Back)
-        GL.glVertex3f( 1.0, 1.0,-1.0);    # Bottom Right Of The Quad (Back)
-
-        # fehler
-        GL.glColor3f(1.0,0.0,1.0);    # Color Blue
-        GL.glNormal3f( 1.0, 0.0, 0.0)
-        GL.glVertex3f(-1.0, 1.0, 1.0);    # Top Right Of The Quad (Left)
-        GL.glVertex3f(-1.0, 1.0,-1.0);    # Top Left Of The Quad (Left)
-        GL.glVertex3f(-1.0,-1.0,-1.0);    # Bottom Left Of The Quad (Left)
-        GL.glVertex3f(-1.0,-1.0, 1.0);    # Bottom Right Of The Quad (Left)
-
-
-        # richtig
-        GL.glColor3f(1.0,0.0,1.0);    # Color Violet
-        GL.glNormal3f(-1.0, 0.0, 0.0)
-        GL.glVertex3f( 1.0, 1.0,-1.0);    # Top Right Of The Quad (Right)
-        GL.glVertex3f( 1.0, 1.0, 1.0);    # Top Left Of The Quad (Right)
-        GL.glVertex3f( 1.0,-1.0, 1.0);    # Bottom Left Of The Quad (Right)
-        GL.glVertex3f( 1.0,-1.0,-1.0);    # Bottom Right Of The Quad (Right)
-        GL.glEnd()
-
-
-
-
-
-
-
-
-
-
-    def drawTriangle2(self):
-      #  
-        GL.glBegin(GL.GL_TRIANGLES)
-       # GL.glNormal3f(0,0,1)
-        GL.glVertex3f(0,0,0)
-       # GL.glNormal3f(0,0,1)
-        GL.glVertex3f(1,0,0)
-       # GL.glNormal3f(0,0,1)
-        GL.glVertex3f(0,1,0)
-        GL.glEnd()       
-
-
-        GL.glBegin(GL.GL_LINES) 
-        GL.glVertex3f(0,0,1)
-        GL.glVertex3f(0,0,0)         
-        GL.glVertex3f(0,0,1)
-        GL.glVertex3f(1,0,0)
-        GL.glVertex3f(0,0,1)  
-        GL.glVertex3f(0,1,0)               
-        GL.glEnd()
-
-        GL.glBegin(GL.GL_LINES) 
-        GL.glVertex3f(0,0,-1)
-        GL.glVertex3f(0,0,0)         
-        GL.glVertex3f(0,0,-1)
-        GL.glVertex3f(-1,0,0)
-        GL.glVertex3f(0,0,1)  
-        GL.glVertex3f(0,-1,0)               
-        GL.glEnd()
-
 
 
     def drawTriangle(self):
