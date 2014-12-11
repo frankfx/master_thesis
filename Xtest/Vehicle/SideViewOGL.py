@@ -179,14 +179,11 @@ class Renderer(QtOpenGL.QGLWidget):
     
     def __getColor4fv(self, plist, r, g, b):
         if self.flag_selection and self.selectedPoint is not None and  self.isElementSelected(plist, self.selectedPoint) :
+            print "selection"
             return [1.0, 0.0, 0.0, self.alpha_rgb]
         else : return [r, g, b, self.alpha_rgb]
     
     def draw(self):
-        if self.flag_show_fuselage :
-            GL.glColor4fv(self.__getColor4fv(self.data.pList_fuselage, 0.0, 0.5, 0.8))
-            GL.glCallList(self.index)
-        
         if self.flag_show_wing1_up :  
             GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_up, 0.0, 0.5, 0.8))              
             GL.glCallList(self.index+1)
@@ -201,7 +198,11 @@ class Renderer(QtOpenGL.QGLWidget):
             
         if self.flag_show_wing2_lo :
             GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_lo_reflect, 0.24725, 0.1995, 0.0745))
-            GL.glCallList(self.index+4)
+            GL.glCallList(self.index+4)        
+        
+        if self.flag_show_fuselage :
+            GL.glColor4fv(self.__getColor4fv(self.data.pList_fuselage, 0.0, 0.5, 0.8))
+            GL.glCallList(self.index)
             
         if self.flag_show_compnt :
             GL.glColor3fv([1.0, 0.0, 0.0])
@@ -285,8 +286,8 @@ class Renderer(QtOpenGL.QGLWidget):
         for shape in pList :
             for seg in shape :
                 for pIdx in range(0, len(seg), 1) :
-                   # t = self.calculateVertexNormal(seg[pIdx], seg[pIdx-1 if pIdx%4>0 else pIdx+3], seg[pIdx+1 if pIdx%4 < 3 else pIdx-3], face_value)   
-                   # GL.glNormal3fv(t)
+                    t = self.calculateVertexNormal(seg[pIdx], seg[pIdx-1 if pIdx%4>0 else pIdx+3], seg[pIdx+1 if pIdx%4 < 3 else pIdx-3], face_value)   
+                    GL.glNormal3fv(t)
                     GL.glVertex3f(seg[pIdx][0], seg[pIdx][1], seg[pIdx][2])
         GL.glEnd()
        
@@ -378,11 +379,11 @@ class Renderer(QtOpenGL.QGLWidget):
 
     def initLight(self):
         
-       # mat_ambient  = [0.135, 0.2225, 0.1575, 1.0]
-       # mat_diffuse  = [0.54, 0.89, 0.63, 1.0]
-       # mat_specular = [0.316228, 0.316228, 0.316228, 1.0]
+        # mat_ambient  = [0.135, 0.2225, 0.1575, 1.0]
+        # mat_diffuse  = [0.54, 0.89, 0.63, 1.0]
+        # mat_specular = [0.316228, 0.316228, 0.316228, 1.0]
         
-        mat_ambient  = [0.24725, 0.1995, 0.0745, 1.0]
+        mat_ambient  = [0.24725, 0.8995, 0.0745, 1.0]
         mat_diffuse  = [0.75164, 0.60648, 0.22648, 1.0]
         mat_specular = [0.628281, 0.555802, 0.366065, 1.0]
         
@@ -407,7 +408,7 @@ class Renderer(QtOpenGL.QGLWidget):
         
         mat_shininess  = 0.4 
         
-        #GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
+        GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
         GL.glColorMaterial(GL.GL_FRONT_AND_BACK,GL.GL_AMBIENT_AND_DIFFUSE)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
         GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)

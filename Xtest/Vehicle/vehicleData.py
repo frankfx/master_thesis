@@ -13,8 +13,8 @@ class VehicleData():
     def __init__(self):
         
         self.tixi = Tixi()
-        #self.tixi.open('simpletest.cpacs.xml')
-        self.tixi.open('D150_CPACS2.0_valid.xml')
+        self.tixi.open('simpletest.cpacs.xml')
+        #self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -25,12 +25,12 @@ class VehicleData():
         self.pList_fuselage                    = self.createFuselage() 
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
         
-        print self.pList_wing_lo
-        
         self.pList_wing_up_reflect, \
             self.pList_wing_lo_reflect         = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
             
         self.pList_component_segment           = self.createComponent()
+        print "re" ,self.pList_component_segment
+        
         self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
         self.pList_flaps_LEDevice              = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
         self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
@@ -48,7 +48,7 @@ class VehicleData():
     '''
     create quad point list of fuselage for opengl 
     '''
-    def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 120):
+    def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 5):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta)        
         fuseList = []
@@ -76,7 +76,7 @@ class VehicleData():
     '''
     create quad point list of wing upper and lower side for opengl 
     '''    
-    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 25):
+    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 5):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
                 
@@ -111,7 +111,7 @@ class VehicleData():
     '''
     create quad point list of component segment for opengl 
     '''
-    def createComponent(self, point_cnt_eta = 1, point_cnt_xsi = 10):
+    def createComponent(self, point_cnt_eta = 1, point_cnt_xsi = 3):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
              
@@ -223,11 +223,31 @@ class VehicleData():
                 componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
                 plistFlaps = []
                 for flap in flapList : 
-                    x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[0], flap[2])       
-                    x2, y2, z2 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[1], flap[3]) 
-                    x3, y3, z3 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[4], flap[6]) 
-                    x4, y4, z4 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[5], flap[7]) 
-                    plistFlaps.append([[x1, y1, z1], [x2, y2, z2], [x3, y3, z3], [x4, y4, z4]])
+
+                    wingUi1, segUid1, eta1, xsi1 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[0], flap[2])       
+                    wingUi2, segUid2, eta2, xsi2 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[1], flap[3]) 
+                    wingUi3, segUid3, eta3, xsi3 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[4], flap[6]) 
+                    wingUi4, segUid4, eta4, xsi4 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[5], flap[7]) 
+                    
+                    #print self.tigl.wingGetIndex(wingUi1), self.tigl.wingGetSegmentIndex(segUid1), eta1, xsi1
+                    (segIdx1, wingidx1) = self.tigl.wingGetSegmentIndex(segUid1)
+                    (segIdx2, wingidx2) = self.tigl.wingGetSegmentIndex(segUid2)
+                    (segIdx3, wingidx3) = self.tigl.wingGetSegmentIndex(segUid3)
+                    (segIdx4, wingidx4) = self.tigl.wingGetSegmentIndex(segUid4)
+                    
+                    
+                    x1, y1, z1 = self.tigl.wingGetUpperPoint(wingidx1, segIdx1, eta1, xsi1)      
+                    x2, y2, z2 = self.tigl.wingGetUpperPoint(wingidx2, segIdx2, eta2, xsi2)      
+                    x3, y3, z3 = self.tigl.wingGetUpperPoint(wingidx3, segIdx3, eta3, xsi3)      
+                    x4, y4, z4 = self.tigl.wingGetUpperPoint(wingidx4, segIdx4, eta4, xsi4)      
+                          
+                    
+                    #x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[0], flap[2])       
+                    #x2, y2, z2 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[1], flap[3]) 
+                    #x3, y3, z3 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[4], flap[6]) 
+                    #x4, y4, z4 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[5], flap[7]) 
+                    #
+                    plistFlaps.append([[x1, y1, z1+0.02], [x2, y2, z2+0.02], [x3, y3, z3+0.02], [x4, y4, z4+0.02]])
                 plistSeg.append(plistFlaps)
             plistWing.append(plistSeg)      
         return plistWing             
