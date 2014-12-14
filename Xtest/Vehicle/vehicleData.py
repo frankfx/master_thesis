@@ -27,9 +27,10 @@ class VehicleData():
         
         self.pList_wing_up_reflect, \
             self.pList_wing_lo_reflect         = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
-            
+        
+        print self.pList_wing_up
+        
         self.pList_component_segment           = self.createComponent()
-        print "re" ,self.pList_component_segment
         
         self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
         self.pList_flaps_LEDevice              = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
