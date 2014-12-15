@@ -14,13 +14,16 @@ class VehicleData():
         
         self.tixi = Tixi()
         self.tixi.open('simpletest.cpacs.xml')
-        #self.tixi.open('D150_CPACS2.0_valid.xml')
+       # self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
             self.tigl.open(self.tixi,"")
         except TiglException as err:    
             print 'Error opening tigl document: ', err.__str__()
+           
+        self.configurationGetLength = self.tigl.configurationGetLength() # 2.05436735655 ; D150 = 37.5708073949
+        self.wingspan               = 0.0           
            
         self.pList_fuselage                    = self.createFuselage() 
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
@@ -38,7 +41,6 @@ class VehicleData():
         self.plist_ribs                        = self.createRibs()
         self.pList_spares                      = self.createSpars()
         
-        self.configurationGetLength = self.tigl.configurationGetLength() # 2.05436735655 ; D150 = 37.5708073949
         
     # =========================================================================================================
     # =========================================================================================================    
@@ -49,7 +51,7 @@ class VehicleData():
     '''
     create quad point list of fuselage for opengl 
     '''
-    def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 5):
+    def createFuselage(self, point_cnt_eta = 4, point_cnt_zeta = 25):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta)        
         fuseList = []
@@ -77,7 +79,7 @@ class VehicleData():
     '''
     create quad point list of wing upper and lower side for opengl 
     '''    
-    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 5):
+    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 11):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
                 
@@ -85,6 +87,9 @@ class VehicleData():
         wingList_lo = []            
         
         for wingIdx in range(1, self.tigl.getWingCount()+1) :
+       
+            cur_wingspan = self.tigl.wingGetSpan(self.tigl.wingGetUID(wingIdx))
+            self.wingspan = cur_wingspan if cur_wingspan > self.wingspan else self.wingspan 
             segList_lo = [] ; segList_up = []
             for segIdx in range(1, self.tigl.wingGetSegmentCount(wingIdx)+1) :
                 plist_lo = [] ; plist_up = []
@@ -112,7 +117,7 @@ class VehicleData():
     '''
     create quad point list of component segment for opengl 
     '''
-    def createComponent(self, point_cnt_eta = 1, point_cnt_xsi = 3):
+    def createComponent(self, point_cnt_eta = 5, point_cnt_xsi = 11):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
              

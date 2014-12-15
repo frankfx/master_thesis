@@ -31,7 +31,9 @@ class Renderer():
         self.viewheight = 0.0
         self.plist = [[[[0.0, 0.0, 0.0], [0.1464466094067262, 0.0, 0.05308323560069059], [0.1464466094067262, 1.0, 0.05308323560069059], [0.0, 1.0, 0.0], [0.1464466094067262, 0.0, 0.05308323560069059], [0.49999999999999994, 0.0, 0.05294025200060001], [0.49999999999999994, 1.0, 0.05294025200060001], [0.1464466094067262, 1.0, 0.05308323560069059], [0.49999999999999994, 0.0, 0.05294025200060001], [0.8535533905932737, 0.0, 0.02010727196643752], [0.8535533905932737, 1.0, 0.02010727196643752], [0.49999999999999994, 1.0, 0.05294025200060001], [0.8535533905932737, 0.0, 0.02010727196643752], [1.0, 0.0, 0.0], [1.0, 1.0, 0.0], [0.8535533905932737, 1.0, 0.02010727196643752]], [[0.0, 1.0, 0.0], [0.1464466094067262, 1.0, 0.05308323560069059], [0.5732233047033631, 2.0, 0.026541617800345297], [0.5, 2.0, 0.0], [0.1464466094067262, 1.0, 0.05308323560069059], [0.49999999999999994, 1.0, 0.05294025200060001], [0.75, 2.0, 0.026470126000300007], [0.5732233047033631, 2.0, 0.026541617800345297], [0.49999999999999994, 1.0, 0.05294025200060001], [0.8535533905932737, 1.0, 0.02010727196643752], [0.9267766952966369, 2.0, 0.01005363598321876], [0.75, 2.0, 0.026470126000300007], [0.8535533905932737, 1.0, 0.02010727196643752], [1.0, 1.0, 0.0], [1.0, 2.0, 0.0], [0.9267766952966369, 2.0, 0.01005363598321876]]]]
 
-        self.normals = []
+        #self.plist = [[[[-1,1,0],[-1,-1,0],[1,-1,0],[1,1,0]]]]
+        
+        self.normals = [[-1,1,1],[-1,-1,1],[1,-1,1],[1,1,1]]
         
         
         #[1.0, 1.0,-1.0], [-1.0, 1.0,-1.0], [-1.0, 1.0, 1.0], [1.0, 1.0, 1.0]
@@ -48,7 +50,7 @@ class Renderer():
         GL.glEnable(GL.GL_LIGHTING)
         GL.glEnable(GL.GL_LIGHT0)
         GL.glEnable(GL.GL_COLOR_MATERIAL)
-       # GL.glEnable(GL.GL_NORMALIZE)
+        GL.glEnable(GL.GL_NORMALIZE)
         GL.glShadeModel(GL.GL_SMOOTH)
         #GL.glEnable(GL.GL_CULL_FACE)
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
@@ -58,9 +60,10 @@ class Renderer():
         
     def initLight(self):
         
-        mat_ambient    = [0.75164, 0.60648, 0.22648, 1.0]  #[0.24725, 0.1995, 0.0745, 1.0]
-        mat_diffuse    =  [0.75164, 0.40648, 0.22648, 1.0] 
-        mat_specular   = [0.01, 0.99, 0.0, 1.0]
+        
+        mat_ambient  = [0.24725, 0.8995, 0.0745, 1.0]
+        mat_diffuse  = [0.75164, 0.60648, 0.22648, 1.0]
+        mat_specular = [0.628281, 0.555802, 0.366065, 1.0]
         
         light_position = [0.0, 0.0, 0.0, 1.0]        
 
@@ -77,7 +80,8 @@ class Renderer():
         # The color of the sphere
         #mat_materialColor = [0.2, 0.2, 1.0, 1.0]
 
-        mat_ambient  = [0.24725, 0.1995, 0.0745, 1.0]
+        
+        mat_ambient  = [0.24725, 0.8995, 0.0745, 1.0]
         mat_diffuse  = [0.75164, 0.60648, 0.22648, 1.0]
         mat_specular = [0.628281, 0.555802, 0.366065, 1.0]
         
@@ -128,30 +132,59 @@ class Renderer():
       #  self.drawTriangle()
         
        # self.createOglShape()
-        GL.glColor3f(1.0,0,0)
-        
+        #GL.glColor3f(1.0,0,0)
+        q = 0
         GL.glBegin(GL.GL_QUADS)
+        for shape in self.plist:
+            for seg in shape :
+                print "quad: " , seg[0] , seg[1] , seg[2] , seg[3]
+                for i in range(0, len(seg), 1):
+                    p  = seg[i]
+                    p1 = seg[i+1 if i%4 != 3 else i-3] 
+                    p2 = seg[i-1 if i%4 != 0 else i+3]
+                    normal = self.calculateVertexNormal(p, p1, p2)
+                    if i == 0:
+                        print "q",q," = ", p , p1, p2, normal
+                    GL.glNormal3fv(normal)
+                    GL.glVertex3fv(p)
+                    q +=1
+                   # if q == 4 : break
+               # break
+           # break
+        GL.glEnd()
+        #self.initLight()
+      
+        q = 0
+        GL.glBegin(GL.GL_LINES)
+        GL.glColor3f(0.0,0.0,1.0)
         for shape in self.plist:
             for seg in shape :
                 for i in range(0, len(seg), 1):
                     p  = seg[i]
-                    p1 = seg[i+1 if i == 0 or i%3 != 0 else i-3] 
+                    p1 = seg[i+1 if i%4 != 3 else i-3] 
                     p2 = seg[i-1 if i%4 != 0 else i+3]
-                    
                     normal = self.calculateVertexNormal(p, p1, p2)
-                    print p
-                    
+                   # if i == 1:
+                    normal = self.calculateVertexNormal(p, p2, p1)
+                    GL.glVertex3fv(normal)
                     GL.glVertex3fv(p)
-               # break
-        GL.glEnd()
-        #self.initLight()
-        
+                    q +=1
+                   # if q == 4 : break
+             #   break
+          #  break
+        GL.glEnd() 
         #GLUT.glutInit()#
         #GLUT.glutSolidSphere(0.5,40,40)
+
+        GL.glPointSize(6)
+        list1 = [[0.1464466094067262, 0.0, 0.05308323560069059], [0.1464466094067262, 1.0, 0.05308323560069059], [0.0, 0.0, 0.0], [0.05308323560069059, 0.0, -0.1464466094067262]]
+        GL.glColor3f(0.0,0.5,0.7)
+      #  GL.glBegin(GL.GL_POINTS)
+       # for p in list1:
+            #GL.glVertex3fv(p)
+      #  GL.glEnd()
+
         GL.glFlush() 
-
-        
-
 
     '''
     get surface normal
@@ -177,7 +210,10 @@ class Renderer():
     def calculateVertexNormal(self, p1, p2, p3):
         vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
         vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
-               
+        
+       # print "vec1" , vec1
+      # print "vec2" , vec2
+        
         return (self.__crossproduct(vec1, vec2))  #self.normalised(self.__crossproduct(vec1, vec2))
 
     
@@ -186,7 +222,7 @@ class Renderer():
         y = vec1[2] * vec2[0] - vec1[0] * vec2[2] 
         z = vec1[0] * vec2[1] - vec1[1] * vec2[0]
         
-        return [x, -y, -z]         
+        return [x, y, z]         
 
 
     def calculateNormal(self, plist):
@@ -349,7 +385,6 @@ class Renderer():
         k[2] = -3
         m[2] = -3
         n[2] = -3
-        print "dsf" ,k
         GL.glBegin(GL.GL_LINES) 
         GL.glColor3f(0,1,0)
         GL.glVertex3fv(k)
