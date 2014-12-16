@@ -296,6 +296,13 @@ def isPinRectangle(r, P):
     return  equalFloats2(areaRectangle, ABP+BCP+CDP+DAP)
 
 
+'''
+debug helper console
+'''
+def echo(value):
+    print "#######################################################################"
+    print str(value)
+    print "#######################################################################"
 
 '''
 debug helper

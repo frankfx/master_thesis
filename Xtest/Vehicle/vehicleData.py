@@ -8,13 +8,16 @@ import sys
 from tiglwrapper   import Tigl, TiglException
 from tixiwrapper   import Tixi
 from Xtest.Open_GL import utility
+import time
 
 class VehicleData():
     def __init__(self):
         
+        __start_time = time.time()
+        
         self.tixi = Tixi()
-        self.tixi.open('simpletest.cpacs.xml')
-       # self.tixi.open('D150_CPACS2.0_valid.xml')
+       # self.tixi.open('simpletest.cpacs.xml')
+        self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -24,16 +27,27 @@ class VehicleData():
            
         self.configurationGetLength = self.tigl.configurationGetLength() # 2.05436735655 ; D150 = 37.5708073949
         self.wingspan               = 0.0           
+         
+         
+        utility.echo("Time after tigl, tixi init: " + str(time.time() - __start_time)) 
            
         self.pList_fuselage                    = self.createFuselage() 
+        
+        utility.echo("Time after fuselage init : " + str(time.time() - __start_time))
+        
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
+        
+        utility.echo("Time after wing one init : " + str(time.time() - __start_time))
         
         self.pList_wing_up_reflect, \
             self.pList_wing_lo_reflect         = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
         
-        print self.pList_wing_up
+        utility.echo("Time after wing two init : " + str(time.time() - __start_time))
         
         self.pList_component_segment           = self.createComponent()
+
+        utility.echo("Time after component init : " + str(time.time() - __start_time))
+
         
         self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
         self.pList_flaps_LEDevice              = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
@@ -41,6 +55,7 @@ class VehicleData():
         self.plist_ribs                        = self.createRibs()
         self.pList_spares                      = self.createSpars()
         
+        utility.echo("End data tigl calculation  -  Time: " + str(time.time() - __start_time))
         
     # =========================================================================================================
     # =========================================================================================================    
@@ -51,7 +66,7 @@ class VehicleData():
     '''
     create quad point list of fuselage for opengl 
     '''
-    def createFuselage(self, point_cnt_eta = 4, point_cnt_zeta = 25):
+    def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 11):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta)        
         fuseList = []

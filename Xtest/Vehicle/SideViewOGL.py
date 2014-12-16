@@ -10,6 +10,8 @@ from vehicleData   import VehicleData
 from PySide        import QtOpenGL, QtGui, QtCore
 from Xtest.Open_GL import utility
 
+from tiglwrapper   import TiglException
+
 try:
     from OpenGL import GL, GLU, GLUT
 except ImportError:
@@ -114,13 +116,13 @@ class Renderer(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
-        GL.glEnable(GL.GL_LIGHTING)
-        GL.glEnable(GL.GL_LIGHT0)
-        GL.glEnable(GL.GL_COLOR_MATERIAL)
-        GL.glEnable(GL.GL_NORMALIZE)
+       # GL.glEnable(GL.GL_LIGHTING)
+       # GL.glEnable(GL.GL_LIGHT0)
+       # GL.glEnable(GL.GL_COLOR_MATERIAL)
+       # GL.glEnable(GL.GL_NORMALIZE)
         GL.glShadeModel(GL.GL_SMOOTH)
         #GL.glShadeModel(GL.GL_FLAT)
-        self.initLight()
+        #self.initLight()
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)             
         
@@ -156,7 +158,7 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()   
 
-        self.initLight()
+        #self.initLight()
         
      #   GL.glScalef(1.0/self.data.wingspan, 1.0/self.data.wingspan,1.0)
         
@@ -173,7 +175,7 @@ class Renderer(QtOpenGL.QGLWidget):
         # GLUT.glutInit()
         #GLUT.glutSolidSphere(1,25,25)
       #  self.initLight()
-        self.draw()    
+        self.drawAircraft()    
         if self.flag_show_grid:
             GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
             self.drawGrid(self.data.configurationGetLength, -self.data.configurationGetLength)    
@@ -182,57 +184,75 @@ class Renderer(QtOpenGL.QGLWidget):
         #GL.glShadeModel(GL.GL_FLAT)
         GL.glFlush() 
 
-    
-    def __drawSelection(self):
+    def draw(self, plist, color, idx):
         if self.flag_selection and self.selectedPoint is not None :
-            for shape in self.data.pList_fuselage :
-                for seg in shape :
-                    print len(shape)
-                    if(self.isSegmentSelected(seg, self.selectedPoint)) :
-                        print "selection"
-                        self.drawSegment(seg, [1.0,0.0,0.0], 1)
-                        return True
-        return False
-             
-    
-    def drawSegment(self, plist, color, face_value):
-        GL.glColor3fv(color)
+            isElemSelected, (shaIdx, segIdx) = self.isElementSelected(plist, self.selectedPoint)
+            if isElemSelected :
+                self.drawInSelectionMode(plist, color, shaIdx, segIdx)
+                
+        GL.glColor4fv(color)              
+        GL.glCallList(self.index + idx)     
+
+
+
+    def drawWing(self, plist, color, idx, reflect=1):
+        if self.flag_selection and self.selectedPoint is not None :
+            for wingIndex in (1, len(plist)+1):
+                segIdx = self.isWingSegmentSelected(wingIndex, self.selectedPoint, reflect) 
+                if segIdx != -1 :
+                    self.drawInSelectionMode(plist, color, wingIndex-1, segIdx-1) 
+                    return
+        GL.glColor4fv(color)              
+        GL.glCallList(self.index + idx) 
+
+    def isWingSegmentSelected(self, wingIndex, point, reflect=1):
+        segIdx = -1
+        try:
+            segIdx, _, _, _ = self.data.tigl.wingGetSegmentEtaXsi(wingIndex, point[0], reflect*point[1], point[2])
+        except TiglException ,e :
+            print "selection failed : " , e.error
+        return segIdx
+
+    def drawInSelectionMode(self, plist, color, shapeIndex, segmentIndex):
+        GL.glColor4fv(color)
         GL.glBegin(GL.GL_QUADS)
-        for pIdx in range(0, len(plist), 1) :
-           # t = self.calculateVertexNormal(plist[pIdx], plist[pIdx-1 if pIdx%4>0 else pIdx+3], plist[pIdx+1 if pIdx%4 < 3 else pIdx-3], face_value)   
-           # GL.glNormal3fv(t)
-           # plist[pIdx][0] += 0.2
-            GL.glVertex3fv(plist[pIdx])
-            print "uuuuuuuuuuuuuu" , plist[pIdx]
+        for shapeIdx in range(0,len(plist)) :
+            for segIdx in range(0, len(plist[shapeIdx])) :
+                for i in range(0, len(plist[shapeIdx][segIdx])) :
+                    if(shapeIdx == shapeIndex and segIdx == segmentIndex):
+                        self.drawSegment(plist[shapeIdx][segIdx], [1.0, 0.0, 0.0, self.alpha_rgb], color)
+                        break
+                    else:
+                        GL.glVertex3fv(plist[shapeIdx][segIdx][i])
         GL.glEnd()
+        
+    def drawSegment(self, plist, color_new, color_old):
+        GL.glColor4fv(color_new)
+        for pIdx in range(0, len(plist), 1) :
+            GL.glVertex3fv(plist[pIdx])
+        GL.glColor4fv(color_old)
+
     
-    def __getColor4fv(self, plist, r, g, b):
-        if self.flag_selection and self.selectedPoint is not None and  self.isElementSelected(plist, self.selectedPoint) :
-            print "selection"
-           # return [1.0, 0.0, 0.0, self.alpha_rgb]
-        return [r, g, b, self.alpha_rgb]
     
-    def draw(self):
+       
+        
+    
+    def drawAircraft(self):
+        if self.flag_show_fuselage :
+            self.draw(self.data.pList_fuselage, [0.0, 0.5, 0.8,self.alpha_rgb], 0)        
+        
         if self.flag_show_wing1_up :  
-            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_up, 0.0, 0.5, 0.8))              
-            GL.glCallList(self.index+1)
+            self.drawWing(self.data.pList_wing_up, [0.0, 0.5, 0.8,self.alpha_rgb], 1)
             
         if self.flag_show_wing1_lo :
-            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_lo, 0.0, 0.5, 0.8))
-            GL.glCallList(self.index+2)
+            self.drawWing(self.data.pList_wing_lo, [0.0, 0.5, 0.8,self.alpha_rgb], 2)
         
         if self.flag_show_wing2_up :
-            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_up_reflect, 0.24725, 0.1995, 0.0745))
-            GL.glCallList(self.index+3)
+            self.drawWing(self.data.pList_wing_up_reflect, [0.24725, 0.9995, 0.0745,self.alpha_rgb], 3, -1)
             
         if self.flag_show_wing2_lo :
-            GL.glColor4fv(self.__getColor4fv(self.data.pList_wing_lo_reflect, 0.24725, 0.1995, 0.0745))
-            GL.glCallList(self.index+4)        
+            self.drawWing(self.data.pList_wing_lo_reflect, [0.24725, 0.1995, 0.0745,self.alpha_rgb], 4, -1)
         
-        if self.flag_show_fuselage :
-            GL.glColor4fv(self.__getColor4fv(self.data.pList_fuselage, 0.0, 0.5, 0.8))
-            GL.glCallList(self.index)
-            
         if self.flag_show_compnt :
             GL.glColor3fv([1.0, 0.0, 0.0])
             GL.glCallList(self.index+5)
@@ -249,8 +269,6 @@ class Renderer(QtOpenGL.QGLWidget):
         if self.flag_show_spars :
             GL.glCallList(self.index+9)
           
-        self.__drawSelection()
-
     def createOglLists(self): 
         self.index = GL.glGenLists(10)
         
@@ -453,19 +471,16 @@ class Renderer(QtOpenGL.QGLWidget):
     # =========================================================================================================  
     # =========================================================================================================                
     def isElementSelected(self, plist, point):
+        print point
+        cntSha = -1 ; cntSeg = -1
         for shape in plist :
-            for seg in shape :     
+            cntSha += 1
+            for seg in shape :
+                cntSeg += 1     
                 for i in range(0, len(seg), 4) :   
                     if(utility.isPinRectangle([seg[i], seg[i+1], seg[i+2], seg[i+3]], point)) :
-                        return True
-        return False
-
-    def isSegmentSelected(self, seg, point):
-        for i in range(0, len(seg), 4) :   
-            if(utility.isPinRectangle([seg[i], seg[i+1], seg[i+2], seg[i+3]], point)) :
-                return True
-        return False
-
+                        return True , (cntSha, cntSeg) 
+        return False , (None, None)
 
 
     def __winPosTo3DPos(self, x, y):
