@@ -1,158 +1,137 @@
-'''
-Created on Dec 3, 2014
-
-@author: fran_re
-'''
-#! /usr/bin/env python
-'''Tests rendering using shader objects from core GL or extensions
-
-Uses the:
-    Lighthouse 3D Tutorial toon shader
-        http://www.lighthouse3d.com/opengl/glsl/index.php?toon2
-
-By way of:
-    http://www.pygame.org/wiki/GLSLExample
-'''
-import OpenGL 
-OpenGL.ERROR_ON_COPY = True 
+import numpy as np
 from OpenGL.GL import *
-from OpenGL.GLU import *
-from OpenGL.GLUT import *
+from PySide.QtCore import *
+from PySide.QtGui import *
+from PySide.QtOpenGL import *
 
-# PyOpenGL 3.0.1 introduces this convenience module...
-from OpenGL.GL.shaders import *
+_vertexShaderSource = (
+    'uniform float scale;'
+    'attribute vec2 position;'
+    'attribute vec4 color;' 
+    'varying vec4 v_color;'
+    'void main()'
+    '{'
+    '    gl_Position = vec4(position*, scale, 0.0, 1.0);'
+    '    v_color = color;'
+    '}'
+)
 
-import time, sys
-program = None
+_vertexShader = (
+    'attribute vec2 a_position;'
+    'attribute vec3 a_color;'
+    'varying vec3 v_color;'
+    ''
+    'void main()'
+    '{'
+    '   gl_Position = vec4(a_position, 0.0, 1.0);'
+    '   v_color = a_color;'
+    '}'
+)
 
-# A general OpenGL initialization function.  Sets all of the initial parameters. 
-def InitGL(Width, Height):                # We call this right after our OpenGL window is created.
-    glClearColor(0.0, 0.0, 0.0, 0.0)    # This Will Clear The Background Color To Black
-    glClearDepth(1.0)                    # Enables Clearing Of The Depth Buffer
-    glDepthFunc(GL_LESS)                # The Type Of Depth Test To Do
-    glEnable(GL_DEPTH_TEST)                # Enables Depth Testing
-    glShadeModel(GL_SMOOTH)                # Enables Smooth Color Shading
-    
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()                    # Reset The Projection Matrix
-                                        # Calculate The Aspect Ratio Of The Window
-    gluPerspective(45.0, float(Width)/float(Height), 0.1, 100.0)
+_fragShader = (
+    'void main()'
+    '{'
+        'gl_FragColor = vec4(0.0,0.0,0.0,1.0);'
+    '}'
+)
 
-    glMatrixMode(GL_MODELVIEW)
- 
-    if not glUseProgram:
-        print 'Missing Shader Objects!'
-        sys.exit(1)
-    global program
-    program = compileProgram(
-        compileShader('''
-            varying vec3 normal;
-            void main() {
-                normal = gl_NormalMatrix * gl_Normal;
-                gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-            }
-        ''',GL_VERTEX_SHADER),
-        compileShader('''
-            varying vec3 normal;
-            void main() {
-                float intensity;
-                vec4 color;
-                vec3 n = normalize(normal);
-                vec3 l = normalize(gl_LightSource[0].position).xyz;
-            
-                // quantize to 5 steps (0, .25, .5, .75 and 1)
-                intensity = (floor(dot(l, n) * 4.0) + 1.0)/4.0;
-                color = vec4(intensity*1.0, intensity*0.5, intensity*0.5,
-                    intensity*1.0);
-            
-                gl_FragColor = color;
-            }
-    ''',GL_FRAGMENT_SHADER),)
 
-# The function called when our window is resized (which shouldn't happen if you enable fullscreen, below)
-def ReSizeGLScene(Width, Height):
-    if Height == 0:                        # Prevent A Divide By Zero If The Window Is Too Small 
-        Height = 1
 
-    glViewport(0, 0, Width, Height)        # Reset The Current Viewport And Perspective Transformation
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(45.0, float(Width)/float(Height), 0.1, 100.0)
-    glMatrixMode(GL_MODELVIEW)
+_fragmentShaderSource = (
+    'varying vec4 v_color;'
+    ''
+    'void main()'
+    '{'
+    '    gl_FragColor = v_color;'
+    '}'
+)
 
-# The main drawing function. 
-def DrawGLScene():
-    # Clear The Screen And The Depth Buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    glLoadIdentity()                    # Reset The View 
 
-    # Move Left 1.5 units and into the screen 6.0 units.
-    glTranslatef(-1.5, 0.0, -6.0)
+class HelloWidget(QGLWidget):
 
-    if program:
+    def __init__(self):
+        QGLWidget.__init__(self)
+
+    def initializeGL(self):
+        self.data = np.zeros(4, dtype = [ ("position", np.float32, 3),
+                                ("color",    np.float32, 4)] )
+        
+        # request program and shader slots from GPU
+        program  = glCreateProgram()
+        vertex   = glCreateShader(GL_VERTEX_SHADER)
+        fragment = glCreateShader(GL_FRAGMENT_SHADER)        
+        
+        # compile shaders into GPU objects
+        # Set shaders source
+#        glShaderSource(vertex, _vertexShaderSource)
+#        glShaderSource(fragment, _fragmentShaderSource)
+        glShaderSource(vertex, _vertexShaderSource)
+        glShaderSource(fragment, _fragmentShaderSource)
+        
+        # Compile shaders
+        glCompileShader(vertex)
+        glCompileShader(fragment)
+        
+        # build and link the program:
+
+        glAttachShader(program, vertex)
+        glAttachShader(program, fragment)
+        glLinkProgram(program)
+
+        # We can not get rid of shaders, they won't be used again:
+        glDetachShader(program, vertex)
+        glDetachShader(program, fragment)
+
+        # make program the default program to be ran. 
+        # We can do it now because we'll use a single in this example:
         glUseProgram(program)
-    glutSolidSphere(1.0,32,32)
-    glTranslate( 1,0,2 )
-    glutSolidCube( 1.0 )
+        
+        # Request a buffer slot from GPU
+        buffere = glGenBuffers(1)
 
-    #  since this is double buffered, swap the buffers to display what just got drawn. 
-    glutSwapBuffers()
+        # Make this buffer the default one
+        glBindBuffer(GL_ARRAY_BUFFER, buffere)
 
-# The function called whenever a key is pressed. Note the use of Python tuples to pass in: (key, x, y)  
-def keyPressed(*args):
-    # If escape is pressed, kill everything.
-    if args[0] == '\x1b':
-        sys.exit()
+        # Upload data
+        glBufferData(GL_ARRAY_BUFFER, self.data.nbytes, self.data, GL_DYNAMIC_DRAW)
+        
+        # Binding the buffer to the program
+        # We need to tell the GPU how to read the buffer and bind each value to the relevant attribute. To do this, GPU needs to kow what is the stride between 2 consecutive element and what is the offset to read one attribute
+        stride = self.data.strides[0]
+        
+        offset = ctypes.c_void_p(0)
+        loc = glGetAttribLocation(program, "position")
+        glEnableVertexAttribArray(loc)
+        glBindBuffer(GL_ARRAY_BUFFER, buffere)
+        glVertexAttribPointer(loc, 3, GL_FLOAT, False, stride, offset)
+        
+        offset = ctypes.c_void_p(self.data.dtype["position"].itemsize)
+        loc = glGetAttribLocation(program, "color")
+        glEnableVertexAttribArray(loc)
+        glBindBuffer(GL_ARRAY_BUFFER, buffere)
+        glVertexAttribPointer(loc, 4, GL_FLOAT, False, stride, offset)        
+        
+        # Binding the uniform
+        #We request the location of the uniform and we upload the value using the dedicated function to upload one float only
+        loc = glGetUniformLocation(program, "scale")
+        glUniform1f(loc, 1.0)
+        
+        
+        
+        # setting data
+        self.data['color']    = [ (1,0,0,1), (0,1,0,1), (0,0,1,1), (1,1,0,1) ]
+        self.data['position'] = [ (-1,-1),   (-1,+1),   (+1,-1),   (+1,+1)   ]
 
-def main():
-    global window
-    # For now we just pass glutInit one empty argument. I wasn't sure what should or could be passed in (tuple, list, ...)
-    # Once I find out the right stuff based on reading the PyOpenGL source, I'll address this.
-    glutInit(sys.argv)
+    def reshape(self,width,height):
+        glViewport(0, 0, width, height)    
 
-    # Select type of Display mode:   
-    #  Double buffer 
-    #  RGBA color
-    # Alpha components supported 
-    # Depth buffer
-    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
-    
-    # get a 640 x 480 window 
-    glutInitWindowSize(640, 480)
-    
-    # the window starts at the upper left corner of the screen 
-    glutInitWindowPosition(0, 0)
-    
-    # Okay, like the C version we retain the window id to use when closing, but for those of you new
-    # to Python (like myself), remember this assignment would make the variable local and not global
-    # if it weren't for the global declaration at the start of main.
-    window = glutCreateWindow("Jeff Molofee's GL Code Tutorial ... NeHe '99")
-
-       # Register the drawing function with glut, BUT in Python land, at least using PyOpenGL, we need to
-    # set the function pointer and invoke a function to actually register the callback, otherwise it
-    # would be very much like the C version of the code.    
-    glutDisplayFunc(DrawGLScene)
-    
-    # Uncomment this line to get full screen.
-    #glutFullScreen()
-
-    # When we are doing nothing, redraw the scene.
-    glutIdleFunc(DrawGLScene)
-    
-    # Register the function called when our window is resized.
-    glutReshapeFunc(ReSizeGLScene)
-    
-    # Register the function called when the keyboard is pressed.  
-    glutKeyboardFunc(keyPressed)
-
-    # Initialize our window. 
-    InitGL(640, 480)
-
-    # Start Event Processing Engine    
-    glutMainLoop()
-
-# Print message to console, and kick off the main to get it rolling.
-
-if __name__ == "__main__":
-    print "Hit ESC key to quit."
-    main()
+    def paintGL(self):
+        glClear(GL_COLOR_BUFFER_BIT)
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+        
+if __name__ == '__main__':
+    import sys
+    app = QApplication(sys.argv)
+    w = HelloWidget()
+    w.show()
+    app.exec_()
