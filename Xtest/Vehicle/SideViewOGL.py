@@ -116,11 +116,12 @@ class Renderer(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
-       # GL.glEnable(GL.GL_LIGHTING)
-       # GL.glEnable(GL.GL_LIGHT0)
-       # GL.glEnable(GL.GL_COLOR_MATERIAL)
-       # GL.glEnable(GL.GL_NORMALIZE)
-        GL.glShadeModel(GL.GL_SMOOTH)
+        #GL.glEnable(GL.GL_COLOR_MATERIAL)
+        #GL.glEnable(GL.GL_LIGHTING)
+        #GL.glEnable(GL.GL_LIGHT0)
+        #GL.glEnable(GL.GL_LIGHT1)
+        #GL.glEnable(GL.GL_NORMALIZE)
+        #GL.glShadeModel(GL.GL_SMOOTH)
         #GL.glShadeModel(GL.GL_FLAT)
         #self.initLight()
         GL.glEnable(GL.GL_BLEND)
@@ -158,13 +159,9 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()   
 
-        #self.initLight()
-        
-     #   GL.glScalef(1.0/self.data.wingspan, 1.0/self.data.wingspan,1.0)
-        
         # set to center and translate values
         GL.glTranslatef(self.xTrans, self.yTrans, -1.5)
-        
+       # self.initLight()
         # GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
@@ -172,26 +169,36 @@ class Renderer(QtOpenGL.QGLWidget):
         # GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0)
         GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0) 
           
-        # GLUT.glutInit()
-        #GLUT.glutSolidSphere(1,25,25)
-      #  self.initLight()
+       #  self.initLight()
+       # GL.glColor3f(1.0, 1.0, 1.0)
         self.drawAircraft()    
         if self.flag_show_grid:
-            GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
+         #   GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
             self.drawGrid(self.data.configurationGetLength, -self.data.configurationGetLength)    
        
-        
-        #GL.glShadeModel(GL.GL_FLAT)
         GL.glFlush() 
 
     def draw(self, plist, color, idx):
         if self.flag_selection and self.selectedPoint is not None :
-            isElemSelected, (shaIdx, segIdx) = self.isElementSelected(plist, self.selectedPoint)
+            isElemSelected, (shaIdx, segIdx) = self.__isElementSelected(plist, self.selectedPoint)
             if isElemSelected :
                 self.drawInSelectionMode(plist, color, shaIdx, segIdx)
                 
         GL.glColor4fv(color)              
         GL.glCallList(self.index + idx)     
+
+    def __isElementSelected(self, plist, point):
+        print point
+        cntSha = -1 ; cntSeg = -1
+        for shape in plist :
+            cntSha += 1
+            for seg in shape :
+                cntSeg += 1     
+                for i in range(0, len(seg), 4) :   
+                    if(utility.isPinRectangle([seg[i], seg[i+1], seg[i+2], seg[i+3]], point)) :
+                        return True , (cntSha, cntSeg) 
+        return False , (None, None)
+
 
 
 
@@ -202,7 +209,7 @@ class Renderer(QtOpenGL.QGLWidget):
                 if segIdx != -1 :
                     self.drawInSelectionMode(plist, color, wingIndex-1, segIdx-1) 
                     return
-        GL.glColor4fv(color)              
+       # GL.glColor4fv(color)              
         GL.glCallList(self.index + idx) 
 
     def isWingSegmentSelected(self, wingIndex, point, reflect=1):
@@ -331,15 +338,45 @@ class Renderer(QtOpenGL.QGLWidget):
     @param face_value: side of normal {1 or -1}
     '''
     def createOglShape(self, pList, glMode, color, face_value=1.0):
-     #   GL.glColor3fv(color)
+        surfaceNormals = self.calculateSurfaceNormals(pList)
+        j = 0
         GL.glBegin(glMode)
         for shape in pList :
             for seg in shape :
-                for pIdx in range(0, len(seg), 1) :
-                    t = self.calculateVertexNormal(seg[pIdx], seg[pIdx-1 if pIdx%4>0 else pIdx+3], seg[pIdx+1 if pIdx%4 < 3 else pIdx-3], face_value)   
-                    GL.glNormal3fv(t)
-                    GL.glVertex3f(seg[pIdx][0], seg[pIdx][1], seg[pIdx][2])
+                for i in range(0, len(seg)) :
+                    if i % 4 == 0 :
+                        GL.glNormal3fv(surfaceNormals[j])
+                        j += 1
+                    GL.glVertex3fv(seg[i])
         GL.glEnd()
+    
+    
+    def calculateSurfaceNormals(self, plist):
+        tmp = []
+        for shape in plist:
+            for seg in shape:
+                for i in range (0, len(seg), 4) :
+                    tmp.append(self.__calculateSurfaceNormal([seg[i], seg[i+1], seg[i+2], seg[i+3]]))
+        return tmp
+    
+    def __calculateSurfaceNormal(self, polynom):
+        normal = [0.0, 0.0, 0.0]
+        for i in range (len(polynom)) :
+            cur = polynom[i]
+            nxt = polynom[(i+1) % len(polynom)]
+            
+            normal[0] = normal[0] + ( (cur[1] - nxt[1]) * (cur[2] + nxt[2])) 
+            normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
+            normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
+            
+        normal[0] = -normal[0] 
+        normal[1] = -normal[1] 
+        normal[2] = -normal[2] 
+            
+        return normal 
+    
+    
+    
        
 #------------------------------------------------------------------------------ 
     #---------------------------------- def createOglShape(self, pList, glMode):
@@ -355,30 +392,14 @@ class Renderer(QtOpenGL.QGLWidget):
         import math
         return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
     
-    def normalised(self, v):
+    def __normalised(self, v):
         l = self.lenVector(v)
         if l == 0.0 :
             return [0.0, 0.0, 0.0]
         else :
             return [v[0] / l, v[1] / l, v[2] / l]       
                 
-    '''
-    get surface normal
-    '''
-    def calculateSurfaceNormal(self, polynom):
-        normal = [0.0, 0.0, 0.0]
-        for i in range (len(polynom)) :
-            cur = polynom[i]
-            nxt = polynom[(i+1) % len(polynom)]
-            
-            normal[0] = normal[0] + ( (cur[1] - nxt[1]) * (cur[2] + nxt[2])) 
-            normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
-            normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
-            
-        normal[0] = -normal[0]
-        normal[1] = -normal[1]
-        normal[2] = -normal[2]
-        return normal #self.normalised(normal)
+
 
     '''
     get vertex normal in p1
@@ -428,60 +449,26 @@ class Renderer(QtOpenGL.QGLWidget):
 
 
     def initLight(self):
-        
-        # mat_ambient  = [0.135, 0.2225, 0.1575, 1.0]
-        # mat_diffuse  = [0.54, 0.89, 0.63, 1.0]
-        # mat_specular = [0.316228, 0.316228, 0.316228, 1.0]
-        
-        mat_ambient  = [0.24725, 0.8995, 0.0745, 1.0]
-        mat_diffuse  = [0.75164, 0.60648, 0.22648, 1.0]
-        mat_specular = [0.628281, 0.555802, 0.366065, 1.0]
-        
-        light_position = [0.0, 0.0, 0.0, 1.0]        
-
-        GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, mat_ambient)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, mat_diffuse)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, mat_specular)
-        
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
-        
-        # GL.glLightf(GL.GL_LIGHT0, GL.GL_CONSTANT_ATTENUATION, 1.0)
-        # GL.glLightf(GL.GL_LIGHT0, GL.GL_LINEAR_ATTENUATION, 0.001)
-        # GL.glLightf(GL.GL_LIGHT0, GL.GL_QUADRATIC_ATTENUATION, 0.004)
-        
-        # The color of the sphere
-        #mat_materialColor = [0.2, 0.2, 1.0, 1.0]
-
-        mat_ambient  = [0.24725, 0.1995, 0.0745, 1.0]
-        mat_diffuse  = [0.75164, 0.60648, 0.22648, 1.0]
-        mat_specular = [0.628281, 0.555802, 0.366065, 1.0]
-
-        mat_shininess  = 0.4
-
         GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
-        GL.glColorMaterial(GL.GL_FRONT_AND_BACK,GL.GL_AMBIENT_AND_DIFFUSE)
-        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_AMBIENT, mat_ambient)
-        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_DIFFUSE, mat_diffuse)
-        GL.glMaterialfv(GL.GL_FRONT_AND_BACK, GL.GL_SPECULAR, mat_specular)
-        GL.glMaterialf(GL.GL_FRONT_AND_BACK, GL.GL_SHININESS, mat_shininess * 128)
+        ambientColor = [0.2, 0.2, 0.2, 1.0]
+        GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, ambientColor)
+        
+        lightColor0 = [0.75164, 0.60648, 0.22648, 1.0]
+        lightPos0   = [4.0, 0.0, 8.0, 1.0]
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, lightColor0)
+        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, lightPos0)
+ 
+        lightColor1 = [0.75164, 0.60648, 0.22648, 1.0]
+        lightPos1   = [-1.0, 0.5, 0.5, 0.0]
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, lightColor1)
+        GL.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, lightPos1)
+        GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
                     
     # =========================================================================================================
     # =========================================================================================================    
     # code selection
     # =========================================================================================================  
     # =========================================================================================================                
-    def isElementSelected(self, plist, point):
-        print point
-        cntSha = -1 ; cntSeg = -1
-        for shape in plist :
-            cntSha += 1
-            for seg in shape :
-                cntSeg += 1     
-                for i in range(0, len(seg), 4) :   
-                    if(utility.isPinRectangle([seg[i], seg[i+1], seg[i+2], seg[i+3]], point)) :
-                        return True , (cntSha, cntSeg) 
-        return False , (None, None)
-
 
     def __winPosTo3DPos(self, x, y):
         point = [None, None, None]                              # result point

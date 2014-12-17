@@ -16,8 +16,8 @@ class VehicleData():
         __start_time = time.time()
         
         self.tixi = Tixi()
-       # self.tixi.open('simpletest.cpacs.xml')
-        self.tixi.open('D150_CPACS2.0_valid.xml')
+        self.tixi.open('simpletest.cpacs.xml')
+       # self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -33,14 +33,20 @@ class VehicleData():
            
         self.pList_fuselage                    = self.createFuselage() 
         
-        utility.echo("Time after fuselage init : " + str(time.time() - __start_time))
+        utility.echo("Time after fuselage init : " + str(time.time() - __start_time) + ", compute: " + self.lenPlist(self.pList_fuselage) + " verts.")
         
         self.pList_wing_up, self.pList_wing_lo = self.createWing()
         
-        utility.echo("Time after wing one init : " + str(time.time() - __start_time))
+        print self.pList_wing_up
+        
+        print self.pList_wing_lo
+        
+        utility.echo("Time after wing one init : " + str(time.time() - __start_time) + ", compute: " + self.lenPlist(self.pList_wing_up) + " verts.")
         
         self.pList_wing_up_reflect, \
             self.pList_wing_lo_reflect         = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
+        
+        
         
         utility.echo("Time after wing two init : " + str(time.time() - __start_time))
         
@@ -63,10 +69,17 @@ class VehicleData():
     # =========================================================================================================  
     # =========================================================================================================
     
+    def lenPlist(self, plist):
+        res = 0
+        for shape in plist :
+            for seg in shape:
+                res += len(seg)
+        return str(res)
+    
     '''
     create quad point list of fuselage for opengl 
     '''
-    def createFuselage(self, point_cnt_eta = 1, point_cnt_zeta = 11):
+    def createFuselage(self, point_cnt_eta = 4, point_cnt_zeta = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta)        
         fuseList = []
@@ -86,15 +99,11 @@ class VehicleData():
             fuseList.append(segList)
         return fuseList
 
-    
-    def createNormals(self, plist, point_cnt_eta, point_cnt_zeta):
-        pass
-        
 
     '''
     create quad point list of wing upper and lower side for opengl 
     '''    
-    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 11):
+    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 4):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
                 
