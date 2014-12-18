@@ -320,3 +320,46 @@ if __name__ == '__main__':
     widget = Widget()
     widget.show()
     app.exec_()    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+        
+
+
+
+        # make program the default program to be ran. 
+        # We can do it now because we'll use a single in this example:
+            
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
