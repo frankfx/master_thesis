@@ -6,6 +6,16 @@ Created on Jul 29, 2014
 
 #vector3d.py
 
+
+
+
+
+
+
+
+
+
+
 import math
 
 class Vector3d:

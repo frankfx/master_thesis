@@ -24,9 +24,6 @@ except ImportError:
 
 class Renderer(QtOpenGL.QGLWidget):
 
-    glMode = {"GL_POINTS" : GL.GL_POINTS, "GL_LINES" : GL.GL_LINES, "GL_LINE_STRIP" : GL.GL_LINE_STRIP,\
-              "GL_LINE_LOOP" : GL.GL_LINE_LOOP , "GL_QUADS" : GL.GL_QUADS, "GL_QUAD_STRIP" : GL.GL_QUAD_STRIP}
-    
     def __init__(self, width, height):
         super(Renderer, self).__init__()
         
@@ -39,11 +36,8 @@ class Renderer(QtOpenGL.QGLWidget):
         self.zRot = 0
         self.xTrans = 0
         self.yTrans = 0  
-        self.aspect= max(self.data.configurationGetLength,self.data.wingspan) / 1.5
-        self.scale = self.aspect # self.data.configurationGetLength / 1.5 # helper for setZoom
-        
-        print self.data.configurationGetLength
-        print self.data.wingspan
+        self.aspect = max(self.data.configurationGetLength,self.data.wingspan) / 1.5
+        self.scale  = self.aspect # self.data.configurationGetLength / 1.5 # helper for setZoom
         
         self.viewwidth = 0.0
         self.viewheight = 0.0
@@ -116,35 +110,33 @@ class Renderer(QtOpenGL.QGLWidget):
 
     def initializeGL(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
-        #GL.glEnable(GL.GL_COLOR_MATERIAL)
-        #GL.glEnable(GL.GL_LIGHTING)
-        #GL.glEnable(GL.GL_LIGHT0)
+        GL.glEnable(GL.GL_COLOR_MATERIAL)
+        GL.glEnable(GL.GL_LIGHTING)
+        GL.glEnable(GL.GL_LIGHT0)
         #GL.glEnable(GL.GL_LIGHT1)
-        #GL.glEnable(GL.GL_NORMALIZE)
+        GL.glEnable(GL.GL_NORMALIZE)
         #GL.glShadeModel(GL.GL_SMOOTH)
         #GL.glShadeModel(GL.GL_FLAT)
         #self.initLight()
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)             
-        
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
         
         self.createOglLists()
         
     def resizeGL(self, w, h):       
-        side = min(w, h)
+        side = max(w, h)
         self.viewwidth = side
         self.viewheight = side
         
-        GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
+        #GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
+        GL.glViewport(0, 0, self.viewwidth, self.viewheight)
         self.__setProjection()        
         
     def __setProjection(self):
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
        
-#        GL.glOrtho(-1.0 * self.aspect * self.scale, +1.0 * self.aspect * self.scale,
- #                  +1.0* self.aspect * self.scale, -1.0* self.aspect * self.scale, -100.0, 100.0)
         GL.glOrtho(-self.aspect, self.aspect,
                    self.aspect, -self.aspect, -100.0, 100.0)
 
@@ -152,6 +144,8 @@ class Renderer(QtOpenGL.QGLWidget):
         self.alpha_rgb = value
 
     def paintGL(self):
+        #self.__printShowingFlags()
+        
         self.__setProjection()
         # Clear screen and Z-buffer
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
@@ -161,7 +155,6 @@ class Renderer(QtOpenGL.QGLWidget):
 
         # set to center and translate values
         GL.glTranslatef(self.xTrans, self.yTrans, -1.5)
-       # self.initLight()
         # GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
         GL.glRotated(self.xRot, 1.0, 0.0, 0.0)
         GL.glRotated(self.yRot, 0.0, 1.0, 0.0)
@@ -169,96 +162,30 @@ class Renderer(QtOpenGL.QGLWidget):
         # GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0)
         GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0) 
           
-       #  self.initLight()
-       # GL.glColor3f(1.0, 1.0, 1.0)
         self.drawAircraft()    
         if self.flag_show_grid:
-         #   GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
             self.drawGrid(self.data.configurationGetLength, -self.data.configurationGetLength)    
        
         GL.glFlush() 
 
-    def draw(self, plist, color, idx):
-        if self.flag_selection and self.selectedPoint is not None :
-            isElemSelected, (shaIdx, segIdx) = self.__isElementSelected(plist, self.selectedPoint)
-            if isElemSelected :
-                self.drawInSelectionMode(plist, color, shaIdx, segIdx)
-                
-        GL.glColor4fv(color)              
-        GL.glCallList(self.index + idx)     
-
-    def __isElementSelected(self, plist, point):
-        print point
-        cntSha = -1 ; cntSeg = -1
-        for shape in plist :
-            cntSha += 1
-            for seg in shape :
-                cntSeg += 1     
-                for i in range(0, len(seg), 4) :   
-                    if(utility.isPinRectangle([seg[i], seg[i+1], seg[i+2], seg[i+3]], point)) :
-                        return True , (cntSha, cntSeg) 
-        return False , (None, None)
-
-
-
-
-    def drawWing(self, plist, color, idx, reflect=1):
-        if self.flag_selection and self.selectedPoint is not None :
-            for wingIndex in (1, len(plist)+1):
-                segIdx = self.isWingSegmentSelected(wingIndex, self.selectedPoint, reflect) 
-                if segIdx != -1 :
-                    self.drawInSelectionMode(plist, color, wingIndex-1, segIdx-1) 
-                    return
-       # GL.glColor4fv(color)              
-        GL.glCallList(self.index + idx) 
-
-    def isWingSegmentSelected(self, wingIndex, point, reflect=1):
-        segIdx = -1
-        try:
-            segIdx, _, _, _ = self.data.tigl.wingGetSegmentEtaXsi(wingIndex, point[0], reflect*point[1], point[2])
-        except TiglException ,e :
-            print "selection failed : " , e.error
-        return segIdx
-
-    def drawInSelectionMode(self, plist, color, shapeIndex, segmentIndex):
-        GL.glColor4fv(color)
-        GL.glBegin(GL.GL_QUADS)
-        for shapeIdx in range(0,len(plist)) :
-            for segIdx in range(0, len(plist[shapeIdx])) :
-                for i in range(0, len(plist[shapeIdx][segIdx])) :
-                    if(shapeIdx == shapeIndex and segIdx == segmentIndex):
-                        self.drawSegment(plist[shapeIdx][segIdx], [1.0, 0.0, 0.0, self.alpha_rgb], color)
-                        break
-                    else:
-                        GL.glVertex3fv(plist[shapeIdx][segIdx][i])
-        GL.glEnd()
-        
-    def drawSegment(self, plist, color_new, color_old):
-        GL.glColor4fv(color_new)
-        for pIdx in range(0, len(plist), 1) :
-            GL.glVertex3fv(plist[pIdx])
-        GL.glColor4fv(color_old)
-
-    
-    
-       
-        
-    
+    '''
+    generic drawing function
+    '''
     def drawAircraft(self):
         if self.flag_show_fuselage :
-            self.draw(self.data.pList_fuselage, [0.0, 0.5, 0.8,self.alpha_rgb], 0)        
+            self.draw(self.data.pList_fuselage, self.data.pList_fuselage_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 0)        
         
         if self.flag_show_wing1_up :  
-            self.drawWing(self.data.pList_wing_up, [0.0, 0.5, 0.8,self.alpha_rgb], 1)
+            self.drawWing(self.data.pList_wing_up, self.data.pList_wing_up_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 1)
             
         if self.flag_show_wing1_lo :
-            self.drawWing(self.data.pList_wing_lo, [0.0, 0.5, 0.8,self.alpha_rgb], 2)
+            self.drawWing(self.data.pList_wing_lo, self.data.pList_wing_lo_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 2)
         
         if self.flag_show_wing2_up :
-            self.drawWing(self.data.pList_wing_up_reflect, [0.24725, 0.9995, 0.0745,self.alpha_rgb], 3, -1)
+            self.drawWing(self.data.pList_wing_up_reflect, self.data.pList_wing_up_reflect_normals, [0.75164, 0.60648, 0.22648,self.alpha_rgb], 3, -1)
             
         if self.flag_show_wing2_lo :
-            self.drawWing(self.data.pList_wing_lo_reflect, [0.24725, 0.1995, 0.0745,self.alpha_rgb], 4, -1)
+            self.drawWing(self.data.pList_wing_lo_reflect, self.data.pList_wing_lo_reflect_normals, [0.75164, 0.60648, 0.22648,self.alpha_rgb], 4, -1)
         
         if self.flag_show_compnt :
             GL.glColor3fv([1.0, 0.0, 0.0])
@@ -275,52 +202,176 @@ class Renderer(QtOpenGL.QGLWidget):
         
         if self.flag_show_spars :
             GL.glCallList(self.index+9)
-          
+
+    '''
+    drawing function for the fuselage. 
+    If fuselage segment was selected, a special function will be activated otherwise the ogl list will be drawn
+    @param plist: fuselage point list
+    @param color: vertex color
+    @param idx: index of precompiled ogl list
+    '''
+    def draw(self, plist, normals, color, idx):
+        if self.flag_selection and self.selectedPoint is not None :
+            isElemSelected, (shaIdx, segIdx) = True, (0,15)# self.__isElementSelected(plist, self.selectedPoint)
+            if isElemSelected :
+                print "Element is selected"
+                self.drawInSelectionMode(plist, normals, color, shaIdx, segIdx)
+                
+        GL.glColor4fv(color)              
+        GL.glCallList(self.index + idx)     
+
+    '''
+    checks if fuslage segment was selected
+    @param plist: fuselage point list
+    @param point: selected point
+    '''
+    def __isElementSelected(self, plist, point):
+        print "selected point : " , point
+        shaIdx = -1
+        for shape in plist :
+            shaIdx += 1
+            segCnt = len(shape)
+            for segIdx in range(segCnt) :
+                stripeCnt = len(shape[segIdx])
+                for stripeIdx in range(len(shape[segIdx])) :
+                    stripe1 = shape[segIdx][stripeIdx]
+                    (se , st) = (segIdx , stripeIdx+1) if stripeIdx +1 < stripeCnt else (segIdx+1 , 0)
+                    if se >= segCnt : break
+                    stripe2 = shape[se][st]
+                    for i in range(0, len(shape[segIdx][stripeIdx])-1) :   
+                        if(utility.isPinRectangle([stripe1[i], 
+                                                   stripe2[i], 
+                                                   stripe2[i+1], 
+                                                   stripe1[i+1]], point)) :
+                            return True , (shaIdx, segIdx) 
+        return False , (None, None)
+
+    '''
+    drawing function for the wings
+    @param plist: wing point list
+    @param color: vertex color
+    @param idx: index of precompiled ogl list
+    @param reflect: 1 for not reflected, -1 for reflected
+    '''
+    def drawWing(self, plist,normals, color, idx, reflect=1):
+        if self.flag_selection and self.selectedPoint is not None :
+            for wingIndex in (1, len(plist)+1):
+                segIdx = self.isWingSegmentSelected(wingIndex, self.selectedPoint, reflect) 
+                if segIdx != -1 :
+                    self.drawInSelectionMode(plist, normals, color, wingIndex-1, segIdx-1) 
+                    return
+        GL.glColor4fv(color)              
+        GL.glCallList(self.index + idx) 
+
+    '''
+    checks if wing segment was selected
+    @param wingIdx: index of a wing
+    @param point: selected point
+    @param reflect: 1 for not reflected, -1 for reflected
+    '''
+    def isWingSegmentSelected(self, wingIdx, point, reflect=1):
+        segIdx = -1
+        try:
+            segIdx, _, _, _ = self.data.tigl.wingGetSegmentEtaXsi(wingIdx, point[0], reflect*point[1], point[2])
+        except TiglException ,e :
+            print "selection failed : " , e.error
+        return segIdx
+
+    '''
+    drawing function if selection was activated
+    @param plist: given point list
+    @param color: vertex color
+    @param shapeIndex: index of the shape which should be drawn
+    @param segmentIndex: index of the segment which should be drawn
+    '''
+    def drawInSelectionMode(self, plist, normals, color, shapeIndex, segmentIndex):
+        GL.glColor4fv(color)
+        GL.glBegin(GL.GL_QUADS)
+        for shapeIdx in range(len(plist)) :
+            for segIdx in range(len(plist[shapeIdx])) :
+                if(shapeIdx == shapeIndex and segIdx == segmentIndex):
+                    self.__drawSegment(plist[shapeIdx][segIdx], normals[shapeIdx][segIdx], [1.0, 0.0, 0.0, self.alpha_rgb], color)
+                else:
+                    self.__drawSegment(plist[shapeIdx][segIdx], normals[shapeIdx][segIdx],color, color)
+        GL.glEnd()
+        
+    '''
+    special segment drawing function
+    @param plist: given point list
+    @param color_new: selection of color for the selected segment
+    @param color_old: default shape color
+    '''        
+    def __drawSegment(self, plist, normals, color_new, color_old):
+        GL.glColor4fv(color_new)
+        for stripeIdx in range(len(plist)-1) :
+            stripe1 = plist[stripeIdx]
+            stripe2 = plist[stripeIdx+1]
+            for i in range(len(stripe1)-1) :
+                GL.glNormal3fv(normals[stripeIdx][i])
+                GL.glVertex3fv(stripe1[i])
+                
+                GL.glNormal3fv(normals[stripeIdx+1][i])
+                GL.glVertex3fv(stripe2[i])
+                
+                GL.glNormal3fv(normals[stripeIdx+1][i+1])
+                GL.glVertex3fv(stripe2[i+1])
+                
+                GL.glNormal3fv(normals[stripeIdx][i+1])
+                GL.glVertex3fv(stripe1[i+1])
+        GL.glColor4fv(color_old)
+
+    '''
+    precompile all point lists
+    '''               
     def createOglLists(self): 
         self.index = GL.glGenLists(10)
         
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
-        self.createOglShape(self.data.pList_fuselage, Renderer.glMode["GL_QUADS"],[0.0, 0.5, 0.8],1)
+        self.createOglShape(self.data.pList_fuselage, self.data.pList_fuselage_normals,[0.0, 0.5, 0.8])
         GL.glEndList()
 
         GL.glNewList(self.index+1, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_up, Renderer.glMode["GL_QUADS"],[0.0, 0.5, 0.8],1)
-        GL.glEndList() 
+        self.createOglShape(self.data.pList_wing_up, self.data.pList_wing_up_normals,[0.0, 0.5, 0.8])
+        GL.glEndList()
 
         GL.glNewList(self.index+2, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_lo, Renderer.glMode["GL_QUADS"],[0.0, 0.5, 0.8],1)
+        self.createOglShape(self.data.pList_wing_lo, self.data.pList_wing_lo_normals,[0.0, 0.5, 0.8])
         GL.glEndList()
- 
+
         # draw reflect upper wing
         GL.glNewList(self.index+3, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_up_reflect, Renderer.glMode["GL_QUADS"],[0.0, 0.5, 0.8],1)
+        self.createOglShape(self.data.pList_wing_up_reflect, self.data.pList_wing_up_reflect_normals,[0.0, 0.5, 0.8])
         GL.glEndList()
 
         GL.glNewList(self.index+4, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_wing_lo_reflect, Renderer.glMode["GL_QUADS"],[0.0, 0.5, 0.8],1)
+        self.createOglShape(self.data.pList_wing_lo_reflect, self.data.pList_wing_lo_reflect_normals,[0.0, 0.5, 0.8])
         GL.glEndList()
 
         GL.glNewList(self.index+5, GL.GL_COMPILE)
-        self.createOglShape(self.data.pList_component_segment, Renderer.glMode["GL_LINES"],[0.0, 1.0, 0.0])
+        self.createOglComponentSegment(self.data.pList_component_segment,[0.0, 1.0, 0.0])
         GL.glEndList()
 
         GL.glNewList(self.index+6, GL.GL_COMPILE)
-        self.createOglFlaps(self.data.pList_flaps_TEDevice)
+        self.createOglFlaps(self.data.pList_flaps_TEDevice, 0.04)
         GL.glEndList()
- 
+
         GL.glNewList(self.index+7, GL.GL_COMPILE)
-        self.createOglFlaps(self.data.pList_flaps_LEDevice)
+        self.createOglFlaps(self.data.pList_flaps_LEDevice, 0.06)
         GL.glEndList()
 
         GL.glNewList(self.index+8, GL.GL_COMPILE)
-        self.createOglFlaps(self.data.pList_flaps_Spoiler)
+        self.createOglFlaps(self.data.pList_flaps_Spoiler, 0.08)
         GL.glEndList()
 
         GL.glNewList(self.index+9, GL.GL_COMPILE)
         self.createOglSpars(self.data.pList_spares)
         GL.glEndList()
 
-
+    '''
+    draw grid
+    @param start: right/up delimiter
+    @param end: left/bottom delimiter
+    '''        
     def drawGrid(self, start = 2, end = -2):
         # Draw a grid "floor".
         GL.glColor3f(1.0, 0.0, 1.0);
@@ -335,112 +386,88 @@ class Renderer(QtOpenGL.QGLWidget):
 
 
     '''
-    @param face_value: side of normal {1 or -1}
+    creates component segment ogl list
+    @param plist: given point list
+    @param color: vertex color
     '''
-    def createOglShape(self, pList, glMode, color, face_value=1.0):
-        surfaceNormals = self.calculateSurfaceNormals(pList)
-        j = 0
-        GL.glBegin(glMode)
-        for shape in pList :
-            for seg in shape :
-                for i in range(0, len(seg)) :
-                    if i % 4 == 0 :
-                        GL.glNormal3fv(surfaceNormals[j])
-                        j += 1
-                    GL.glVertex3fv(seg[i])
+    def createOglComponentSegment(self, plist, color):
+        GL.glBegin(GL.GL_LINES)
+        for sha in plist :
+            for seg in sha :
+                for stripe in seg :
+                    for p in stripe :
+                        GL.glVertex3fv(p)
         GL.glEnd()
     
     
-    def calculateSurfaceNormals(self, plist):
-        tmp = []
-        for shape in plist:
-            for seg in shape:
-                for i in range (0, len(seg), 4) :
-                    tmp.append(self.__calculateSurfaceNormal([seg[i], seg[i+1], seg[i+2], seg[i+3]]))
-        return tmp
-    
-    def __calculateSurfaceNormal(self, polynom):
-        normal = [0.0, 0.0, 0.0]
-        for i in range (len(polynom)) :
-            cur = polynom[i]
-            nxt = polynom[(i+1) % len(polynom)]
-            
-            normal[0] = normal[0] + ( (cur[1] - nxt[1]) * (cur[2] + nxt[2])) 
-            normal[1] = normal[1] + ( (cur[2] - nxt[2]) * (cur[0] + nxt[0])) 
-            normal[2] = normal[2] + ( (cur[0] - nxt[0]) * (cur[1] + nxt[1])) 
-            
-        normal[0] = -normal[0] 
-        normal[1] = -normal[1] 
-        normal[2] = -normal[2] 
-            
-        return normal 
-    
-    
-    
-       
-#------------------------------------------------------------------------------ 
-    #---------------------------------- def createOglShape(self, pList, glMode):
-        #---------------------------------------------------- GL.glBegin(glMode)
-        #-------------------------------------------------- for shape in pList :
-            #------------------------------------------------ for seg in shape :
-                #------------------------------------------------ for p in seg :
-                    #--------- GL.glNormal3fv(self.calculateSurfaceNormal(quad))
-                    #--------------------------- GL.glVertex3f(p[0], p[1], p[2])
-        #------------------------------------------------------------ GL.glEnd()
-       
-    def lenVector(self, v):
-        import math
-        return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
-    
-    def __normalised(self, v):
-        l = self.lenVector(v)
-        if l == 0.0 :
-            return [0.0, 0.0, 0.0]
-        else :
-            return [v[0] / l, v[1] / l, v[2] / l]       
-                
+    '''
+    creates shape ogl list
+    @param plist: given point list
+    @param plist_normals: per vertex normals
+    @param color: vertex color
+    '''
+    def createOglShape(self, pList, plist_normals, color):
+        GL.glBegin(GL.GL_QUADS)
+        for shaIdx in range(0, len(pList)) :
+            segCnt = len(pList[shaIdx])
+            for segIdx in range(segCnt) :
+                stripeCnt = len(pList[shaIdx][segIdx])
+                for stripeIdx in range(0, len(pList[shaIdx][segIdx])) :
+                    
+                    (tmp_seg , tmp_stripe) = (segIdx , stripeIdx+1) if stripeIdx +1 < stripeCnt else (segIdx+1 , 0)
+                    if tmp_seg >= segCnt : break
+                    for i in range(0, len(pList[shaIdx][segIdx][stripeIdx])-1) :
+                        j = (i+1)
+                        p1 = pList[shaIdx][segIdx][stripeIdx][i]
+                        p2 = pList[shaIdx][tmp_seg][tmp_stripe][i]
+                        p3 = pList[shaIdx][tmp_seg][tmp_stripe][j] 
+                        p4 = pList[shaIdx][segIdx][stripeIdx][j]
 
+                        n1 = plist_normals[shaIdx][segIdx][stripeIdx][i]
+                        n2 = plist_normals[shaIdx][tmp_seg][tmp_stripe][i]
+                        n3 = plist_normals[shaIdx][tmp_seg][tmp_stripe][j] 
+                        n4 = plist_normals[shaIdx][segIdx][stripeIdx][j]                        
+                        
+                        GL.glNormal3fv(n1)
+                        GL.glVertex3fv(p1)
+
+                        GL.glNormal3fv(n2)
+                        GL.glVertex3fv(p2)
+                        
+                        GL.glNormal3fv(n3)
+                        GL.glVertex3fv(p3)
+                        
+                        GL.glNormal3fv(n4)
+                        GL.glVertex3fv(p4)
+        GL.glEnd()
+    
 
     '''
-    get vertex normal in p1
+    creates flaps ogl list
+    @param plist: given point list
+    @param offset: offset to prevent z-fighting
     '''
-    def calculateVertexNormal(self, p1, p2, p3, face_value):
-        vec1 = [p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]]
-        vec2 = [p3[0] - p1[0], p3[1] - p1[1], p3[2] - p1[2]]
-        #vec1 = [p1[0] - p2[0], p1[1] - p2[1], p1[2] - p2[2]]
-        #vec2 = [p1[0] - p3[0], p1[1] - p3[1], p1[2] - p3[2]]
-               
-               
-        return self.__crossproduct(vec1, vec2, face_value)  #self.normalised(self.__crossproduct(vec1, vec2))
-
-    
-    def __crossproduct(self, vec1, vec2, face_value):
-        x = face_value * (vec1[1] * vec2[2] - vec1[2] * vec2[1]) 
-        y = face_value * (vec1[2] * vec2[0] - vec1[0] * vec2[2]) 
-        z = face_value * (vec1[0] * vec2[1] - vec1[1] * vec2[0])
-        
-        return [x, y, z]         
-
-
-
-
-    def createOglFlaps(self, pList):
+    def createOglFlaps(self, pList, offset):
         GL.glBegin(GL.GL_QUADS)
         for shape in pList :
             for segments in shape :
                 for flaps in segments :
                     color = self.newColorVec()
                     GL.glColor3fv(color)
-                    GL.glVertex3fv(flaps[0])
-                    GL.glVertex3fv(flaps[1])
-                    GL.glVertex3fv(flaps[3])
-                    GL.glVertex3fv(flaps[2])
+                    GL.glVertex3f(flaps[0][0], flaps[0][1], flaps[0][2] + offset)
+                    GL.glVertex3f(flaps[1][0], flaps[1][1], flaps[1][2] + offset)
+                    GL.glVertex3f(flaps[3][0], flaps[3][1], flaps[3][2] + offset)
+                    GL.glVertex3f(flaps[2][0], flaps[2][1], flaps[2][2] + offset)
         GL.glEnd()
-        
+
+    '''
+    creates spars ogl list
+    @param plist: given point list
+    '''        
     def createOglSpars(self, pList):
-        for shape in pList :
-            for segments in shape :
-                for spares in segments :  
+        for sha in pList :
+            for seg in sha :
+                for spares in seg :  
                     GL.glColor3fv(self.newColorVec())      
                     GL.glBegin(GL.GL_LINE_STRIP)       
                     for vert in spares :
@@ -484,10 +511,6 @@ class Renderer(QtOpenGL.QGLWidget):
         # z should not be 0!!!
         # error when projection matrix not identity (gluPerspective) 
         point[0], point[1], point[2] = GLU.gluUnProject(x, y_new, z, modelview, projection, viewport)                         
-        
-        #point[0] = round(point[0],2)
-        #point[1] = round(point[1],2)
-        #point[2] = round(point[2],2)
         
         return point
 
@@ -538,6 +561,14 @@ class Renderer(QtOpenGL.QGLWidget):
             
         return color        
                 
+    # debug         
+    def __printShowingFlags(self):
+        print "fuselage" , self.flag_show_fuselage
+        print "wing1up" , self.flag_show_wing1_up
+        print "wing1lo" , self.flag_show_wing1_lo
+        print "wing2up" , self.flag_show_wing2_up
+        print "wing2lo" , self.flag_show_wing2_lo
+
                 
 class Widget(QtGui.QWidget):
     def __init__(self, parent = None):

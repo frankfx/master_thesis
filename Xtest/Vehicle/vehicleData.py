@@ -9,59 +9,63 @@ from tiglwrapper   import Tigl, TiglException
 from tixiwrapper   import Tixi
 from Xtest.Open_GL import utility
 import time
+import numpy as np
+import math
+from numpy import shape
 
 class VehicleData():
     def __init__(self):
         
         __start_time = time.time()
         
+        self.__initTixiTigl()
+           
+        utility.echo("Time after init tigl, tixi: " + str(time.time() - __start_time)) 
+        self.pList_fuselage         = self.__createFuselage() 
+        self.pList_fuselage_normals = self.createNormalList(self.pList_fuselage, True)
+        utility.echo("Time after init fuselage: " + str(time.time() - __start_time) + ", compute: " + self.__lenPlist(self.pList_fuselage) + " verts.")
+
+        #self.__printPlist(self.pList_fuselage)
+        #sys.exit()
+
+        
+        self.pList_wing_up, self.pList_wing_lo = self.__createWings()
+        self.pList_wing_up_normals             = self.createNormalList(self.pList_wing_up, False)
+        self.pList_wing_lo_normals             = self.createNormalList(self.pList_wing_lo, True)
+        utility.echo("Time after wing one init : " + str(time.time() - __start_time) + ", compute: " + self.__lenPlist(self.pList_wing_up) + " verts.")
+
+
+        self.pList_wing_up_reflect, self.pList_wing_lo_reflect = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
+        self.pList_wing_up_reflect_normals                     = self.createNormalList(self.pList_wing_up_reflect, True)
+        self.pList_wing_lo_reflect_normals                     = self.createNormalList(self.pList_wing_lo_reflect, False)
+        utility.echo("Time after init wing two : " + str(time.time() - __start_time))
+
+
+        self.pList_component_segment           = self.__createComponent()
+        utility.echo("Time after component init : " + str(time.time() - __start_time))
+        self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
+        self.pList_flaps_LEDevice              = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
+        self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
+#       self.plist_ribs                        = self.createRibs()
+        self.pList_spares                      = self.createSpars()
+
+        
+        utility.echo("End data tigl calculation  -  Time: " + str(time.time() - __start_time))
+    
+    
+    def __initTixiTigl(self):
         self.tixi = Tixi()
         self.tixi.open('simpletest.cpacs.xml')
-       # self.tixi.open('D150_CPACS2.0_valid.xml')
+        #self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
             self.tigl.open(self.tixi,"")
         except TiglException as err:    
             print 'Error opening tigl document: ', err.__str__()
-           
+
         self.configurationGetLength = self.tigl.configurationGetLength() # 2.05436735655 ; D150 = 37.5708073949
-        self.wingspan               = 0.0           
-         
-         
-        utility.echo("Time after tigl, tixi init: " + str(time.time() - __start_time)) 
-           
-        self.pList_fuselage                    = self.createFuselage() 
-        
-        utility.echo("Time after fuselage init : " + str(time.time() - __start_time) + ", compute: " + self.lenPlist(self.pList_fuselage) + " verts.")
-        
-        self.pList_wing_up, self.pList_wing_lo = self.createWing()
-        
-        print self.pList_wing_up
-        
-        print self.pList_wing_lo
-        
-        utility.echo("Time after wing one init : " + str(time.time() - __start_time) + ", compute: " + self.lenPlist(self.pList_wing_up) + " verts.")
-        
-        self.pList_wing_up_reflect, \
-            self.pList_wing_lo_reflect         = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
-        
-        
-        
-        utility.echo("Time after wing two init : " + str(time.time() - __start_time))
-        
-        self.pList_component_segment           = self.createComponent()
-
-        utility.echo("Time after component init : " + str(time.time() - __start_time))
-
-        
-        self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
-        self.pList_flaps_LEDevice              = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
-        self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
-        self.plist_ribs                        = self.createRibs()
-        self.pList_spares                      = self.createSpars()
-        
-        utility.echo("End data tigl calculation  -  Time: " + str(time.time() - __start_time))
+        self.wingspan               = 0.0
         
     # =========================================================================================================
     # =========================================================================================================    
@@ -69,117 +73,162 @@ class VehicleData():
     # =========================================================================================================  
     # =========================================================================================================
     
-    def lenPlist(self, plist):
+    '''
+    returns the point count of a given point list 
+    @param plist: point list
+    '''    
+    def __lenPlist(self, plist):
         res = 0
         for shape in plist :
             for seg in shape:
-                res += len(seg)
+                for stripe in seg :
+                    res += len(stripe)
         return str(res)
+        
+    def __printPlist(self, plist):
+        for shape in plist :
+            print "new shape"
+            for seg in shape :
+                print "new seg"
+                for stripe in seg:
+                    print stripe    
     
     '''
-    create quad point list of fuselage for opengl 
+    create fuselage point List
+    @param pnt_cnt_eta: stripe count
+    @param pnt_cnt_zeta: point count per stripe
     '''
-    def createFuselage(self, point_cnt_eta = 4, point_cnt_zeta = 10):
-        eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
-        zeta_List = utility.createXcoordsLinear(1.0, point_cnt_zeta)        
-        fuseList = []
+    def __createFuselage(self, pnt_cnt_eta = 1, pnt_cnt_zeta = 50):
+        eta_List  = utility.createXcoordsLinear(1.0, pnt_cnt_eta)
+        zeta_List = utility.createXcoordsLinear(1.0, pnt_cnt_zeta)        
 
+        #zeta_List = zeta_List[:len(zeta_List)-1]
+        zeta_List.pop()
+        print zeta_List
+        
+        #sys.exit()
+
+        fuseList = []
         for fuseIdx in range(1, self.tigl.getFuselageCount()+1) :
             segList = []
             for segIdx in range(1, self.tigl.fuselageGetSegmentCount(fuseIdx)+1) :
-                plist = []
-                for etaIdx in range(0, len(eta_List)-1,1) :
-                    for zetaIdx in range(0, len(zeta_List)-1,1) :
-                        x1, y1, z1 = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta_List[etaIdx], zeta_List[zetaIdx])
-                        x2, y2, z2 = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta_List[etaIdx], zeta_List[zetaIdx+1])
-                        x3, y3, z3 = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta_List[etaIdx+1], zeta_List[zetaIdx+1])
-                        x4, y4, z4 = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta_List[etaIdx+1], zeta_List[zetaIdx])
-                        plist.append([x1,y1,z1]) ; plist.append([x2,y2,z2]) ; plist.append([x3,y3,z3]) ; plist.append([x4,y4,z4])
-                segList.append(plist)
+                stripeList = []
+                for eta in eta_List :
+                    stripe = []
+                    for zeta in zeta_List :
+                        x, y, z = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta, zeta)
+                        stripe.append([x,y,z])
+                    stripeList.append(stripe)
+                segList.append(stripeList)
             fuseList.append(segList)
         return fuseList
 
-
+    
     '''
-    create quad point list of wing upper and lower side for opengl 
+    create wing point List
+    @param pnt_cnt_eta: stripe count
+    @param pnt_cnt_xsi: point count per stripe    
     '''    
-    def createWing(self, point_cnt_eta = 1, point_cnt_xsi = 4):
+    def __createWings(self, point_cnt_eta = 1, point_cnt_xsi = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
                 
         wingList_up = []            
         wingList_lo = []            
-        
         for wingIdx in range(1, self.tigl.getWingCount()+1) :
-       
-            cur_wingspan = self.tigl.wingGetSpan(self.tigl.wingGetUID(wingIdx))
-            self.wingspan = cur_wingspan if cur_wingspan > self.wingspan else self.wingspan 
-            segList_lo = [] ; segList_up = []
+            self.__setMaxWingSpan(wingIdx)
+            segList_lo = [] 
+            segList_up = []
             for segIdx in range(1, self.tigl.wingGetSegmentCount(wingIdx)+1) :
-                plist_lo = [] ; plist_up = []
-                for etaIdx in range(0, len(eta_List)-1, 1) :
-                    for xsiIdx in range(0, len(xsi_List)-1, 1) :
-                        xu1, yu1, zu1 = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta_List[etaIdx], xsi_List[xsiIdx])
-                        xu2, yu2, zu2 = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta_List[etaIdx], xsi_List[xsiIdx+1])
-                        xu3, yu3, zu3 = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta_List[etaIdx+1], xsi_List[xsiIdx+1])
-                        xu4, yu4, zu4 = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta_List[etaIdx+1], xsi_List[xsiIdx])
-                        
-                        xl1, yl1, zl1 = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta_List[etaIdx], xsi_List[xsiIdx])
-                        xl2, yl2, zl2 = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta_List[etaIdx], xsi_List[xsiIdx+1])
-                        xl3, yl3, zl3 = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta_List[etaIdx+1], xsi_List[xsiIdx+1])
-                        xl4, yl4, zl4 = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta_List[etaIdx+1], xsi_List[xsiIdx])
-                        
-                        plist_up.append([xu1, yu1, zu1]) ; plist_up.append([xu2, yu2, zu2])
-                        plist_up.append([xu3, yu3, zu3]) ; plist_up.append([xu4, yu4, zu4])
-                        
-                        plist_lo.append([xl1, yl1, zl1]) ; plist_lo.append([xl2, yl2, zl2])
-                        plist_lo.append([xl3, yl3, zl3]) ; plist_lo.append([xl4, yl4, zl4])
-                segList_lo.append(plist_lo) ; segList_up.append(plist_up)
-            wingList_lo.append(segList_lo) ; wingList_up.append(segList_up)
+                stripeList_lo = [] 
+                stripeList_up = []
+                for eta in eta_List :
+                    stripe_lo = []
+                    stripe_up = []
+                    for xsi in xsi_List :
+                        x_l, y_l, z_l = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta, xsi)
+                        x_u, y_u, z_u = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta, xsi)
+                        stripe_lo.append([x_l, y_l, z_l])
+                        stripe_up.append([x_u, y_u, z_u])
+                    stripeList_lo.append(stripe_lo)    
+                    stripeList_up.append(stripe_up)    
+                segList_lo.append(stripeList_lo) 
+                segList_up.append(stripeList_up)
+            wingList_lo.append(segList_lo)
+            wingList_up.append(segList_up)
         return wingList_up , wingList_lo
 
     '''
-    create quad point list of component segment for opengl 
+    reflect wing point list
+    @param list1: upper wing point list
+    @param list2: lower wing point list    
+    ''' 
+    def __reflectWing(self, list1, list2):
+        wingList_up = []
+        wingList_lo = []  
+        for wingIdx in range(0, len(list1)):
+            segList_up = []
+            segList_lo = []
+            for segIdx in range(0, len(list1[wingIdx])) :
+                stripeList_lo = []
+                stripeList_up = []                
+                for stripeIdx in range(0, len(list1[wingIdx][segIdx])) :
+                    stripe_lo = []
+                    stripe_up = []                
+                    for i in range(0, len(list1[wingIdx][segIdx][stripeIdx])):
+                        tmp = list1[wingIdx][segIdx][stripeIdx][i]
+                        stripe_up.append([tmp[0], -1*tmp[1], tmp[2]])
+                        tmp = list2[wingIdx][segIdx][stripeIdx][i]
+                        stripe_lo.append([tmp[0], -1*tmp[1], tmp[2]])
+                    stripeList_lo.append(stripe_lo)
+                    stripeList_up.append(stripe_up)
+                segList_up.append(stripeList_up)
+                segList_lo.append(stripeList_lo)
+            wingList_up.append(segList_up)
+            wingList_lo.append(segList_lo)
+        return wingList_up, wingList_lo
+
+
     '''
-    def createComponent(self, point_cnt_eta = 5, point_cnt_xsi = 11):
+    sets the wing span
+    @param wingIdx: index of one wing   
+    ''' 
+    def __setMaxWingSpan(self, wingIdx):
+        cur_wingspan = self.tigl.wingGetSpan(self.tigl.wingGetUID(wingIdx))
+        max_wingspan = cur_wingspan if cur_wingspan > self.wingspan else self.wingspan
+        self.wingspan =  max_wingspan
+
+    '''
+    create component segment point List
+    @param pnt_cnt_eta: stripe count
+    @param pnt_cnt_xsi: point count per stripe    
+    '''
+    def __createComponent(self, point_cnt_eta = 10, point_cnt_xsi = 11):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsLinear(1.0, point_cnt_xsi) 
              
         wingList = []   
-                    
         for wingIdx in range(1, self.tigl.getWingCount()+1) :
             segList = []
             for compSegIdx in range(1, self.tigl.wingGetComponentSegmentCount(wingIdx)+1) : 
-                plist = []
+                stripeList = []
                 compSegUID = self.tigl.wingGetComponentSegmentUID(wingIdx, compSegIdx)
-                for etaIdx in range(0, len(eta_List)-1,1) :
-                    for xsiIdx in range(0, len(xsi_List)-1, 1) :
-                        x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta_List[etaIdx], xsi_List[xsiIdx])
-                        x2, y2, z2 = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta_List[etaIdx], xsi_List[xsiIdx+1])
-                        x3, y3, z3 = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta_List[etaIdx+1], xsi_List[xsiIdx+1])
-                        x4, y4, z4 = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta_List[etaIdx+1], xsi_List[xsiIdx])
-                        plist.append([x1,y1,z1]) ; plist.append([x2,y2,z2]) ; plist.append([x3,y3,z3]) ; plist.append([x4,y4,z4])
-                segList.append(plist)
+                for eta in eta_List :
+                    stripe = []
+                    for xsi in xsi_List :
+                        x, y, z = self.tigl.wingComponentSegmentGetPoint(compSegUID, eta, xsi)
+                        stripe.append([x, y, z])
+                    stripeList.append(stripe)
+                segList.append(stripeList)
             wingList.append(segList)
         return wingList
+     
         
-    def __reflectWing(self, list1, list2):
-        wingList_up = [] ; wingList_lo = []  
-        for wingIdx in range(0, len(list1),1):
-            segList_up = [] ; segList_lo = []
-            for segIdx in range(0, len(list1[wingIdx]), 1) :
-                plist_up = [] ; plist_lo = []
-                for i in range(0, len(list1[wingIdx][segIdx]), 1):
-                    tmp = list1[wingIdx][segIdx][i]
-                    plist_up.append([tmp[0], -1*tmp[1], tmp[2]])
-                    tmp = list2[wingIdx][segIdx][i]
-                    plist_lo.append([tmp[0], -1*tmp[1], tmp[2]])
-                segList_up.append(plist_up)
-                segList_lo.append(plist_lo)
-            wingList_up.append(segList_up)
-            wingList_lo.append(segList_lo)
-        return wingList_up, wingList_lo
-        
+    '''
+    create spar point List
+    @param pnt_cnt_eta: stripe count
+    @param pnt_cnt_xsi: point count per stripe    
+    '''
     def createSpars(self):
         plistWing = []
         for wingIndex in range(1, self.tigl.getWingCount()+1) :
@@ -211,10 +260,10 @@ class VehicleData():
         sparSegmentList = []
         for sparSegmentIdx in range(1, self.tixi.getNumberOfChilds(path_sparSegments)+1) :
             path = path_sparSegments + 'sparSegment[' + str(sparSegmentIdx) + ']/sparPositionUIDs/' 
-            sparPositionUIDsList = []
+            sparPositionUIDs = []
             for sparPositionUIDIdx in range(1, self.tixi.getNumberOfChilds(path)+1) :
-                sparPositionUIDsList.append(self.tixi.getTextElement(path + 'sparPositionUID[' + str(sparPositionUIDIdx) + ']'))
-            sparSegmentList.append(sparPositionUIDsList)
+                sparPositionUIDs.append(self.tixi.getTextElement(path + 'sparPositionUID[' + str(sparPositionUIDIdx) + ']'))
+            sparSegmentList.append(sparPositionUIDs)
         
         sparList = []
         for sparSegment in sparSegmentList :
@@ -228,14 +277,26 @@ class VehicleData():
             
         return sparList
 
+    def __getSparPositionUIDs(self, wingIndex, compSegmentIndex):
+        path_sparSegments = '/cpacs/vehicles/aircraft/model/wings/wing['\
+                                +str(wingIndex)+']/componentSegments/componentSegment['\
+                                +str(compSegmentIndex)+']/structure/spars/sparSegments/'
+        
+        path = path_sparSegments + 'sparSegment/@uID' 
+
+        uidList = []
+        for sparSegmentIdx in range(1, self.tixi.getNumberOfChilds(path_sparSegments)+1) :
+            uidList.append(self.tixi.xPathExpressionGetTextByIndex(path, sparSegmentIdx))
+        return uidList
+    
     
     '''
     @param flapType: (parent, child)-String-Tuple of flap types, eg. ("trailingEdgeDevices","trailingEdgeDevice")
     '''
-    def createFlaps(self, flapType, point_cnt_eta = 10, point_cnt_xsi = 10):    
-        plistWing = []
+    def createFlaps(self, flapType):    
         (flapParent, _) = flapType
-        
+
+        plistWing = []        
         for wingIndex in range(1, self.tigl.getWingCount()+1) :
             plistSeg = []
             for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) : 
@@ -250,34 +311,36 @@ class VehicleData():
                 except:
                     print "no " + str(flapType) + " for wing " + str(wingIndex) + " found." ; break
 
-                componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
                 plistFlaps = []
+                componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
+                
                 for flap in flapList : 
 
-                    wingUi1, segUid1, eta1, xsi1 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[0], flap[2])       
-                    wingUi2, segUid2, eta2, xsi2 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[1], flap[3]) 
-                    wingUi3, segUid3, eta3, xsi3 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[4], flap[6]) 
-                    wingUi4, segUid4, eta4, xsi4 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[5], flap[7]) 
+                    _, segUid1, eta1, xsi1 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[0], flap[2])       
+                    _, segUid2, eta2, xsi2 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[1], flap[3]) 
+                    _, segUid3, eta3, xsi3 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[4], flap[6]) 
+                    _, segUid4, eta4, xsi4 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[5], flap[7]) 
                     
-                    #print self.tigl.wingGetIndex(wingUi1), self.tigl.wingGetSegmentIndex(segUid1), eta1, xsi1
                     (segIdx1, wingidx1) = self.tigl.wingGetSegmentIndex(segUid1)
                     (segIdx2, wingidx2) = self.tigl.wingGetSegmentIndex(segUid2)
                     (segIdx3, wingidx3) = self.tigl.wingGetSegmentIndex(segUid3)
                     (segIdx4, wingidx4) = self.tigl.wingGetSegmentIndex(segUid4)
                     
+                    if eta1 < 0 : print "error" , eta1 ; eta1 = 0.0
                     
                     x1, y1, z1 = self.tigl.wingGetUpperPoint(wingidx1, segIdx1, eta1, xsi1)      
                     x2, y2, z2 = self.tigl.wingGetUpperPoint(wingidx2, segIdx2, eta2, xsi2)      
                     x3, y3, z3 = self.tigl.wingGetUpperPoint(wingidx3, segIdx3, eta3, xsi3)      
                     x4, y4, z4 = self.tigl.wingGetUpperPoint(wingidx4, segIdx4, eta4, xsi4)      
                           
-                    
+                    # point on component segment
                     #x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[0], flap[2])       
                     #x2, y2, z2 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[1], flap[3]) 
                     #x3, y3, z3 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[4], flap[6]) 
                     #x4, y4, z4 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, flap[5], flap[7]) 
-                    #
-                    plistFlaps.append([[x1, y1, z1+0.02], [x2, y2, z2+0.02], [x3, y3, z3+0.02], [x4, y4, z4+0.02]])
+                    # end 
+                    
+                    plistFlaps.append([[x1, y1, z1], [x2, y2, z2], [x3, y3, z3], [x4, y4, z4]])
                 plistSeg.append(plistFlaps)
             plistWing.append(plistSeg)      
         return plistWing             
@@ -354,6 +417,13 @@ class VehicleData():
         return plistSpoiler  
 
 
+    '''
+    creates a list of normals of a given point list
+    @param plist: given point list
+    @param flag: ???????????????
+    '''  
+    
+    #TODO: complete ribs implementation
     def createRibs(self):
         for wingIndex in range(1, self.tigl.getWingCount()+1) :
             for compSegmentIndex in range(1, self.tigl.wingGetComponentSegmentCount(wingIndex)+1) :        
@@ -361,9 +431,8 @@ class VehicleData():
                     ribList = self.__createRibs(wingIndex, compSegmentIndex)
                 except:
                     print "no ribs for wing " + str(wingIndex) + " found." ; break
-                                
         return[]           
-    
+
     def __createRibs(self, wingIndex, compSegmentIndex):
         path  = '/cpacs/vehicles/aircraft/model/wings/wing['+str(wingIndex)+']/componentSegments/componentSegment['\
                                                                             +str(compSegmentIndex)+']/structure/'
@@ -409,17 +478,101 @@ class VehicleData():
                 
         return [] 
 
+    '''
+    creates a list of normals of a given point list
+    @param plist: given point list
+    @param flag: ???????????????
+    '''    
+    def createNormalList(self, plist, flag):
+        normalList = self.__createZeroPList(plist)
         
-    def __getSparPositionUIDs(self, wingIndex, compSegmentIndex):
-        path_sparSegments = '/cpacs/vehicles/aircraft/model/wings/wing['\
-                                +str(wingIndex)+']/componentSegments/componentSegment['\
-                                +str(compSegmentIndex)+']/structure/spars/sparSegments/'
+        shaIdx = -1
+        for shape in plist :
+            shaIdx += 1
+            segCnt = len(shape)
+            for segIdx in range(segCnt):
+                stripeCnt = len(shape[segIdx])
+                for stripeIdx in range(stripeCnt):
+                    (tmp_seg , tmp_stripe) = (segIdx , stripeIdx+1) if stripeIdx +1 < stripeCnt else (segIdx+1 , 0)
+                    if tmp_seg >= segCnt : break
+                    
+                    stripe1 = shape[segIdx][stripeIdx]
+                    stripe2 = shape[tmp_seg][tmp_stripe]
+                    pCnt = len(shape[segIdx][stripeIdx])
+
+                    flag2 = False                    
+                    if shape[segIdx][stripeIdx][0] == shape[segIdx][stripeIdx][pCnt-1] :
+                        print "yea"
+                    flag2 = True
+                    
+                    for i in range(pCnt):
+                        
+                        if flag2:
+                            if i == pCnt - 2 :
+                                j = 0
+                            else:                        
+                                j = (i+1)#%pCnt
+                            
+                            if i >= pCnt-1 :
+                                normalList[shaIdx][segIdx][stripeIdx][i] = normalList[shaIdx][segIdx][stripeIdx][0]
+                                normalList[shaIdx][tmp_seg][tmp_stripe][i] = normalList[shaIdx][tmp_seg][tmp_stripe][0]
+                                break 
+                        else:
+                            j = (i+1)%pCnt
+                            
+                        if flag:
+                            norm1 = self.__calculateVertexNormal(stripe1[i], stripe2[i], stripe1[j])
+                            norm2 = self.__calculateVertexNormal(stripe1[j], stripe1[i], stripe2[j])
+                            norm3 = self.__calculateVertexNormal(stripe2[i], stripe2[j], stripe1[i])
+                            norm4 = self.__calculateVertexNormal(stripe2[j], stripe1[j], stripe2[i])
+                        else :
+                            norm1 = self.__calculateVertexNormal(stripe1[i], stripe1[j], stripe2[i])
+                            norm2 = self.__calculateVertexNormal(stripe1[j], stripe2[j], stripe1[i])
+                            norm3 = self.__calculateVertexNormal(stripe2[i], stripe1[i], stripe2[j])
+                            norm4 = self.__calculateVertexNormal(stripe2[j], stripe2[i], stripe1[j])
+            
+                        normalList[shaIdx][segIdx][stripeIdx][i]   = self.__add(normalList[shaIdx][segIdx][stripeIdx][i], norm1)
+                        normalList[shaIdx][segIdx][stripeIdx][j]   = self.__add(normalList[shaIdx][segIdx][stripeIdx][j], norm2)
+                        normalList[shaIdx][tmp_seg][tmp_stripe][i] = self.__add(normalList[shaIdx][tmp_seg][tmp_stripe][i], norm3)
+                        normalList[shaIdx][tmp_seg][tmp_stripe][j] = self.__add(normalList[shaIdx][tmp_seg][tmp_stripe][j], norm4)
+        return normalList
+
+
+    '''
+    copies a point list and sets all vertices to [0.0, 0.0, 0.0]
+    @param plist: given point list
+    '''        
+    def __createZeroPList(self, plist):
+        shaList = []
+        for shape in plist :
+            segList = []
+            for seg in shape :
+                stripeList = []
+                for stripe in seg :
+                    stripeList.append( [[0.0, 0.0, 0.0]]*len(stripe) )
+                segList.append(stripeList)
+            shaList.append(segList)
+        return shaList        
         
-        path = path_sparSegments + 'sparSegment/@uID' 
-
-        uidList = []
-        for sparSegmentIdx in range(1, self.tixi.getNumberOfChilds(path_sparSegments)+1) :
-            uidList.append(self.tixi.xPathExpressionGetTextByIndex(path, sparSegmentIdx))
-        return uidList
-
+    '''
+    get vertex normal in v1
+    '''
+    def __calculateVertexNormal(self, v1, v2, v3):
+        edge1 = [v2[0] - v1[0], v2[1] - v1[1], v2[2] - v1[2]]
+        edge2 = [v3[0] - v1[0], v3[1] - v1[1], v3[2] - v1[2]]
+        return self.__normalize(np.cross(edge1, edge2))
     
+    def __add(self, vec1, vec2):
+        return [vec1[0] + vec2[0], vec1[1] + vec2[1], vec1[2] + vec2[2]]    
+    
+    def __lenVector(self, v):
+        return math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2])
+        
+    def __normalize(self, v):
+        l = self.__lenVector(v)
+        return [0.0, 0.0, 0.0] if l == 0.0 else [v[0] / l, v[1] / l, v[2] / l]  
+
+# ======================================================================================================================================
+# debug
+# ====================================================================================================================================== 
+#t = VehicleData()        

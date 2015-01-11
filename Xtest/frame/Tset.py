@@ -10,6 +10,21 @@ from OpenGL.GL.exceptional import glVertex
 
 vert_source = """
 
+    attribute vec3 inputPosition;
+    attribute vec2 inputTexCoord;
+    attribute vec3 inputNormal;
+
+    uniform mat4 projection, modelview, normalMat;
+    uniform int mode;
+
+    varying vec4 forFragColor;
+
+    const vec3 lightPos = vec3(1.0, 1.0, 1.0);
+    const vec3 ambientColor = vec3(0.24725, 0.1995, 0.0745);
+    const vec3 diffuseColor = vec3(0.75164, 0.60648, 0.22648);
+    const vec3 specColor = vec3(0.628281, 0.555802, 0.366065);
+    
+    
     uniform float scale;
     uniform float xrot;
     uniform float yrot;
@@ -17,15 +32,8 @@ vert_source = """
     uniform float tx;
     uniform float ty;
     uniform float tz;
-
-    attribute vec3 inputPosition;
-    attribute vec3 inputNormal;
     
-    uniform mat4 projection, modelview, normalMat;
-        
-    varying vec3 normalInterp;
-    varying vec3 vertPos;
-       
+    
     mat4 rotationX = mat4(
         vec4(1.0,       0.0,        0.0, 0.0),
         vec4(0.0, cos(xrot), -sin(xrot), 0.0),
@@ -53,39 +61,18 @@ vert_source = """
         vec4(0.0, 0.0, 1.0, 0.0),
         vec4(tx, ty, tz, 1.0)
     );
-       
-       
-        
+    
     void main(){
+        
         mat4 model = modelview * translation * rotationX * rotationY * rotationZ;
         gl_Position = projection * model * 
-                  vec4(inputPosition*scale, 1.0);    
-    
-        vec4 vertPos4 = model * 
                   vec4(inputPosition*scale, 1.0);
-        vertPos = vec3(vertPos4) / vertPos4.w;
-        normalInterp = vec3(normalMat *  vec4(inputNormal, 0.0));
-    }
-"""
 
 
-frag_source = """
-    varying vec3 normalInterp;
-    varying vec3 vertPos;
-    
-    uniform int mode;
-
-    const vec3 lightPos = vec3(1.0, 1.0, 1.0);
-    //const vec3 ambientColor = vec3(0.3, 0.0, 0.0);
-    //const vec3 diffuseColor = vec3(0.5, 0.0, 0.0);
-    //const vec3 specColor = vec3(1.0, 1.0, 1.0);
-    const vec3 ambientColor = vec3(0.24725, 0.1995, 0.0745);
-    const vec3 diffuseColor = vec3(0.75164, 0.60648, 0.22648);
-    const vec3 specColor = vec3(0.628281, 0.555802, 0.366065);
-    
-    
-    void main() {
-        vec3 normal = normalize(normalInterp);
+        /* first transform the normal into eye space and normalize the result */
+        vec3 normal = vec3(normalMat * vec4(inputNormal, 0.0));
+        vec4 vertPos4 = modelview * vec4(inputPosition, 1.0);
+        vec3 vertPos = vec3(vertPos4) / vertPos4.w;            
         vec3 lightDir = normalize(lightPos - vertPos);
         vec3 reflectDir = reflect(-lightDir, normal);
         vec3 viewDir = normalize(-vertPos);
@@ -93,21 +80,36 @@ frag_source = """
         float lambertian = max(dot(lightDir, normal), 0.0);
         float specular = 0.0;
         
+        if(normal  == vec3(0.0, 0.0, 0.0)){
+            //lambertian = 0.4;
+        }
+            
         if(lambertian > 0.0) {
             float specAngle = max(dot(reflectDir, viewDir), 0.0);
             specular = pow(specAngle, 4.0);
-        }
-
-        gl_FragColor = vec4(ambientColor + 
-                    lambertian*diffuseColor +
-                    specular*specColor, 1.0);
         
-        //only ambient
-        if(mode == 2) gl_FragColor = vec4(ambientColor, 1.0);
-        //only diffuse
-        if(mode == 2) gl_FragColor = vec4(lambertian*diffuseColor, 1.0);
-        //only specular
-        if(mode == 2) gl_FragColor = vec4(specular*specColor, 1.0);
+            // the exponent controls the shininess (try mode 2)
+            if(mode == 2) specular = pow(specAngle, 16.0);
+        
+            // according to the rendering equation we would need 
+            // to multiply with the the lambertian, but this has
+            // only little visual effect
+            if(mode == 3) specular *= lambertian;
+        
+            // switch to mode 4 to turn off the specular component
+            if(mode == 4) specular *= 0.0;
+        }    
+        forFragColor = vec4(ambientColor + lambertian*diffuseColor + 
+                    specular*specColor, 1.0);
+    }
+"""
+
+
+frag_source = """
+    varying vec4 forFragColor;
+
+    void main() {
+        gl_FragColor = forFragColor;
     }
 """
 
@@ -122,6 +124,8 @@ class HelloWidget(QGLWidget):
         self.height = 800
         self.resize(self.width ,self.height)
        
+        self.data = np.zeros(6, dtype = [ ("position", np.float32, 3), ("color", np.float32, 3)] )
+        
         self.projection = np.zeros(16) # projection matrix
         self.modelview = np.zeros(16)  # modelview matrix
         #self.normalMat = np.zeros(16)  # normal matrix
@@ -138,43 +142,23 @@ class HelloWidget(QGLWidget):
         self.mode = 1
 
     def initializeGL(self):
-        print glGetString(GL_SHADING_LANGUAGE_VERSION)
         glEnable(GL_DEPTH_TEST)
-        #glEnable(GL_COLOR_MATERIAL)
-        #glEnable(GL_LIGHTING)
-        #glEnable(GL_LIGHT0)
+        glEnable(GL_COLOR_MATERIAL)
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
+        print "fsfs"
         self.setupShaders()
-        
-        data = np.zeros(6, dtype = [ ("position", np.float32, 3), ("normals", np.float32, 3)] )
-        data["position"] = [ (-1.0, -1.0 , 0.0),   (-1.0 , 1.0 ,0.0),  (1.0, -1.0, 0.0), (1.0,1.0,0.0), (1.5, -1.2, -0.5) ,(1.5, 0.8, -0.5) ]
-        data["normals"]  = [ (0.0, 0.0, 1.0), (0.0, 0.0, 1.0), (0.70710678118654746, 0.0, 1.7071067811865475), (0.70710678118654746, 0.0, 1.7071067811865475), (0.70710678118654746, 0.0, 0.70710678118654746), 
-                                  (0.70710678118654746, 0.0, 0.70710678118654746)]
 
-        data2 = np.zeros(12, dtype = [ ("position", np.float32, 3), ("normals", np.float32, 3)] )
-        data2["position"] = [ (-1.0, -1.0 , 0.0), (0.0, 0.0, 1.0),
-                              (-1.0 , 1.0 ,0.0), (0.0, 0.0, 1.0),
-                              (1.0, -1.0, 0.0), (0.0, 0.0, 1.0), 
-                              (1.0,1.0,0.0), (0.70710678118654746, 0.0, 1.7071067811865475),
-                              (1.5, -1.2, -0.5) , (0.70710678118654746, 0.0, 1.7071067811865475),
-                              (1.5, 0.8, -0.5), (0.70710678118654746, 0.0, 0.70710678118654746) ]
-
-
-
-
-
-        # Request a buffer slot from GPU
-        self.bufID, self.bufID1 = glGenBuffers(2)
-        self.createBufferShape(self.bufID, data)
-        self.createBufferShape(self.bufID1, data2)
-
+        print "fsfs"
         # setting data
         #self.data["color"]    = [ (1,0,0,1), (0,1,0,1), (0,0,1,1), (1,1,0,1) ]
         #self.data["position"] = [ (-1,-1),   (-1,+1),   (+1,-1),   (+1,+1)   ]
-         #[(-1.0, 1.0, 1.0), (-1.0, -1.0, 1.0), (1.0,1.0,1.0), 
-         #(1.0,-1.0,1.0), (1.5, 1.2, -1.5), 
-         #(1.5, -0.8, -1.5)]
+        self.data["color"]    =  [(0.0, 0.0, 1.0), (0.0, 0.0, 1.0), (0.70710678118654746, 0.0, 1.7071067811865475), 
+         (0.70710678118654746, 0.0, 1.7071067811865475), (0.70710678118654746, 0.0, 0.70710678118654746), 
+         (0.70710678118654746, 0.0, 0.70710678118654746)]
+        
 
-        data["position"] = [ (-1.0, 1.0 , 0.0),   (-1.0 , -1.0 ,0.0),  (1.0, 1.0, 0.0), (1.0,-1.0,0.0), (1.5, 1.2, -0.5) ,(1.5, -0.8, -0.5) ]
+        self.data["position"] = [ (-1.0, 1.0 , 0.0),   (-1.0 , -1.0 ,0.0),  (1.0, 1.0, 0.0), (1.0,-1.0,0.0), (1.5, 1.2, -0.5) ,(1.5, -0.8, -0.5) ]
         #self.data["position"] = [ (0.0, 0.0, 0.0), (0.24999999999999994, 0.0, 0.059412421875), (0.24999999999999994, 1.0, 0.059412421875), (0.0, 1.0, 0.0), 
         #                         (0.24999999999999994, 0.0, 0.059412421875), (0.7499999999999999, 0.0, 0.0316030623052), (0.7499999999999999, 1.0, 0.0316030623052), (0.24999999999999994, 1.0, 0.059412421875), 
          #                        (0.7499999999999999, 0.0, 0.0316030623052), (1.0, 0.0, 0.0), (1.0, 1.0, 0.0), (0.7499999999999999, 1.0, 0.0316030623052), 
@@ -192,29 +176,29 @@ class HelloWidget(QGLWidget):
 
         self.normalWingUp = [(0.0, 0.0, -1.0), (0.0, 0.0, -1.0),(0.0, 0.0, -1.0),(-0, -0, -1.0)]
 
-        
-
-    def createBufferShape(self, bufID, data):
-        self.mat4Identity(self.modelview)
+        # Request a buffer slot from GPU
+        bufID = glGenBuffers(1)
 
         # Make this buffer the default one
         glBindBuffer(GL_ARRAY_BUFFER, bufID)
         
         # Upload data
-        glBufferData(GL_ARRAY_BUFFER, data.nbytes, data, GL_DYNAMIC_DRAW)
+        glBufferData(GL_ARRAY_BUFFER, self.data.nbytes, self.data, GL_DYNAMIC_DRAW)
 
         # Binding the buffer to the program
         # We need to tell the GPU how to read the buffer and bind each value to the relevant attribute. To do this, GPU needs to kow what is the stride between 2 consecutive element and what is the offset to read one attribute
-        stride = data.strides[0]
+        stride = self.data.strides[0]
 
         offset = ctypes.c_void_p(0)
         loc = glGetAttribLocation(self.progID, "inputPosition")
         glEnableVertexAttribArray(loc)
+        glBindBuffer(GL_ARRAY_BUFFER, bufID)
         glVertexAttribPointer(loc, 3, GL_FLOAT, False, stride, offset)
 
-        offset = ctypes.c_void_p(data.dtype["position"].itemsize)
+        offset = ctypes.c_void_p(self.data.dtype["position"].itemsize)
         loc = glGetAttribLocation(self.progID, "inputNormal")
         glEnableVertexAttribArray(loc)
+        glBindBuffer(GL_ARRAY_BUFFER, bufID)
         glVertexAttribPointer(loc, 4, GL_FLOAT, False, stride, offset)
 
         # Binding the uniform
@@ -234,30 +218,11 @@ class HelloWidget(QGLWidget):
         self.modeLoc   = glGetUniformLocation(self.progID, "mode")
         
         self.normalLoc = glGetAttribLocation(self.progID, "inputNormal");
-
-    def drawShape1(self, glMode):
-        modelviewInv = np.zeros(16)  # normal matrix = np.zeros(16)  # normal matrix
-        normalmatrix = np.zeros(16)
         
-        self.mat4Invert(self.modelview, modelviewInv)
-        self.mat4Transpose(modelviewInv, normalmatrix)
+        # load the current projection and modelview matrix into the
+        # corresponding UNIFORM variables of the shader
 
-        glUseProgram(self.progID)
-        glUniform1f(self.loc, self.scale)
-        glUniformMatrix4fv(self.projectionLoc, 1, False, (ctypes.c_float * 16)(*self.projection))
-        glUniformMatrix4fv(self.modelviewLoc, 1, False, (ctypes.c_float * 16)(*self.modelview)) 
-        glUniformMatrix4fv(self.normalMatrixLoc, 1, False, (ctypes.c_float * 16)(*normalmatrix)) 
-        glUniform1f(self.rotLocX, self.xrot)
-        glUniform1f(self.rotLocY, self.yrot)
-        glUniform1f(self.rotLocZ, self.zrot)
-
-        glUniform1f(self.transLocX, self.tx)
-        glUniform1f(self.transLocY, self.ty)
-        glUniform1f(self.transLocZ, self.tz)
-
-        glUniform1i(self.modeLoc, self.mode)
-
-        glDrawArrays(glMode, 0, 6)
+       # glBindBuffer(GL_ARRAY_BUFFER, bufID+1)
 
     def setupShaders(self):
         # create shader
@@ -312,11 +277,53 @@ class HelloWidget(QGLWidget):
     def paintGL(self):
         self.__setProjection()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        self.mat4Identity(self.modelview)
+
+        modelviewInv = np.zeros(16)  # normal matrix = np.zeros(16)  # normal matrix
+        normalmatrix = np.zeros(16)
         
-        #self.drawShape1(GL_QUAD_STRIP)
-        self.drawShape1(GL_LINES)
-        #self.createBufferShape2(self.bufID1)
-        #glDrawArrays(GL_LINES, 0, 6)
+        
+        
+        self.mat4Invert(self.modelview, modelviewInv)
+        
+        
+        modelviewInv[2] = 2
+        self.mat4Transpose(modelviewInv, normalmatrix)
+        self.mat4Print(modelviewInv)
+        self.mat4Print(normalmatrix)
+
+        
+
+
+    #----------------------------------------------------- glUseProgram(progID);
+    #-------------- // load the current projection and modelview matrix into the
+    #-------------------------- // corresponding UNIFORM variables of the shader
+    #------------------ glUniformMatrix4fv(projectionLoc, 1, false, projection);
+    #-------------------- glUniformMatrix4fv(modelviewLoc, 1, false, modelview);
+    # if(normalMatrixLoc != -1) glUniformMatrix4fv(normalMatrixLoc, 1, false, normalmatrix);
+    #-------------------------- if(modeLoc != -1) glUniform1i(modeLoc, modeVal);
+        
+
+
+        print "Marita" , self.loc
+
+        glUseProgram(self.progID)
+        glUniform1f(self.loc, self.scale)
+        glUniformMatrix4fv(self.projectionLoc, 1, False, (ctypes.c_float * 16)(*self.projection))
+        glUniformMatrix4fv(self.modelviewLoc, 1, False, (ctypes.c_float * 16)(*self.modelview)) 
+        glUniformMatrix4fv(self.normalMatrixLoc, 1, False, (ctypes.c_float * 16)(*normalmatrix)) 
+        glUniform1f(self.rotLocX, self.xrot)
+        glUniform1f(self.rotLocY, self.yrot)
+        glUniform1f(self.rotLocZ, self.zrot)
+
+        glUniform1f(self.transLocX, self.tx)
+        glUniform1f(self.transLocY, self.ty)
+        glUniform1f(self.transLocZ, self.tz)
+
+        glUniform1i(self.modeLoc, self.mode)
+
+        glDrawArrays(GL_QUAD_STRIP, 0, 6)
 
     def mat4Identity(self, a) : 
         for i in range(0, 16) : a[i] = 0.0
