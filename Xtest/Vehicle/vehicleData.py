@@ -103,7 +103,7 @@ class VehicleData():
         zeta_List = utility.createXcoordsLinear(1.0, pnt_cnt_zeta)        
 
         #zeta_List = zeta_List[:len(zeta_List)-1]
-        zeta_List.pop()
+        #zeta_List.pop()
         print zeta_List
         
         #sys.exit()
@@ -500,25 +500,25 @@ class VehicleData():
                     stripe2 = shape[tmp_seg][tmp_stripe]
                     pCnt = len(shape[segIdx][stripeIdx])
 
-                    flag2 = False                    
-                    if shape[segIdx][stripeIdx][0] == shape[segIdx][stripeIdx][pCnt-1] :
-                        print "yea"
-                    flag2 = True
+                    #flag2 = False                    
+                    #if shape[segIdx][stripeIdx][0] == shape[segIdx][stripeIdx][pCnt-1] :
+                    #    print "yea"
+                    #flag2 = True
                     
                     for i in range(pCnt):
                         
-                        if flag2:
-                            if i == pCnt - 2 :
-                                j = 0
-                            else:                        
-                                j = (i+1)#%pCnt
+                   #     if flag2:
+                    #        if i == pCnt - 2 :
+                     #           j = 0
+                      #      else:                        
+                        j = (i+1)%pCnt
                             
-                            if i >= pCnt-1 :
-                                normalList[shaIdx][segIdx][stripeIdx][i] = normalList[shaIdx][segIdx][stripeIdx][0]
-                                normalList[shaIdx][tmp_seg][tmp_stripe][i] = normalList[shaIdx][tmp_seg][tmp_stripe][0]
-                                break 
-                        else:
-                            j = (i+1)%pCnt
+                         #   if i >= pCnt-1 :
+                         #       normalList[shaIdx][segIdx][stripeIdx][i] = normalList[shaIdx][segIdx][stripeIdx][0]
+                         #       normalList[shaIdx][tmp_seg][tmp_stripe][i] = normalList[shaIdx][tmp_seg][tmp_stripe][0]
+                         #       break 
+                        #else:
+                         #   j = (i+1)%pCnt
                             
                         if flag:
                             norm1 = self.__calculateVertexNormal(stripe1[i], stripe2[i], stripe1[j])

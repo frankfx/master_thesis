@@ -125,12 +125,12 @@ class Renderer(QtOpenGL.QGLWidget):
         self.createOglLists()
         
     def resizeGL(self, w, h):       
-        side = max(w, h)
+        side = min(w, h)
         self.viewwidth = side
         self.viewheight = side
         
-        #GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
-        GL.glViewport(0, 0, self.viewwidth, self.viewheight)
+        GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
+        #GL.glViewport(0, 0, self.viewwidth, self.viewheight)
         self.__setProjection()        
         
     def __setProjection(self):
@@ -153,6 +153,7 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glMatrixMode(GL.GL_MODELVIEW)
         GL.glLoadIdentity()   
 
+        #GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE )
         # set to center and translate values
         GL.glTranslatef(self.xTrans, self.yTrans, -1.5)
         # GL.glTranslatef(self.data.configurationGetLength/2.0, 0, 0)
@@ -212,11 +213,10 @@ class Renderer(QtOpenGL.QGLWidget):
     '''
     def draw(self, plist, normals, color, idx):
         if self.flag_selection and self.selectedPoint is not None :
-            isElemSelected, (shaIdx, segIdx) = True, (0,15)# self.__isElementSelected(plist, self.selectedPoint)
+            isElemSelected, (shaIdx, segIdx) = self.__isElementSelected(plist, self.selectedPoint)
             if isElemSelected :
                 print "Element is selected"
                 self.drawInSelectionMode(plist, normals, color, shaIdx, segIdx)
-                
         GL.glColor4fv(color)              
         GL.glCallList(self.index + idx)     
 
