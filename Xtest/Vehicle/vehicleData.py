@@ -55,8 +55,8 @@ class VehicleData():
     
     def __initTixiTigl(self):
         self.tixi = Tixi()
-        self.tixi.open('simpletest.cpacs.xml')
-        #self.tixi.open('D150_CPACS2.0_valid.xml')
+        #self.tixi.open('simpletest.cpacs.xml')
+        self.tixi.open('D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:

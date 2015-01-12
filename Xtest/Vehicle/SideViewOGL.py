@@ -10,6 +10,7 @@ from vehicleData   import VehicleData
 from PySide        import QtOpenGL, QtGui, QtCore
 from Xtest.Open_GL import utility
 from point import Point
+from selectionList import SelectionList
 
 from tiglwrapper   import TiglException
 
@@ -72,6 +73,8 @@ class Renderer(QtOpenGL.QGLWidget):
         # selection
         self.ctrlIsPressed  = False
         self.selectedPoints = []
+        self.selectedPointsCnt = 5*[0]
+        self.selectionList = SelectionList()
 
         # widget option
         self.setFocusPolicy(QtCore.Qt.ClickFocus)
@@ -172,10 +175,10 @@ class Renderer(QtOpenGL.QGLWidget):
     '''
     def drawAircraft(self):
         if self.flag_show_fuselage :
-            self.draw(self.data.pList_fuselage, self.data.pList_fuselage_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 0)        
+            self.draw(self.data.pList_fuselage, self.data.pList_fuselage_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 0, self.selectionList.fuseIsEmpty())        
         
         if self.flag_show_wing1_up :  
-            self.draw(self.data.pList_wing_up, self.data.pList_wing_up_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 1)
+            self.draw(self.data.pList_wing_up, self.data.pList_wing_up_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 1, self.selectionList.wingUpIsEmpty())
             
         if self.flag_show_wing1_lo :
             self.draw(self.data.pList_wing_lo, self.data.pList_wing_lo_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 2)
@@ -209,33 +212,29 @@ class Renderer(QtOpenGL.QGLWidget):
     @param color: vertex color
     @param idx: index of precompiled ogl list
     '''
-    def draw(self, plist, normals, color, idx, drawSelectionMode=False):
-        if drawSelectionMode :
-            GL.glCallList(self.select_index)
-        else :
+    def draw(self, plist, normals, color, idx, normalMode=True):
+        if normalMode :
             GL.glColor4fv(color)              
             GL.glCallList(self.index + idx)     
+        else:
+            GL.glCallList(self.select_index + idx)
 
     '''
     checks if fuslage segment was selected
     @param plist: fuselage point list
     @param point: selected point
     '''
-    def updateOglShapeSelectionList(self, plist, plist_normals, color, idx):
-        print "sdfsdfsd"
-        for p in self.selectedPoints :
-            print p
-        if len(self.selectedPoints) > 0 : 
-            GL.glNewList(self.select_index+idx, GL.GL_COMPILE)
-            self.createOglShapeSelection(plist, plist_normals, color)
-            GL.glEndList()
+    def updateOglShapeSelectionList(self, plist, plist_normals, selectionList, color, idx):
+        GL.glNewList(self.select_index+idx, GL.GL_COMPILE)
+        self.createOglShapeSelection(plist, plist_normals, selectionList, color)
+        GL.glEndList()
         
-    def createOglShapeSelection(self, plist, plist_normals, color):
+    def createOglShapeSelection(self, plist, plist_normals, selectionList, color):
         GL.glBegin(GL.GL_QUADS)
         for shaIdx in range(len(plist)) :
             segCnt = len(plist[shaIdx])
             for segIdx in range(segCnt) :
-                GL.glColor4fv(self.__getSegmentColor(shaIdx, segIdx, color)) 
+                GL.glColor4fv(self.__getSegmentColor(shaIdx, segIdx, selectionList, color)) 
                 stripeCnt = len(plist[shaIdx][segIdx])
                 for stripeIdx in range(0, stripeCnt) :
                     self.__setVertices(plist, plist_normals, shaIdx, segIdx, stripeIdx, segCnt, stripeCnt)
@@ -244,14 +243,15 @@ class Renderer(QtOpenGL.QGLWidget):
     '''
     determines the color of the segment (selected segments will be drawn red)
     '''
-    def __getSegmentColor(self, shaIdx, segIdx, color):
+    def __getSegmentColor(self, shaIdx, segIdx, selectionList, color):
         pos = -1 ; i = 0
-        for p in self.selectedPoints :
+        for p in selectionList :
+            print selectionList
             if segIdx == p.getSegmentIdx() and shaIdx == p.getShapeIdx() :
                 if pos == -1 :  pos = i
                 else : 
-                    del self.selectedPoints[i]
-                    del self.selectedPoints[pos]
+                    del selectionList[i]
+                    del selectionList[pos]
                     return color
             i += 1
         if pos == -1 : return color
@@ -291,9 +291,9 @@ class Renderer(QtOpenGL.QGLWidget):
     '''
     def __getSelectedWingSegment(self, plist, point, reflect=1):
         for shaIdx in range(len(plist)):
-            segIdx = self.isWingSegmentSelected(shaIdx, point, reflect) 
+            segIdx = self.isWingSegmentSelected(shaIdx+1, point, reflect) 
             if segIdx != -1 :
-                return (shaIdx, segIdx)
+                return (shaIdx, segIdx-1)
         return (None, None)
     
     '''
@@ -576,27 +576,23 @@ class Renderer(QtOpenGL.QGLWidget):
         self.lastPos_x = event.pos().x()
         self.lastPos_y = event.pos().y()
         
-        redraw = False
-        
         if self.ctrlIsPressed:
             selectedPoint = self.__winPosTo3DPos(self.lastPos_x, self.lastPos_y)
 
             (shaIdx, segIdx) = self.__getSelectedSegment(self.data.pList_fuselage, selectedPoint)
-            
-            print shaIdx, segIdx
-            
-            redraw = self.__getPoint(shaIdx, segIdx, self.data.pList_fuselage, self.data.pList_fuselage_normals, selectedPoint, [0.0, 0.5, 0.8,self.alpha_rgb], 0)
-            if redraw :
-                self.updateGL()  ; return
-            else :
+            if shaIdx is not None : 
+                self.selectionList.addPointToFuse(Point(shaIdx, segIdx, selectedPoint))
+                self.updateOglShapeSelectionList(self.data.pList_fuselage, self.data.pList_fuselage_normals, self.selectionList.fuselist, [0.0, 0.5, 0.8,self.alpha_rgb], 0)
+                self.updateGL()
+            else:    
                 (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_up, selectedPoint)
-                redraw = self.__getPoint(shaIdx, segIdx, self.data.pList_wing_up, self.data.pList_wing_up_normals, selectedPoint, [0.0, 0.5, 0.8,self.alpha_rgb], 1)
-                if redraw:
-                    self.updateGL() ; return
-                else :
-                    (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_lo, selectedPoint)
-                    redraw = self.__getPoint(shaIdx, segIdx, self.data.pList_wing_lo, self.data.pList_wing_lo_normals, selectedPoint, [0.0, 0.5, 0.8,self.alpha_rgb], 2)
-
+                if shaIdx is not None :
+                    self.selectionList.addPointToWingUp(Point(shaIdx, segIdx, selectedPoint))
+                    self.updateOglShapeSelectionList(self.data.pList_wing_up, self.data.pList_wing_up_normals, self.selectionList.wing_up, [0.0, 0.5, 0.8,self.alpha_rgb], 1)
+                    self.updateGL()
+                    
+            
+            
             
 #------------------------------------------------------------------------------ 
                 #------------------------------------------- if shaIdx is None :
@@ -610,17 +606,12 @@ class Renderer(QtOpenGL.QGLWidget):
 
                 
                 
-        elif len(self.selectedPoints) > 0 :
-            self.selectedPoints = []
+        elif not self.selectionList.isEmpty() :
+            self.selectionList.removeAll()
             self.updateGL()
     
     
-    def __getPoint(self, shaIdx, segIdx, plist, normals, selectedP, color, idx):
-        if shaIdx == None : return False
-        else :
-            self.selectedPoints.append(Point(shaIdx, segIdx, selectedP))
-            self.updateOglShapeSelectionList(plist, normals, color, idx, True)
-        return True     
+        
 
     def mouseMoveEvent(self, event):
         dx = (event.x() - self.lastPos_x ) 
