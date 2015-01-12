@@ -98,13 +98,12 @@ class VehicleData():
     @param pnt_cnt_eta: stripe count
     @param pnt_cnt_zeta: point count per stripe
     '''
-    def __createFuselage(self, pnt_cnt_eta = 1, pnt_cnt_zeta = 50):
+    def __createFuselage(self, pnt_cnt_eta = 1, pnt_cnt_zeta = 20):
         eta_List  = utility.createXcoordsLinear(1.0, pnt_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, pnt_cnt_zeta)        
 
         #zeta_List = zeta_List[:len(zeta_List)-1]
         #zeta_List.pop()
-        print zeta_List
         
         #sys.exit()
 

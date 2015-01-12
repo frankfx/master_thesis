@@ -258,6 +258,7 @@ def enum(*sequential, **named):
     return type('Enum', (), enums)
 
 
+
 # formula http://martin-thoma.com/how-to-check-if-a-point-is-inside-a-rectangle/
 def isPinRectangle(r, P):
     """ 
