@@ -1,6 +1,5 @@
 import sys
 import re
-t
 from tixiwrapper import Tixi, TixiException
 
 from lxml import etree
@@ -68,7 +67,9 @@ class EditorWindow(QMainWindow):
                 
                 self.editor.setPlainText(self.tixi.exportDocumentAsString())
                 self.cur_file_path = xmlFilename
-                self.cur_schema_path = cpacs_scheme                
+                self.cur_schema_path = cpacs_scheme  
+                
+                self.getCursorXPath()              
             except TixiException, e:  
                 print e.error
                 self.statusBar().showMessage('CPACS ERROR: ' + e.error)
@@ -137,8 +138,8 @@ class EditorWindow(QMainWindow):
         self.label1.hide()
         self.fontsizeSpinBox.hide()
 
-        self.button1.clicked.connect(self.handleButton1)
-        self.button2.clicked.connect(self.handleButton2)
+        self.button1.clicked.connect(self.fire_search_backward)
+        self.button2.clicked.connect(self.fire_search_foreward)
          
         self.fontsizeSpinBox.setRange(4, 30)
         self.fontsizeSpinBox.setSingleStep(1)
@@ -149,6 +150,7 @@ class EditorWindow(QMainWindow):
     def setfontsize(self, value):
         self.font.setPointSize(value)
         self.editor.setFont(self.font)
+        self.getCursorXPath()
                 
     def setupEditor(self):
         self.font = QFont()
@@ -254,41 +256,61 @@ class EditorWindow(QMainWindow):
         return self.stats    
         
     ''' find previous button '''    
-    def handleButton1(self):
+    def fire_search_backward(self):
         self.editor.find(self.searchbox.text(), QTextDocument.FindBackward)  
         self.searchbox.setFocus()
         
     ''' find next button '''    
-    def handleButton2(self):
-        list_p = self.searchbox.text().split('/')
-        if len(list_p) == 1 :
-            if self.editor.find(self.searchbox.text()) : 
-                ()
-            elif not self.editor.find(self.searchbox.text(), QTextDocument.FindBackward):
-                QMessageBox.about(self, "error", "String %s not found" % (self.searchbox.text()))
+    def fire_search_foreward(self):
+        
+        searchList = filter(lambda a : a!='',  self.searchbox.text().split('/'))
+        if len(searchList) == 1 :
+            if self.editor.find(searchList[0]) : 
+                pass
+            elif not self.editor.find(searchList[0], QTextDocument.FindBackward):
+                QMessageBox.about(self, "error", "String %s not found" % (searchList[0]))
             else :
                 self.editor.moveCursor(QTextCursor.Start)
-                self.editor.find(self.searchbox.text())
+                self.editor.find(searchList[0])
         else :
-            self.searchXPath(self.searchbox.text())
+            self.searchXPath(self.searchbox.text(), searchList)
                 
         self.searchbox.setFocus()     
       
-    def searchXPath(self, path):
-        list_p = self.searchbox.text().split('/')
-        list_p = list_p[1:] if list_p[0] == '' else list_p
-        for x in list_p :
-            print x
-            if '[' in x :
-                num = int(re.findall('\d+', x)[0])
-                x = x.split('[').group(0)
-                while num > 0 : 
-                    if not self.editor.find(x) : QMessageBox.about(self, "error", "XPath %s not found" % path)
-                    num -= 1
-            elif not self.editor.find(x) : 
-                QMessageBox.about(self, "error", "XPath %s not found" % path) 
-                return
-          
+    def searchXPath(self, path, searchList):
+        try:
+            self.tixi.xPathEvaluateNodeNumber(path)
+            self.editor.moveCursor(QTextCursor.Start)
+            for s in searchList :
+                if not self.editor.find(s) :
+                    QMessageBox.about(self, "error", "XPath %s not found" % path)
+                    return 
+        except TixiException :
+            QMessageBox.about(self, "error", "XPath %s not found" % path)
+        
+        
+    def getCursorXPath(self):
+        
+        row = self.lineNumber
+        col = self.colNumber
+        
+        self.editor.find('uID', QTextDocument.FindBackward)
+
+        uID = self.editor.textCursor().block().text()
+
+        cursor = self.editor.textCursor()
+        cursor.movePosition(QTextCursor.StartOfBlock)
+
+        row2 = self.lineNumber
+        col2 = self.colNumber
+
+        cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor, row-row2)        
+        cursor.movePosition(QTextCursor.Right, QTextCursor.MoveAnchor, col-1)
+        self.editor.setTextCursor(cursor)
+       
+        print uID
+        print self.tixi.uIDGetXPath(uID)
+                  
     '''
     set the line and column number
     '''
@@ -419,7 +441,7 @@ class EditorWindow(QMainWindow):
     '''
     def keyPressEvent(self,event):
         if self.searchbox.isFocused() and event.key() == Qt.Key_Return :            
-            self.handleButton2()
+            self.fire_search_foreward()
 
     '''
     show and hide searchbox and buttons
