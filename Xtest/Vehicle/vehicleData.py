@@ -23,16 +23,13 @@ class VehicleData():
         utility.echo("Time after init tigl, tixi: " + str(time.time() - __start_time)) 
         self.pList_fuselage         = self.__createFuselage() 
         self.pList_fuselage_normals = self.createNormalList(self.pList_fuselage, True)
-        utility.echo("Time after init fuselage: " + str(time.time() - __start_time) + ", compute: " + self.__lenPlist(self.pList_fuselage) + " verts.")
-
-        #self.__printPlist(self.pList_fuselage)
-        #sys.exit()
+        utility.echo("Time after init fuselage: " + str(time.time() - __start_time) + ", compute: " + self.__cntPList(self.pList_fuselage) + " verts.")
 
         
         self.pList_wing_up, self.pList_wing_lo = self.__createWings()
         self.pList_wing_up_normals             = self.createNormalList(self.pList_wing_up, False)
         self.pList_wing_lo_normals             = self.createNormalList(self.pList_wing_lo, True)
-        utility.echo("Time after wing one init : " + str(time.time() - __start_time) + ", compute: " + self.__lenPlist(self.pList_wing_up) + " verts.")
+        utility.echo("Time after wing one init : " + str(time.time() - __start_time) + ", compute: " + self.__cntPList(self.pList_wing_up) + " verts.")
 
 
         self.pList_wing_up_reflect, self.pList_wing_lo_reflect = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
@@ -40,23 +37,29 @@ class VehicleData():
         self.pList_wing_lo_reflect_normals                     = self.createNormalList(self.pList_wing_lo_reflect, False)
         utility.echo("Time after init wing two : " + str(time.time() - __start_time))
 
-
         self.pList_component_segment           = self.__createComponent()
+
         utility.echo("Time after component init : " + str(time.time() - __start_time))
         self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
-        self.pList_flaps_LEDevice              = self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
+        self.pList_flaps_TE_normals            = self.createFlapNormals(self.pList_flaps_TEDevice)
+
+        self.pList_flaps_LEDevice              =  self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
+        self.pList_flaps_LE_normals            = self.createFlapNormals(self.pList_flaps_LEDevice)
+
         self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
+        self.pList_flaps_Spoiler_normals       = self.createFlapNormals(self.pList_flaps_Spoiler)
+
 #       self.plist_ribs                        = self.createRibs()
         self.pList_spares                      = self.createSpars()
 
-        
+
         utility.echo("End data tigl calculation  -  Time: " + str(time.time() - __start_time))
     
     
     def __initTixiTigl(self):
         self.tixi = Tixi()
-        #self.tixi.open('simpletest.cpacs.xml')
-        self.tixi.open('D150_CPACS2.0_valid.xml')
+        self.tixi.open('../cpacs_files/simpletest.cpacs.xml')
+        #self.tixi.open('../cpacs_files/D150_CPACS2.0_valid.xml')
         
         self.tigl = Tigl()
         try:
@@ -74,26 +77,6 @@ class VehicleData():
     # =========================================================================================================
     
     '''
-    returns the point count of a given point list 
-    @param plist: point list
-    '''    
-    def __lenPlist(self, plist):
-        res = 0
-        for shape in plist :
-            for seg in shape:
-                for stripe in seg :
-                    res += len(stripe)
-        return str(res)
-        
-    def __printPlist(self, plist):
-        for shape in plist :
-            print "new shape"
-            for seg in shape :
-                print "new seg"
-                for stripe in seg:
-                    print stripe    
-    
-    '''
     create fuselage point List
     @param pnt_cnt_eta: stripe count
     @param pnt_cnt_zeta: point count per stripe
@@ -101,15 +84,11 @@ class VehicleData():
     def __createFuselage(self, pnt_cnt_eta = 1, pnt_cnt_zeta = 20):
         eta_List  = utility.createXcoordsLinear(1.0, pnt_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, pnt_cnt_zeta)        
-
-        #zeta_List = zeta_List[:len(zeta_List)-1]
-        #zeta_List.pop()
         
-        #sys.exit()
-
         fuseList = []
         for fuseIdx in range(1, self.tigl.getFuselageCount()+1) :
             segList = []
+            print self.tigl.fuselageGetSegmentCount(fuseIdx)+1
             for segIdx in range(1, self.tigl.fuselageGetSegmentCount(fuseIdx)+1) :
                 stripeList = []
                 for eta in eta_List :
@@ -131,6 +110,8 @@ class VehicleData():
     def __createWings(self, point_cnt_eta = 1, point_cnt_xsi = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
+                
+        print self.tigl.wingGetSegmentCount(1)
                 
         wingList_up = []            
         wingList_lo = []            
@@ -243,13 +224,34 @@ class VehicleData():
                 for sparSegment in sparList : 
                     plistSpar = []
                     for spar in sparSegment :
-                        x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, spar[0], spar[1])       
+                        x1, y1, z1 = self.tigl.wingComponentSegmentGetPoint(componentSegmentUID, spar[0], spar[1])  
+                        
+                      #  seg, wing = self.tigl.wingComponentSegmentFindSegment(componentSegmentUID, x1, y1, z1)
+                      #  seg, wing =  self.tigl.wingGetSegmentIndex(seg)
+                       # x1, y1, z1 = self.tigl.wingGetUpperPoint(wing, seg, spar[0], spar[1])     
+                        
                         plistSpar.append([x1, y1, z1])
                     plistSparSeg.append(plistSpar)
                 plistSeg.append(plistSparSeg)
             plistWing.append(plistSeg)      
             
         return plistWing   
+                
+                
+                
+              
+                
+                
+                    
+                
+                
+                
+                
+                
+                
+                
+                
+                
                 
     def __createSpars(self, wingIndex, compSegmentIndex):
         path_sparSegments = '/cpacs/vehicles/aircraft/model/wings/wing['\
@@ -477,6 +479,22 @@ class VehicleData():
                 
         return [] 
 
+    def createFlapNormals(self, plist):
+        shaList = [] ; segList = [] ; flapList = []
+        for shape in plist :
+            segList = []
+            for seg in shape :
+                flapList = []
+                for flap in seg :
+                    norm1 = self.__calculateVertexNormal(flap[0], flap[1], flap[2])
+                    norm2 = self.__calculateVertexNormal(flap[1], flap[3], flap[0])
+                    norm3 = self.__calculateVertexNormal(flap[3], flap[2], flap[1])
+                    norm4 = self.__calculateVertexNormal(flap[2], flap[0], flap[3])
+                    flapList.append([norm1, norm2, norm3, norm4])
+                segList.append(flapList)
+            shaList.append(segList)
+        return shaList
+
     '''
     creates a list of normals of a given point list
     @param plist: given point list
@@ -552,6 +570,27 @@ class VehicleData():
                 segList.append(stripeList)
             shaList.append(segList)
         return shaList        
+
+
+    '''
+    returns the point count of a given point list 
+    @param plist: point list
+    '''    
+    def __cntPList(self, plist):
+        res = 0
+        for shape in plist :
+            for seg in shape:
+                for stripe in seg :
+                    res += len(stripe)
+        return str(res)
+        
+    def __printPlist(self, plist):
+        for shape in plist :
+            print "new shape"
+            for seg in shape :
+                print "new seg"
+                for stripe in seg:
+                    print stripe 
         
     '''
     get vertex normal in v1
@@ -574,4 +613,6 @@ class VehicleData():
 # ======================================================================================================================================
 # debug
 # ====================================================================================================================================== 
-#t = VehicleData()        
+t = VehicleData()     
+  
+   

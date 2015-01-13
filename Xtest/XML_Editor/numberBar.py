@@ -4,10 +4,7 @@ Created on Aug 11, 2014
 @author: fran_re
 '''
 
-from PySide import QtGui, QtOpenGL
-from PySide.QtCore import QFile, QEvent,Qt
-from PySide.QtGui import QStackedWidget, QMessageBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor
-
+from PySide import QtGui
 
 class NumberBar(QtGui.QWidget):
     def __init__(self, *args):

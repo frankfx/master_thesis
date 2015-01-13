@@ -6,7 +6,7 @@ Created on Aug 12, 2014
 import re
 from PySide.QtGui import QTextEdit, QCompleter, QStringListModel, QTextCursor, QApplication
 from PySide.QtCore import Qt
-
+from Xtest.XML_Editor import config
     
 class EditorCodeCompletion(QTextEdit):
     def __init__(self, path_dict):
@@ -129,7 +129,7 @@ class EditorCodeCompletion(QTextEdit):
      
 if __name__ == "__main__":
 
-    import config
+
     app = QApplication([])
     te = EditorCodeCompletion(config.Config.path_code_completion_dict)
     te.show()

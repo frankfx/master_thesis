@@ -228,6 +228,7 @@ freePathType
 fuelInTankType
 fuelType
 fuelsType
+fuselage
 fuselageElementType
 fuselageElementsType
 fuselageProfilesType
@@ -589,6 +590,8 @@ wheelsType
 windowAssemblyPositionType
 windowsAssemblyType
 windowsType
+wing
+wings
 wingAirfoilsType
 wingCellType
 wingCellsType
@@ -636,4 +639,4 @@ zeroComponentsType
 zeroDisciplineType
 zeroDisciplinesType
 zeroParameterType
-zeroParametersType
+zeroParametersTypeUIDGroupDefinitionType

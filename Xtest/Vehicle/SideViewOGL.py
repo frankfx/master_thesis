@@ -45,7 +45,7 @@ class Renderer(QtOpenGL.QGLWidget):
         self.viewheight = 0.0
 
         # helper
-        self.r_color = 0.0
+        self.r_color = 0.7
         self.g_color = 0.0
         self.b_color = 0.0
         self.alpha_rgb = 1.0
@@ -120,7 +120,8 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glEnable(GL.GL_LIGHT1)
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glEnable(GL.GL_BLEND)
-        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)             
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)  
+                   
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
         
         self.createOglLists()
@@ -145,8 +146,6 @@ class Renderer(QtOpenGL.QGLWidget):
         self.alpha_rgb = value
 
     def paintGL(self):
-        #self.__printShowingFlags()
-        
         self.__setProjection()
         # Clear screen and Z-buffer
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT) 
@@ -174,25 +173,10 @@ class Renderer(QtOpenGL.QGLWidget):
     generic drawing function
     '''
     def drawAircraft(self):
-        if self.flag_show_fuselage :
-            self.draw(self.data.pList_fuselage, self.data.pList_fuselage_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 0, self.selectionList.fuseIsEmpty())        
-        
-        if self.flag_show_wing1_up :  
-            self.draw(self.data.pList_wing_up, self.data.pList_wing_up_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 1, self.selectionList.wingUpIsEmpty())
-            
-        if self.flag_show_wing1_lo :
-            self.draw(self.data.pList_wing_lo, self.data.pList_wing_lo_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 2)
-        
-        if self.flag_show_wing2_up :
-            self.draw(self.data.pList_wing_up_reflect, self.data.pList_wing_up_reflect_normals, [0.75164, 0.60648, 0.22648,self.alpha_rgb], 3)
-            
-        if self.flag_show_wing2_lo :
-            self.draw(self.data.pList_wing_lo_reflect, self.data.pList_wing_lo_reflect_normals, [0.75164, 0.60648, 0.22648,self.alpha_rgb], 4)
-        
         if self.flag_show_compnt :
             GL.glColor3fv([1.0, 0.0, 0.0])
             GL.glCallList(self.index+5)
-        
+
         if self.flag_show_flap_TE_Device :
             GL.glCallList(self.index+6)
         
@@ -200,10 +184,28 @@ class Renderer(QtOpenGL.QGLWidget):
             GL.glCallList(self.index+7)
         
         if self.flag_show_flap_spoiler :
-            GL.glCallList(self.index+8)
-        
+            GL.glCallList(self.index+8)            
+            
         if self.flag_show_spars :
             GL.glCallList(self.index+9)
+        
+        if self.flag_show_wing1_up :  
+            self.draw(self.data.pList_wing_up, self.data.pList_wing_up_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 1, self.selectionList.wingUpIsEmpty())
+            
+        if self.flag_show_wing1_lo :
+            self.draw(self.data.pList_wing_lo, self.data.pList_wing_lo_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 2, self.selectionList.wingLoIsEmpty())
+        
+        if self.flag_show_wing2_up :
+            self.draw(self.data.pList_wing_up_reflect, self.data.pList_wing_up_reflect_normals, [0.75164, 0.60648, 0.22648,1.0], 3, self.selectionList.wingUpRIsEmpty())
+            
+        if self.flag_show_wing2_lo :
+            self.draw(self.data.pList_wing_lo_reflect, self.data.pList_wing_lo_reflect_normals, [0.75164, 0.60648, 0.22648,1.0], 4, self.selectionList.wingLoRIsEmpty())
+        
+        if self.flag_show_fuselage :
+            self.draw(self.data.pList_fuselage, self.data.pList_fuselage_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 0, self.selectionList.fuseIsEmpty())        
+        
+
+        
 
     '''
     drawing function for the fuselage. 
@@ -246,7 +248,6 @@ class Renderer(QtOpenGL.QGLWidget):
     def __getSegmentColor(self, shaIdx, segIdx, selectionList, color):
         pos = -1 ; i = 0
         for p in selectionList :
-            print selectionList
             if segIdx == p.getSegmentIdx() and shaIdx == p.getShapeIdx() :
                 if pos == -1 :  pos = i
                 else : 
@@ -290,10 +291,10 @@ class Renderer(QtOpenGL.QGLWidget):
     @param reflect: 1 for not reflected, -1 for reflected
     '''
     def __getSelectedWingSegment(self, plist, point, reflect=1):
-        for shaIdx in range(len(plist)):
-            segIdx = self.isWingSegmentSelected(shaIdx+1, point, reflect) 
+        for shaIdx in range(1 ,len(plist)+1):
+            segIdx = self.isWingSegmentSelected(shaIdx, point, reflect) 
             if segIdx != -1 :
-                return (shaIdx, segIdx-1)
+                return (shaIdx-1, segIdx-1)
         return (None, None)
     
     '''
@@ -386,15 +387,15 @@ class Renderer(QtOpenGL.QGLWidget):
         GL.glEndList()
 
         GL.glNewList(self.index+6, GL.GL_COMPILE)
-        self.createOglFlaps(self.data.pList_flaps_TEDevice, 0.04)
+        self.createOglFlaps(self.data.pList_flaps_TEDevice, self.data.pList_flaps_TE_normals, 0.04)
         GL.glEndList()
 
         GL.glNewList(self.index+7, GL.GL_COMPILE)
-        self.createOglFlaps(self.data.pList_flaps_LEDevice, 0.06)
+        self.createOglFlaps(self.data.pList_flaps_LEDevice, self.data.pList_flaps_LE_normals, 0.06)
         GL.glEndList()
 
         GL.glNewList(self.index+8, GL.GL_COMPILE)
-        self.createOglFlaps(self.data.pList_flaps_Spoiler, 0.08)
+        self.createOglFlaps(self.data.pList_flaps_Spoiler, self.data.pList_flaps_Spoiler_normals, 0.08)
         GL.glEndList()
 
         GL.glNewList(self.index+9, GL.GL_COMPILE)
@@ -455,19 +456,40 @@ class Renderer(QtOpenGL.QGLWidget):
     @param plist: given point list
     @param offset: offset to prevent z-fighting
     '''
-    def createOglFlaps(self, pList, offset):
+    '''
+    creates flaps ogl list
+    @param plist: given point list
+    @param offset: offset to prevent z-fighting
+    '''
+    def createOglFlaps(self, pList, norm, offset):
+        print pList
+        print norm
+        
+        
         GL.glBegin(GL.GL_QUADS)
-        for shape in pList :
-            for segments in shape :
-                for flaps in segments :
+        for shaIdx in range(len(pList)) :
+            for segIdx in range(len(pList[shaIdx])) :
+                for flapIdx in range(len(pList[shaIdx][segIdx])) :
                     color = self.newColorVec()
                     GL.glColor3fv(color)
-                    GL.glVertex3f(flaps[0][0], flaps[0][1], flaps[0][2] + offset)
-                    GL.glVertex3f(flaps[1][0], flaps[1][1], flaps[1][2] + offset)
-                    GL.glVertex3f(flaps[3][0], flaps[3][1], flaps[3][2] + offset)
-                    GL.glVertex3f(flaps[2][0], flaps[2][1], flaps[2][2] + offset)
+                    p = pList[shaIdx][segIdx][flapIdx]
+                    n = norm[shaIdx][segIdx][flapIdx]
+                    
+                    GL.glNormal3fv(n[0])
+                    GL.glVertex3f(p[0][0], p[0][1], p[0][2] + offset)
+                    
+                    GL.glNormal3fv(n[1])
+                    GL.glVertex3f(p[1][0], p[1][1], p[1][2] + offset)
+                    
+                    GL.glNormal3fv(n[3])
+                    GL.glVertex3f(p[3][0], p[3][1], p[3][2] + offset)
+                    
+                    GL.glNormal3fv(n[2])
+                    GL.glVertex3f(p[2][0], p[2][1], p[2][2] + offset)
         GL.glEnd()
-
+        
+  
+    
     '''
     creates spars ogl list
     @param plist: given point list
@@ -580,7 +602,7 @@ class Renderer(QtOpenGL.QGLWidget):
             selectedPoint = self.__winPosTo3DPos(self.lastPos_x, self.lastPos_y)
 
             (shaIdx, segIdx) = self.__getSelectedSegment(self.data.pList_fuselage, selectedPoint)
-            if shaIdx is not None : 
+            if shaIdx is not None :
                 self.selectionList.addPointToFuse(Point(shaIdx, segIdx, selectedPoint))
                 self.updateOglShapeSelectionList(self.data.pList_fuselage, self.data.pList_fuselage_normals, self.selectionList.fuselist, [0.0, 0.5, 0.8,self.alpha_rgb], 0)
                 self.updateGL()
@@ -590,22 +612,24 @@ class Renderer(QtOpenGL.QGLWidget):
                     self.selectionList.addPointToWingUp(Point(shaIdx, segIdx, selectedPoint))
                     self.updateOglShapeSelectionList(self.data.pList_wing_up, self.data.pList_wing_up_normals, self.selectionList.wing_up, [0.0, 0.5, 0.8,self.alpha_rgb], 1)
                     self.updateGL()
-                    
-            
-            
-            
-#------------------------------------------------------------------------------ 
-                #------------------------------------------- if shaIdx is None :
-                    # (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_lo, selectedPoint)
-                    #--------------------------------------- if shaIdx is None :
-                        # (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_up_reflect, selectedPoint, -1)
-                        #----------------------------------- if shaIdx is None :
-                            # (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_lo_reflect, selectedPoint, -1)
-            
-                
-
-                
-                
+                else:
+                    (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_lo, selectedPoint)
+                    if shaIdx is not None :
+                        self.selectionList.addPointToWingLo(Point(shaIdx, segIdx, selectedPoint))
+                        self.updateOglShapeSelectionList(self.data.pList_wing_lo, self.data.pList_wing_lo_normals, self.selectionList.wing_lo, [0.0, 0.5, 0.8,self.alpha_rgb], 2)
+                        self.updateGL()            
+                    else:
+                        (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_up_reflect, selectedPoint, -1)
+                        if shaIdx is not None :
+                            self.selectionList.addPointToWingUpRefl(Point(shaIdx, segIdx, selectedPoint))
+                            self.updateOglShapeSelectionList(self.data.pList_wing_up_reflect, self.data.pList_wing_up_reflect_normals, self.selectionList.wing_up_r, [0.75164, 0.60648, 0.22648,self.alpha_rgb], 3)
+                            self.updateGL()     
+                        else :
+                            (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_lo_reflect, selectedPoint, -1)
+                            if shaIdx is not None :
+                                self.selectionList.addPointToWingLoRefl(Point(shaIdx, segIdx, selectedPoint))
+                                self.updateOglShapeSelectionList(self.data.pList_wing_lo_reflect, self.data.pList_wing_lo_reflect_normals, self.selectionList.wing_lo_r, [0.75164, 0.60648, 0.22648,self.alpha_rgb], 4)
+                                self.updateGL() 
         elif not self.selectionList.isEmpty() :
             self.selectionList.removeAll()
             self.updateGL()
@@ -638,7 +662,7 @@ class Renderer(QtOpenGL.QGLWidget):
     def newColorVec(self):   
         color = [self.r_color, self.g_color, self.b_color]
         
-        offset = 0.2
+        offset = 0.5
         self.b_color += offset
         
         if self.b_color >= 1.0 : 
@@ -856,7 +880,7 @@ class Widget(QtGui.QWidget):
     def setShowAircraft(self):
         for i in range(5) : 
             if not self.showOptions[i].isChecked() :
-                print self.showOptions[i].isChecked()
+                print "setShowAircraft" , self.showOptions[i].isChecked()
                 self.__checkAircraft(True) ; return
         self.__checkAircraft(False)
     
