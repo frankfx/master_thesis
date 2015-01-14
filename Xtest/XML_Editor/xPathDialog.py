@@ -29,6 +29,7 @@ class XPathDialog(QtGui.QMainWindow):
         bottomFiller = QtGui.QWidget()
         bottomFiller.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)        
 
+
         vbox = QtGui.QVBoxLayout()
         vbox.setContentsMargins(5, 5, 5, 5)
         vbox.addWidget(topFiller)
@@ -54,8 +55,6 @@ class XPathDialog(QtGui.QMainWindow):
     def createMenus(self):
         self.editMenu = self.menuBar().addMenu("&Edit")
         self.editMenu.addAction(self.copyAct)
-        self.editMenu.addAction(self.closeAct)
-        
         
     def createActions(self):
         self.copyAct = QtGui.QAction("&Copy", self,
@@ -71,6 +70,8 @@ class XPathDialog(QtGui.QMainWindow):
         self.clipboard.setText(self.infoLabel.text().replace("</*i>", ""), QtGui.QClipboard.Clipboard)
 
     def closeEvent(self,event):
+        # bad solution but it works - for editor_Window getCursorXPath 
+        self.closeAct.trigger()
         event.accept()
 
 if __name__ == "__main__":

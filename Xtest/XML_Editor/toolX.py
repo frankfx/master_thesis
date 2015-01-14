@@ -5,8 +5,10 @@ Created on Jan 14, 2015
 '''
 
 from PySide import QtGui
+from Xtest.XML_Editor import difficultTestTool
+import numpy as np
 
-class NewFileDialog(QtGui.QWidget):
+class ToolX(QtGui.QWidget):
     '''
     This class represents a new file dialog widget. It will be used to create an empty cpacs file
     '''
@@ -15,43 +17,55 @@ class NewFileDialog(QtGui.QWidget):
         '''
         constructs five input text fields and two buttons to for submitting the input or cancel the event
         '''
-        super(NewFileDialog, self).__init__()          
+        super(ToolX, self).__init__()          
         
-        self.textDataSet = QtGui.QLineEdit()
-        self.textCreator = QtGui.QLineEdit()
-        self.textVersion = QtGui.QLineEdit()
-        self.textDescrip = QtGui.QTextEdit()
-        self.textCpacsVe = QtGui.QLineEdit()
+        self.text1 = QtGui.QLineEdit()
+        self.text2 = QtGui.QLineEdit()
+       
         
         self.buttonBox = QtGui.QDialogButtonBox()
         self.buttonBox.addButton("ok", QtGui.QDialogButtonBox.AcceptRole)
         self.buttonBox.addButton("cancel", QtGui.QDialogButtonBox.RejectRole)
         
+        self.buttonBox.accepted.connect(self.submitInput)
+        
         self.closeAct = QtGui.QAction("C&lose", self, shortcut="Ctrl+Q",
         statusTip="Exit the application", triggered=None)
         
         layout = QtGui.QFormLayout()
-        layout.addRow("&name of the data set", self.textDataSet)
-        layout.addRow("&creator of the file", self.textCreator)
-        layout.addRow("&version of the file", self.textVersion)
-        layout.addRow("&description to the file", self.textDescrip)
-        layout.addRow("&CPACS version number", self.textCpacsVe)
+        layout.addRow("&x", self.text1)
+        layout.addRow("&y", self.text2)
         
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addLayout(layout)
         mainLayout.addWidget(self.buttonBox)
         
         self.setLayout(mainLayout)
-        self.setWindowTitle(self.tr("Create new CPACS file"))  
+        self.setWindowTitle(self.tr("Tool X"))  
         self.setFixedSize(400,300)
         
     def submitInput(self):
         '''
         returns the input values from the new file dialog form
         '''        
-        return dict(name         = self.textDataSet.text(), creator     = self.textCreator.text(), 
-                   version      = self.textVersion.text(), description = self.textDescrip.toPlainText(),
-                   cpacsVersion = self.textCpacsVe.text())
+        # call difficult tool with command line
+        t = difficultTestTool.doSomething(int(self.text1.text()), int(self.text2.text()))
+
+        t = np.arange(0.0, 2.0, 0.01)
+        
+        print t
+        from pylab import *
+
+       
+        s = sin(2*pi*t)
+        plot(t, s)
+
+        xlabel('time (s)')
+        ylabel('voltage (mV)')
+        title('About as simple as it gets, folks')
+        grid(True)
+        savefig("test.png")
+        show()
 
 
     def closeEvent(self,event):
@@ -59,9 +73,8 @@ class NewFileDialog(QtGui.QWidget):
         event.accept()
         
 
-
 if __name__ == "__main__":
     app = QtGui.QApplication([])
-    test = NewFileDialog()
+    test = ToolX()
     test.show()
     app.exec_()       

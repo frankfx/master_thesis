@@ -15,6 +15,7 @@ from numberBar import NumberBar
 from Xtest.XML_Editor.config import Config
 
 from highlighter import Highlighter
+from toolX import ToolX
 
 class EditorWindow(QMainWindow):
     """initialize editor"""
@@ -234,6 +235,9 @@ class EditorWindow(QMainWindow):
         link_to_node_NoAction = QAction('no', self)
         link_to_node_NoAction.triggered.connect(self.dummyFuction)  
 
+        toolXAction = QAction('Tool X',self)
+        toolXAction.triggered.connect(self.fireToolX)
+
         menubar = self.menuBar()
         filemenu = menubar.addMenu("File")
         filemenu.addAction(newAction)
@@ -251,6 +255,9 @@ class EditorWindow(QMainWindow):
         editormenu_child1 = editormenu.addMenu('Link to node')
         editormenu_child1.addAction(link_to_node_YesAction)
         editormenu_child1.addAction(link_to_node_NoAction)
+        toolmenu = menubar.addMenu("Tools")
+        toolmenu.addAction(toolXAction)
+
 
     def fireUpdateNumbar(self):
         self.updateLineNumber()
@@ -311,14 +318,19 @@ class EditorWindow(QMainWindow):
         self.popUpWidget = XPathDialog(self.tixi.uIDGetXPath(uID)) 
 
         self.setEnabled(False)
-        self.popUpWidget.copyAct.triggered.connect(self.__copyXPath)
-        self.popUpWidget.closed.triggered.connect(self.__resetPopUpWidget)
+        self.popUpWidget.closeAct.triggered.connect(self.__resetPopUpWidget)
         
         self.popUpWidget.show()
-      
-      
-    def __copyXPath(self):
-        print "hallo welt"    
+  
+
+    def fireToolX(self):
+        self.popUpWidget = ToolX()
+        self.setEnabled(False)
+        #self.popUpWidget.buttonBox.accepted.connect(self.__createNewCpacsFile)
+        self.popUpWidget.closeAct.triggered.connect(self.__resetPopUpWidget)
+        
+        self.popUpWidget.show()
+        
 
     def updateLineNumber(self): 
         '''
@@ -343,6 +355,8 @@ class EditorWindow(QMainWindow):
         extraSelections.append(selection)
         self.editor.setExtraSelections(extraSelections)
         self.editor.setFocus()  
+ 
+
  
     #TODO: implemnt
     def fireUpdate(self):
@@ -377,6 +391,7 @@ class EditorWindow(QMainWindow):
         self.popUpWidget = NewFileDialog()
         self.popUpWidget.buttonBox.accepted.connect(self.__createNewCpacsFile)
         self.popUpWidget.buttonBox.rejected.connect(self.__resetPopUpWidget)
+        self.popUpWidget.closeAct.triggered.connect(self.__resetPopUpWidget)
         self.popUpWidget.show()
         
        
