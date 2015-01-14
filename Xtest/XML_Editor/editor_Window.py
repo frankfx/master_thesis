@@ -1,6 +1,10 @@
 import sys
 import re
+
 from tixiwrapper import Tixi, TixiException
+from Xtest.XML_Editor.newFileDialog import NewFileDialog
+from xPathDialog import XPathDialog
+
 
 from lxml import etree
 from PySide.QtGui import QMessageBox, QSpinBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor, QMainWindow, QGridLayout, QHBoxLayout, QWidget, QPushButton, QFont, QTextEdit, QApplication
@@ -16,7 +20,7 @@ class EditorWindow(QMainWindow):
     """initialize editor"""
     def __init__(self):
         super(EditorWindow, self).__init__()   
-       
+        
         self.tixi = Tixi()
        
         self.cur_file_path = ""
@@ -28,6 +32,8 @@ class EditorWindow(QMainWindow):
         self.setupStatusbar()
         self.setupMenubar()
         self.setupNumbar()
+        
+        self.popUpWidget = None
         
         self.flag_layout = False
        
@@ -59,7 +65,7 @@ class EditorWindow(QMainWindow):
     @param xmlFilename: input file
     @param cpacs_scheme: validation scheme
     '''
-    def loadFile(self, xmlFilename=None, cpacs_scheme=None):
+    def loadFile(self, xmlFilename=None, cpacs_scheme=Config.path_cpacs_21_schema):
         if xmlFilename and cpacs_scheme :
             try:
                 self.tixi.openDocument(xmlFilename) 
@@ -69,7 +75,6 @@ class EditorWindow(QMainWindow):
                 self.cur_file_path = xmlFilename
                 self.cur_schema_path = cpacs_scheme  
                 
-                self.getCursorXPath()              
             except TixiException, e:  
                 print e.error
                 self.statusBar().showMessage('CPACS ERROR: ' + e.error)
@@ -150,7 +155,6 @@ class EditorWindow(QMainWindow):
     def setfontsize(self, value):
         self.font.setPointSize(value)
         self.editor.setFont(self.font)
-        self.getCursorXPath()
                 
     def setupEditor(self):
         self.font = QFont()
@@ -216,10 +220,13 @@ class EditorWindow(QMainWindow):
 
         clearAction = QAction('Clear', self)
         clearAction.setStatusTip('Clear Editor')
-        clearAction.triggered.connect(self.fireClear)
+        clearAction.triggered.connect(self.editor.clear)
 
-        numbarAction = QAction('LineNumber', self)
+        numbarAction = QAction('Line Number', self)
         numbarAction.triggered.connect(self.fireSwitchLayout)                 
+
+        xpathAction = QAction('Current XPath', self)
+        xpathAction.triggered.connect(self.getCursorXPath)  
 
         link_to_node_YesAction = QAction('yes', self)
         link_to_node_YesAction.triggered.connect(self.dummyFuction)  
@@ -240,6 +247,7 @@ class EditorWindow(QMainWindow):
         editormenu.addAction(clearAction) 
         editormenu.addSeparator()
         editormenu.addAction(numbarAction)
+        editormenu.addAction(xpathAction)
         editormenu_child1 = editormenu.addMenu('Link to node')
         editormenu_child1.addAction(link_to_node_YesAction)
         editormenu_child1.addAction(link_to_node_NoAction)
@@ -290,39 +298,41 @@ class EditorWindow(QMainWindow):
         
         
     def getCursorXPath(self):
-        
-        row = self.lineNumber
-        col = self.colNumber
-        
+        '''
+        returns the current cursor xpath position
+        '''        
         self.editor.find('uID', QTextDocument.FindBackward)
+        self.editor.find('"')
 
-        uID = self.editor.textCursor().block().text()
+        tc = self.editor.textCursor()        
+        tc.select(QTextCursor.WordUnderCursor)
+        uID = tc.selectedText()
 
-        cursor = self.editor.textCursor()
-        cursor.movePosition(QTextCursor.StartOfBlock)
+        self.popUpWidget = XPathDialog(self.tixi.uIDGetXPath(uID)) 
 
-        row2 = self.lineNumber
-        col2 = self.colNumber
+        self.setEnabled(False)
+        self.popUpWidget.copyAct.triggered.connect(self.__copyXPath)
+        self.popUpWidget.closed.triggered.connect(self.__resetPopUpWidget)
+        
+        self.popUpWidget.show()
+      
+      
+    def __copyXPath(self):
+        print "hallo welt"    
 
-        cursor.movePosition(QTextCursor.Down, QTextCursor.MoveAnchor, row-row2)        
-        cursor.movePosition(QTextCursor.Right, QTextCursor.MoveAnchor, col-1)
-        self.editor.setTextCursor(cursor)
-       
-        print uID
-        print self.tixi.uIDGetXPath(uID)
-                  
-    '''
-    set the line and column number
-    '''
     def updateLineNumber(self): 
+        '''
+        sets the line and column number
+        '''
         self.lineNumber = self.editor.textCursor().blockNumber() + 1
         self.colNumber = self.editor.textCursor().columnNumber() + 1
         self.m_statusRight.setText("row: " + str(self.lineNumber) + ", col:"  + str(self.colNumber))           
 
-    '''
-    highlight something
-    '''        
+       
     def highlightCurrentLine(self) :
+        '''
+        highlight line under cursor
+        ''' 
         extraSelections = []
         selection = QTextEdit.ExtraSelection()
         lineColor = QColor(255, 250, 205)
@@ -336,117 +346,96 @@ class EditorWindow(QMainWindow):
  
     #TODO: implemnt
     def fireUpdate(self):
-        print ('dummy funciton - update the model')
+        print ('dummy function - update the model')
 
-    '''
-    reloads cpacs file if not updated yet
-    '''
+
     def fireRevert(self):
+        '''
+        reloads cpacs file if not updated yet
+        '''
         if(self.cur_file_path and self.cur_schema_path) :
             self.loadFile(self.cur_file_path, self.cur_schema_path)
         else :
             QMessageBox.about(self, "error", "CPACS-File or Validation-Schema not available")
             
-    '''
-    resets the editor
-    '''
-    def fireClear(self):
-        self.editor.clear()
- 
-    '''
-    function to show or hide line numbers
-    '''
+
     def fireSwitchLayout(self): 
+        '''
+        function to show or hide line numbers
+        '''
         if(self.flag_layout) :
             self.number_bar.show()
         else :  
             self.number_bar.hide()
         self.flag_layout = not self.flag_layout 
- 
- 
- 
- 
-    def fireSearchSTRING(self):
-        self.searchOpt = self.searchOptions.STRING
-        
-    def fireSearchXPATH(self):
-        self.searchOpt = self.searchOptions.XPATH
     
     def fireNewAction(self):
-        self.editor.clear()
-        self.editor.setText(Config.cpacs_default)
- 
- 
- 
- 
- 
- 
+        '''
+        opens new file input form   
+        '''          
+        self.setEnabled(False)
+        self.popUpWidget = NewFileDialog()
+        self.popUpWidget.buttonBox.accepted.connect(self.__createNewCpacsFile)
+        self.popUpWidget.buttonBox.rejected.connect(self.__resetPopUpWidget)
+        self.popUpWidget.show()
+        
+       
+    def __createNewCpacsFile(self):
+        '''
+        closes all documents and creates new empty cpacs temporary file   
+        '''        
+        idict = self.popUpWidget.submitInput()
+        self.tixi.closeAllDocuments()
+        self.tixi.create('cpacs')
+        self.tixi.addCpacsHeader(idict['name'], idict['creator'], idict['version'], idict['description'], idict['cpacsVersion'])
+        self.tixi.saveDocument('../cpacs_files/temp.xml')
+        self.loadFile('../cpacs_files/temp.xml')
+        self.__resetPopUpWidget()
+        
+    def __resetPopUpWidget(self):
+        print "reset yea"
+        self.popUpWidget.close()
+        self.popUpWidget = None    
+        self.setEnabled(True)
+    
+    
     def fireComment(self):  
+        '''
+        inserts open respective closing tag before and after a selected text. 
+        '''
         tc = self.editor.textCursor()
 
         tc.beginEditBlock()
         tc.setPosition(self.editor.textCursor().selectionStart())
-        tc.movePosition(QTextCursor.StartOfLine)
-        tc.insertBlock()
-        tc.movePosition(QTextCursor.PreviousBlock)
         tc.insertText("<!--")
         
         tc.setPosition(self.editor.textCursor().selectionEnd())
-        tc.movePosition(QTextCursor.EndOfLine)
-        tc.insertBlock()
         tc.insertText("-->")  
         tc.endEditBlock()      
-        
+
 
     def fireUnComment(self):
+        '''
+        removes open respective closing tag before and after a selected text. 
+        '''        
         tc = self.editor.textCursor()
-        c_shift = 0
+        selectTxt = tc.selectedText()
         
-        tc.beginEditBlock()
-        s_row = tc.selectionStart()
-        e_row = tc.selectionEnd()
+        if selectTxt.find('<!--') != -1 : 
+            if selectTxt.rfind('-->') != -1 :
+                selectTxt = selectTxt.replace('<!--', '', 1)
+                selectTxt = self.__rreplace(selectTxt, '-->' , '', 1)
+                tc.insertText(selectTxt)
+            else:
+                QMessageBox.about(self, "error", "no open tag (%s) in selection" % ('-->')) 
+        else:
+            QMessageBox.about(self, "error", "no close tag (%s) in selection" % ('<!--')) 
         
-        tc.setPosition(s_row)
-        tc.select(QTextCursor.LineUnderCursor)
-        txt = sel_txt = tc.selectedText()
-        
-        if txt == '' : return
-        
-        txt = txt.replace('<!--', '', 1)
-        if txt == '' : 
-            tc.select(QTextCursor.BlockUnderCursor)
-            tc.removeSelectedText()
-            c_shift = 5 # 4 (see else) +1 because of the deleted row
-        elif txt != sel_txt : 
-            tc.insertText(txt)
-            c_shift = 4 # 4 because of the deleted </--
-            
-        tc.setPosition(e_row)
-        tc.movePosition(QTextCursor.PreviousCharacter,QTextCursor.MoveAnchor, c_shift)
-        tc.select(QTextCursor.LineUnderCursor)
-        txt = sel_txt = tc.selectedText()
-        
-        if txt == '' : return
-             
-        txt = txt.replace('-->', '', 1)
-        if txt == '' : 
-            tc.select(QTextCursor.BlockUnderCursor)
-            tc.removeSelectedText()
-        elif txt != sel_txt :
-            tc.insertText(txt)
-        tc.endEditBlock()
 
-    '''
-    handle for searching strings by pressing enter key
-    '''
-    def keyPressEvent(self,event):
-        if self.searchbox.isFocused() and event.key() == Qt.Key_Return :            
-            self.fire_search_foreward()
-
-    '''
-    show and hide searchbox and buttons
-    '''
     def fireSearchView(self):
+        '''
+        show and hide searchbox and buttons
+        '''        
         if self.searchbox.isFocused() :
             self.searchbox.hide()
             self.button1.hide()
@@ -460,7 +449,29 @@ class EditorWindow(QMainWindow):
             self.label1.show()
             self.fontsizeSpinBox.show()
             self.searchbox.setFocus()
-              
+
+    def keyPressEvent(self,event):
+        '''
+        handle for searching strings by pressing enter key
+        '''        
+        if self.searchbox.isFocused() and event.key() == Qt.Key_Return :            
+            self.fire_search_foreward()   
+   
+    # ======================================================================================================================
+    # utilities
+    # ======================================================================================================================
+    
+    def __rreplace(self, s, old, new, occurrence):
+        '''
+        reverse string replace function
+        @param s: source string
+        @param old: char to be replaced
+        @param new: new char 
+        @param occurrence: only the given count occurrences are replaced.
+        ''' 
+        li = s.rsplit(old, occurrence)
+        return new.join(li)   
+           
 def main():
     app = QApplication(sys.argv)
     w = EditorWindow()
