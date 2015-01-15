@@ -26,11 +26,11 @@ except ImportError:
 
 class Renderer(QtOpenGL.QGLWidget):
 
-    def __init__(self, width, height):
+    def __init__(self, width, height, tixi, tigl):
         super(Renderer, self).__init__()
         
         # point lists
-        self.data = VehicleData()
+        self.data = VehicleData(tixi, tigl)
         
         # transformations
         self.xRot = 0
@@ -677,7 +677,7 @@ class Renderer(QtOpenGL.QGLWidget):
 
                 
 class Widget(QtGui.QWidget):
-    def __init__(self, parent = None):
+    def __init__(self, tixi, tigl, parent = None):
         super(Widget, self).__init__(parent)
         
         # window preferences
@@ -686,7 +686,7 @@ class Widget(QtGui.QWidget):
         self.resize(self.width ,self.height)
         
         # objects
-        self.renderer = Renderer(self.width ,self.height)
+        self.renderer = Renderer(self.width ,self.height, tixi, tigl)
         
         # window elements
         self.xSlider = self.createSlider(QtCore.SIGNAL("xRotationChanged(int)"),
@@ -697,7 +697,7 @@ class Widget(QtGui.QWidget):
                                          self.renderer.setZRotation)           
   
         label1 = QtGui.QLabel("opacity")
-        label2 = QtGui.QLabel("   xRot")
+        label2 = QtGui.QLabel("xRot")
         label3 = QtGui.QLabel("yRot")
         label4 = QtGui.QLabel("zRot")
         label5 = QtGui.QLabel("zoom")
@@ -715,22 +715,24 @@ class Widget(QtGui.QWidget):
         zoom.setSuffix('%')
         zoom.setValue(50)        
         zoom.valueChanged.connect(self.setZoom)      
-      
 
         grid = QtGui.QGridLayout()
-        grid.addWidget(label1,       1,0)
-        grid.addWidget(transparency, 1,1)
-        grid.addWidget(label5,       2,0)
-        grid.addWidget(zoom,         2,1)
-        
-        grid.addWidget(label2       ,1, 3)
-        grid.addWidget(label3       ,2, 3)
-        grid.addWidget(label4       ,3, 3)        
-        grid.addWidget(self.xSlider ,1, 4)
-        grid.addWidget(self.ySlider ,2, 4)
-        grid.addWidget(self.zSlider ,3, 4)
 
-        grid.addWidget(self.renderer,4,0,1,6)
+        grid = QtGui.QGridLayout()
+        grid.addWidget(transparency, 1,0)
+        grid.addWidget(label1,       1,1)
+        grid.addWidget(zoom,         1,2)
+        grid.addWidget(label5,       1,3)
+
+        grid.addWidget(self.xSlider ,1, 4)
+        grid.addWidget(self.ySlider ,1, 6)
+        grid.addWidget(self.zSlider ,1, 8)        
+        grid.addWidget(label2       ,1, 5)
+        grid.addWidget(label3       ,1, 7)
+        grid.addWidget(label4       ,1, 9)        
+
+
+        grid.addWidget(self.renderer,4,0,1,10)
         self.setLayout(grid)
         
         self.setFocusPolicy(QtCore.Qt.ClickFocus)
@@ -897,12 +899,9 @@ class Widget(QtGui.QWidget):
 
     def createSlider(self, changedSignal, setterSlot):
         slider = QtGui.QSlider(QtCore.Qt.Horizontal)
-
-        slider.setRange(0, 360 * 2)
-        slider.setSingleStep(2)
-        slider.setPageStep(15 * 2)
-        slider.setTickInterval(15 * 2)
-        slider.setTickPosition(QtGui.QSlider.TicksRight)
+        slider = QtGui.QSpinBox()
+        slider.setRange(0, 360)
+        slider.setSingleStep(5)
 
         self.renderer.connect(slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
         self.connect(self.renderer, changedSignal, slider, QtCore.SLOT("setValue(int)"))

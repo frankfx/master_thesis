@@ -5,8 +5,8 @@ Created on Dec 3, 2014
 '''
 
 import sys
-from tiglwrapper   import Tigl, TiglException
-from tixiwrapper   import Tixi
+#from tiglwrapper   import Tigl, TiglException
+#from tixiwrapper   import Tixi
 from Xtest.Open_GL import utility
 import time
 import numpy as np
@@ -14,11 +14,15 @@ import math
 from numpy import shape
 
 class VehicleData():
-    def __init__(self):
+    def __init__(self, tixi, tigl):
         
         __start_time = time.time()
         
-        self.__initTixiTigl()
+        self.tixi = tixi
+        self.tigl = tigl
+        #self.__initTixiTigl()
+        self.configurationGetLength = self.tigl.configurationGetLength() # 2.05436735655 ; D150 = 37.5708073949
+        self.wingspan               = 0.0        
            
         utility.echo("Time after init tigl, tixi: " + str(time.time() - __start_time)) 
         self.pList_fuselage         = self.__createFuselage() 
@@ -56,19 +60,17 @@ class VehicleData():
         utility.echo("End data tigl calculation  -  Time: " + str(time.time() - __start_time))
     
     
-    def __initTixiTigl(self):
-        self.tixi = Tixi()
-        self.tixi.open('../cpacs_files/simpletest.cpacs.xml')
-        #self.tixi.open('../cpacs_files/D150_CPACS2.0_valid.xml')
-        
-        self.tigl = Tigl()
-        try:
-            self.tigl.open(self.tixi,"")
-        except TiglException as err:    
-            print 'Error opening tigl document: ', err.__str__()
+    #------------------------------------------------- def __initTixiTigl(self):
+        #---------------------------------------------------- self.tixi = Tixi()
+        #----------------- self.tixi.open('../cpacs_files/simpletest.cpacs.xml')
+        #------------- #self.tixi.open('../cpacs_files/D150_CPACS2.0_valid.xml')
+#------------------------------------------------------------------------------ 
+        #---------------------------------------------------- self.tigl = Tigl()
+        #------------------------------------------------------------------ try:
+            #-------------------------------------- self.tigl.open(self.tixi,"")
+        #------------------------------------------ except TiglException as err:
+            #-------------- print 'Error opening tigl document: ', err.__str__()
 
-        self.configurationGetLength = self.tigl.configurationGetLength() # 2.05436735655 ; D150 = 37.5708073949
-        self.wingspan               = 0.0
         
     # =========================================================================================================
     # =========================================================================================================    
@@ -613,6 +615,6 @@ class VehicleData():
 # ======================================================================================================================================
 # debug
 # ====================================================================================================================================== 
-t = VehicleData()     
+#t = VehicleData()     
   
    

@@ -4,9 +4,9 @@ Created on Aug 12, 2014
 @author: fran_re
 '''
 import re
-from PySide.QtGui import QTextEdit, QCompleter, QStringListModel, QTextCursor, QApplication
+from PySide.QtGui import QTextEdit, QCompleter, QStringListModel, QTextCursor, QApplication, QTextDocument
 from PySide.QtCore import Qt
-from Xtest.XML_Editor import config
+from Xtest.XML_Editor.configuration import config
     
 class EditorCodeCompletion(QTextEdit):
     def __init__(self, path_dict):
@@ -30,11 +30,7 @@ class EditorCodeCompletion(QTextEdit):
         
         self.m_completer.setModel(model)
         self.m_completer.setCompletionMode(QCompleter.PopupCompletion)
-        #self.connect(self.m_completer, SIGNAL("activated()"), self.insertCompletion)
-       
         self.m_completer.activated.connect(self.insertCompletion)
-
-
 
     def insertCompletion (self, completion):
         cursor = self.textCursor()
@@ -45,49 +41,46 @@ class EditorCodeCompletion(QTextEdit):
         cursor.insertText(completion[extra:])
         self.setTextCursor(cursor)
         cursor.endEditBlock()
-    
-    def insertCompletionInline(self, completion):
-        cursor = self.textCursor()
-        cursor.beginEditBlock()
-        cursor.movePosition(QTextCursor.Left)
-        cursor.movePosition(QTextCursor.EndOfWord)
-        cursor.insertText(completion)
-        cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, len(completion))
-        self.setTextCursor(cursor)
-        cursor.endEditBlock()
+
+    def __insertTag(self):
+        '''
+        inserts the corresponding closing tag to an opening xml tag
+        '''
+        self.find('<', QTextDocument.FindBackward)
+        tc = self.textCursor()        
+        tc.select(QTextCursor.WordUnderCursor)
+        txt = '' if self.__stringHasBracket(tc.selectedText().replace(' ', '')) else tc.selectedText()
+        txt = '</' + txt + '>'
         
-    def getTagName(self, pos):
-        cursor = self.textCursor()
-        cursor.select(QTextCursor.LineUnderCursor)
-        if self.isWellfomed(cursor.selectedText()) :
-            txt = cursor.selectedText()[:pos]
-            try :
-                txt = re.findall('<.*?>', txt)[-1]
-                pattern = "(?<=[<]).*?(?=[\s>])"        # (?<=[<]) === look behind [<] ;;; .*? === any sign but not greedy
-                return re.search(pattern, txt).group(0) # (?=[\s>]) === look ahead [space or >] 
-            except IndexError:
-                return ''
-        else : return None
-
-    def textUnderCursor(self):
-        cursor = self.textCursor()
-        cursor.select(QTextCursor.WordUnderCursor)
-        return cursor.selectedText()
-
-    def isWellfomed(self, str):
-        stack = re.findall("[<>]", str)
-        return False if len(stack)%2 != 0 else self.rec_isWellformed(stack)
- 
-    def rec_isWellformed(self, stack):
-        return True if len(stack) == 0 else self.wellFormed(stack.pop(), stack.pop()) and self.rec_isWellformed(stack)
+        self.find('>')    
+        tc = self.textCursor()
+        tc.clearSelection()
+        
+        tc.insertText(txt) 
+        tc.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, len(txt))
+        self.setTextCursor(tc)
     
-    def wellFormed(self, fst, snd):
-        return fst == ')' and snd == '(' or \
-               fst == '>' and snd == '<' or \
-               fst == '}' and snd == '{'        
+    def __stringHasBracket(self, s):
+        return '<' in s or '>' in s
+
+    def __insertClosingTag(self, key):
+        '''
+        inserts a closing tag after the closing bracket of open tag
+        @param key: keyboard input value as int
+        '''
+        if self.flag_open_angle_bracket :
+            if key == 62  :  # >
+                self.__insertTag()
+                self.flag_open_angle_bracket = False            
+        elif key == 62  :  # >
+            return
+        elif key == 60  :  # <
+            self.flag_open_angle_bracket = True
  
     def keyPressEvent(self, event):
-        
+        '''
+        checks keyboard input to set closing tag or start code completion 
+        '''        
         if self.m_completer.popup().isVisible() :
             if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return or event.key() == Qt.Key_Tab or event.key() == Qt.Key_Escape :
                 event.ignore()
@@ -97,19 +90,13 @@ class EditorCodeCompletion(QTextEdit):
         
         # ============================================================================================= 
         # begin tag inline insertion 
-        if self.flag_open_angle_bracket :
-            if event.key() == 62  :  # >
-                result = self.getTagName(self.textCursor().position())
-                if result is not None :
-                    self.insertCompletionInline('</' + result + '>')
-                    self.tag_name = ""
-                    self.flag_open_angle_bracket = False            
-        elif event.key() == 60  :  # <
-            self.flag_open_angle_bracket = True
+        self.__insertClosingTag(event.key())
         # end tag inline insertion 
         # ============================================================================================= 
         
-        completionPrefix = self.textUnderCursor()
+        cursor = self.textCursor()
+        cursor.select(QTextCursor.WordUnderCursor)        
+        completionPrefix = cursor.selectedText()
 
         isShortcut = (event.modifiers() == Qt.ControlModifier and
                       event.key() == Qt.Key_Space)
@@ -128,8 +115,6 @@ class EditorCodeCompletion(QTextEdit):
            
      
 if __name__ == "__main__":
-
-
     app = QApplication([])
     te = EditorCodeCompletion(config.Config.path_code_completion_dict)
     te.show()

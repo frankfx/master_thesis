@@ -8,6 +8,8 @@ class Config():
     path_cpacs_D150             = "../cpacs_files/D150_CPACS2.0_valid.xml"
     path_cpacs_A320_Fuse        = "../cpacs_files/A320_Fuse.xml"
     path_cpacs_A320_Wing        = "../cpacs_files/A320_Wing.xml"
+    path_cpacs_tmp_file         = "../cpacs_files/temp.xml"
+    path_cpacs_simple           = "../cpacs_files/simpletest.cpacs.xml"
     
     path_code_completion_dict   = "configuration/keywords"
     

@@ -1,28 +1,27 @@
 import sys
 import re
 
-from tixiwrapper import Tixi, TixiException
-from Xtest.XML_Editor.newFileDialog import NewFileDialog
-from xPathDialog import XPathDialog
-
+from tixiwrapper import TixiException
+from Xtest.XML_Editor.popUps.popUp_newFile import NewFileDialog
+from Xtest.XML_Editor.popUps.popUp_showXPath import XPathDialog
+from PySide.QtGui import QLineEdit
 
 from lxml import etree
 from PySide.QtGui import QMessageBox, QSpinBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor, QMainWindow, QGridLayout, QHBoxLayout, QWidget, QPushButton, QFont, QTextEdit, QApplication
 from PySide.QtCore import Qt, SIGNAL
-from editor_CodeCompletion import EditorCodeCompletion
-from Xtest.XML_Editor.search_field import SearchField
+from Xtest.XML_Editor.editor_comp import EditorCodeCompletion
 from numberBar import NumberBar
-from Xtest.XML_Editor.config import Config
+from Xtest.XML_Editor.configuration.config import Config
 
 from highlighter import Highlighter
-from toolX import ToolX
+from Xtest.XML_Editor.popUps.tools.toolX import ToolX
 
 class EditorWindow(QMainWindow):
     """initialize editor"""
-    def __init__(self):
+    def __init__(self, tixi):
         super(EditorWindow, self).__init__()   
         
-        self.tixi = Tixi()
+        self.tixi = tixi
        
         self.cur_file_path = ""
         self.cur_schema_path = ""
@@ -210,10 +209,10 @@ class EditorWindow(QMainWindow):
         newAction.setStatusTip('creats empty cpacs-file')
         newAction.triggered.connect(self.fireNewAction)                       
                         
-        updateAction = QAction('Update', self)
-        updateAction.setShortcut('Ctrl+U')
-        updateAction.setStatusTip('Update CPACS')
-        updateAction.triggered.connect(self.fireUpdate)
+        self.updateAction = QAction('Update', self)
+        self.updateAction.setShortcut('Ctrl+U')
+        self.updateAction.setStatusTip('Update CPACS')
+        self.updateAction.triggered.connect(self.fireUpdate)
 
         revertAction = QAction('Revert', self)
         revertAction.setShortcut('Ctrl+R')
@@ -241,7 +240,7 @@ class EditorWindow(QMainWindow):
         menubar = self.menuBar()
         filemenu = menubar.addMenu("File")
         filemenu.addAction(newAction)
-        filemenu.addAction(updateAction) 
+        filemenu.addAction(self.updateAction) 
         filemenu.addAction(revertAction)         
         sourcemenu = menubar.addMenu("Source")  
         sourcemenu.addAction(commentAction)  
@@ -323,13 +322,7 @@ class EditorWindow(QMainWindow):
         self.popUpWidget.show()
   
 
-    def fireToolX(self):
-        self.popUpWidget = ToolX()
-        self.setEnabled(False)
-        #self.popUpWidget.buttonBox.accepted.connect(self.__createNewCpacsFile)
-        self.popUpWidget.closeAct.triggered.connect(self.__resetPopUpWidget)
-        
-        self.popUpWidget.show()
+
         
 
     def updateLineNumber(self): 
@@ -361,7 +354,9 @@ class EditorWindow(QMainWindow):
     #TODO: implemnt
     def fireUpdate(self):
         print ('dummy function - update the model')
-
+        self.tixi.saveDocument(Config.path_cpacs_tmp_file)
+      # '../cpacs_files/temp.xml'
+        
 
     def fireRevert(self):
         '''
@@ -393,7 +388,15 @@ class EditorWindow(QMainWindow):
         self.popUpWidget.buttonBox.rejected.connect(self.__resetPopUpWidget)
         self.popUpWidget.closeAct.triggered.connect(self.__resetPopUpWidget)
         self.popUpWidget.show()
-        
+   
+    def fireToolX(self):
+        self.popUpWidget = ToolX("X-Tool")
+        self.setEnabled(False)
+        self.popUpWidget.buttonBox.accepted.connect(self.__resetPopUpWidget)
+        self.popUpWidget.buttonBox.rejected.connect(self.__resetPopUpWidget)
+        # closeAct for pressing X to close window
+        self.popUpWidget.closeAct.triggered.connect(self.__resetPopUpWidget)
+        self.popUpWidget.show()        
        
     def __createNewCpacsFile(self):
         '''
@@ -408,7 +411,6 @@ class EditorWindow(QMainWindow):
         self.__resetPopUpWidget()
         
     def __resetPopUpWidget(self):
-        print "reset yea"
         self.popUpWidget.close()
         self.popUpWidget = None    
         self.setEnabled(True)
@@ -486,6 +488,25 @@ class EditorWindow(QMainWindow):
         ''' 
         li = s.rsplit(old, occurrence)
         return new.join(li)   
+   
+class SearchField(QLineEdit):    
+    '''This is a docstring'''
+    def __init__(self):
+        super(SearchField, self).__init__()
+        self.__focus = False
+        
+    def focusInEvent(self, focusevent):
+        self.__focus = True
+        super(SearchField, self).focusInEvent(focusevent)
+
+    def focusOutEvent(self, focusevent):
+        self.__focus = False
+        super(SearchField, self).focusInEvent(focusevent)
+
+    def isFocused(self):
+        '''returns true if focus is on text field'''
+        return self.__focus   
+   
            
 def main():
     app = QApplication(sys.argv)
