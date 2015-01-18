@@ -31,7 +31,7 @@ class MainWindow(QtGui.QMainWindow):
         dockWidgets = [('xml editor', EditorWindow(tixi)), ('ogl editor', Widget(tixi, tigl)), 
                        ('Red', QtGui.QListWidget()), ('Green', QtGui.QListWidget())]
         
-        dockWidgets[0].updateAction.triggered.connect(self.fireUpdate)
+        #dockWidgets[0].updateAction.triggered.connect(self.fireUpdate)
         
         self.dockList = []
 

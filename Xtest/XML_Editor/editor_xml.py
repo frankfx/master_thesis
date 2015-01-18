@@ -1,7 +1,7 @@
 import sys
 import re
 
-from tixiwrapper import TixiException
+from tixiwrapper import Tixi, TixiException
 from Xtest.XML_Editor.popUps.popUp_newFile import NewFileDialog
 from Xtest.XML_Editor.popUps.popUp_showXPath import XPathDialog
 from PySide.QtGui import QLineEdit
@@ -301,29 +301,148 @@ class EditorWindow(QMainWindow):
                     return 
         except TixiException :
             QMessageBox.about(self, "error", "XPath %s not found" % path)
-        
-        
+
+
     def getCursorXPath(self):
+        start_pos = self.editor.textCursor().position()
+
+        tag , tag_pos , isCursorInTag = self.getTagNameAtCursor()
+
+        _,xpath_idx, xpath_uid = self.__findXPath_rec('/cpacs', '/cpacs' , tag, tag_pos)  
+        
+        if not isCursorInTag:
+            xpath_idx = self.__strRemoveReverseToChar(xpath_idx, '/')
+            xpath_uid = self.__strRemoveReverseToChar(xpath_uid, '/')
+ 
+        print xpath_idx
+        self.__setCursorToPostion(start_pos)
+        self.__startXPathPopUp(xpath_idx, xpath_uid)
+        
+        
+    def getTagNameAtCursor(self):
         '''
-        returns the current cursor xpath position
-        '''        
-        self.editor.find('uID', QTextDocument.FindBackward)
-        self.editor.find('"')
+        @return: name of tag , position of tag , cursor is btw open and closing tag 
+        '''
+        self.editor.find('<', QTextDocument.FindBackward)
+        isClosingTag , fst_tag   = self.__getTagName()
 
-        tc = self.editor.textCursor()        
+        pos = self.editor.textCursor().position()
+        
+        if isClosingTag :
+            # find open tag of this closing tag
+            self.editor.find('<'+fst_tag, QTextDocument.FindBackward)
+            pos = self.editor.textCursor().position()
+            
+            return fst_tag , pos , False
+        else:
+            return fst_tag , pos , True
+
+
+    def __getTagName(self):
+        tc = self.editor.textCursor()
         tc.select(QTextCursor.WordUnderCursor)
-        uID = tc.selectedText()
+        
+        tx = tc.selectedText()  
+        isClosingTag = False
+        
+        if "</" in tx :
+            # select next word
+            tc.select(QTextCursor.WordUnderCursor)
+            tx = tc.selectedText()
+            isClosingTag = True
+        
+        return isClosingTag , "" if "<" in tx else tx
+        
 
-        self.popUpWidget = XPathDialog(self.tixi.uIDGetXPath(uID)) 
+    def __findXPath_rec(self, xpath_idx, xpath_uid, search, pos):
+        nodes = self.__getChildNodesIdxTuple(xpath_idx)
+        
+        for (node, idx) in nodes:
+            if node != '#text' :
+                new_xpath_idx, new_xpath_uid = self.__createNewXPath(xpath_idx, xpath_uid, node, idx)
+                if search == node and self.isNodeAtSearchedTagPosition(new_xpath_uid, pos) :
+                    return True, new_xpath_idx , new_xpath_uid
+                else:
+                    flag , res_idx, res_uid = self.__findXPath_rec(new_xpath_idx, new_xpath_uid, search, pos)
+                    if flag : return True, res_idx, res_uid
+        return False , xpath_idx , xpath_uid
+
+
+    def __getChildNodesIdxTuple(self, xpath):
+        node_list = []
+        n = self.tixi.getNumberOfChilds(xpath)
+        for i in range(1, n+1):
+            node_list.append(self.tixi.getChildNodeName(xpath,i))
+        
+        res = []
+        for j in range(0, len(node_list)) :
+            val = node_list[j]
+            cnt = 1
+            for k in range(0, j):
+                if node_list[k] == val : 
+                    cnt = cnt + 1
+            res.append((node_list[j],cnt))
+        
+        return res
+
+    def __createNewXPath(self, xpath_idx, xpath_uid, node, idx):
+        path_idx = xpath_idx + '/' + node
+        path_uid = xpath_uid + '/' + node
+
+        try :
+            uID = self.tixi.getTextAttribute(path_idx + '[' + str(idx) + ']', 'uID')
+            path_idx = path_idx + '[' + str(idx) + ']'
+            path_uid = path_uid+'[' + uID + ']'
+        except TixiException:
+            pass # e.error == 'ATTRIBUTE_NOT_FOUND
+            
+        return path_idx , path_uid
+
+
+    
+    def isNodeAtSearchedTagPosition(self, xpath, pos):
+        '''
+        @param xpath: xpath with uids (doesn't work with indices)
+        @param param: 
+        '''
+        self.editor.moveCursor(QTextCursor.Start)
+        
+        # split string at / and remove all empty strings
+        l = filter(lambda x : x != '' , xpath.split('/'))
+        
+        # search index snd loop
+        j = 0
+        
+        # search backwards for uid 
+        for i in range(len(l)-1, -1, -1) :
+            if '[' in l[i] :       
+                # get value in brackets : [x] --> x
+                uid = re.search(r'\[(.*)\]', l[i]).group(1)
+                self.editor.find('uID="'+uid+'"')
+                j = i+1
+                break
+        
+        # search forward for all nodes after last uid
+        while j < len(l) :
+            self.editor.find('<'+l[j])
+            j += 1
+
+        return pos <= self.editor.textCursor().position()
+
+
+    def __setCursorToPostion(self, pos):
+        tc = self.editor.textCursor()
+        tc.setPosition(pos)
+        self.editor.setTextCursor(tc)
+
+    def __startXPathPopUp(self, xpath_idx, xpath_uid):
+        self.popUpWidget = XPathDialog(xpath_idx, xpath_uid) 
 
         self.setEnabled(False)
         self.popUpWidget.closeAct.triggered.connect(self.__resetPopUpWidget)
         
-        self.popUpWidget.show()
-  
+        self.popUpWidget.show()  
 
-
-        
 
     def updateLineNumber(self): 
         '''
@@ -348,8 +467,6 @@ class EditorWindow(QMainWindow):
         extraSelections.append(selection)
         self.editor.setExtraSelections(extraSelections)
         self.editor.setFocus()  
- 
-
  
     #TODO: implemnt
     def fireUpdate(self):
@@ -477,6 +594,16 @@ class EditorWindow(QMainWindow):
     # ======================================================================================================================
     # utilities
     # ======================================================================================================================
+    def __strRemoveReverseToChar(self, s, c):
+        return self.__rm_rec(s, c)
+    
+    def __rm_rec(self, s, c):
+        if s == "" :
+            return ""
+        elif s[-1] == c :
+            return s[:-1]
+        else :
+            return self.__rm_rec(s[:-1], c)     
     
     def __rreplace(self, s, old, new, occurrence):
         '''
@@ -510,7 +637,9 @@ class SearchField(QLineEdit):
            
 def main():
     app = QApplication(sys.argv)
-    w = EditorWindow()
+    tixi = Tixi()
+    tixi.open(Config.path_cpacs_simple)
+    w = EditorWindow(tixi)
     conf = Config()
     w.loadFile(conf.path_cpacs_A320_Wing, conf.path_cpacs_21_schema)
     # w.loadFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
