@@ -15,6 +15,8 @@ from Xtest.XML_Editor.configuration.config import Config
 
 from highlighter import Highlighter
 from Xtest.XML_Editor.popUps.tools.toolX import ToolX
+from PyQt4.uic.Compiler.qtproxies import QtGui
+from PySide import QtCore
 
 class EditorWindow(QMainWindow):
     """initialize editor"""
@@ -225,8 +227,8 @@ class EditorWindow(QMainWindow):
         numbarAction = QAction('Line Number', self)
         numbarAction.triggered.connect(self.fireSwitchLayout)                 
 
-        xpathAction = QAction('Current XPath', self)
-        xpathAction.triggered.connect(self.getCursorXPath)  
+        self.xpathAction = QAction('Current XPath', self)
+        self.xpathAction.triggered.connect(self.getCursorXPath)  
 
         link_to_node_YesAction = QAction('yes', self)
         link_to_node_YesAction.triggered.connect(self.dummyFuction)  
@@ -250,13 +252,23 @@ class EditorWindow(QMainWindow):
         editormenu.addAction(clearAction) 
         editormenu.addSeparator()
         editormenu.addAction(numbarAction)
-        editormenu.addAction(xpathAction)
+        editormenu.addAction(self.xpathAction)
         editormenu_child1 = editormenu.addMenu('Link to node')
         editormenu_child1.addAction(link_to_node_YesAction)
         editormenu_child1.addAction(link_to_node_NoAction)
         toolmenu = menubar.addMenu("Tools")
         toolmenu.addAction(toolXAction)
 
+        self.editor.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.editor.customContextMenuRequested.connect(self.showMenu)
+        #self.editor.connect(self.editor, SIGNAL( "customContextMenuRequested(QPoint)" ), self.showMenu )
+
+    def showMenu( self, pos ):
+        """ Show a context menu for the active layer in the legend """
+        menu = self.editor.createStandardContextMenu()
+        menu.addAction(self.xpathAction)
+        menu.exec_(QtCore.QPoint( self.mapToGlobal( pos ).x() + 5, self.mapToGlobal( pos ).y() )) 
+            
 
     def fireUpdateNumbar(self):
         self.updateLineNumber()

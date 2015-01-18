@@ -19,7 +19,6 @@ class XPathDialog(QtGui.QMainWindow):
         
         self.xpath_idx  = xpath_idx
         self.xpath_uid  = xpath_uid
-        self.labelWidth = 80
         
         widget = QtGui.QWidget()
         self.setCentralWidget(widget)
@@ -27,20 +26,22 @@ class XPathDialog(QtGui.QMainWindow):
         topFiller = QtGui.QWidget()
         topFiller.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         
-        self.infoLabel = QtGui.QTextEdit(xpath_idx)
-        self.infoLabel.setReadOnly(True)
-        self.infoLabel.setFixedHeight(70)
+        self.infoLabel = QtGui.QLabel("  " + xpath_uid + "  ")
+        self.infoLabel.setStyleSheet("font: italic bold 14px")
         
-        #self.infoLabel = QtGui.QLabel(xpath_idx , alignment=QtCore.Qt.AlignCenter)
-        #self.infoLabel.setFrameStyle(QtGui.QFrame.StyledPanel | QtGui.QFrame.Sunken)        
 
+        self.scrollArea = QtGui.QScrollArea()
+        self.scrollArea.setFixedHeight(40)
+        self.scrollArea.setWidget(self.infoLabel)
+        
+       
         bottomFiller = QtGui.QWidget()
         bottomFiller.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)        
 
         vbox = QtGui.QVBoxLayout()
         vbox.setContentsMargins(5, 5, 5, 5)
         vbox.addWidget(topFiller)
-        vbox.addWidget(self.infoLabel)
+        vbox.addWidget(self.scrollArea)
         vbox.addWidget(bottomFiller)
         widget.setLayout(vbox)
 
@@ -62,10 +63,11 @@ class XPathDialog(QtGui.QMainWindow):
         menu.exec_(event.globalPos())        
         
     def createMenus(self):
-        self.editMenu = self.menuBar().addMenu("&Edit")
+        self.editMenu = self.menuBar().addMenu("&Menu")
         self.editMenu.addAction(self.copyAct)
         self.editMenu.addAction(self.xpathIdxAct)
         self.editMenu.addAction(self.xpathUidAct)
+        self.editMenu.addAction(self.closeAct)
         
     def createActions(self):
         self.copyAct = QtGui.QAction("&Copy", self,
@@ -82,25 +84,28 @@ class XPathDialog(QtGui.QMainWindow):
                 triggered=self.setUidXPath)
     
         self.closeAct = QtGui.QAction("C&lose", self, shortcut="Ctrl+Q",
-                statusTip="Exit the application", triggered=None)
+                statusTip="Exit the application", triggered=self.close)
     
     def setUidXPath(self):
-        self.infoLabel.setText(self.xpath_uid)
-        
+        self.infoLabel.setText("  "+self.xpath_uid+"  ")
+        self.infoLabel.setFixedWidth(self.infoLabel.fontMetrics().boundingRect(self.infoLabel.text()).width())
+    
     def setIdxXPath(self):
-        self.infoLabel.setText(self.__breakStringAtPos(self.xpath_idx, self.labelWidth))
+        self.infoLabel.setText("  "+self.xpath_idx+"  ")
+        self.infoLabel.setFixedWidth(self.infoLabel.fontMetrics().boundingRect(self.infoLabel.text()).width())
     
     def copy(self):
         self.clipboard = QtGui.QApplication.clipboard()
-        self.clipboard.setText(self.infoLabel.toPlainText().replace("\n", ""), QtGui.QClipboard.Clipboard)
+        self.clipboard.setText(self.infoLabel.text().replace(" ", ""), QtGui.QClipboard.Clipboard)
 
     def closeEvent(self,event):
+        print "hi"
         # bad solution but it works - for editor_Window getCursorXPath 
         self.closeAct.trigger()
         event.accept()
 
 if __name__ == "__main__":
     app = QtGui.QApplication([])
-    test = XPathDialog("hallo Rene du bist toll hallo Rene du bist toll hallo Rene du bist toll hallo Rene du bist toll", "j")
+    test = XPathDialog("hallo Rene", "jens pfeifer")
     test.show()
     app.exec_()       
