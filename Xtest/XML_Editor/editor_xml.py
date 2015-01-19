@@ -359,13 +359,10 @@ class EditorWindow(QMainWindow):
         
         _,xpath_idx, xpath_uid = self.__findXPath_rec('/cpacs', '/cpacs' , tag, tag_pos)  
         
-        print "Renre! ", xpath_idx
-        
         if not isCursorInTag:
             xpath_idx = self.__strRemoveReverseToChar(xpath_idx, '/')
             xpath_uid = self.__strRemoveReverseToChar(xpath_uid, '/')
  
-        print xpath_idx
         self.__setCursorToPostion(start_pos)
         self.__startXPathPopUp(xpath_idx, xpath_uid)
         
@@ -421,21 +418,19 @@ class EditorWindow(QMainWindow):
 
 
     def __getChildNodesIdxTuple(self, xpath):
-        node_list = []
-        n = self.tixi.getNumberOfChilds(xpath)
-        for i in range(1, n+1):
-            node_list.append(self.tixi.getChildNodeName(xpath,i))
+        n = self.tixi.getNumberOfChilds(xpath) + 1
+        node_list = map(lambda i : self.tixi.getChildNodeName(xpath, i), range(1,n))
         
         res = []
-        for j in range(0, len(node_list)) :
-            val = node_list[j]
+        for j in range(len(node_list)) :
             cnt = 1
-            for k in range(0, j):
-                if node_list[k] == val : 
+            for k in range(j):
+                if node_list[k] == node_list[j] : 
                     cnt = cnt + 1
             res.append((node_list[j],cnt))
         
         return res
+    
 
     def __createNewXPath(self, xpath_idx, xpath_uid, node, idx):
         path_idx = xpath_idx + '/' + node
@@ -469,11 +464,9 @@ class EditorWindow(QMainWindow):
         # search backwards for uid 
         for i in range(len(l)-1, -1, -1) :
             if '[' in l[i] :    
-                print "hier bei klammer auf"   
                 # get value in brackets : [x] --> x
                 uid = re.search(r'\[@(.*)\]', l[i]).group(1)
                 self.editor.find(uid)
-                print uid 
                 
                 j = i+1
                 break
