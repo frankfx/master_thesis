@@ -282,7 +282,6 @@ class Renderer(QtOpenGL.QGLWidget):
                             return (shaIdx, segIdx) 
         return (None, None)
 
-
     '''
     drawing function for the wings
     @param plist: wing point list
@@ -799,6 +798,10 @@ class Widget(QtGui.QWidget):
         self.showOptions[10].setChecked(self.renderer.flag_show_spars)
         self.showOptions[10].setChecked(self.renderer.flag_show_grid)
  
+    def updateView(self):
+        print "hier"
+        self.renderer.data.updateTixiTiglData()
+        self.renderer.updateLists()
  
     def setTransparency(self, value):
         self.renderer.setTransparent(1.0 - value/100.0)
@@ -910,6 +913,8 @@ class Widget(QtGui.QWidget):
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
+    
+    
     widget = Widget()
     widget.show()
-    app.exec_()    
+    app.exec_()

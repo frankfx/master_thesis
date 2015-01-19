@@ -12,10 +12,12 @@ class MainWindow(QtGui.QMainWindow):
 
         self.setWindowTitle('Main Window')
 
-        conf = Config()
         tixi = Tixi()
-        tixi.open(conf.path_cpacs_simple)
-        #tixi.open(conf.path_cpacs_D150)
+        #tixi.open(conf.path_cpacs_simple)
+        #tixi.open(Config.path_cpacs_D150)
+        tixi.openDocument(Config.path_cpacs_simple) 
+        #tixi.openDocument(conf.path_cpacs_A320_Wing) 
+        #self.tixi.schemaValidateFromFile(cpacs_scheme)
         
         tigl = Tigl()
         try:
@@ -27,11 +29,14 @@ class MainWindow(QtGui.QMainWindow):
         self.button = QtGui.QPushButton('Raise Next Tab', self)
         self.button.clicked.connect(self.handleButton)
         self.setCentralWidget(self.button)
-       
-        dockWidgets = [('xml editor', EditorWindow(tixi)), ('ogl editor', Widget(tixi, tigl)), 
+        
+        xml_editor = EditorWindow(tixi, Config.path_cpacs_simple)
+        ogl_editor = Widget(tixi, tigl)
+        
+        dockWidgets = [('xml editor', xml_editor), ('ogl editor', ogl_editor), 
                        ('Red', QtGui.QListWidget()), ('Green', QtGui.QListWidget())]
         
-        #dockWidgets[0].updateAction.triggered.connect(self.fireUpdate)
+        xml_editor.updateAction.triggered.connect(ogl_editor.updateView)
         
         self.dockList = []
 
@@ -61,6 +66,7 @@ class MainWindow(QtGui.QMainWindow):
         self.nextindex += 1
         if self.nextindex > len(self.dockList) - 1:
             self.nextindex = 0
+
 
 if __name__ == '__main__':
 

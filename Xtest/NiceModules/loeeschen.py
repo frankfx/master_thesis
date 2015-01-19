@@ -22,6 +22,11 @@ def __breakStringAtPos(string, pos, end=40):
         return string[0] + __breakStringAtPos(string[1:], pos)
 
 
-l = "Rene liebt/ Marita ganz/ ganz/ sehr. Und/ das ist fein"
+l = "sd"
 
 print __breakStringAtPos(l, 0, 5)
+
+
+import os
+retvalue = os.system("xsltproc -o test.xml mappingInputRaw.xsl D150_CPACS2.0_valid2.xml")
+print retvalue

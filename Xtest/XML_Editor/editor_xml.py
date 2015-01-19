@@ -17,14 +17,13 @@ from highlighter import Highlighter
 from Xtest.XML_Editor.popUps.tools.toolX import ToolX
 from PyQt4.uic.Compiler.qtproxies import QtGui
 from PySide import QtCore
+from xml.dom import HIERARCHY_REQUEST_ERR
 
 class EditorWindow(QMainWindow):
     """initialize editor"""
-    def __init__(self, tixi):
+    def __init__(self, tixi, xmlFilename, cpacs_scheme=Config.path_cpacs_21_schema):
         super(EditorWindow, self).__init__()   
         
-        self.tixi = tixi
-       
         self.cur_file_path = ""
         self.cur_schema_path = ""
         
@@ -62,17 +61,20 @@ class EditorWindow(QMainWindow):
         self.resize(800, 800)
         self.show()       
 
+        self.loadFile(xmlFilename, cpacs_scheme ,tixi) 
+
     '''
     loads cpacs file and validates it against the cpacs_schema
     @param xmlFilename: input file
     @param cpacs_scheme: validation scheme
     '''
-    def loadFile(self, xmlFilename=None, cpacs_scheme=Config.path_cpacs_21_schema):
+    def loadFile(self, xmlFilename=None, cpacs_scheme=Config.path_cpacs_21_schema, tixi=None):
         if xmlFilename and cpacs_scheme :
             try:
-                self.tixi.openDocument(xmlFilename) 
-                self.tixi.schemaValidateFromFile(cpacs_scheme)
-                
+                tixi.open(xmlFilename)
+                #self.tixi.openDocument(xmlFilename) 
+                #self.tixi.schemaValidateFromFile(cpacs_scheme)
+                self.tixi = tixi
                 self.editor.setPlainText(self.tixi.exportDocumentAsString())
                 self.cur_file_path = xmlFilename
                 self.cur_schema_path = cpacs_scheme  
@@ -289,6 +291,8 @@ class EditorWindow(QMainWindow):
     ''' find next button '''    
     def fire_search_foreward(self):
         
+        #print self.tixi.getNumberOfChilds('/cpacs/vehicles/aircraft/model[@uID="Aircraft1"]/wings/wing[@uID="Aircraft1_Wing1"]/transformation[@uID="Aircraft1_Wing1_Transf"]/scaling[@uID="Aircraft1_Wing1_Transf_Sca"]/z')
+        
         searchList = filter(lambda a : a!='',  self.searchbox.text().split('/'))
         if len(searchList) == 1 :
             if self.editor.find(searchList[0]) : 
@@ -303,24 +307,59 @@ class EditorWindow(QMainWindow):
                 
         self.searchbox.setFocus()     
       
+    # test  
+    # /cpacs/vehicles/aircraft/model/wings/wing/sections/section
     def searchXPath(self, path, searchList):
         try:
-            self.tixi.xPathEvaluateNodeNumber(path)
+            if self.tixi.xPathEvaluateNodeNumber(path) > 1 :
+                QMessageBox.about(self, "error", "XPath %s not unique" % path)
+                return
+                
             self.editor.moveCursor(QTextCursor.Start)
-            for s in searchList :
-                if not self.editor.find(s) :
-                    QMessageBox.about(self, "error", "XPath %s not found" % path)
-                    return 
+            
+            found = True
+
+            # search index snd loop
+            j = 0
+        
+            # search backwards for uid 
+            for i in range(len(searchList)-1, -1, -1) :
+                if '[' in searchList[i] :    
+                    # get value in brackets : [x] --> x
+                    uid = re.search(r'\[(.*)\]', searchList[i]).group(1)
+                    uid = self.__transToSearchUid(searchList[:i+1], uid)
+                    
+                    found = self.editor.find(uid)
+                    j = i+1
+                    break
+                
+            # search forward for all nodes after last uid
+            while found and j < len(searchList) :
+                found = self.editor.find('<'+searchList[j])
+                j += 1
+            if not found :
+                QMessageBox.about(self, "error", "XPath %s not found" % path)
         except TixiException :
             QMessageBox.about(self, "error", "XPath %s not found" % path)
 
+
+    def __transToSearchUid(self, path_list, uid):
+        try: 
+            int(uid)
+            path = ""
+            for p in path_list : path = path + '/' + p 
+            return self.tixi.getTextAttribute(path , 'uID')
+        except ValueError: 
+            return uid.replace('@', '')
 
     def getCursorXPath(self):
         start_pos = self.editor.textCursor().position()
 
         tag , tag_pos , isCursorInTag = self.getTagNameAtCursor()
-
+        
         _,xpath_idx, xpath_uid = self.__findXPath_rec('/cpacs', '/cpacs' , tag, tag_pos)  
+        
+        print "Renre! ", xpath_idx
         
         if not isCursorInTag:
             xpath_idx = self.__strRemoveReverseToChar(xpath_idx, '/')
@@ -373,6 +412,7 @@ class EditorWindow(QMainWindow):
             if node != '#text' :
                 new_xpath_idx, new_xpath_uid = self.__createNewXPath(xpath_idx, xpath_uid, node, idx)
                 if search == node and self.isNodeAtSearchedTagPosition(new_xpath_uid, pos) :
+                    print "gefunden" , new_xpath_idx
                     return True, new_xpath_idx , new_xpath_uid
                 else:
                     flag , res_idx, res_uid = self.__findXPath_rec(new_xpath_idx, new_xpath_uid, search, pos)
@@ -404,7 +444,8 @@ class EditorWindow(QMainWindow):
         try :
             uID = self.tixi.getTextAttribute(path_idx + '[' + str(idx) + ']', 'uID')
             path_idx = path_idx + '[' + str(idx) + ']'
-            path_uid = path_uid+'[' + uID + ']'
+            path_uid = path_uid+'[@uID="' + uID + '"]'
+            
         except TixiException:
             pass # e.error == 'ATTRIBUTE_NOT_FOUND
             
@@ -427,10 +468,13 @@ class EditorWindow(QMainWindow):
         
         # search backwards for uid 
         for i in range(len(l)-1, -1, -1) :
-            if '[' in l[i] :       
+            if '[' in l[i] :    
+                print "hier bei klammer auf"   
                 # get value in brackets : [x] --> x
-                uid = re.search(r'\[(.*)\]', l[i]).group(1)
-                self.editor.find('uID="'+uid+'"')
+                uid = re.search(r'\[@(.*)\]', l[i]).group(1)
+                self.editor.find(uid)
+                print uid 
+                
                 j = i+1
                 break
         
@@ -483,7 +527,12 @@ class EditorWindow(QMainWindow):
     #TODO: implemnt
     def fireUpdate(self):
         print ('dummy function - update the model')
-        self.tixi.saveDocument(Config.path_cpacs_tmp_file)
+        text_file = open(Config.path_cpacs_tmp_file, "w")
+        text_file.write(self.editor.toPlainText())
+        text_file.close()
+        
+        
+        #self.tixi.saveDocument(Config.path_cpacs_tmp_file)
       # '../cpacs_files/temp.xml'
         
 
@@ -650,10 +699,10 @@ class SearchField(QLineEdit):
 def main():
     app = QApplication(sys.argv)
     tixi = Tixi()
-    tixi.open(Config.path_cpacs_simple)
-    w = EditorWindow(tixi)
-    conf = Config()
-    w.loadFile(conf.path_cpacs_A320_Wing, conf.path_cpacs_21_schema)
+    #tixi.open(Config.path_cpacs_simple, )
+    w = EditorWindow(tixi, Config.path_cpacs_A320_Wing, Config.path_cpacs_21_schema)
+
+   # w.loadFile(conf.path_cpacs_A320_Wing, conf.path_cpacs_21_schema)
     # w.loadFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
     sys.exit(app.exec_())
  

@@ -27,11 +27,11 @@ class XPathDialog(QtGui.QMainWindow):
         topFiller.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         
         self.infoLabel = QtGui.QLabel("  " + xpath_uid + "  ")
-        self.infoLabel.setStyleSheet("font: italic bold 14px")
+        self.infoLabel.setStyleSheet("font: 14px")
         
 
         self.scrollArea = QtGui.QScrollArea()
-        self.scrollArea.setFixedHeight(40)
+        self.scrollArea.setFixedHeight(60)
         self.scrollArea.setWidget(self.infoLabel)
         
        
