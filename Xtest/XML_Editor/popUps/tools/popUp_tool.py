@@ -38,4 +38,6 @@ class PopUpTool(QtGui.QWidget):
     def closeEvent(self,event):
         print "aus"
         self.closeAct.trigger()
-        #event.accept()       
+        #event.accept()
+        
+        
