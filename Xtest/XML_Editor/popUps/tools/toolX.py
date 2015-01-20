@@ -264,9 +264,27 @@ class ToolX(PopUpTool):
 
     def __setCaseVisible(self, b):
         self.groupBoxLoadCases.setVisible(b)
+        if b == False :
+            self.__setLoadCase_1(b)
+            self.__setLoadCase_2(b) 
+        elif self.radioLoadCases1.isChecked() :
+            self.__setLoadCase_1(b)
+        elif self.radioLoadCases2.isChecked() :
+            self.__setLoadCase_2(b) 
+        else :
+            print "toggled"
+            self.radioLoadCases1.toggle()
 
     def __setPerMapVisible(self, b):
         self.groupBoxPerMap.setVisible(b) 
+        if self.radioPerMap1.isChecked() :
+            self.__setPerMapFSTVisible(b)
+        elif self.radioPerMap2.isChecked() :
+            self.__setPerMapSNDVisible(b) 
+        else :
+            print "toggled"
+            self.radioPerMap1.toggle()        
+        
         
     def __setLoadCaseUIDVisible(self, b):
         self.__setLoadCase_1(b)
@@ -274,11 +292,12 @@ class ToolX(PopUpTool):
     def __setLoadCaseVisible(self, b):  
         self.__setLoadCase_2(b)
         
-    def __setPerMapFSTVisible(self, b):    
-        self.__setPerMapFSTVisible(b)
+    def __setPerMapFSTVisible(self, b):   
+        pass 
+        #self.__setPerMapFSTVisible(b)
 
     def __setPerMapSNDVisible(self, b):
-        self.__setPerMapSNDVisible(b)
+        pass
         
         #self.radioCaseVsPerMap1.toggle()
 
