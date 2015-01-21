@@ -9,42 +9,41 @@ from popUp_tool import PopUpTool
 from Xtest.XML_Editor.externTools import difficultTestTool
 from Xtest.Open_GL import utility
 from pylab import *
+from Xtest.XML_Editor.configuration.config import Config
 import os
+
+from tixiwrapper   import Tixi, TixiException
 
 class ToolX(PopUpTool):
     def __init__(self, name, width=300, height=700):
         super(ToolX, self).__init__(name, width, height)          
         
         self.setupWidget()
+        self.initTixi()
                 
         layout = QtGui.QFormLayout()
         layout.addRow(self.butOpenTool)
         layout.addRow(self.labelName, self.textName)
         layout.addRow(self.labelVers, self.textVers)
         layout.addRow(self.butOpenAircraftModelUID)        
-        layout.addRow(self.labelAMUID, self.textAMUID)
+        layout.addRow(self.gridAMUID)
         layout.addRow(self.butOpenDataSetName)
+        layout.addRow(self.labelCheckDSet, self.checkDataset)
         layout.addRow(self.labelDSet, self.textDSet)
-        layout.addRow(self.butOpenReferenceValues)
-        layout.addRow(self.labelArea,self.textArea)
-        layout.addRow(self.labelLenCmx,self.textLenCmx)
-        layout.addRow(self.labelLenCmy,self.textLenCmy)
-        layout.addRow(self.labelLenCmz,self.textLenCmz)
-        layout.addRow(self.labelMomRefPnt,self.textMomRefPnt)
         layout.addRow(self.butOpenLCasesAndPerMap)
         layout.addRow(self.groupBoxCaseVsPerMap)
-        layout.addRow(self.groupBoxLoadCases)
         layout.addRow(self.labelLoadCaseUID, self.textLoadCaseUID)
-        layout.addRow(self.labelLoadCase, self.textLoadCase)
-        layout.addRow(self.groupBoxPerMap)        
-        layout.addRow(self.labelMachNum, self.textMachNum)
-        layout.addRow(self.labelReynNum, self.textReynNum)
-        layout.addRow(self.labelAngleYaw, self.textAngleYaw)
-        layout.addRow(self.labelAngleAtt, self.textAngleAtt)
         layout.addRow(self.labelPositiveSteadi, self.textPositiveSteadi)
         layout.addRow(self.labelNegativeSteadi, self.textNegativeSteadi)
-        layout.addRow(self.labelCtrlSurfaces, self.textCtrlSurfaces)
         layout.addRow(self.labelCtrlSurUID, self.textCtrlSurUID)
+        layout.addRow(self.butOpenToolParameters)
+        layout.addRow(self.labelUsePOLINT, self.textUsePOLINT)
+        layout.addRow(self.labelArchiveMode, self.textArchiveMode)
+        layout.addRow(self.labelParallelComputation, self.textParallelComputation)
+        layout.addRow(self.labelCheckWingUID, self.checkWingUID)
+        layout.addRow(self.labelWingUID, self.textWingUID)
+        layout.addRow(self.labelSpanwise, self.textSpanwise)
+        layout.addRow(self.labelchordwise, self.textChordwise)
 
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addLayout(layout)
@@ -52,6 +51,12 @@ class ToolX(PopUpTool):
         
         self.setLayout(mainLayout)
         
+    def enableTextDatasetName(self, n):
+        self.textDSet.setEnabled(n)
+
+    def enableTextWingUID(self, n):
+        self.textWingUID.setEnabled(n)
+
 
     def setupInputFields(self):
         # tool
@@ -59,35 +64,118 @@ class ToolX(PopUpTool):
         self.textVers = QtGui.QLineEdit()
         
         # aircraftModelUID
-        self.textAMUID  = QtGui.QLineEdit()
+        self.listAMUID1 = QtGui.QListWidget()
+        self.listAMUID2 = QtGui.QListWidget()
+        self.butLeft    = QtGui.QPushButton()
+        self.butRight   = QtGui.QPushButton()
+        self.gridAMUID  = QtGui.QGridLayout()
+
+        self.butLeft.setIcon(QtGui.QIcon(Config.path_but_left_icon))
+        self.butLeft.setIconSize(QtCore.QSize(10,10))
+        self.butLeft.clicked.connect(self.modelUIDSwitchLeft) 
+
+        self.butRight.setIcon(QtGui.QIcon(Config.path_but_right_icon))
+        self.butRight.setIconSize(QtCore.QSize(10,10))   
+        self.butRight.clicked.connect(self.modelUIDSwitchRight)
+
+        self.gridAMUID.addWidget(self.labelAMUID1, 0,0)
+        self.gridAMUID.addWidget(self.labelAMUID2, 0,3)
+        self.gridAMUID.addWidget(self.listAMUID1, 1,0, 2, 1)
+        self.gridAMUID.addWidget(self.butLeft, 1,1)
+        self.gridAMUID.addWidget(self.butRight, 2,1)
+        self.gridAMUID.addWidget(self.listAMUID2, 1,3, 2, 1)
+
 
         # datasetName
         self.textDSet = QtGui.QLineEdit()
+        self.textDSet.setDisabled(True)
+        self.checkDataset = QtGui.QCheckBox()
+        self.checkDataset.stateChanged.connect(self.enableTextDatasetName)
         
-        # referenceValues
-        self.textArea      = QtGui.QLineEdit()        
-        self.textLenCmx    = QtGui.QLineEdit()        
-        self.textLenCmy    = QtGui.QLineEdit()        
-        self.textLenCmz    = QtGui.QLineEdit()        
-        self.textMomRefPnt = QtGui.QLineEdit()        
-
         # loadCase
-        self.textLoadCaseUID  = QtGui.QLineEdit()
-        self.textLoadCase     = QtGui.QLineEdit()
+        self.textLoadCaseUID  = QtGui.QListWidget()
+        self.textLoadCaseUID.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
         
-        # performanceMap one
-        # - positiveQuasiSteadyRotation --> see performanceMap two
-        # - negativeQuasiSteadyRotation --> see performanceMap two
-        self.textCtrlSurUID = QtGui.QLineEdit()
-        
-        # performanceMap two
-        self.textMachNum  = QtGui.QLineEdit()
-        self.textReynNum  = QtGui.QLineEdit()
-        self.textAngleYaw = QtGui.QLineEdit()
-        self.textAngleAtt = QtGui.QLineEdit()
+        # performanceMap 
         self.textPositiveSteadi = QtGui.QLineEdit()
         self.textNegativeSteadi = QtGui.QLineEdit()
-        self.textCtrlSurfaces   = QtGui.QLineEdit()
+        self.textCtrlSurUID = QtGui.QLineEdit()
+        
+        # tool parameters
+        self.textUsePOLINT = QtGui.QComboBox()
+        self.textUsePOLINT.addItem("True")
+        self.textUsePOLINT.addItem("False")
+        
+        self.textArchiveMode = QtGui.QComboBox()
+        self.textArchiveMode.addItem("0=logfile")
+        self.textArchiveMode.addItem("1=log+inputfiles")
+        self.textArchiveMode.addItem("2=all results")
+        
+        self.textParallelComputation = QtGui.QLineEdit()
+        self.textParallelComputation.setValidator(QtGui.QIntValidator(0, 10000, self) )       
+        
+
+        self.textSpanwise  = QtGui.QLineEdit()        
+        self.textChordwise = QtGui.QLineEdit()        
+        self.textWingUID   = QtGui.QLineEdit()
+        self.textWingUID.setDisabled(True)        
+        self.checkWingUID  = QtGui.QCheckBox()
+        self.checkWingUID.stateChanged.connect(self.enableTextWingUID)
+
+        
+
+    def initTixi(self, path = Config.path_cpacs_D150_2):
+        self.tixi = Tixi() 
+        self.tixi.openDocument(path)
+        
+        if self.tixiValidateXPath("/cpacs/toolspecific/liftingLine") :
+            self.tixiSetAircraftModelUID() 
+        else:
+            QtGui.QMessageBox.about(self, "error", "no toolspecific found in the given file path : %s" % path)
+            sys.exit()
+        
+        
+    def tixiValidateXPath(self, xpath):
+        try:
+            return self.tixi.xPathEvaluateNodeNumber(xpath)
+        except Exception :
+            return False
+        
+    
+    def tixiSetToolName(self):
+        self.textName.setText(self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/tool/name"))
+
+    def tixiSetToolVersion(self):
+        self.textVers.setText(self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/tool/name[1]"))
+        
+    def tixiSetAircraftModelUID(self):
+        tmp_list = []
+        for j in range(1, self.tixi.getNamedChildrenCount("/cpacs/toolspecific/liftingLine", "aircraftModelUID") + 1) :
+            item = self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/aircraftModelUID["+str(j)+"]")
+            self.listAMUID2.addItem(item)
+            tmp_list.append(item)
+       
+        for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/vehicles/aircraft", "model") + 1) :
+            item = self.tixi.getTextAttribute("/cpacs/vehicles/aircraft/model[" + str(i) +"]" , 'uID')
+            if not item in tmp_list:
+                self.listAMUID1.addItem(item)
+
+
+    def tixiSetDatasetName(self):
+        if self.tixiValidateXPath("/cpacs/toolspecific/liftingLine/datasetName"):
+            self.textDSet.setText(self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/datasetName"))        
+    
+    def tixiSetLoadCaseUID(self):
+        for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/vehicles/aircraft/model/analyses/loadAnalysis/loadCases", "flightLoadCase") + 1) :
+            print "available"
+            print self.tixi.getTextAttribute("/cpacs/vehicles/aircraft/model/analyses/loadAnalysis/loadCases/flightLoadCase["+str(i)+"]" , 'uID')
+        
+        for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/toolspecific/liftingLine/loadCases", "loadCaseUID") + 1) :
+            print "chosen uids"
+            print self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/loadCases/loadCaseUID["+str(i)+"]")
+        
+   
+        
 
     def setupLabels(self):
         # longest label word
@@ -103,16 +191,12 @@ class ToolX(PopUpTool):
         self.labelVers   = QtGui.QLabel(nameList[1])
         
         # aircraftModelUID
-        self.labelAMUID = QtGui.QLabel(nameList[2])         
-        # datasetName
-        self.labelDSet = QtGui.QLabel(nameList[3])        
+        self.labelAMUID1 = QtGui.QLabel("available uids")
+        self.labelAMUID2 = QtGui.QLabel("chosen uids")
         
-        # referenceValues 
-        self.labelArea      = QtGui.QLabel(nameList[4])        
-        self.labelLenCmx    = QtGui.QLabel(nameList[5])        
-        self.labelLenCmy    = QtGui.QLabel(nameList[6])        
-        self.labelLenCmz    = QtGui.QLabel(nameList[7])        
-        self.labelMomRefPnt = QtGui.QLabel(nameList[8])         
+        # datasetName
+        self.labelDSet = QtGui.QLabel(nameList[3])               
+        self.labelCheckDSet= QtGui.QLabel("set")
 
         # loadCase
         self.labelLoadCaseUID = QtGui.QLabel(nameList[9])
@@ -129,48 +213,60 @@ class ToolX(PopUpTool):
         self.labelPositiveSteadi = QtGui.QLabel(nameList[16])
         self.labelNegativeSteadi = QtGui.QLabel(nameList[17])
         self.labelCtrlSurfaces = QtGui.QLabel(nameList[18])
+        
+        # tool parameters
+        self.labelUsePOLINT      = QtGui.QLabel("usePOLINT")
+        self.labelArchiveMode    = QtGui.QLabel("archiveMode")
+        self.labelParallelComputation = QtGui.QLabel("parallelComputation")
+        self.labelCheckWingUID   = QtGui.QLabel("set wingUID")
+        self.labelWingUID        = QtGui.QLabel("wingUID")
+        self.labelSpanwise       = QtGui.QLabel("spanwise")
+        self.labelchordwise      = QtGui.QLabel("chordwise")
 
     def setupToolTips(self):
         self.textName.setToolTip("name of tool")        
         self.textVers.setToolTip("version of tool")
-        self.textAMUID.setToolTip("reference to aircraft model")
         self.textDSet.setToolTip("name of the dataset for LIFTING_LINE calculation") 
+        self.textParallelComputation.setToolTip("0=parallel computation on all available cores\n1=sequencial computation\nn=parallel computation on n cores")
 
     def setupButtons(self):
+        # create buttons
         self.buttonBox = QtGui.QDialogButtonBox()
         self.buttonBox.addButton("ok", QtGui.QDialogButtonBox.AcceptRole)
         self.buttonBox.addButton("cancel", QtGui.QDialogButtonBox.RejectRole)        
         
         self.butOpenTool             = QtGui.QPushButton("Tool")
         self.butOpenAircraftModelUID = QtGui.QPushButton("aircraftModelUID")        
-        self.butOpenDataSetName      = QtGui.QPushButton("datasetName")        
-        self.butOpenReferenceValues  = QtGui.QPushButton("referenceValues")        
+        self.butOpenDataSetName      = QtGui.QPushButton("datasetName*")        
         self.butOpenLCasesAndPerMap  = QtGui.QPushButton("loadCase performanceMap") 
+        self.butOpenToolParameters   = QtGui.QPushButton("toolParameters")
 
+        # style buttons
         self.butOpenTool.setStyleSheet("background-color:#98AFC7; border-style: outset; border-width: 2px; border-radius: 10px;border-color: beige;font: bold 14px;min-width: 10em; padding: 2px;")
         self.butOpenAircraftModelUID.setStyleSheet("background-color:#98AFC7; border-style: outset; border-width: 2px; border-radius: 10px;border-color: beige;font: bold 14px;min-width: 10em; padding: 2px;")
         self.butOpenDataSetName.setStyleSheet("background-color:#98AFC7; border-style: outset; border-width: 2px; border-radius: 10px;border-color: beige;font: bold 14px;min-width: 10em; padding: 2px;")
-        self.butOpenReferenceValues.setStyleSheet("background-color:#98AFC7; border-style: outset; border-width: 2px; border-radius: 10px;border-color: beige;font: bold 14px;min-width: 10em; padding: 2px;")
         self.butOpenLCasesAndPerMap.setStyleSheet("background-color:#98AFC7; border-style: outset; border-width: 2px; border-radius: 10px;border-color: beige;font: bold 14px;min-width: 10em; padding: 2px;")
+        self.butOpenToolParameters.setStyleSheet("background-color:#98AFC7; border-style: outset; border-width: 2px; border-radius: 10px;border-color: beige;font: bold 14px;min-width: 10em; padding: 2px;")
         
+        # connect buttons
         self.flagButTool = True
         self.flagButAir  = True
         self.flagButData = True
-        self.flagButRef  = True
         self.flagButCase = True
+        self.flagButTPar = True
         
         self.buttonBox.accepted.connect(self.submitInput) 
-        self.buttonBox.rejected.connect(self.close)          
+        self.buttonBox.rejected.connect(self.close)       
         self.butOpenTool.clicked.connect(self.__visibilityTool)       
         self.butOpenAircraftModelUID.clicked.connect(self.__visibilityAircraftModelUID)       
         self.butOpenDataSetName.clicked.connect(self.__visibilityDataSetName)       
-        self.butOpenReferenceValues.clicked.connect(self.__visibilityReferenceValues)       
         self.butOpenLCasesAndPerMap.clicked.connect(self.__visibilityLoadCasePerMap)       
+        self.butOpenToolParameters.clicked.connect(self.__visibilityToolParameters)       
 
         self.butOpenAircraftModelUID.click()
         self.butOpenDataSetName.click()
-        self.butOpenReferenceValues.click()
         self.butOpenLCasesAndPerMap.click()
+        self.butOpenToolParameters.click()
 
     def setupGroupBoxes(self):
         # loadCases vs performanceMap
@@ -183,98 +279,24 @@ class ToolX(PopUpTool):
         self.groupBoxCaseVsPerMap.setLayout(grid)
         self.groupBoxCaseVsPerMap.setFlat(True)        
 
-        # loadCases
-        self.groupBoxLoadCases = QtGui.QGroupBox()
-        grid = QtGui.QGridLayout()
-        self.radioLoadCases1 = QtGui.QRadioButton("&loadCaseUID")
-        self.radioLoadCases2 = QtGui.QRadioButton("&loadCase")
-        grid.addWidget(self.radioLoadCases1,0,1)
-        grid.addWidget(self.radioLoadCases2,0,2)
-        self.groupBoxLoadCases.setLayout(grid)
-        self.groupBoxLoadCases.setFlat(True)   
-
-        # performanceMap
-        self.groupBoxPerMap = QtGui.QGroupBox()
-        grid   = QtGui.QGridLayout()
-        self.radioPerMap1 = QtGui.QRadioButton("performanceMap one")
-        self.radioPerMap2 = QtGui.QRadioButton("performanceMap two")
-        grid.addWidget(self.radioPerMap1,0,1)
-        grid.addWidget(self.radioPerMap2,0,2)
-        self.groupBoxPerMap.setLayout(grid)
-        self.groupBoxPerMap.setFlat(True)  
-
-
-        self.__hideCaseAndPerMap()
+        #self.__hideCaseAndPerMap()
 
         self.radioCaseVsPerMap1.toggled.connect(self.showLoadCase)
         self.radioCaseVsPerMap2.toggled.connect(self.showPerMap)
         
-        self.radioLoadCases1.toggled.connect(self.__showLoadCaseUID)
-        self.radioLoadCases2.toggled.connect(self.__showLoadCase)
-        
-        self.radioPerMap1.toggled.connect(self.__setPerMap_1)        
-        self.radioPerMap2.toggled.connect(self.__setPerMap_2)        
-
 
     def showLoadCase(self, b):
-        self.groupBoxLoadCases.setVisible(b)
-        self.__setPerMap_1(False)
-        self.__setPerMap_2(False)
-
-        if self.radioLoadCases1.isChecked() :
-            self.__setLoadCase_1(True)
-        elif self.radioLoadCases2.isChecked() :
-            self.__setLoadCase_2(True)
-
-    def showPerMap(self, b):
-        self.groupBoxPerMap.setVisible(b) 
-        self.__setLoadCase_1(False)
-        self.__setLoadCase_2(False)
-        
-        if self.radioPerMap1.isChecked() :
-            self.__setPerMap_1(True)
-        elif self.radioPerMap2.isChecked() :
-            self.__setPerMap_2(True)
-        
-    def __showLoadCaseUID(self, b):
-        self.__setLoadCase_1(b)
-    
-    def __showLoadCase(self, b):  
-        self.__setLoadCase_2(b)
-
-    def __setLoadCase_1(self, b):
         self.labelLoadCaseUID.setVisible(b)
         self.textLoadCaseUID.setVisible(b)
 
-    def __setLoadCase_2(self, b):        
-        self.labelLoadCase.setVisible(b)
-        self.textLoadCase.setVisible(b) 
-
-    def __setPerMap_1(self, b):
+    def showPerMap(self, b):
         self.labelPositiveSteadi.setVisible(b)
         self.labelNegativeSteadi.setVisible(b)
         self.labelCtrlSurUID.setVisible(b)
 
         self.textPositiveSteadi.setVisible(b)
         self.textNegativeSteadi.setVisible(b)
-        self.textCtrlSurUID.setVisible(b)
-
-    def __setPerMap_2(self, b):
-        self.labelMachNum.setVisible(b)
-        self.labelReynNum.setVisible(b)         
-        self.labelAngleYaw.setVisible(b)
-        self.labelAngleAtt.setVisible(b)
-        self.labelPositiveSteadi.setVisible(b)
-        self.labelNegativeSteadi.setVisible(b)
-        self.labelCtrlSurfaces.setVisible(b)
-
-        self.textMachNum.setVisible(b)
-        self.textReynNum.setVisible(b)         
-        self.textAngleYaw.setVisible(b)
-        self.textAngleAtt.setVisible(b)
-        self.textPositiveSteadi.setVisible(b)
-        self.textNegativeSteadi.setVisible(b)
-        self.textCtrlSurfaces.setVisible(b)  
+        self.textCtrlSurUID.setVisible(b)        
 
     def __visibilityTool(self):
         self.flagButTool = not self.flagButTool
@@ -285,46 +307,53 @@ class ToolX(PopUpTool):
 
     def __visibilityAircraftModelUID(self):
         self.flagButAir = not self.flagButAir
-        self.labelAMUID.setVisible(self.flagButAir)
-        self.textAMUID.setVisible(self.flagButAir)
+        self.labelAMUID1.setVisible(self.flagButAir)
+        self.labelAMUID2.setVisible(self.flagButAir)
+        self.listAMUID1.setVisible(self.flagButAir)
+        self.listAMUID2.setVisible(self.flagButAir)
+        self.butLeft.setVisible(self.flagButAir)
+        self.butRight.setVisible(self.flagButAir)
 
     def __visibilityDataSetName (self):
         self.flagButData = not self.flagButData
         self.labelDSet.setVisible(self.flagButData)
+        self.labelCheckDSet.setVisible(self.flagButData)
         self.textDSet.setVisible(self.flagButData)
+        self.checkDataset.setVisible(self.flagButData)
 
-    def __visibilityReferenceValues(self):
-        self.flagButRef = not self.flagButRef
-        self.labelArea.setVisible(self.flagButRef)
-        self.labelLenCmx.setVisible(self.flagButRef)
-        self.labelLenCmy.setVisible(self.flagButRef)
-        self.labelLenCmz.setVisible(self.flagButRef)
-        self.labelMomRefPnt.setVisible(self.flagButRef)
-        self.textArea.setVisible(self.flagButRef)
-        self.textLenCmx.setVisible(self.flagButRef)
-        self.textLenCmy.setVisible(self.flagButRef)
-        self.textLenCmz.setVisible(self.flagButRef)
-        self.textMomRefPnt.setVisible(self.flagButRef)    
-    
     def __visibilityLoadCasePerMap(self):
         self.flagButCase = not self.flagButCase
         self.groupBoxCaseVsPerMap.setVisible(self.flagButCase)
+        
         if not self.flagButCase :
-            self.__hideCaseAndPerMap()   
+            self.showLoadCase(False)
+            self.showPerMap(False)
         elif self.radioCaseVsPerMap1.isChecked():
             self.showLoadCase(True)
         elif self.radioCaseVsPerMap2.isChecked():
             self.showPerMap(True)
+        else:
+            self.showLoadCase(False)
+            self.showPerMap(False)
 
-
-    def __hideCaseAndPerMap(self):
-        self.groupBoxLoadCases.hide()
-        self.groupBoxPerMap.hide()
+    def __visibilityToolParameters(self):
+        self.flagButTPar = not self.flagButTPar
+        self.labelUsePOLINT.setVisible(self.flagButTPar)
+        self.labelArchiveMode.setVisible(self.flagButTPar)
+        self.labelParallelComputation.setVisible(self.flagButTPar)
+        self.labelCheckWingUID.setVisible(self.flagButTPar)
+        self.labelWingUID.setVisible(self.flagButTPar)
+        self.labelSpanwise.setVisible(self.flagButTPar)
+        self.labelchordwise.setVisible(self.flagButTPar)
         
-        self.__setLoadCase_1(False)
-        self.__setLoadCase_2(False)
-        self.__setPerMap_1(False)
-        self.__setPerMap_2(False)
+        self.textUsePOLINT.setVisible(self.flagButTPar)
+        self.textArchiveMode.setVisible(self.flagButTPar)
+        self.textParallelComputation.setVisible(self.flagButTPar)
+        self.checkWingUID.setVisible(self.flagButTPar)
+        self.textWingUID.setVisible(self.flagButTPar)
+        self.textSpanwise.setVisible(self.flagButTPar)
+        self.textChordwise.setVisible(self.flagButTPar)
+
         
     def __getSeperator(self):
         line = QtGui.QFrame()
@@ -336,19 +365,13 @@ class ToolX(PopUpTool):
         return self.textName.text() , self.textVers.text()
     
     def getValuesAircraftModelUID(self):
-        return self.textAMUID.text()
-    
+        print "not implemented yet"
+        
     def getValuesDatasetName(self):
         return self.textDSet.text()
     
-    def getValuesReferenceValues(self):
-        return self.textArea.text() , self.textLenCmx.text() ,self.textLenCmy.text(), self.textLenCmz.text()
-    
     def getValuesLoadCasesLoadCaseUID(self):
         return self.textLoadCaseUID.text()
-    
-    def getValuesLoadCasesLoadCase(self):
-        return self.textLoadCase.text()
 
     def getValuesPerformanceMap_1(self):
         return self.textPositiveSteadi.text() , self.textNegativeSteadi.text(), self.textCtrlSurUID.text()
@@ -357,6 +380,44 @@ class ToolX(PopUpTool):
         return self.textMachNum.text(), self.textReynNum.text(), self.textAngleYaw.text(), self.textAngleAtt.text(), self.textPositiveSteadi.text(), self.textNegativeSteadi.text(), self.textCtrlSurfaces.text()
         
 
+    def modelUIDSwitchLeft(self):
+        self.switchBetweenLists(self.listAMUID2, self.listAMUID1, False)
+      
+    def modelUIDSwitchRight(self):
+        self.switchBetweenLists(self.listAMUID1, self.listAMUID2, True)      
+        
+    def switchBetweenLists(self, list1, list2, swap):
+        item = list1.currentItem()
+        list1.setCurrentItem(None)
+        if item is not None :
+            if swap and list2.count()>0:
+                tmp = list2.takeItem(0)
+                list1.takeItem(list1.row(item))
+                list2.addItem(item)
+                list1.addItem(tmp)                  
+            else: 
+                list1.takeItem(list1.row(item))
+                list2.addItem(item)
+      
+        
+
+
+    def modelUIDSwitchLeft2(self):
+        self.switchBetweenLists(self.listAMUID2, self.listAMUID1)
+      
+    def modelUIDSwitchRight2(self):
+        self.switchBetweenLists(self.listAMUID1, self.listAMUID2)  
+
+    def switchBetweenLists2(self, list1, list2):
+        item = list1.currentItem()
+        list1.setCurrentItem(None)
+        if item is not None :
+            list1.takeItem(list1.row(item))
+            list2.addItem(item)
+            
+            
+
+    
     def keyPressEvent(self, event):
         if event.modifiers() & QtCore.Qt.ControlModifier:
             if event.key() == QtCore.Qt.Key_1:
@@ -375,7 +436,8 @@ class ToolX(PopUpTool):
 
     @utility.overrides(PopUpTool)    
     def setConnection(self):
-        os.system("xsltproc -o ../cpacs_files/test.xml ../cpacs_files/mappingInputRaw.xsl ../cpacs_files/D150_CPACS2.0_valid2.xml")
+        os.system("xsltproc -o " + Config.path_cpacs_test + " " + Config.path_cpacs_inputMapping + " " + Config.path_cpacs_D150_2)
+        #os.system("xsltproc -o test.xml mappingInputRaw.xsl D150_CPACS2.0_valid2.xml")
 
     @utility.overrides(PopUpTool)    
     def submitInput(self):
@@ -390,7 +452,7 @@ class ToolX(PopUpTool):
             b = int(self.text2.text())
             self.tool = difficultTestTool.doSomething(a, b)
         except :
-            print "error"
+            print "error in submitInput"
             self.tool = np.arange(2.0, 0.1)
         s = sin(2*pi*self.tool)
         plot(self.tool, s)

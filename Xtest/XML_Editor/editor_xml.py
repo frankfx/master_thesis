@@ -15,9 +15,7 @@ from Xtest.XML_Editor.configuration.config import Config
 
 from highlighter import Highlighter
 from Xtest.XML_Editor.popUps.tools.toolX import ToolX
-from PyQt4.uic.Compiler.qtproxies import QtGui
 from PySide import QtCore
-from xml.dom import HIERARCHY_REQUEST_ERR
 
 class EditorWindow(QMainWindow):
     """initialize editor"""

@@ -11,6 +11,15 @@ class Config():
     path_cpacs_tmp_file         = "../cpacs_files/temp.xml"
     path_cpacs_simple           = "../cpacs_files/simpletest.cpacs.xml"
     
+    path_cpacs_test           = "../../../cpacs_files/test.xml"   
+    path_cpacs_inputMapping   = "../../../cpacs_files/mappingInputRaw.xsl"   
+    path_cpacs_outputMapping  = "../../../cpacs_files/mappingOutputRaw.xsl"   
+    path_cpacs_D150_2         = "../../../cpacs_files/D150_CPACS2.0_valid2.xml"   
+    
+    path_but_right_icon       = "../../../images/buttonRightIcon.png"
+    path_but_left_icon        = "../../../images/buttonLeftIcon.png"
+    
+    
     path_code_completion_dict   = "configuration/keywords"
     
     cpacs_default               =   "<?xml version=\"1.0\"?> \n" + \
