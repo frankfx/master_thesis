@@ -6,13 +6,12 @@ Created on Jan 14, 2015
 
 from PySide import QtGui, QtCore
 from popUp_tool import PopUpTool
-from Xtest.XML_Editor.externTools import difficultTestTool
 from Xtest.Open_GL import utility
-from pylab import *
 from Xtest.XML_Editor.configuration.config import Config
-import os
-
 from tixiwrapper   import Tixi, TixiException
+import os, sys
+
+
 
 class ToolX(PopUpTool):
     def __init__(self, name, width=300, height=700):
@@ -31,11 +30,17 @@ class ToolX(PopUpTool):
         layout.addRow(self.labelCheckDSet, self.checkDataset)
         layout.addRow(self.labelDSet, self.textDSet)
         layout.addRow(self.butOpenLCasesAndPerMap)
-        layout.addRow(self.groupBoxCaseVsPerMap)
-        layout.addRow(self.labelLoadCaseUID, self.textLoadCaseUID)
-        layout.addRow(self.labelPositiveSteadi, self.textPositiveSteadi)
-        layout.addRow(self.labelNegativeSteadi, self.textNegativeSteadi)
-        layout.addRow(self.labelCtrlSurUID, self.textCtrlSurUID)
+        layout.addRow(self.grid)
+        layout.addRow(self.gridLoadCaseUID)
+        layout.addRow(self.gridCtrlSurUID)
+        layout.addRow(self.labelPositiveQuasiSteadyRotation)
+        layout.addRow(self.labelPositiveSteadi_pstar, self.textPositiveSteadi_pstar)
+        layout.addRow(self.labelPositiveSteadi_qstar, self.textPositiveSteadi_qstar)
+        layout.addRow(self.labelPositiveSteadi_rstar, self.textPositiveSteadi_rstar)
+        layout.addRow(self.labelNegativeQuasiSteadyRotation)
+        layout.addRow(self.labelNegativeSteadi_pstar, self.textNegativeSteadi_pstar)
+        layout.addRow(self.labelNegativeSteadi_qstar, self.textNegativeSteadi_qstar)
+        layout.addRow(self.labelNegativeSteadi_rstar, self.textNegativeSteadi_rstar)
         layout.addRow(self.butOpenToolParameters)
         layout.addRow(self.labelUsePOLINT, self.textUsePOLINT)
         layout.addRow(self.labelArchiveMode, self.textArchiveMode)
@@ -64,27 +69,29 @@ class ToolX(PopUpTool):
         self.textVers = QtGui.QLineEdit()
         
         # aircraftModelUID
-        self.listAMUID1 = QtGui.QListWidget()
-        self.listAMUID2 = QtGui.QListWidget()
-        self.butLeft    = QtGui.QPushButton()
-        self.butRight   = QtGui.QPushButton()
-        self.gridAMUID  = QtGui.QGridLayout()
+        self.listAMUID1    = QtGui.QListWidget()
+        self.listAMUID2    = QtGui.QListWidget()
+        self.butAMUIDLeft  = QtGui.QPushButton()
+        self.butAMUIDRight = QtGui.QPushButton()
+        self.gridAMUID     = QtGui.QGridLayout()
 
-        self.butLeft.setIcon(QtGui.QIcon(Config.path_but_left_icon))
-        self.butLeft.setIconSize(QtCore.QSize(10,10))
-        self.butLeft.clicked.connect(self.modelUIDSwitchLeft) 
+        self.listAMUID1.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.listAMUID1.setSortingEnabled(True)
 
-        self.butRight.setIcon(QtGui.QIcon(Config.path_but_right_icon))
-        self.butRight.setIconSize(QtCore.QSize(10,10))   
-        self.butRight.clicked.connect(self.modelUIDSwitchRight)
+        self.butAMUIDLeft.setIcon(QtGui.QIcon(Config.path_but_left_icon))
+        self.butAMUIDLeft.setIconSize(QtCore.QSize(10,10))
+        self.butAMUIDLeft.clicked.connect(self.modelUIDSwitchLeft) 
+
+        self.butAMUIDRight.setIcon(QtGui.QIcon(Config.path_but_right_icon))
+        self.butAMUIDRight.setIconSize(QtCore.QSize(10,10))   
+        self.butAMUIDRight.clicked.connect(self.modelUIDSwitchRight)
 
         self.gridAMUID.addWidget(self.labelAMUID1, 0,0)
         self.gridAMUID.addWidget(self.labelAMUID2, 0,3)
         self.gridAMUID.addWidget(self.listAMUID1, 1,0, 2, 1)
-        self.gridAMUID.addWidget(self.butLeft, 1,1)
-        self.gridAMUID.addWidget(self.butRight, 2,1)
+        self.gridAMUID.addWidget(self.butAMUIDLeft, 1,1)
+        self.gridAMUID.addWidget(self.butAMUIDRight, 2,1)
         self.gridAMUID.addWidget(self.listAMUID2, 1,3, 2, 1)
-
 
         # datasetName
         self.textDSet = QtGui.QLineEdit()
@@ -93,23 +100,77 @@ class ToolX(PopUpTool):
         self.checkDataset.stateChanged.connect(self.enableTextDatasetName)
         
         # loadCase
-        self.textLoadCaseUID  = QtGui.QListWidget()
-        self.textLoadCaseUID.setSelectionMode(QtGui.QAbstractItemView.MultiSelection)
-        
+        self.listLoadCaseUID1    = QtGui.QListWidget()
+        self.listLoadCaseUID2    = QtGui.QListWidget()
+        self.butLoadCaseUIDLeft  = QtGui.QPushButton()
+        self.butLoadCaseUIDRight = QtGui.QPushButton()
+        self.gridLoadCaseUID     = QtGui.QGridLayout()
+
+        self.listLoadCaseUID1.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.listLoadCaseUID2.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.listLoadCaseUID1.setSortingEnabled(True)
+        self.listLoadCaseUID2.setSortingEnabled(True)
+
+        self.butLoadCaseUIDLeft.setIcon(QtGui.QIcon(Config.path_but_left_icon))
+        self.butLoadCaseUIDLeft.setIconSize(QtCore.QSize(10,10))
+        self.butLoadCaseUIDLeft.clicked.connect(self.loadCaseUIDSwitchLeft) 
+
+        self.butLoadCaseUIDRight.setIcon(QtGui.QIcon(Config.path_but_right_icon))
+        self.butLoadCaseUIDRight.setIconSize(QtCore.QSize(10,10))   
+        self.butLoadCaseUIDRight.clicked.connect(self.loadCaseUIDSwitchRight)
+
+        self.gridLoadCaseUID.addWidget(self.labelLoadCaseUID1, 0,0)
+        self.gridLoadCaseUID.addWidget(self.labelLoadCaseUID2, 0,3)
+        self.gridLoadCaseUID.addWidget(self.listLoadCaseUID1, 1,0, 2, 1)
+        self.gridLoadCaseUID.addWidget(self.butLoadCaseUIDLeft, 1,1)
+        self.gridLoadCaseUID.addWidget(self.butLoadCaseUIDRight, 2,1)
+        self.gridLoadCaseUID.addWidget(self.listLoadCaseUID2, 1,3, 2, 1)
+
         # performanceMap 
-        self.textPositiveSteadi = QtGui.QLineEdit()
-        self.textNegativeSteadi = QtGui.QLineEdit()
-        self.textCtrlSurUID = QtGui.QLineEdit()
+        self.textPositiveSteadi_pstar = QtGui.QLineEdit()
+        self.textPositiveSteadi_qstar = QtGui.QLineEdit()
+        self.textPositiveSteadi_rstar = QtGui.QLineEdit()
         
+        self.textNegativeSteadi_pstar = QtGui.QLineEdit()
+        self.textNegativeSteadi_qstar = QtGui.QLineEdit()
+        self.textNegativeSteadi_rstar = QtGui.QLineEdit()
+
+        self.listCtrlSurUID1    = QtGui.QListWidget()
+        self.listCtrlSurUID2    = QtGui.QListWidget()
+        self.butCtrlSurUIDLeft  = QtGui.QPushButton()
+        self.butCtrlSurUIDRight = QtGui.QPushButton()
+        self.gridCtrlSurUID     = QtGui.QGridLayout()
+
+        self.listCtrlSurUID1.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.listCtrlSurUID2.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.listCtrlSurUID1.setSortingEnabled(True)
+        self.listCtrlSurUID2.setSortingEnabled(True)
+
+        self.butCtrlSurUIDLeft.setIcon(QtGui.QIcon(Config.path_but_left_icon))
+        self.butCtrlSurUIDLeft.setIconSize(QtCore.QSize(10,10))
+        self.butCtrlSurUIDLeft.clicked.connect(self.ctrlSurUIDSwitchLeft) 
+
+        self.butCtrlSurUIDRight.setIcon(QtGui.QIcon(Config.path_but_right_icon))
+        self.butCtrlSurUIDRight.setIconSize(QtCore.QSize(10,10))   
+        self.butCtrlSurUIDRight.clicked.connect(self.ctrlSurUIDSwitchRight)
+
+        self.gridCtrlSurUID.addWidget(self.labelCtrlSurUID1,   0,0)
+        self.gridCtrlSurUID.addWidget(self.labelCtrlSurUID2,   0,2)
+        self.gridCtrlSurUID.addWidget(self.listCtrlSurUID1,    1,0, 2, 1)
+        self.gridCtrlSurUID.addWidget(self.butCtrlSurUIDLeft,  1,1)
+        self.gridCtrlSurUID.addWidget(self.butCtrlSurUIDRight, 2,1)
+        self.gridCtrlSurUID.addWidget(self.listCtrlSurUID2,    1,2, 2, 1)
+
+
         # tool parameters
         self.textUsePOLINT = QtGui.QComboBox()
         self.textUsePOLINT.addItem("True")
         self.textUsePOLINT.addItem("False")
         
         self.textArchiveMode = QtGui.QComboBox()
-        self.textArchiveMode.addItem("0=logfile")
-        self.textArchiveMode.addItem("1=log+inputfiles")
-        self.textArchiveMode.addItem("2=all results")
+        self.textArchiveMode.addItem("0")
+        self.textArchiveMode.addItem("1")
+        self.textArchiveMode.addItem("2")
         
         self.textParallelComputation = QtGui.QLineEdit()
         self.textParallelComputation.setValidator(QtGui.QIntValidator(0, 10000, self) )       
@@ -121,7 +182,6 @@ class ToolX(PopUpTool):
         self.textWingUID.setDisabled(True)        
         self.checkWingUID  = QtGui.QCheckBox()
         self.checkWingUID.stateChanged.connect(self.enableTextWingUID)
-
         
 
     def initTixi(self, path = Config.path_cpacs_D150_2):
@@ -129,7 +189,9 @@ class ToolX(PopUpTool):
         self.tixi.openDocument(path)
         
         if self.tixiValidateXPath("/cpacs/toolspecific/liftingLine") :
-            self.tixiSetAircraftModelUID() 
+            self.tixiSetPositiveQuasiSteadyRotation() 
+            self.tixiSetNegativeQuasiSteadyRotation()
+            self.tixiSetToolParameters()
         else:
             QtGui.QMessageBox.about(self, "error", "no toolspecific found in the given file path : %s" % path)
             sys.exit()
@@ -149,33 +211,126 @@ class ToolX(PopUpTool):
         self.textVers.setText(self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/tool/name[1]"))
         
     def tixiSetAircraftModelUID(self):
-        tmp_list = []
+        uids_avail = []
         for j in range(1, self.tixi.getNamedChildrenCount("/cpacs/toolspecific/liftingLine", "aircraftModelUID") + 1) :
             item = self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/aircraftModelUID["+str(j)+"]")
             self.listAMUID2.addItem(item)
-            tmp_list.append(item)
+            uids_avail.append(item)
        
         for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/vehicles/aircraft", "model") + 1) :
             item = self.tixi.getTextAttribute("/cpacs/vehicles/aircraft/model[" + str(i) +"]" , 'uID')
-            if not item in tmp_list:
+            if not item in uids_avail:
                 self.listAMUID1.addItem(item)
 
+        self.tixiSetControlSurfaceUID()
 
     def tixiSetDatasetName(self):
         if self.tixiValidateXPath("/cpacs/toolspecific/liftingLine/datasetName"):
             self.textDSet.setText(self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/datasetName"))        
+
+    def tixiSetControlSurfaceUID(self):
+        # AircraftModelUID has changed, we must clear current available ControlSurfaces (list 1)
+        if self.listCtrlSurUID1.count() > 0 :
+            self.listCtrlSurUID1.clear()
+        
+        # save current ControlSurface selection and remove them from list2
+        uids = set()
+        for _ in range(0, self.listCtrlSurUID2.count()):
+            uids.add(self.listCtrlSurUID2.takeItem(0).text())
+            
+        # check if AircraftModelUID was selected (AMUID list 2)
+        if self.listAMUID2.count() > 0:
+            # get selected model
+            model_uid  = self.listAMUID2.item(0).text()
+            # read available ControlSurfaces for this model and save in list 1
+            uids_avail = set()
+            for j in range(1, self.tixi.getNamedChildrenCount('/cpacs/vehicles/aircraft/model[@uID="' + model_uid + '"]/analyses/aeroPerformanceMap/controlSurfaces', 'controlSurface') + 1) :
+                item = self.tixi.getTextElement('/cpacs/vehicles/aircraft/model[@uID="' + model_uid + '"]/analyses/aeroPerformanceMap/controlSurfaces/controlSurface['+str(j)+']/controlSurfaceUID')
+                uids_avail.add(item)
+
+            # set items of old ControlSurface selection back to list 2 if they are available for this model
+            uids = uids.intersection(uids_avail)
+            
+            # read given ControlSurfaces
+            for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/toolspecific/liftingLine/performanceMap", "controlSurfaceUID") + 1) :
+                item = self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/performanceMap/controlSurfaceUID["+str(i)+"]")
+                # check if given ControlSurfaces available for given AircraftModel
+                if item in uids_avail :
+                    # set them to ControlSurfaces Set
+                    uids.add(item)
+            # set them to list
+            for item in uids:
+                self.listCtrlSurUID2.addItem(item)
+            
+            for item in uids_avail.difference(uids):
+                self.listCtrlSurUID1.addItem(item)
+
     
     def tixiSetLoadCaseUID(self):
-        for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/vehicles/aircraft/model/analyses/loadAnalysis/loadCases", "flightLoadCase") + 1) :
-            print "available"
-            print self.tixi.getTextAttribute("/cpacs/vehicles/aircraft/model/analyses/loadAnalysis/loadCases/flightLoadCase["+str(i)+"]" , 'uID')
+        # AircraftModelUID has changed, we must clear current available LoadCases (list 1)
+        if self.listLoadCaseUID1.count() > 0 :
+            self.listLoadCaseUID1.clear()
         
-        for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/toolspecific/liftingLine/loadCases", "loadCaseUID") + 1) :
-            print "chosen uids"
-            print self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/loadCases/loadCaseUID["+str(i)+"]")
+        # save current LoadCase selection and remove them from list2
+        uids_LoadCases = set()
+        for _ in range(0, self.listLoadCaseUID2.count()):
+            uids_LoadCases.add(self.listLoadCaseUID2.takeItem(0).text())
+            
+        # check if AircraftModelUID was selected (AMUID list 2)
+        if self.listAMUID2.count() > 0:
+            # get selected model
+            model_uid  = self.listAMUID2.item(0).text()
+            # read available LoadCases for this model and save in list 1
+            uids_avail = set()
+            for j in range(1, self.tixi.getNamedChildrenCount('/cpacs/vehicles/aircraft/model[@uID="' + model_uid + '"]/analyses/loadAnalysis/loadCases', 'flightLoadCase') + 1) :
+                item = self.tixi.getTextAttribute('/cpacs/vehicles/aircraft/model[@uID="' + model_uid + '"]/analyses/loadAnalysis/loadCases/flightLoadCase['+str(j)+']' , 'uID')
+                uids_avail.add(item)
+
+            # set items of old LoadCase selection back to list 2 if they are available for this model
+            uids_LoadCases = uids_LoadCases.intersection(uids_avail)
+            
+            # read given loadCases
+            for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/toolspecific/liftingLine/loadCases", "loadCaseUID") + 1) :
+                item = self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/loadCases/loadCaseUID["+str(i)+"]")
+                # check if given loadCase available for given AircraftModel
+                if item in uids_avail :
+                    # set them to LoadCase Set
+                    uids_LoadCases.add(item)
+                    print uids_LoadCases
+            # set them to list
+            for item in uids_LoadCases:
+                self.listLoadCaseUID2.addItem(item)
+            
+            for item in uids_avail.difference(uids_LoadCases):
+                self.listLoadCaseUID1.addItem(item)
+
+    def tixiSetPositiveQuasiSteadyRotation(self):
+        path = "/cpacs/toolspecific/liftingLine/performanceMap/positiveQuasiSteadyRotation"
+        self.textPositiveSteadi_pstar.setText(self.tixi.getTextElement(path+"/pstar"))
+        self.textPositiveSteadi_qstar.setText(self.tixi.getTextElement(path+"/qstar"))
+        self.textPositiveSteadi_rstar.setText(self.tixi.getTextElement(path+"/rstar"))
         
-   
-        
+    def tixiSetNegativeQuasiSteadyRotation(self):
+        path = "/cpacs/toolspecific/liftingLine/performanceMap/negativeQuasiSteadyRotation"
+        self.textNegativeSteadi_pstar.setText(self.tixi.getTextElement(path+"/pstar"))
+        self.textNegativeSteadi_qstar.setText(self.tixi.getTextElement(path+"/qstar"))
+        self.textNegativeSteadi_rstar.setText(self.tixi.getTextElement(path+"/rstar"))
+
+    def tixiSetToolParameters(self):
+        b = self.tixi.getBooleanElement("/cpacs/toolspecific/liftingLine/toolParameters/usePOLINT")
+        self.textUsePOLINT.setCurrentIndex(0 if b else 1)
+        b = self.tixi.getIntegerElement("/cpacs/toolspecific/liftingLine/toolParameters/archiveMode")
+        self.textArchiveMode.setCurrentIndex(b)
+        b = self.tixi.getIntegerElement("/cpacs/toolspecific/liftingLine/toolParameters/parallelComputation")
+        self.textParallelComputation.setText(str(b))
+
+
+
+        for i in range(1, self.tixi.getNamedChildrenCount("/cpacs/toolspecific/liftingLine/toolParameters/wingPanelings", "wingPaneling")+1):
+            self.tixi.getIntegerElement("/cpacs/toolspecific/liftingLine/toolParameters/wingPanelings/wingPaneling[" + str(i) +"]/spanwise")
+            self.tixi.getIntegerElement("/cpacs/toolspecific/liftingLine/toolParameters/wingPanelings/wingPaneling[" + str(i) +"]/chordwise")
+
+
 
     def setupLabels(self):
         # longest label word
@@ -199,20 +354,23 @@ class ToolX(PopUpTool):
         self.labelCheckDSet= QtGui.QLabel("set")
 
         # loadCase
-        self.labelLoadCaseUID = QtGui.QLabel(nameList[9])
-        self.labelLoadCase    = QtGui.QLabel(nameList[10])
+        self.labelLoadCaseUID1 = QtGui.QLabel("available uids")
+        self.labelLoadCaseUID2 = QtGui.QLabel("chosen uids")
+        
+        # performanceMap two
+        self.labelCtrlSurUID1 = QtGui.QLabel("available uids")
+        self.labelCtrlSurUID2 = QtGui.QLabel("chosen uids")
 
         # performanceMap two
-        self.labelCtrlSurUID = QtGui.QLabel(nameList[11]) 
+        self.labelPositiveQuasiSteadyRotation = QtGui.QLabel("positiveQuasiSteadyRotation")
+        self.labelPositiveSteadi_pstar = QtGui.QLabel("pstar")
+        self.labelPositiveSteadi_qstar = QtGui.QLabel("qstar")
+        self.labelPositiveSteadi_rstar = QtGui.QLabel("rstar")
 
-        # performanceMap two
-        self.labelMachNum = QtGui.QLabel(nameList[12])
-        self.labelReynNum = QtGui.QLabel(nameList[13])
-        self.labelAngleYaw = QtGui.QLabel(nameList[14])
-        self.labelAngleAtt = QtGui.QLabel(nameList[15])
-        self.labelPositiveSteadi = QtGui.QLabel(nameList[16])
-        self.labelNegativeSteadi = QtGui.QLabel(nameList[17])
-        self.labelCtrlSurfaces = QtGui.QLabel(nameList[18])
+        self.labelNegativeQuasiSteadyRotation = QtGui.QLabel("negativeQuasiSteadyRotation")        
+        self.labelNegativeSteadi_pstar = QtGui.QLabel("pstar")
+        self.labelNegativeSteadi_qstar = QtGui.QLabel("qstar")
+        self.labelNegativeSteadi_rstar = QtGui.QLabel("rstar")
         
         # tool parameters
         self.labelUsePOLINT      = QtGui.QLabel("usePOLINT")
@@ -228,6 +386,8 @@ class ToolX(PopUpTool):
         self.textVers.setToolTip("version of tool")
         self.textDSet.setToolTip("name of the dataset for LIFTING_LINE calculation") 
         self.textParallelComputation.setToolTip("0=parallel computation on all available cores\n1=sequencial computation\nn=parallel computation on n cores")
+        self.textArchiveMode.setToolTip("0 = logfile\n1 = log+inputfiles\n2 = all results")    
+
 
     def setupButtons(self):
         # create buttons
@@ -270,33 +430,52 @@ class ToolX(PopUpTool):
 
     def setupGroupBoxes(self):
         # loadCases vs performanceMap
-        self.groupBoxCaseVsPerMap = QtGui.QGroupBox()
-        grid   = QtGui.QGridLayout()
+        #self.groupBoxCaseVsPerMap = QtGui.QGroupBox()
+        self.grid   = QtGui.QGridLayout()
         self.radioCaseVsPerMap1 = QtGui.QRadioButton("&loadCases")
         self.radioCaseVsPerMap2 = QtGui.QRadioButton("&performanceMap")
-        grid.addWidget(self.radioCaseVsPerMap1,0,1)
-        grid.addWidget(self.radioCaseVsPerMap2,0,2)
-        self.groupBoxCaseVsPerMap.setLayout(grid)
-        self.groupBoxCaseVsPerMap.setFlat(True)        
-
-        #self.__hideCaseAndPerMap()
+        self.grid.addWidget(self.radioCaseVsPerMap1,0,1)
+        self.grid.addWidget(self.radioCaseVsPerMap2,0,2)
 
         self.radioCaseVsPerMap1.toggled.connect(self.showLoadCase)
         self.radioCaseVsPerMap2.toggled.connect(self.showPerMap)
         
 
     def showLoadCase(self, b):
-        self.labelLoadCaseUID.setVisible(b)
-        self.textLoadCaseUID.setVisible(b)
+        self.labelLoadCaseUID1.setVisible(b)
+        self.labelLoadCaseUID2.setVisible(b)
+        self.listLoadCaseUID1.setVisible(b)
+        self.listLoadCaseUID2.setVisible(b)
+        self.butLoadCaseUIDLeft.setVisible(b)
+        self.butLoadCaseUIDRight.setVisible(b)
 
     def showPerMap(self, b):
-        self.labelPositiveSteadi.setVisible(b)
-        self.labelNegativeSteadi.setVisible(b)
-        self.labelCtrlSurUID.setVisible(b)
+        self.labelPositiveQuasiSteadyRotation.setVisible(b)
+        self.labelPositiveSteadi_pstar.setVisible(b)
+        self.labelPositiveSteadi_qstar.setVisible(b)
+        self.labelPositiveSteadi_rstar.setVisible(b)
+        
+        self.labelNegativeQuasiSteadyRotation.setVisible(b)
+        self.labelNegativeSteadi_pstar.setVisible(b)
+        self.labelNegativeSteadi_qstar.setVisible(b)
+        self.labelNegativeSteadi_rstar.setVisible(b)
 
-        self.textPositiveSteadi.setVisible(b)
-        self.textNegativeSteadi.setVisible(b)
-        self.textCtrlSurUID.setVisible(b)        
+        self.textPositiveSteadi_pstar.setVisible(b)
+        self.textPositiveSteadi_qstar.setVisible(b)
+        self.textPositiveSteadi_rstar.setVisible(b)
+        
+        self.textNegativeSteadi_pstar.setVisible(b)
+        self.textNegativeSteadi_qstar.setVisible(b)
+        self.textNegativeSteadi_rstar.setVisible(b)
+
+        self.labelCtrlSurUID1.setVisible(b)
+        self.labelCtrlSurUID2.setVisible(b)
+        self.listCtrlSurUID1.setVisible(b)
+        self.listCtrlSurUID2.setVisible(b)
+        self.butCtrlSurUIDLeft.setVisible(b)
+        self.butCtrlSurUIDRight.setVisible(b)
+
+
 
     def __visibilityTool(self):
         self.flagButTool = not self.flagButTool
@@ -311,8 +490,8 @@ class ToolX(PopUpTool):
         self.labelAMUID2.setVisible(self.flagButAir)
         self.listAMUID1.setVisible(self.flagButAir)
         self.listAMUID2.setVisible(self.flagButAir)
-        self.butLeft.setVisible(self.flagButAir)
-        self.butRight.setVisible(self.flagButAir)
+        self.butAMUIDLeft.setVisible(self.flagButAir)
+        self.butAMUIDRight.setVisible(self.flagButAir)
 
     def __visibilityDataSetName (self):
         self.flagButData = not self.flagButData
@@ -323,7 +502,9 @@ class ToolX(PopUpTool):
 
     def __visibilityLoadCasePerMap(self):
         self.flagButCase = not self.flagButCase
-        self.groupBoxCaseVsPerMap.setVisible(self.flagButCase)
+        
+        self.radioCaseVsPerMap1.setVisible(self.flagButCase)
+        self.radioCaseVsPerMap2.setVisible(self.flagButCase)
         
         if not self.flagButCase :
             self.showLoadCase(False)
@@ -378,13 +559,15 @@ class ToolX(PopUpTool):
 
     def getValuesPerformanceMap_2(self):
         return self.textMachNum.text(), self.textReynNum.text(), self.textAngleYaw.text(), self.textAngleAtt.text(), self.textPositiveSteadi.text(), self.textNegativeSteadi.text(), self.textCtrlSurfaces.text()
-        
+
 
     def modelUIDSwitchLeft(self):
         self.switchBetweenLists(self.listAMUID2, self.listAMUID1, False)
+        self.tixiSetLoadCaseUID()
       
     def modelUIDSwitchRight(self):
         self.switchBetweenLists(self.listAMUID1, self.listAMUID2, True)      
+        self.tixiSetLoadCaseUID()
         
     def switchBetweenLists(self, list1, list2, swap):
         item = list1.currentItem()
@@ -398,15 +581,18 @@ class ToolX(PopUpTool):
             else: 
                 list1.takeItem(list1.row(item))
                 list2.addItem(item)
-      
-        
 
+    def ctrlSurUIDSwitchLeft(self):
+        self.switchBetweenLists2(self.listCtrlSurUID2, self.listCtrlSurUID1)
 
-    def modelUIDSwitchLeft2(self):
-        self.switchBetweenLists(self.listAMUID2, self.listAMUID1)
+    def ctrlSurUIDSwitchRight(self):
+        self.switchBetweenLists2(self.listCtrlSurUID1, self.listCtrlSurUID2) 
+
+    def loadCaseUIDSwitchLeft(self):
+        self.switchBetweenLists2(self.listLoadCaseUID2, self.listLoadCaseUID1)
       
-    def modelUIDSwitchRight2(self):
-        self.switchBetweenLists(self.listAMUID1, self.listAMUID2)  
+    def loadCaseUIDSwitchRight(self):
+        self.switchBetweenLists2(self.listLoadCaseUID1, self.listLoadCaseUID2)  
 
     def switchBetweenLists2(self, list1, list2):
         item = list1.currentItem()
@@ -414,7 +600,6 @@ class ToolX(PopUpTool):
         if item is not None :
             list1.takeItem(list1.row(item))
             list2.addItem(item)
-            
             
 
     
