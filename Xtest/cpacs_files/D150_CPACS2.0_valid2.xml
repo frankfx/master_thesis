@@ -8792,6 +8792,7 @@
 				<parallelComputation>0</parallelComputation>
 				<wingPanelings>
 					<wingPaneling>
+						<wingUID>D150_VAMP_HL1</wingUID>
 						<spanwise>2</spanwise>
 						<chordwise>2</chordwise>
 					</wingPaneling>

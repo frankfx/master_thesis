@@ -5196,31 +5196,7 @@
 			</wingAirfoils></profiles></vehicles><toolspecific><liftingLine><tool>
 				<name>LIFTING_LINE</name>
 				<version>2.4.1</version>
-			</tool><aircraftModelUID>D150_VAMP</aircraftModelUID><aircraftModelUID>D140_VAMP</aircraftModelUID><aircraftModelUID>D130_VAMP</aircraftModelUID><aircraftModelUID>D120_VAMP</aircraftModelUID><aircraftModelUID>D110_VAMP</aircraftModelUID><aircraftModelUID>D100_VAMP</aircraftModelUID><aircraftModelUID>D90_VAMP</aircraftModelUID><aircraftModelUID>D20_VAMP</aircraftModelUID><datasetName>D150_VAMP_CPACS2.0</datasetName><referenceValues><area>122.4</area><lengthCMX>4.19311980812</lengthCMX><lengthCMY>4.19311980812</lengthCMY><lengthCMZ>4.19311980812</lengthCMZ><momentReferencePoint><x>0</x><y>0</y><z>0</z></momentReferencePoint></referenceValues><loadCases><loadCase><name>Lc: n= 2.5, EAS = 120.7482m/s, Airspeed = 208.0307m/s, mass= 71311.4997 kg</name><description>V-n-Loadcase flapSetting=0 deg</description><loadCaseUID>Lc_1</loadCaseUID><flow><machNumber>0.69467</machNumber><standardAltitude>0</standardAltitude><angleOfYaw>0.</angleOfYaw><targetLiftCoefficient>0.64</targetLiftCoefficient></flow></loadCase><loadCase><name>Lc: n= 2.5, EAS = 150.4448m/s, Airspeed = 259.1936m/s, mass= 71311.4997 kg</name><description>V-n-Loadcase flapSetting=0 deg</description><loadCaseUID>Lc_2</loadCaseUID><flow><machNumber>0.86552</machNumber><standardAltitude>0</standardAltitude><angleOfYaw>0.</angleOfYaw><targetLiftCoefficient>0.41227</targetLiftCoefficient></flow></loadCase><loadCase><name>Lc: n= 2.5, EAS = 150.4448m/s, Airspeed = 259.1936m/s, mass= 71311.4997 kg</name><description>V-n-Loadcase flapSetting=0 deg</description><loadCaseUID>Lc_3</loadCaseUID><flow><machNumber>0.86552</machNumber><standardAltitude>0</standardAltitude><angleOfYaw>0.</angleOfYaw><targetLiftCoefficient>0.41227</targetLiftCoefficient><quasiSteadyRotation>
-											<pstar>0.01</pstar>
-										</quasiSteadyRotation></flow></loadCase><loadCase><name>Lc: n= 0, EAS = 150.4448m/s, Airspeed = 259.1936m/s, mass= 71311.4997 kg</name><description>V-n-Loadcase flapSetting=0 deg</description><loadCaseUID>Lc_4</loadCaseUID><flow><machNumber>0.86552</machNumber><standardAltitude>0</standardAltitude><angleOfYaw>0.</angleOfYaw><targetLiftCoefficient>0.41227</targetLiftCoefficient><quasiSteadyRotation>
-											<pstar>0.01</pstar>
-											<qstar>0.02</qstar>
-											<rstar>0.03</rstar>
-										</quasiSteadyRotation></flow></loadCase><loadCase><name>Lc: n= -1, EAS = 135.5804m/s, Airspeed = 233.5843m/s, mass= 71311.4997 kg</name><description>V-n-Loadcase flapSetting=0 deg</description><loadCaseUID>Lc_5</loadCaseUID><flow><machNumber>0.78</machNumber><standardAltitude>0</standardAltitude><angleOfYaw>0.</angleOfYaw><targetLiftCoefficient>0.50763</targetLiftCoefficient><controlSurfaces>
-										<controlSurface>
-											<controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron</controlSurfaceUID>
-											<relDeflection>0.5</relDeflection>
-										</controlSurface>
-										<controlSurface>
-											<controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron_symm</controlSurfaceUID>
-											<relDeflection>0.1</relDeflection>
-										</controlSurface>
-									</controlSurfaces></flow></loadCase><loadCase><name>Lc: n= -1, EAS = 135.5804m/s, Airspeed = 233.5843m/s, mass= 71311.4997 kg</name><description>V-n-Loadcase flapSetting=0 deg</description><loadCaseUID>Lc_6</loadCaseUID><flow><machNumber>0.78</machNumber><standardAltitude>10000</standardAltitude><angleOfYaw>0.</angleOfYaw><targetLiftCoefficient>0.50763</targetLiftCoefficient><controlSurfaces>
-										<controlSurface>
-											<controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron</controlSurfaceUID>
-											<relDeflection>0.5</relDeflection>
-										</controlSurface>
-										<controlSurface>
-											<controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron_symm</controlSurfaceUID>
-											<relDeflection>0.1</relDeflection>
-										</controlSurface>
-									</controlSurfaces></flow></loadCase></loadCases><performanceMap><machNumber mapType="vector">0.2;0.78</machNumber><reynoldsNumber mapType="vector">1e+007;2.77e+007;3e+007</reynoldsNumber><angleOfYaw mapType="vector">-5;0;5</angleOfYaw><angleOfAttack mapType="vector">-7.5;-5;-2.5;0;0.5;1;1.5;2;2.5;3;3.25;3.5;4;4.5;5;6;7.5;10;12.5;15</angleOfAttack><positiveQuasiSteadyRotation>
+			</tool><aircraftModelUID>D150_VAMP</aircraftModelUID><datasetName>D150_VAMP_CPACS2.0</datasetName><referenceValues><area>122.4</area><lengthCMX>4.19311980812</lengthCMX><lengthCMY>4.19311980812</lengthCMY><lengthCMZ>4.19311980812</lengthCMZ><momentReferencePoint><x>0</x><y>0</y><z>0</z></momentReferencePoint></referenceValues><performanceMap><machNumber mapType="vector">0.2;0.78</machNumber><reynoldsNumber mapType="vector">1e+007;2.77e+007;3e+007</reynoldsNumber><angleOfYaw mapType="vector">-5;0;5</angleOfYaw><angleOfAttack mapType="vector">-7.5;-5;-2.5;0;0.5;1;1.5;2;2.5;3;3.25;3.5;4;4.5;5;6;7.5;10;12.5;15</angleOfAttack><positiveQuasiSteadyRotation>
 					<pstar>0.002</pstar>
 					<qstar>0.004</qstar>
 					<rstar>0.006</rstar>
@@ -5234,7 +5210,8 @@
 				<parallelComputation>0</parallelComputation>
 				<wingPanelings>
 					<wingPaneling>
-						<spanwise>2</spanwise>
+						<wingUID>sdf</wingUID>
+						<spanwise>4</spanwise>
 						<chordwise>2</chordwise>
 					</wingPaneling>
 				</wingPanelings>

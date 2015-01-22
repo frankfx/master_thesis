@@ -45,7 +45,7 @@ class NewFileDialog(QtGui.QWidget):
         self.setWindowTitle(self.tr("Create new CPACS file"))  
         self.setFixedSize(400,300)
         
-    def submitInput(self):
+    def fire_submitInput(self):
         '''
         returns the input values from the new file dialog form
         '''        

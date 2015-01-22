@@ -15,6 +15,7 @@ class Config():
     path_cpacs_inputMapping   = "../../../cpacs_files/mappingInputRaw.xsl"   
     path_cpacs_outputMapping  = "../../../cpacs_files/mappingOutputRaw.xsl"   
     path_cpacs_D150_2         = "../../../cpacs_files/D150_CPACS2.0_valid2.xml"   
+    path_cpacs_D150_3         = "../../../cpacs_files/D150_CPACS2.0_valid3.xml"   
     
     path_but_right_icon       = "../../../images/buttonRightIcon.png"
     path_but_left_icon        = "../../../images/buttonLeftIcon.png"

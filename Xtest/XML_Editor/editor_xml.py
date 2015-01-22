@@ -571,7 +571,7 @@ class EditorWindow(QMainWindow):
         '''
         closes all documents and creates new empty cpacs temporary file   
         '''        
-        idict = self.popUpWidget.submitInput()
+        idict = self.popUpWidget.fire_submitInput()
         self.tixi.closeAllDocuments()
         self.tixi.create('cpacs')
         self.tixi.addCpacsHeader(idict['name'], idict['creator'], idict['version'], idict['description'], idict['cpacsVersion'])

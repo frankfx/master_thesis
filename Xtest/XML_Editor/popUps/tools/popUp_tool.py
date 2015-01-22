@@ -21,8 +21,9 @@ class PopUpTool(QtGui.QWidget):
         statusTip="Exit the application", triggered=None)        
 
         self.setWindowTitle(self.tr(name))  
-        self.setFixedSize(width, height)
-
+        #self.setFixedSize(width, height)
+        
+       
     def setupWidget(self):
         '''abstract method'''
         return NotImplemented
@@ -31,7 +32,11 @@ class PopUpTool(QtGui.QWidget):
         '''abstract method'''
         return NotImplemented  
     
-    def submitInput(self):
+    def fire_submitInput(self):
+        '''abstract method'''
+        return NotImplemented
+
+    def fire_submitInputAndStartTool(self):
         '''abstract method'''
         return NotImplemented
     
