@@ -1,0 +1,58 @@
+\input{header}
+\input{Abstract}
+\pagenumbering{Roman}
+\setcounter{page}{1}
+\tableofcontents
+\newpage
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+\input{Einleitung}
+\newpage
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\input{Grundlagen}
+\newpage
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\input{EigenesVerfahren}
+\newpage
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\input{Ergebnisse}
+\newpage
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\input{ZusammenfassungAusblick}
+\newpage
+
+\nocite{*}%Auch nicht-zitierte BibTeX-Einträge werden angezeigt.
+\bibliography{Literaturverzeichnis}
+\bibliographystyle{eg-alpha}
+\newpage
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\input{Abkurzungen}
+%Abkürzungsverzeichnis im Inhaltsverzeichnis anzeigen
+\addcontentsline{toc}{chapter}{Abkürzungsverzeichnis} 
+%Abbildungsverzeichnis
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\listoffigures
+%Tabellenverzeichnis
+\listoftables
+%Liste von Algorithmen
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\markboth{Liste der Algorithmen}{Liste der Algorithmen}
+\phantomsection
+\addcontentsline{toc}{chapter}{Liste der Algorithmen}
+\listofalgorithms
+%Liste von Code
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\markboth{Listings}{Listings}
+\phantomsection
+\addcontentsline{toc}{chapter}{Listings}
+\lstlistoflistings
+%Anhang
+\newpage
+\newpage\thispagestyle{empty}\hspace{1em}\newpage
+\input{Anhang}
+%Danksagung
+\input{Danksagung}
+\addcontentsline{toc}{chapter}{Danksagung} 
+
+\end{document} 

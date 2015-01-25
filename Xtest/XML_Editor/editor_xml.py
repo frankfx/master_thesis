@@ -559,7 +559,7 @@ class EditorWindow(QMainWindow):
         self.popUpWidget.show()
    
     def fireToolX(self):
-        self.popUpWidget = ToolX("X-Tool")
+        self.popUpWidget = ToolX("X-Tool", self.tixi)
         self.setEnabled(False)
         self.popUpWidget.buttonBox.accepted.connect(self.__resetPopUpWidget)
         self.popUpWidget.buttonBox.rejected.connect(self.__resetPopUpWidget)
@@ -691,7 +691,7 @@ def main():
     app = QApplication(sys.argv)
     tixi = Tixi()
     #tixi.open(Config.path_cpacs_simple, )
-    w = EditorWindow(tixi, Config.path_cpacs_A320_Wing, Config.path_cpacs_21_schema)
+    w = EditorWindow(tixi, Config.path_cpacs_D150_2, Config.path_cpacs_21_schema)
 
    # w.loadFile(conf.path_cpacs_A320_Wing, conf.path_cpacs_21_schema)
     # w.loadFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)

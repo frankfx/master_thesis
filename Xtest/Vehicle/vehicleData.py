@@ -13,54 +13,107 @@ import time
 import numpy as np
 import math
 from numpy import shape
+import thread
 
 class VehicleData():
     def __init__(self, tixi, tigl):
 
-        self.tixi = tixi
-        self.tigl = tigl
+        ### for test
+        self.tixi = Tixi()
+        #tixi.open(conf.path_cpacs_simple)
+        #tixi.open(Config.path_cpacs_D150)
+        self.tixi.openDocument(Config.path_cpacs_D150) 
+        #tixi.openDocument(conf.path_cpacs_A320_Wing) 
+        #self.tixi.schemaValidateFromFile(cpacs_scheme)
+        
+        self.tigl = Tigl()
+        try:
+            self.tigl.open(self.tixi,"")
+        except TiglException as err:    
+            print 'Error opening tigl document: ', err.__str__()      
+        
+
+        #self.tixi = tixi
+        #self.tigl = tigl
         #self.__initTixiTigl()
-        self.configurationGetLength = self.tigl.configurationGetLength() # 2.05436735655 ; D150 = 37.5708073949
+        #self.configurationGetLength = self.tigl.configurationGetLength() # 2.05436735655 ; D150 = 37.5708073949
         self.wingspan               = 0.0        
            
         self.__createAllPointLists()
            
     def __createAllPointLists(self):
         __start_time = time.time()
-        utility.echo("Time after init tigl, tixi: " + str(time.time() - __start_time)) 
-        self.pList_fuselage         = self.__createFuselage() 
-        self.pList_fuselage_normals = self.createNormalList(self.pList_fuselage, True)
-        utility.echo("Time after init fuselage: " + str(time.time() - __start_time) + ", compute: " + self.__cntPList(self.pList_fuselage) + " verts.")
-
         
-        self.pList_wing_up, self.pList_wing_lo = self.__createWings()
-        self.pList_wing_up_normals             = self.createNormalList(self.pList_wing_up, False)
-        self.pList_wing_lo_normals             = self.createNormalList(self.pList_wing_lo, True)
-        utility.echo("Time after wing one init : " + str(time.time() - __start_time) + ", compute: " + self.__cntPList(self.pList_wing_up) + " verts.")
+        #self.pList_fuselage         = self.__createFuselage() 
+        #self.pList_fuselage = self.__createFuselage(1, 4)
+        try:
+            thread.start_new_thread(self.__createFuselage2,(1,3))
+            thread.start_new_thread(self.__createFuselage,(1,4))
+        except:
+            print "Error: unable to start thread"        
+        
+        time.sleep(3)        
+        #print self.pList_fuselage[0][1]
+        #print self.pList_fuselage2[0][1]
+        
+#        self.pList_fuselage_normals = self.createNormalList(self.pList_fuselage, True)
 
 
-        self.pList_wing_up_reflect, self.pList_wing_lo_reflect = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
-        self.pList_wing_up_reflect_normals                     = self.createNormalList(self.pList_wing_up_reflect, True)
-        self.pList_wing_lo_reflect_normals                     = self.createNormalList(self.pList_wing_lo_reflect, False)
-        utility.echo("Time after init wing two : " + str(time.time() - __start_time))
+       # print self.pList_fuselage[0][1]
 
-        self.pList_component_segment           = self.__createComponent()
+        #utility.echo("Time after init fuselage: " + str(time.time() - __start_time) + ", compute: " + self.__cntPList(self.pList_fuselage) + " verts.")
 
-        utility.echo("Time after component init : " + str(time.time() - __start_time))
-        self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
-        self.pList_flaps_TE_normals            = self.createFlapNormals(self.pList_flaps_TEDevice)
+       # __start_time = time.time()
+       # self.pList_fuselage         = self.__createFuselage2() 
+#        self.pList_fuselage_normals = self.createNormalList(self.pList_fuselage, True)
+       # print self.pList_fuselage[0][1]
+       # utility.echo("Time after init fuselage: " + str(time.time() - __start_time) + ", compute: " + self.__cntPList(self.pList_fuselage) + " verts.")
 
-        self.pList_flaps_LEDevice              =  self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
-        self.pList_flaps_LE_normals            = self.createFlapNormals(self.pList_flaps_LEDevice)
+        #sys.exit()
+        #__start_time = time.time()
+        
+       # self.pList_wing_up, self.pList_wing_lo = self.__createWings()
+      #  self.pList_wing_up_normals             = self.createNormalList(self.pList_wing_up, False)
+      #  self.pList_wing_lo_normals             = self.createNormalList(self.pList_wing_lo, True)
+       
+       # print self.pList_wing_up[0][1]
+       # self.pList_wing_up_reflect, self.pList_wing_lo_reflect = self.__reflectWing(self.pList_wing_up, self.pList_wing_lo)
+       # print self.pList_wing_up[0][1]
+       # print self.pList_wing_up_reflect[0][1]
+      #  self.pList_wing_up_reflect_normals                     = self.createNormalList(self.pList_wing_up_reflect, True)
+      #  self.pList_wing_lo_reflect_normals                     = self.createNormalList(self.pList_wing_lo_reflect, False)
+       # utility.echo("Time after init wing two : " + str(time.time() - __start_time))
 
-        self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
-        self.pList_flaps_Spoiler_normals       = self.createFlapNormals(self.pList_flaps_Spoiler)
 
-#       self.plist_ribs                        = self.createRibs()
-        self.pList_spares                      = self.createSpars()
-
-
-        utility.echo("End data tigl calculation  -  Time: " + str(time.time() - __start_time))
+       # __start_time = time.time()
+       # self.pList_wing_up_reflect, self.pList_wing_lo_reflect, self.w1, self.w2 = self.__createWings1()
+      #  self.pList_wing_up_reflect_normals                     = self.createNormalList(self.pList_wing_up_reflect, True)
+      #  self.pList_wing_lo_reflect_normals                     = self.createNormalList(self.pList_wing_lo_reflect, False)
+        # utility.echo("Time after init wing two : " + str(time.time() - __start_time))
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+        #--------------------------------------------------- print self.w1[0][1]
+        #-------------------------------- print self.pList_wing_up_reflect[0][1]
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+        #------------------------------------------------------------ sys.exit()
+        #----- self.pList_component_segment           = self.__createComponent()
+#------------------------------------------------------------------------------ 
+        # utility.echo("Time after component init : " + str(time.time() - __start_time))
+        # self.pList_flaps_TEDevice              = self.createFlaps(("trailingEdgeDevices", "trailingEdgeDevice"))
+        # self.pList_flaps_TE_normals            = self.createFlapNormals(self.pList_flaps_TEDevice)
+#------------------------------------------------------------------------------ 
+        # self.pList_flaps_LEDevice              =  self.createFlaps(("leadingEdgeDevices", "leadingEdgeDevice"))
+        # self.pList_flaps_LE_normals            = self.createFlapNormals(self.pList_flaps_LEDevice)
+#------------------------------------------------------------------------------ 
+        # self.pList_flaps_Spoiler               = self.createFlaps(("spoilers", "spoiler"))
+        # self.pList_flaps_Spoiler_normals       = self.createFlapNormals(self.pList_flaps_Spoiler)
+#------------------------------------------------------------------------------ 
+#------------ #       self.plist_ribs                        = self.createRibs()
+        #----------- self.pList_spares                      = self.createSpars()
+#------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+        # utility.echo("End data tigl calculation  -  Time: " + str(time.time() - __start_time))
     
     
     def updateTixiTiglData(self, xml_file=None):
@@ -84,13 +137,14 @@ class VehicleData():
     @param pnt_cnt_zeta: point count per stripe
     '''
     def __createFuselage(self, pnt_cnt_eta = 1, pnt_cnt_zeta = 20):
+        __start_time = time.time()
+        
         eta_List  = utility.createXcoordsLinear(1.0, pnt_cnt_eta)
         zeta_List = utility.createXcoordsLinear(1.0, pnt_cnt_zeta)        
         
         fuseList = []
         for fuseIdx in range(1, self.tigl.getFuselageCount()+1) :
             segList = []
-            print self.tigl.fuselageGetSegmentCount(fuseIdx)+1
             for segIdx in range(1, self.tigl.fuselageGetSegmentCount(fuseIdx)+1) :
                 stripeList = []
                 for eta in eta_List :
@@ -101,8 +155,37 @@ class VehicleData():
                     stripeList.append(stripe)
                 segList.append(stripeList)
             fuseList.append(segList)
-        return fuseList
+        print "sdf"
+        self.pList_fuselage = fuseList 
+        utility.echo("Time after init wing two : " + str(time.time() - __start_time))
+        print self.pList_fuselage[0][1]
+                
+        
 
+    def __createFuselage2(self, pnt_cnt_eta = 1, pnt_cnt_zeta = 20):
+        
+        __start_time = time.time()
+        eta_List  = utility.createXcoordsLinear(1.0, pnt_cnt_eta)
+        zeta_List = utility.createXcoordsLinear(1.0, pnt_cnt_zeta)        
+        
+        fuseList = []
+        for fuseIdx in range(1, self.tigl.getFuselageCount()+1) :
+            segList = []
+            for segIdx in range(1, self.tigl.fuselageGetSegmentCount(fuseIdx)+1) :
+                stripeList = []
+                for eta in eta_List :
+                    stripe = []
+                    for zeta in zeta_List :
+                        x, y, z = self.tigl.fuselageGetPoint(fuseIdx, segIdx, eta, zeta)
+                        stripe.append([x,y,z])
+                    stripeList.append(stripe)
+                segList.append(stripeList)
+            fuseList.append(segList)
+        print "sdf"
+        self.pList_fuselage2 = fuseList 
+       # return fuseList
+        utility.echo("Time after init wing two : " + str(time.time() - __start_time))
+        print self.pList_fuselage2[0][1]
     
     '''
     create wing point List
@@ -112,8 +195,6 @@ class VehicleData():
     def __createWings(self, point_cnt_eta = 1, point_cnt_xsi = 10):
         eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
         xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
-                
-        print self.tigl.wingGetSegmentCount(1)
                 
         wingList_up = []            
         wingList_lo = []            
@@ -139,6 +220,58 @@ class VehicleData():
             wingList_lo.append(segList_lo)
             wingList_up.append(segList_up)
         return wingList_up , wingList_lo
+
+
+    def __createWings1(self, point_cnt_eta = 1, point_cnt_xsi = 10):
+        eta_List = utility.createXcoordsLinear(1.0, point_cnt_eta)
+        xsi_List = utility.createXcoordsCosineSpacing(1.0, point_cnt_xsi) 
+                
+        wingList_up = []            
+        wingList_lo = []            
+        wingList_up_refl = []            
+        wingList_lo_refl = []            
+        
+        for wingIdx in range(1, self.tigl.getWingCount()+1) :
+            self.__setMaxWingSpan(wingIdx)
+            segList_lo = [] 
+            segList_up = []
+            segList_lo_refl = [] 
+            segList_up_refl = []
+            for segIdx in range(1, self.tigl.wingGetSegmentCount(wingIdx)+1) :
+                stripeList_lo = [] 
+                stripeList_up = []
+                stripeList_lo_refl = [] 
+                stripeList_up_refl = []
+                for eta in eta_List :
+                    stripe_lo = []
+                    stripe_up = []
+                    stripe_lo_refl = []
+                    stripe_up_refl = []
+                    for xsi in xsi_List :
+                        x_l, y_l, z_l = self.tigl.wingGetLowerPoint(wingIdx, segIdx, eta, xsi)
+                        x_u, y_u, z_u = self.tigl.wingGetUpperPoint(wingIdx, segIdx, eta, xsi)
+                        stripe_lo.append([x_l, y_l, z_l])
+                        stripe_up.append([x_u, y_u, z_u])
+                        stripe_lo_refl.append([x_l, -1*y_l, z_l])
+                        stripe_up_refl.append([x_u, -1*y_u, z_u])                        
+                    stripeList_lo.append(stripe_lo)    
+                    stripeList_up.append(stripe_up)    
+                    stripeList_lo_refl.append(stripe_lo_refl) 
+                    stripeList_up_refl.append(stripe_up_refl)                    
+                segList_lo.append(stripeList_lo) 
+                segList_up.append(stripeList_up)
+                segList_lo_refl.append(stripeList_lo_refl) 
+                segList_up_refl.append(stripeList_up_refl)                
+            wingList_lo.append(segList_lo)
+            wingList_up.append(segList_up)
+            wingList_lo_refl.append(segList_lo_refl) 
+            wingList_up_refl.append(segList_up_refl)            
+
+        return wingList_up , wingList_lo , wingList_up_refl , wingList_lo_refl
+
+
+
+
 
     '''
     reflect wing point list
@@ -615,6 +748,6 @@ class VehicleData():
 # ======================================================================================================================================
 # debug
 # ====================================================================================================================================== 
-#t = VehicleData()     
+t = VehicleData(None, None)     
   
    

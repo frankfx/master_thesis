@@ -1,0 +1,148 @@
+% das Papierformat zuerst
+%
+%\documentclass[a4paper, 11pt,bibtotoc]{scrartcl}
+\documentclass[a4paper, 11pt,bibtotoc,abstracton]{scrreprt}  
+
+%Für URL
+\usepackage{url}
+\renewcommand{\UrlFont}{\rmfamily}
+
+%Für Zitaten
+\usepackage{cite}
+
+%Abkürzungen
+\usepackage{acronym}
+
+
+%Inhaltsverzeichnis bearbeiten
+\usepackage{tocbibind}
+
+% für mathematische Symbole
+\usepackage{amsmath}
+
+
+% Vektorgrafiken mit Latex importieren
+\usepackage{import}
+
+\usepackage[colorlinks=false, pdfborder={0 0 0}]{hyperref}
+%documentclass[a4paper, 12pt]{article}  
+% deutsche Silbentrennung
+\usepackage[english,ngerman]{babel}
+\renewcommand{\sectfont}{\rmfamily\bfseries}
+% wegen deutschen Umlauten
+\usepackage[ansinew]{inputenc}
+\usepackage{graphicx}
+\usepackage{subfigure}\hyphenation{Bit-rate}
+
+%Algorithm schreiben
+\usepackage{algorithm2e}
+
+%Tabellen
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{colortbl}
+
+
+%Farben
+\usepackage{color}
+\usepackage{listings}%Code einbinden
+\definecolor{darkblue}{rgb}{.08,.21,.36}
+\definecolor{darkred}{rgb}{.6,.19,.20}
+\definecolor{darkgreen}{rgb}{0,.6,0}
+\definecolor{red}{rgb}{.98,0,0}
+\definecolor{lightblue}{rgb}{0.8,0.85,1}
+%\definecolor{lightgrey}{rgb}{0.98,0.98,0.98}
+\definecolor{lightgrey}{gray}{.98}
+\definecolor{black}{rgb}{0.0,0.0,0.0}
+
+
+\lstloadlanguages{C++}
+\lstset{%
+  language=C++,
+  basicstyle=\small,
+  commentstyle=\itshape\color{darkgreen},
+  keywordstyle=\bfseries\color{darkblue},
+  stringstyle=\color{darkred},
+  showspaces=false,
+  showtabs=false,
+  columns=fixed,
+  backgroundcolor=\color{lightgrey},
+  numbers=left,
+  frame=single,
+  numberstyle=\tiny,
+  breaklines=true,
+  showstringspaces=false,
+  xleftmargin=1cm,
+  basicstyle=\small
+}%
+
+\usepackage{amssymb}%Mathematische Symbole, wie R,N,Q,Z,...
+\setlength{\parindent}{0pt} %einrücken nach absatz verhindern
+%\usepackage{setspace}%Zeilenabstand
+\usepackage{algorithmic}%Für Pseudocode
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Seiten Kopf- und Fußzeilen
+\usepackage[automark,						
+		headsepline,								
+		plainfootsepline, 
+		]{scrpage2}
+
+\automark[section]{chapter} 
+\pagestyle{scrheadings}			
+
+\clearscrheadings	%Alte Kopfformatierungen entfernen
+\clearscrplain		%Alte Plain-Formatierung entfernen
+\clearscrheadfoot %Alten Fuß entfernen
+\cfoot[\pagemark]{\pagemark}%Seitenzahl zentriert im Fuß 
+\ihead{\leftmark}
+\ohead{\rightmark} 
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\begin{titlepage}
+\begin{center}
+{\huge \textbf{Philipps-Universität Marburg}}\\[0.5cm]
+\textbf{Fachbereich 12 - Mathematik und Informatik}\\[0.5cm]
+
+\begin{figure}[h]
+	\centering
+		\includegraphics[width=0.8\textwidth]{fig/unilogo.pdf}
+\end{figure}
+
+{\huge \textbf{{\large \\[1cm]Diplomarbeit}}}
+\\[1cm]
+
+{\Huge \textbf{Progressive Meshes\\ mit CUDA}}
+\\[1cm]
+
+{\large von}\\
+{\large Max Mustermann}\\
+{\large Dezember 2009}\\[3cm]
+
+{\large
+Betreuer:\\ Prof. Dr. Thorsten Thormählen\\und\\Prof. Dr. Manfred Sommer\\[1cm]
+Arbeitsgruppe Grafik und Multimedia Programmierung}
+
+\end{center}
+\end{titlepage}
+\newpage
+\thispagestyle{empty}
+\section*{}
+\newpage
+\thispagestyle{empty}
+\vspace*{7cm}
+\textbf{\Large {Erklärung}}\\[0.5cm]
+Ich  Max Mustermann(Informatikstudent an der Philipps-Universität Marburg, Matrikelnummer
+xxxxxx), versichere an Eides statt, dass ich die vorliegende Diplomarbeit selbstständig verfasst und keine anderen
+als die angegebenen Quellen und Hilfsmittel verwendet habe. Die hier vorliegende Diplomarbeit wurde weder in ihrer jetzigen noch in einer ähnlichen Form keiner Prüfungskommission vorgelegt.\\[1cm]
+Marburg, 17 Dezember 2009\\[0.5cm]
+Max Mustermann
+\newpage
+\shipout\null
+
+%\setstretch {1.15}%Zeilenabstand setzen
+
+  
+% hier beginnt das Dokument
