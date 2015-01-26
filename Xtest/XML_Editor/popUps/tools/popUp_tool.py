@@ -34,6 +34,7 @@ class PopUpTool(QtGui.QWidget):
     
     def fire_submitInput(self):
         '''abstract method'''
+        print "Rene ist gut"
         return NotImplemented
 
     def fire_submitInputAndStartTool(self):
@@ -41,8 +42,6 @@ class PopUpTool(QtGui.QWidget):
         return NotImplemented
     
     def closeEvent(self,event):
-        print "aus"
         self.closeAct.trigger()
-        #event.accept()
         
         

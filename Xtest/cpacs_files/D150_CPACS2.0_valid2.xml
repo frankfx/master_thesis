@@ -24,18 +24,6 @@
 						</dampingDerivatives>
 						<controlSurfaces>
 							<controlSurface>
-								<controlSurfaceUID>D150_VAMP_W1_CompSeg1_innerFlap</controlSurfaceUID>
-								<relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
-							</controlSurface>
-							<controlSurface>
-								<controlSurfaceUID>D150_VAMP_W1_CompSeg1_innerFlap_symm</controlSurfaceUID>
-								<relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
-							</controlSurface>
-							<controlSurface>
-								<controlSurfaceUID>D150_VAMP_W1_CompSeg1_outerFlap</controlSurfaceUID>
-								<relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
-							</controlSurface>
-							<controlSurface>
 								<controlSurfaceUID>D150_VAMP_W1_CompSeg1_outerFlap_symm</controlSurfaceUID>
 								<relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
 							</controlSurface>
@@ -6859,6 +6847,10 @@
 						</dampingDerivatives>
 						<controlSurfaces>
 							<controlSurface>
+								<controlSurfaceUID>D110_VAMP_W1_CompSeg1_innerFlap</controlSurfaceUID>
+								<relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
+							</controlSurface>						  
+							<controlSurface>
 								<controlSurfaceUID>D150_VAMP_W1_CompSeg1_innerFlap</controlSurfaceUID>
 								<relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
 							</controlSurface>
@@ -8747,6 +8739,7 @@
 				<version>2.4.1</version>
 			</tool>
 			<aircraftModelUID>D150_VAMP</aircraftModelUID>
+<!-- 			<aircraftModelUID>D140_VAMP</aircraftModelUID> -->
 	
 			<datasetName>D150_VAMP_CPACS2.0</datasetName>
 <!--

@@ -25,18 +25,6 @@
             </dampingDerivatives>
             <controlSurfaces>
               <controlSurface>
-                <controlSurfaceUID>D150_VAMP_W1_CompSeg1_innerFlap</controlSurfaceUID>
-                <relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
-              </controlSurface>
-              <controlSurface>
-                <controlSurfaceUID>D150_VAMP_W1_CompSeg1_innerFlap_symm</controlSurfaceUID>
-                <relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
-              </controlSurface>
-              <controlSurface>
-                <controlSurfaceUID>D150_VAMP_W1_CompSeg1_outerFlap</controlSurfaceUID>
-                <relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
-              </controlSurface>
-              <controlSurface>
                 <controlSurfaceUID>D150_VAMP_W1_CompSeg1_outerFlap_symm</controlSurfaceUID>
                 <relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
               </controlSurface>
@@ -6860,6 +6848,10 @@
             </dampingDerivatives>
             <controlSurfaces>
               <controlSurface>
+                <controlSurfaceUID>D110_VAMP_W1_CompSeg1_innerFlap</controlSurfaceUID>
+                <relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
+              </controlSurface>
+              <controlSurface>
                 <controlSurfaceUID>D150_VAMP_W1_CompSeg1_innerFlap</controlSurfaceUID>
                 <relDeflection mapType="vector">0.0;0.5;1.0</relDeflection>
               </controlSurface>
@@ -8748,7 +8740,7 @@
         <version>2.4.1</version>
       </tool>
       <aircraftModelUID>D150_VAMP</aircraftModelUID>
-      <datasetName>D150_VAMP_CPACS2.0</datasetName>
+      <!-- 			<aircraftModelUID>D140_VAMP</aircraftModelUID> -->
       <!--
 			<loadCases>
 				<loadCaseUID>Lc_1</loadCaseUID>
@@ -8767,32 +8759,25 @@
         <loadCaseUID>Lc_5</loadCaseUID>
         <loadCaseUID>Lc_6</loadCaseUID>
       </loadCases>
-      <performanceMap>
-        <controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron</controlSurfaceUID>
-        <controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron_symm</controlSurfaceUID>
-        <controlSurfaceUID>D150_VAMP_HL1_CompSeg1_elevator</controlSurfaceUID>
-        <controlSurfaceUID>D150_VAMP_HL1_CompSeg1_elevator_symm</controlSurfaceUID>
-        <controlSurfaceUID>D150_VAMP_SL1_CompSeg1_rudder</controlSurfaceUID>
-        <positiveQuasiSteadyRotation>
-          <pstar>0.002</pstar>
-          <qstar>0.004</qstar>
-          <rstar>0.006</rstar>
-        </positiveQuasiSteadyRotation>
-        <negativeQuasiSteadyRotation>
-          <pstar>-0.001</pstar>
-          <qstar>-0.004</qstar>
-          <rstar>-0.006</rstar>
-        </negativeQuasiSteadyRotation>
-      </performanceMap>
       <toolParameters>
-        <usePOLINT>false</usePOLINT>
+        <usePOLINT>False</usePOLINT>
         <archiveMode>2</archiveMode>
-        <parallelComputation>0</parallelComputation>
+        <parallelComputation>0123123</parallelComputation>
         <wingPanelings>
           <wingPaneling>
             <wingUID>D150_VAMP_HL1</wingUID>
             <spanwise>2</spanwise>
             <chordwise>2</chordwise>
+          </wingPaneling>
+          <wingPaneling>
+            <wingUID>D150_VAMP_W1</wingUID>
+            <spanwise></spanwise>
+            <chordwise></chordwise>
+          </wingPaneling>
+          <wingPaneling>
+            <wingUID>D150_VAMP_SL1</wingUID>
+            <spanwise></spanwise>
+            <chordwise></chordwise>
           </wingPaneling>
         </wingPanelings>
       </toolParameters>
