@@ -1,0 +1,54 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module example</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>example</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:/home/rene/workspace/Test_Project/Xtest/Pydoctest/example.py">/home/rene/workspace/Test_Project/Xtest/Pydoctest/example.py</a></font></td></tr></table>
+    <p><tt>Created&nbsp;on&nbsp;Aug&nbsp;19,&nbsp;2014<br>
+&nbsp;<br>
+@author:&nbsp;fran_re</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-factorial"><strong>factorial</strong></a>(n)</dt><dd><tt>Return&nbsp;the&nbsp;factorial&nbsp;of&nbsp;n,&nbsp;an&nbsp;exact&nbsp;integer&nbsp;&gt;=&nbsp;0.<br>
+&nbsp;<br>
+If&nbsp;the&nbsp;result&nbsp;is&nbsp;small&nbsp;enough&nbsp;to&nbsp;fit&nbsp;in&nbsp;an&nbsp;int,&nbsp;return&nbsp;an&nbsp;int.<br>
+Else&nbsp;return&nbsp;a&nbsp;long.<br>
+&nbsp;<br>
+&gt;&gt;&gt;&nbsp;[<a href="#-factorial">factorial</a>(n)&nbsp;for&nbsp;n&nbsp;in&nbsp;range(6)]<br>
+[1,&nbsp;1,&nbsp;2,&nbsp;6,&nbsp;24,&nbsp;121]<br>
+&gt;&gt;&gt;&nbsp;[<a href="#-factorial">factorial</a>(long(n))&nbsp;for&nbsp;n&nbsp;in&nbsp;range(6)]<br>
+[1,&nbsp;1,&nbsp;2,&nbsp;6,&nbsp;24,&nbsp;120]<br>
+&gt;&gt;&gt;&nbsp;<a href="#-factorial">factorial</a>(30)<br>
+265252859812191058636308480000000L<br>
+&gt;&gt;&gt;&nbsp;<a href="#-factorial">factorial</a>(30L)<br>
+265252859812191058636308480000000L<br>
+&gt;&gt;&gt;&nbsp;<a href="#-factorial">factorial</a>(-1)<br>
+Traceback&nbsp;(most&nbsp;recent&nbsp;call&nbsp;last):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+ValueError:&nbsp;n&nbsp;must&nbsp;be&nbsp;&gt;=&nbsp;0<br>
+&nbsp;<br>
+Factorials&nbsp;of&nbsp;floats&nbsp;are&nbsp;OK,&nbsp;but&nbsp;the&nbsp;float&nbsp;must&nbsp;be&nbsp;an&nbsp;exact&nbsp;integer:<br>
+&gt;&gt;&gt;&nbsp;<a href="#-factorial">factorial</a>(30.1)<br>
+Traceback&nbsp;(most&nbsp;recent&nbsp;call&nbsp;last):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+ValueError:&nbsp;n&nbsp;must&nbsp;be&nbsp;exact&nbsp;integer<br>
+&gt;&gt;&gt;&nbsp;<a href="#-factorial">factorial</a>(30.0)<br>
+265252859812191058636308480000000L<br>
+&nbsp;<br>
+It&nbsp;must&nbsp;also&nbsp;not&nbsp;be&nbsp;ridiculously&nbsp;large:<br>
+&gt;&gt;&gt;&nbsp;<a href="#-factorial">factorial</a>(1e100)<br>
+Traceback&nbsp;(most&nbsp;recent&nbsp;call&nbsp;last):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;...<br>
+OverflowError:&nbsp;n&nbsp;too&nbsp;large</tt></dd></dl>
+</td></tr></table>
+</body></html>

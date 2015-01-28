@@ -4,17 +4,15 @@ Created on Jan 28, 2015
 @author: rene
 '''
 from tixiwrapper import Tixi
-from PySide import QtGui
+from PySide import QtGui, QtCore
+from plotWidget import PlotWidget
 
-class Plotter(QtGui.QMainWindow):
-    def __init__(self, path, parent=None):
-        super(Plotter, self).__init__(parent) 
+class Plotter_DamingDerivates(QtGui.QMainWindow):
+    def __init__(self, parent=None):
+        super(Plotter_DamingDerivates, self).__init__(parent) 
         
         self.tixi = Tixi()
         self.tixi.open("../cpacs_files/outputfile_PM_Ref.xml")
-
-        self.pathPerMap = "/cpacs/vehicles/aircraft/model[1]/analyses/aeroPerformanceMap"
-        self.path_specific = path
 
         self.buttonBox = QtGui.QDialogButtonBox()
         self.buttonBox.addButton(QtGui.QDialogButtonBox.Ok)
@@ -43,9 +41,8 @@ class Plotter(QtGui.QMainWindow):
         self.listAngleOfYaw  = QtGui.QListWidget()
         self.listAngleOfAtt  = QtGui.QListWidget()
 
-        #self.comboBoxXAxis.setCurrentIndex(0)
         self.__hidePlotLists(True, False, False, False)
-        self.__fillPlotLists(self.pathPerMap)
+        self.__fillPlotLists("/cpacs/vehicles/aircraft/model[1]/analyses/aeroPerformanceMap")
 
         self.grid = QtGui.QGridLayout()
 
@@ -74,6 +71,22 @@ class Plotter(QtGui.QMainWindow):
         
         self.setCentralWidget(widget)
     
+        self.plotWidgets = [PlotWidget("dcfxdpstar"), PlotWidget("dcfxdqstar"), PlotWidget("dcfxdrstar"), 
+                            PlotWidget("dcfydpstar"), PlotWidget("dcfydqstar"), PlotWidget("dcfydrstar"),
+                            PlotWidget("dcfzdpstar"), PlotWidget("dcfzdqstar"), PlotWidget("dcfzdrstar"),
+                            PlotWidget("dcmxdpstar"), PlotWidget("dcmxdqstar"), PlotWidget("dcmxdrstar"),
+                            PlotWidget("dcmydpstar"), PlotWidget("dcmydqstar"), PlotWidget("dcmydrstar"),
+                            PlotWidget("dcmzdpstar"), PlotWidget("dcmzdqstar"), PlotWidget("dcmzdrstar")]
+        i = 0 ; l = len(self.plotWidgets) / 4
+        for widget in self.plotWidgets :
+            if i < l :
+                self.addSimpleWidget(widget, QtCore.Qt.LeftDockWidgetArea, True) 
+            elif i < 2 * l :
+                self.addSimpleWidget(widget, QtCore.Qt.RightDockWidgetArea, True)
+            else :
+                self.addSimpleWidget(widget, QtCore.Qt.BottomDockWidgetArea, False)
+            i+=1
+
         # ===============================================================================================
         # actions
         # ===============================================================================================
@@ -99,6 +112,7 @@ class Plotter(QtGui.QMainWindow):
                          QtGui.QDockWidget.DockWidgetFloatable)
         self.addDockWidget(dockWidgetArea, dock)
 
+
     def fire_XAxisChanged(self, idx):
         self.reset()
         self.__setPlotListVisibility(idx == 0, idx == 1, idx == 2, idx == 3)
@@ -110,31 +124,31 @@ class Plotter(QtGui.QMainWindow):
         yaw_idx    = self.listAngleOfYaw.currentRow()
         att_idx    = self.listAngleOfAtt.currentRow()   
         
+        path = "/cpacs/vehicles/aircraft/model[1]/analyses/aeroPerformanceMap"
+        
         if x_axis_idx == 0 :
-            x_axis = self.getMachNumberVector(self.pathPerMap)
+            x_axis = self.getMachNumberVector(path)
         elif x_axis_idx == 1 :
-            x_axis = self.getReynoldsNumberVector(self.pathPerMap)
+            x_axis = self.getReynoldsNumberVector(path)
         elif x_axis_idx == 2 :
-            x_axis = self.getAngleOfYawVector(self.pathPerMap)  
+            x_axis = self.getAngleOfYawVector(path)  
         elif x_axis_idx == 3 :
-            x_axis = self.getAngleOfAttackVector(self.pathPerMap)  
+            x_axis = self.getAngleOfAttackVector(path)  
         
-        ((cnt_mach, cnt_reyn, cnt_angleYaw, cnt_angleAtt), size) = self.tixi.getArrayDimensionSizes(self.pathPerMap, 4)
+        ((mach, reyn, angleYaw, angleAtt), dimSize) = self.tixi.getArrayDimensionSizes(path, 4)
         
-        displayOpt = 'go' if self.comboBoxPlotPnt.currentText() == "points" else "" 
+        display = self.comboBoxPlotPnt.currentText()
+        displayOpt = 'go' if display == "points" else "" 
         
-        dimPos = [mach_idx, reyn_idx, yaw_idx, att_idx]
-        dimSize = [cnt_mach, cnt_reyn, cnt_angleYaw, cnt_angleAtt]
-    
         for widget in self.plotWidgets:
-            array = self.getCoefficientArray(self.path_specific, widget.getTitle(), size)
-                        
+            array = self.getCoefficientArray(path + "/dampingDerivatives/positiveRates", widget.getTitle(), dimSize)
             widget.setXLabel(self.comboBoxXAxis.currentText())
-            widget.updatePlot(self.tixi, self.pathPerMap, x_axis_idx, x_axis, array, dimPos, dimSize, displayOpt)
+            widget.updatePlot(self.tixi, x_axis_idx, mach_idx, reyn_idx, yaw_idx, att_idx, mach, reyn, angleYaw, angleAtt, x_axis, array, path, displayOpt)
             
     def reset(self):
         for widget in self.plotWidgets:
             widget.updateReset()
+
 
     def __fillPlotLists(self, path):
         for item in self.getMachNumberVector(path) :
@@ -162,7 +176,7 @@ class Plotter(QtGui.QMainWindow):
         return self.tixi.getFloatVector(path + "/machNumber", self.tixi.getVectorSize(path + "/machNumber"))
 
     def getCoefficientArray(self, path, child, num):
-        return self.tixi.getArray(path , child, num)
+        return self.tixi.getArray(path, child, num)
 
     def __hidePlotLists(self, flag_mach, flag_reyn, flag_yaw, flag_att):
         self.__setPlotListVisibility(flag_mach, flag_reyn, flag_yaw, flag_att)
@@ -179,7 +193,7 @@ class Plotter(QtGui.QMainWindow):
 
 if __name__ == "__main__":
     app = QtGui.QApplication([])
-    test = Plotter("")
+    test = Plotter_DamingDerivates()
     test.show()
     
     app.exec_() 

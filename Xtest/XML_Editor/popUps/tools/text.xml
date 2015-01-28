@@ -8734,54 +8734,6 @@
     </airport>
   </airports>
   <toolspecific>
-    <liftingLine>
-      <tool>
-        <name>LIFTING_LINE</name>
-        <version>2.4.1</version>
-      </tool>
-      <aircraftModelUID>D150_VAMP</aircraftModelUID>
-      <!-- 			<aircraftModelUID>D140_VAMP</aircraftModelUID> -->
-      <!--
-			<loadCases>
-				<loadCaseUID>Lc_1</loadCaseUID>
-				<loadCaseUID>Lc_2</loadCaseUID>
-				<loadCaseUID>Lc_3</loadCaseUID>
-				<loadCaseUID>Lc_4</loadCaseUID>
-				<loadCaseUID>Lc_5</loadCaseUID>
-				<loadCaseUID>Lc_6</loadCaseUID>
-			</loadCases>
--->
-      <loadCases>
-        <loadCaseUID>Lc_1</loadCaseUID>
-        <loadCaseUID>Lc_2</loadCaseUID>
-        <loadCaseUID>Lc_3</loadCaseUID>
-        <loadCaseUID>Lc_4</loadCaseUID>
-        <loadCaseUID>Lc_5</loadCaseUID>
-        <loadCaseUID>Lc_6</loadCaseUID>
-      </loadCases>
-      <toolParameters>
-        <usePOLINT>False</usePOLINT>
-        <archiveMode>2</archiveMode>
-        <parallelComputation>0123123</parallelComputation>
-        <wingPanelings>
-          <wingPaneling>
-            <wingUID>D150_VAMP_HL1</wingUID>
-            <spanwise>2</spanwise>
-            <chordwise>2</chordwise>
-          </wingPaneling>
-          <wingPaneling>
-            <wingUID>D150_VAMP_W1</wingUID>
-            <spanwise></spanwise>
-            <chordwise></chordwise>
-          </wingPaneling>
-          <wingPaneling>
-            <wingUID>D150_VAMP_SL1</wingUID>
-            <spanwise></spanwise>
-            <chordwise></chordwise>
-          </wingPaneling>
-        </wingPanelings>
-      </toolParameters>
-    </liftingLine>
     <tWDat>
       <tool>
         <name>TWDat</name>

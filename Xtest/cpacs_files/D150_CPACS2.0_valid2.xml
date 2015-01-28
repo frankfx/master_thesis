@@ -8733,65 +8733,6 @@
 		</airport>
 	</airports>
 	<toolspecific>
-		<liftingLine>
-			<tool>
-				<name>LIFTING_LINE</name>
-				<version>2.4.1</version>
-			</tool>
-			<aircraftModelUID>D150_VAMP</aircraftModelUID>
-<!-- 			<aircraftModelUID>D140_VAMP</aircraftModelUID> -->
-	
-			<datasetName>D150_VAMP_CPACS2.0</datasetName>
-<!--
-			<loadCases>
-				<loadCaseUID>Lc_1</loadCaseUID>
-				<loadCaseUID>Lc_2</loadCaseUID>
-				<loadCaseUID>Lc_3</loadCaseUID>
-				<loadCaseUID>Lc_4</loadCaseUID>
-				<loadCaseUID>Lc_5</loadCaseUID>
-				<loadCaseUID>Lc_6</loadCaseUID>
-			</loadCases>
--->
-
-			<loadCases>
-				<loadCaseUID>Lc_1</loadCaseUID>
-				<loadCaseUID>Lc_2</loadCaseUID>
-				<loadCaseUID>Lc_3</loadCaseUID>
-				<loadCaseUID>Lc_4</loadCaseUID>
-				<loadCaseUID>Lc_5</loadCaseUID>
-				<loadCaseUID>Lc_6</loadCaseUID>
-			</loadCases>
-
-			<performanceMap>
-				<controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron</controlSurfaceUID>
-				<controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron_symm</controlSurfaceUID>
-				<controlSurfaceUID>D150_VAMP_HL1_CompSeg1_elevator</controlSurfaceUID>
-				<controlSurfaceUID>D150_VAMP_HL1_CompSeg1_elevator_symm</controlSurfaceUID>
-				<controlSurfaceUID>D150_VAMP_SL1_CompSeg1_rudder</controlSurfaceUID>
-				<positiveQuasiSteadyRotation>
-					<pstar>0.002</pstar>
-					<qstar>0.004</qstar>
-					<rstar>0.006</rstar>
-				</positiveQuasiSteadyRotation>
-				<negativeQuasiSteadyRotation>
-					<pstar>-0.001</pstar>
-					<qstar>-0.004</qstar>
-					<rstar>-0.006</rstar>
-				</negativeQuasiSteadyRotation>
-			</performanceMap>
-			<toolParameters>
-				<usePOLINT>false</usePOLINT>
-				<archiveMode>2</archiveMode>
-				<parallelComputation>0</parallelComputation>
-				<wingPanelings>
-					<wingPaneling>
-						<wingUID>D150_VAMP_HL1</wingUID>
-						<spanwise>2</spanwise>
-						<chordwise>2</chordwise>
-					</wingPaneling>
-				</wingPanelings>
-			</toolParameters>
-		</liftingLine>
 		<tWDat>
 			<tool>
 				<name>TWDat</name>

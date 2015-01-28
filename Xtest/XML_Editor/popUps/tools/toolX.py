@@ -407,9 +407,32 @@ class ToolX(PopUpTool):
             self.tixiGetControlSurfaceUID()
             self.tixiGetToolParameters()
         else:
-            QtGui.QMessageBox.about(self, "error", "no toolspecific found in the given file")
-            self.close()
+            self.tixiCreateEmptyLiftingLine()
+            self.tixiGetAircraftModelUID()
+            self.tixiGetLoadCaseUID()            
+            self.tixiGetControlSurfaceUID()            
+            self.__tixiGetToolParametersWingSpaneling()
+                    
+                    
+    def tixiCreateEmptyLiftingLine(self):
+        parentPath = "/cpacs/toolspecific"
+        self.tixi.createElement(parentPath, "liftingLine")
+        self.tixi.createElement(parentPath + "/liftingLine", "tool")
+        self.tixi.createElement(parentPath + "/liftingLine", "aircraftModelUID")
+        self.tixi.createElement(parentPath + "/liftingLine", "toolParameters")
+
+        self.tixi.createElement(parentPath + "/liftingLine/tool", "name")
+        self.tixi.createElement(parentPath + "/liftingLine/tool", "version")        
+
+        self.tixi.createElement(parentPath + "/liftingLine/toolParameters", "usePOLINT")
+        self.tixi.createElement(parentPath + "/liftingLine/toolParameters", "archiveMode")
+        self.tixi.createElement(parentPath + "/liftingLine/toolParameters", "parallelComputation")
+        self.tixi.createElement(parentPath + "/liftingLine/toolParameters", "wingPanelings")
+        self.tixi.createElement(parentPath + "/liftingLine/toolParameters/wingPanelings", "wingPaneling")
+        self.tixi.createElement(parentPath + "/liftingLine/toolParameters/wingPanelings/wingPaneling", "spanwise")
+        self.tixi.createElement(parentPath + "/liftingLine/toolParameters/wingPanelings/wingPaneling", "chordwise")
         
+    
     def tixiGetToolName(self):
         if self.tixi.checkElement("/cpacs/toolspecific/liftingLine/tool/name"):
             self.textName.setText(self.tixi.getTextElement("/cpacs/toolspecific/liftingLine/tool/name"))
@@ -546,12 +569,18 @@ class ToolX(PopUpTool):
 
 
     def tixiGetToolParameters(self):
+        self.__tixiGetToolParametersConfig()
+        self.__tixiGetToolParametersWingSpaneling()
+
+    def __tixiGetToolParametersConfig(self):
         b = self.tixi.getBooleanElement("/cpacs/toolspecific/liftingLine/toolParameters/usePOLINT")
         self.comboUsePOLINT.setCurrentIndex(0 if b else 1)
         b = self.tixi.getIntegerElement("/cpacs/toolspecific/liftingLine/toolParameters/archiveMode")
         self.comboArchiveMode.setCurrentIndex(b)
         b = self.tixi.getIntegerElement("/cpacs/toolspecific/liftingLine/toolParameters/parallelComputation")
         self.textParallelComputation.setText(str(b))
+        
+    def __tixiGetToolParametersWingSpaneling(self):
 
         # if AircraftModelUID has changed, we must clear current available wingUIDs)
         if self.listWingUID.count() > 0 :
@@ -564,11 +593,12 @@ class ToolX(PopUpTool):
             model_uid  = self.listAMUID2.item(0).text()
             path = '/cpacs/vehicles/aircraft/model[@uID="' + model_uid + '"]/wings'
         
-            # get all wing uids
-            for i in range(1, self.tixi.getNamedChildrenCount(path, "wing")+1): 
-                uID = self.tixi.getTextAttribute(path + "/wing[" + str(i) +"]" , "uID")
-                self.listWingUID.addItem(uID)
-                self.listWingUIDALL.update({uID : ("", "")})
+            if tixi.checkElement(path) :
+                # get all wing uids
+                for i in range(1, self.tixi.getNamedChildrenCount(path, "wing")+1): 
+                    uID = self.tixi.getTextAttribute(path + "/wing[" + str(i) +"]" , "uID")
+                    self.listWingUID.addItem(uID)
+                    self.listWingUIDALL.update({uID : ("", "")})
 
             # get all given wing uids in tool block
             path = "/cpacs/toolspecific/liftingLine/toolParameters/wingPanelings"
@@ -791,7 +821,8 @@ class ToolX(PopUpTool):
 
     def tixiSetAircraftModelUID(self):
         self.__tixiCreateNode("/cpacs/toolspecific/liftingLine", "aircraftModelUID", 2)
-        self.__tixiUpdateTextElement("/cpacs/toolspecific/liftingLine/aircraftModelUID", self.listAMUID2.item(0).text())        
+        item = self.listAMUID2.item(0)
+        self.__tixiUpdateTextElement("/cpacs/toolspecific/liftingLine/aircraftModelUID", "" if item is None else item.text())        
 
     def tixiSetDatasetName(self):
         isAvailNodeDatasetName = self.tixi.checkElement("/cpacs/toolspecific/liftingLine/datasetName")
@@ -831,11 +862,6 @@ class ToolX(PopUpTool):
     def __tixiSetControlSurfaceUID(self):
         #self.__tixiCreateNode("/cpacs/toolspecific/liftingLine/performanceMap", "controlSurfaceUID" , 2)
         start_idx = self.tixi.getNumberOfChilds("/cpacs/toolspecific/liftingLine/performanceMap") +1
-        for i in range(1, start_idx) :
-            print "huhn" ,self.tixi.getChildNodeName("/cpacs/toolspecific/liftingLine/performanceMap", i)
-        
-        
-        print "start idx" , start_idx
         self.__tixiUpdateListElement("/cpacs/toolspecific/liftingLine/performanceMap", "controlSurfaceUID", self.listCtrlSurUID2, start_idx)        
         
     def __tixiCreateQuasiSteadyRotation(self, path, child, idx=None):
@@ -974,13 +1000,8 @@ class ToolX(PopUpTool):
             if text in rmLoadCaseUIDs :
                 self.tixi.removeElement(path + "/" + child + "["+str(k)+"]")
         
-        
-        print path
-        print child
-        print "startidx in updta", start_idx
         idx = 1
         for newUID in newLoadCaseUIDs:
-            print "startidx in updta loop", start_idx
             if start_idx is not None:
                 self.tixi.createElementAtIndex(path, child, start_idx)
                 self.tixi.updateTextElement(path + "/" + child + "[" + str(idx) +"]", newUID) 
@@ -998,12 +1019,14 @@ class ToolX(PopUpTool):
     def fire_modelUIDSwitchLeft(self):
         self.switchBetweenLists(self.listAMUID2, self.listAMUID1, False)
         self.tixiGetLoadCaseUID()
-        self.tixiGetControlSurfaceUID()        
+        self.tixiGetControlSurfaceUID()
+        self.__tixiGetToolParametersWingSpaneling()        
       
     def fire_modelUIDSwitchRight(self):
         self.switchBetweenLists(self.listAMUID1, self.listAMUID2, True)      
         self.tixiGetLoadCaseUID()
         self.tixiGetControlSurfaceUID()
+        self.__tixiGetToolParametersWingSpaneling()  
         
     def switchBetweenLists(self, list1, list2, swap):
         item = list1.currentItem()
