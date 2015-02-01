@@ -7,7 +7,9 @@ import re
 from PySide.QtGui import QTextEdit, QCompleter, QStringListModel, QTextCursor, QApplication, QTextDocument
 from PySide.QtCore import Qt
 from Xtest.XML_Editor.configuration import config
-    
+
+from __future__ import print_function    
+	
 class EditorCodeCompletion(QTextEdit):
     def __init__(self, path_dict):
         super(EditorCodeCompletion, self).__init__()  

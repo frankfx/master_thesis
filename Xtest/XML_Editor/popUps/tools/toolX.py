@@ -3,13 +3,13 @@ Created on Jan 14, 2015
 
 @author: fran_re
 '''
-
+import os, sys
 from PySide import QtGui, QtCore
 from popUp_tool import PopUpTool
 from Xtest.Open_GL import utility
 from Xtest.XML_Editor.configuration.config import Config
 from tixiwrapper   import Tixi, TixiException
-import os, sys
+
 
 
 
@@ -611,7 +611,7 @@ class ToolX(PopUpTool):
                     chord = self.tixi.getIntegerElement(path + "/wingPaneling[" + str(i) +"]/chordwise")
                     self.listWingUIDALL.update({uid:(str(span), str(chord))})              
                 elif cnt_wingPaneling > 1 :
-                    print "ERROR!!!!!!!! more than one wingPaneling available but no uids"
+                    print ("ERROR!!!!!!!! more than one wingPaneling available but no uids")
                     break
             
             if not self.checkWingUID.isChecked() :

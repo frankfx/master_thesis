@@ -1,6 +1,8 @@
 import sys
 import re
 
+from __future__ import print_function
+
 from tixiwrapper import Tixi, TixiException
 from Xtest.XML_Editor.popUps.popUp_newFile import NewFileDialog
 from Xtest.XML_Editor.popUps.popUp_showXPath import XPathDialog
@@ -77,8 +79,8 @@ class EditorWindow(QMainWindow):
                 self.cur_file_path = xmlFilename
                 self.cur_schema_path = cpacs_scheme  
                 
-            except TixiException, e:  
-                print e.error
+            except (TixiException, e):  
+                #print e.error
                 self.statusBar().showMessage('CPACS ERROR: ' + e.error)
 
     '''
