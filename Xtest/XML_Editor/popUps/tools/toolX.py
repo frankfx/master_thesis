@@ -6,6 +6,7 @@ Created on Jan 14, 2015
 import os, sys
 from PySide import QtGui, QtCore
 from popUp_tool import PopUpTool
+from popUp_FileSettings import PopUpFileSettings
 from Xtest.Open_GL import utility
 from Xtest.XML_Editor.configuration.config import Config
 from tixiwrapper   import Tixi, TixiException
@@ -62,8 +63,24 @@ class ToolX(PopUpTool):
        
     @utility.overrides(PopUpTool)    
     def setConnection(self):
-        os.system("xsltproc -o " + Config.path_cpacs_test + " " + Config.path_cpacs_inputMapping + " " + Config.path_cpacs_D150_3)
+        inMap, outMap, cpacs4lili, xsltproc = self.path_settings.getPathValues()
+        
+        operation_sys = sys.platform 
+        
+        if "linux" in operation_sys : 
+            print ("linux yeah")
+            os.system("xsltproc -o " + Config.path_cpacs_test + " " + Config.path_cpacs_inputMapping + " " + Config.path_cpacs_D150_3)
+        elif "win" in operation_sys :
+            print ("windows hmm")
+            os.system("java -Xms512M -Xmx512M -jar " + Config.path_saxon9he +" -s:" +Config.path_cpacs_D150_3 + " -xsl:" + Config.path_cpacs_inputMapping + " -o:" + Config.path_cpacs_test2)
+        else:
+            QtGui.QMessageBox.about(self, "error", "unkown os, please contact the developer") 
+            
 
+    def openConfig(self):
+        self.path_settings = PopUpFileSettings("path to .. settings")
+        self.path_settings.buttonBox.button(QtGui.QDialogButtonBox.Ok).clicked.connect(self.setConnection)
+    
     @utility.overrides(PopUpTool)    
     def fire_submitInput(self):
         self.tixiSetToolName()
@@ -82,8 +99,8 @@ class ToolX(PopUpTool):
 
     @utility.overrides(PopUpTool)            
     def fire_submitInputAndStartTool(self):
-        pass
-
+        self.fire_submitInput()
+        self.setConnection()
     
 
     ## ========================================================================================================================================================
@@ -343,7 +360,9 @@ class ToolX(PopUpTool):
         self.buttonBox = QtGui.QDialogButtonBox()
         self.buttonBox.addButton(QtGui.QDialogButtonBox.Ok)
         self.buttonBox.addButton(QtGui.QDialogButtonBox.Apply)
-        self.buttonBox.addButton(QtGui.QDialogButtonBox.Cancel)        
+        self.buttonBox.addButton(QtGui.QDialogButtonBox.Cancel) 
+        button_config = self.buttonBox.addButton("config", QtGui.QDialogButtonBox.HelpRole) 
+               
         
         self.butOpenTool             = QtGui.QPushButton("Tool")
         self.butOpenAircraftModelUID = QtGui.QPushButton("aircraftModelUID")        
@@ -368,6 +387,8 @@ class ToolX(PopUpTool):
         self.buttonBox.button(QtGui.QDialogButtonBox.Ok).clicked.connect(self.fire_submitInputAndStartTool)
         self.buttonBox.button(QtGui.QDialogButtonBox.Apply).clicked.connect(self.fire_submitInput)
         self.buttonBox.button(QtGui.QDialogButtonBox.Cancel).clicked.connect(self.close)
+        button_config.clicked.connect(self.openConfig)
+
 
         self.butOpenTool.clicked.connect(self.fire_setVisibilityTool)       
         self.butOpenAircraftModelUID.clicked.connect(self.fire_setVisibilityAircraftModelUID)       
@@ -1063,7 +1084,7 @@ class ToolX(PopUpTool):
 if __name__ == "__main__":
     app = QtGui.QApplication([])
     tixi = Tixi()
-    tixi.openDocument(Config.path_cpacs_D150_2)
+    tixi.openDocument(Config.path_cpacs_D150_3)
     test = ToolX("name", tixi)
     test.show()
     
