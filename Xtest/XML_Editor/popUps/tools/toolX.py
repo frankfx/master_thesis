@@ -66,16 +66,32 @@ class ToolX(PopUpTool):
         inMap, outMap, cpacs4lili, xsltproc = self.path_settings.getPathValues()
         
         operation_sys = sys.platform 
+        flag = "linux" in operation_sys
         
-        if "linux" in operation_sys : 
-            print ("linux yeah")
-            os.system("xsltproc -o " + Config.path_cpacs_test + " " + Config.path_cpacs_inputMapping + " " + Config.path_cpacs_D150_3)
-        elif "win" in operation_sys :
-            print ("windows hmm")
-            os.system("java -Xms512M -Xmx512M -jar " + Config.path_saxon9he +" -s:" +Config.path_cpacs_D150_3 + " -xsl:" + Config.path_cpacs_inputMapping + " -o:" + Config.path_cpacs_test2)
-        else:
-            QtGui.QMessageBox.about(self, "error", "unkown os, please contact the developer") 
-            
+        self.startInputMapping(flag, Config.path_cpacs_D150_3, Config.path_cpacs_inputMapping)
+        self.startCpacs4Lili(flag)
+        self.startOutputMapping(flag, Config.path_cpacs_D150_3, Config.path_cpacs_outputMapping)        
+      
+    def startInputMapping(self, linux, initFile, inputMapping):
+        if linux:
+            os.system("xsltproc -o " + Config.path_cpacs_test + " " + inputMapping + " " + initFile)
+        else :
+            os.system("java -Xms512M -Xmx512M -jar " + Config.path_saxon9he +" -s:" + initFile + " -xsl:" + inputMapping + " -o:" + Config.path_cpacs_test2)
+    
+    def startCpacs4Lili(self, linux):
+        if linux:
+            return NotImplemented
+        else :
+            return NotImplemented #os.system("cpacs4Lili -o " + "mapped File", "outfilename")
+    
+    def startOutputMapping(self, linux, initFile, outputMapping):
+        print ("outputmapping" , "init file" , "outputMapping.xsl"  ) 
+        
+        if linux:
+            os.system("xsltproc -o " + Config.path_cpacs_test3 + " " + outputMapping + " " + initFile)
+        else :
+            os.system("java -Xms512M -Xmx512M -jar " + Config.path_saxon9he +" -s:" + initFile + " -xsl:" + outputMapping + " -o:" + Config.path_cpacs_test3)
+          
 
     def openConfig(self):
         self.path_settings = PopUpFileSettings("path to .. settings")
@@ -93,14 +109,16 @@ class ToolX(PopUpTool):
             self.tixi.saveDocument("text.xml")
             self.tixi.openDocument("text.xml")
             # self.close()
+            return True
         else:
             QtGui.QMessageBox.about(self, "error", "please choose load case or performance map") 
             self.fire_setVisibilityAll(True, True, True, False, True)
+            return False
 
     @utility.overrides(PopUpTool)            
     def fire_submitInputAndStartTool(self):
-        self.fire_submitInput()
-        self.setConnection()
+        if self.fire_submitInput():
+            self.setConnection()
     
 
     ## ========================================================================================================================================================

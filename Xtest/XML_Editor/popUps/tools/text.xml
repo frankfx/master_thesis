@@ -7059,6 +7059,7 @@
         <version>2.4.1</version>
       </tool>
       <aircraftModelUID>D150_VAMP</aircraftModelUID>
+      <loadCases/>
       <!--
 			<loadCases>
 				<loadCaseUID>Lc_1</loadCaseUID>
@@ -7069,13 +7070,6 @@
 				<loadCaseUID>Lc_6</loadCaseUID>
 			</loadCases>
 -->
-      <performanceMap>
-        <controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron</controlSurfaceUID>
-        <controlSurfaceUID>D150_VAMP_W1_CompSeg1_aileron_symm</controlSurfaceUID>
-        <controlSurfaceUID>D150_VAMP_HL1_CompSeg1_elevator</controlSurfaceUID>
-        <controlSurfaceUID>D150_VAMP_HL1_CompSeg1_elevator_symm</controlSurfaceUID>
-        <controlSurfaceUID>D150_VAMP_SL1_CompSeg1_rudder</controlSurfaceUID>
-      </performanceMap>
       <toolParameters>
         <usePOLINT>False</usePOLINT>
         <archiveMode>2</archiveMode>
