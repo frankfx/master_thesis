@@ -1,9 +1,9 @@
 from PySide import QtCore, QtGui
 from Xtest.XML_Editor.editor_xml import EditorWindow
 from Xtest.Vehicle.sideViewOGL import Widget
-from Xtest.XML_Editor.configuration.config import Config
+from Xtest.config import Config
 from tiglwrapper   import Tigl, TiglException
-from tixiwrapper   import Tixi, TixiException
+from tixiwrapper   import Tixi
 
 class MainWindow(QtGui.QMainWindow):
     """initialize editor"""

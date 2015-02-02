@@ -14,7 +14,7 @@ from numberBar import NumberBar
 from Xtest.config import Config
 
 from highlighter import Highlighter
-#from Xtest.XML_Editor.popUps.tools.toolX import ToolX
+from Xtest.XML_Editor.popUps.tools.toolX import ToolX
 from PySide import QtCore
 
 class EditorWindow(QMainWindow):
@@ -129,9 +129,9 @@ class EditorWindow(QMainWindow):
     close and cleanup tixi
     '''
     def __del__(self):
-      pass
-	  #  self.tixi.close()
-      #  self.tixi.cleanup() 
+        pass
+        #self.tixi.close()
+        #self.tixi.cleanup() 
 
     '''
     set and connect the search buttons
@@ -545,9 +545,11 @@ class EditorWindow(QMainWindow):
         function to show or hide line numbers
         '''
         if(self.flag_layout) :
-            self.number_bar.show()
+            self.number_bar.flag_show_numbers = True
+            self.update()
         else :  
-            self.number_bar.hide()
+            self.number_bar.flag_show_numbers = False
+            self.update()
         self.flag_layout = not self.flag_layout 
     
     def fireNewAction(self):

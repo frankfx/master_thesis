@@ -38,7 +38,7 @@ class Renderer(QtOpenGL.QGLWidget):
         self.zRot = 0
         self.xTrans = 0
         self.yTrans = 0  
-        self.aspect = max(self.data.configurationGetLength,self.data.wingspan) / 1.5
+        self.aspect = max(self.data.configurationGetLength, self.data.wingspan) / 1.5
         self.scale  = self.aspect # self.data.configurationGetLength / 1.5 # helper for setZoom
         
         self.viewwidth = 0.0
@@ -128,18 +128,24 @@ class Renderer(QtOpenGL.QGLWidget):
         
     def resizeGL(self, w, h):       
         side = min(w, h)
-        self.viewwidth = side
-        self.viewheight = side
+        self.viewwidth = w#side
+        self.viewheight =h# side
         
-        GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
-        #GL.glViewport(0, 0, self.viewwidth, self.viewheight)
+        #GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
+        GL.glViewport(0, 0, self.viewwidth, self.viewheight)
         self.__setProjection()        
         
     def __setProjection(self):
+        h  = self.viewheight
+        if(h == 0):
+            h = 1
+        ratio = 1.0* self.viewwidth / h
+        
+        self.aspect_width = self.aspect*ratio
+        
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
-       
-        GL.glOrtho(-self.aspect, self.aspect,
+        GL.glOrtho(-self.aspect_width, self.aspect_width,
                    self.aspect, -self.aspect, -100.0, 100.0)
 
     def setTransparent(self, value):
@@ -461,10 +467,6 @@ class Renderer(QtOpenGL.QGLWidget):
     @param offset: offset to prevent z-fighting
     '''
     def createOglFlaps(self, pList, norm, offset):
-        print pList
-        print norm
-        
-        
         GL.glBegin(GL.GL_QUADS)
         for shaIdx in range(len(pList)) :
             for segIdx in range(len(pList[shaIdx])) :
@@ -543,21 +545,6 @@ class Renderer(QtOpenGL.QGLWidget):
             GL.glNormal3fv(n4)
             GL.glVertex3fv(p4)         
         
-      #  GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
-      #  ambientColor = [0.2, 0.2, 0.2, 1.0]
-      #  GL.glLightModelfv(GL.GL_LIGHT_MODEL_AMBIENT, ambientColor)
-        #GL.glLightModeli(GL.GL_Light, GL.GL_TRUE)
-       
-       # lightColor0 = [0.15164, 0.60648, 0.22648, 1.0]
-       # lightPos0   = [0.0, 0.0, 0.0, 1.0]
-       # GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, lightColor0)
-      #  GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, lightPos0)
- 
-      #  lightColor1 = [0.75164, 0.60648, 0.22648, 1.0]
-     #   lightPos1   = [0.0, 0.5, 0.5, 0.0]
-     #   GL.glLightfv(GL.GL_LIGHT1, GL.GL_DIFFUSE, lightColor1)
-      #  GL.glLightfv(GL.GL_LIGHT1, GL.GL_POSITION, lightPos1)
-      #  GL.glLightModeli(GL.GL_LIGHT_MODEL_TWO_SIDE, GL.GL_TRUE)
                     
     # =========================================================================================================
     # =========================================================================================================    
@@ -645,8 +632,8 @@ class Renderer(QtOpenGL.QGLWidget):
 
         #Betrachtsfeld = -aspect bis aspect
         
-        oglXunit = 2.0 * self.aspect
-        oglYunit = oglXunit
+        oglXunit = 2.0 * self.aspect_width
+        oglYunit = 2.0 * self.aspect
         
         # pixel real world to Pixel ogl world 
         oglXTrans = oglXunit * 1.0 / self.viewwidth

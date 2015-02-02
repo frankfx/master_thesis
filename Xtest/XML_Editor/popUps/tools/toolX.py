@@ -8,8 +8,8 @@ from PySide import QtGui, QtCore
 from popUp_tool import PopUpTool
 from popUp_FileSettings import PopUpFileSettings
 from Xtest.Open_GL import utility
-from Xtest.XML_Editor.configuration.config import Config
-from tixiwrapper import Tixi, TixiException
+from Xtest.config import Config
+from tixiwrapper import Tixi
 
 
 
@@ -99,6 +99,9 @@ class ToolX(PopUpTool):
     
     @utility.overrides(PopUpTool)    
     def fire_submitInput(self):
+        if not self.tixi.checkElement("/cpacs/toolspecific/liftingLine") :
+            print("create new lifting line")
+            self.tixiCreateEmptyLiftingLine()
         self.tixiSetToolName()
         self.tixiSetToolVersion()
         self.tixiSetAircraftModelUID()
@@ -436,6 +439,7 @@ class ToolX(PopUpTool):
         self.tixi = tixi 
         
         if self.tixi.checkElement("/cpacs/toolspecific/liftingLine") :
+            print "has LiftingListe"
             self.tixiGetToolName()
             self.tixiGetToolVersion()
             self.tixiGetAircraftModelUID()
@@ -446,7 +450,7 @@ class ToolX(PopUpTool):
             self.tixiGetControlSurfaceUID()
             self.tixiGetToolParameters()
         else:
-            self.tixiCreateEmptyLiftingLine()
+            print ("no lifting list")
             self.tixiGetAircraftModelUID()
             self.tixiGetLoadCaseUID()            
             self.tixiGetControlSurfaceUID()            
@@ -612,8 +616,10 @@ class ToolX(PopUpTool):
         self.__tixiGetToolParametersWingSpaneling()
 
     def __tixiGetToolParametersConfig(self):
+        print "hier"
         b = self.tixi.getBooleanElement("/cpacs/toolspecific/liftingLine/toolParameters/usePOLINT")
         self.comboUsePOLINT.setCurrentIndex(0 if b else 1)
+        print (self.comboUsePOLINT.currentText())
         b = self.tixi.getIntegerElement("/cpacs/toolspecific/liftingLine/toolParameters/archiveMode")
         self.comboArchiveMode.setCurrentIndex(b)
         b = self.tixi.getIntegerElement("/cpacs/toolspecific/liftingLine/toolParameters/parallelComputation")
@@ -632,7 +638,7 @@ class ToolX(PopUpTool):
             model_uid  = self.listAMUID2.item(0).text()
             path = '/cpacs/vehicles/aircraft/model[@uID="' + model_uid + '"]/wings'
         
-            if tixi.checkElement(path) :
+            if self.tixi.checkElement(path) :
                 # get all wing uids
                 for i in range(1, self.tixi.getNamedChildrenCount(path, "wing")+1): 
                     uID = self.tixi.getTextAttribute(path + "/wing[" + str(i) +"]" , "uID")
@@ -1099,11 +1105,11 @@ class ToolX(PopUpTool):
             list1.takeItem(list1.row(item))
             list2.addItem(item)
 
-if __name__ == "__main__":
-    app = QtGui.QApplication([])
-    tixi = Tixi()
-    tixi.openDocument(Config.path_cpacs_D150_3)
-    test = ToolX("name", tixi)
-    test.show()
-    
-    app.exec_()       
+#---------------------------------------------------- if __name__ == "__main__":
+    #---------------------------------------------- app = QtGui.QApplication([])
+    #------------------------------------------------------------- tixi = Tixi()
+    #------------------------------- tixi.openDocument(Config.path_cpacs_D150_3)
+    #------------------------------------------------ test = ToolX("name", tixi)
+    #--------------------------------------------------------------- test.show()
+#------------------------------------------------------------------------------ 
+    #--------------------------------------------------------------- app.exec_()
