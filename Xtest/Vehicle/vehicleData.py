@@ -13,7 +13,11 @@ import time
 import numpy as np
 import math
 from numpy import shape
-import thread
+
+try:
+    import thread
+except:
+    import _thread 
 
 class VehicleData():
     def __init__(self, tixi, tigl):
@@ -101,7 +105,7 @@ class VehicleData():
             self.tigl.open(self.tixi,"")
             self.__createAllPointLists()
         except TiglException as err:
-            print 'Error opening tigl document: ', err.__str__()
+            print ('Error opening tigl document: ', err.__str__())
             
         
     # =========================================================================================================
@@ -298,7 +302,7 @@ class VehicleData():
                 try :
                     sparList = self.__createSpars(wingIndex, compSegmentIndex)
                 except:
-                    print "no spar for wing " + str(wingIndex) + " found." ; break
+                    print ("no spar for wing " + str(wingIndex) + " found.") ; break
                 
                 componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
                 plistSparSeg = []
@@ -389,9 +393,9 @@ class VehicleData():
                         flapList = self.__createFlapsLE(wingIndex, compSegmentIndex)
                     elif flapParent == 'spoilers' :
                         flapList = self.__createFlaps_Spoiler(wingIndex, compSegmentIndex)
-                    else : print "unexpected behaviour in createFlaps" ; sys.exit()
+                    else : print ("unexpected behaviour in createFlaps") ; sys.exit()
                 except:
-                    print "no " + str(flapType) + " for wing " + str(wingIndex) + " found." ; break
+                    print ("no " + str(flapType) + " for wing " + str(wingIndex) + " found.") ; break
 
                 plistFlaps = []
                 componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
@@ -408,7 +412,7 @@ class VehicleData():
                     (segIdx3, wingidx3) = self.tigl.wingGetSegmentIndex(segUid3)
                     (segIdx4, wingidx4) = self.tigl.wingGetSegmentIndex(segUid4)
                     
-                    if eta1 < 0 : print "error" , eta1 ; eta1 = 0.0
+                    if eta1 < 0 : print ("error" , eta1) ; eta1 = 0.0
                     
                     x1, y1, z1 = self.tigl.wingGetUpperPoint(wingidx1, segIdx1, eta1, xsi1)      
                     x2, y2, z2 = self.tigl.wingGetUpperPoint(wingidx2, segIdx2, eta2, xsi2)      
@@ -512,7 +516,7 @@ class VehicleData():
                 try :
                     ribList = self.__createRibs(wingIndex, compSegmentIndex)
                 except:
-                    print "no ribs for wing " + str(wingIndex) + " found." ; break
+                    print ("no ribs for wing " + str(wingIndex) + " found.") ; break
         return[]           
 
     def __createRibs(self, wingIndex, compSegmentIndex):
@@ -535,7 +539,7 @@ class VehicleData():
             elif ribStart == 'leadingEdge' :
                 xsiStart = 1.0 ; xsiEnd = 1.0
             elif ribStart in self.__getSparPositionUIDs(wingIndex, compSegmentIndex) :
-                print "unimplemented now"
+                print ("unimplemented now")
                 pass
 
             if ribEnd == 'trailingEdge' :
@@ -667,11 +671,11 @@ class VehicleData():
         
     def __printPlist(self, plist):
         for shape in plist :
-            print "new shape"
+            print ("new shape")
             for seg in shape :
-                print "new seg"
+                print ("new seg")
                 for stripe in seg:
-                    print stripe 
+                    print (stripe) 
         
     '''
     get vertex normal in v1

@@ -5,13 +5,11 @@ Created on Jan 14, 2015
 '''
 import os, sys
 from PySide import QtGui, QtCore
-from popUp_tool import PopUpTool
-from popUp_FileSettings import PopUpFileSettings
+from Xtest.XML_Editor.popUps.tools.popUp_tool import PopUpTool
+from Xtest.XML_Editor.popUps.tools.popUp_FileSettings import PopUpFileSettings
 from Xtest.Open_GL import utility
 from Xtest.config import Config
 from tixiwrapper import Tixi
-
-
 
 
 class ToolX(PopUpTool):
@@ -439,7 +437,7 @@ class ToolX(PopUpTool):
         self.tixi = tixi 
         
         if self.tixi.checkElement("/cpacs/toolspecific/liftingLine") :
-            print "has LiftingListe"
+            print ("has LiftingListe")
             self.tixiGetToolName()
             self.tixiGetToolVersion()
             self.tixiGetAircraftModelUID()
@@ -616,7 +614,6 @@ class ToolX(PopUpTool):
         self.__tixiGetToolParametersWingSpaneling()
 
     def __tixiGetToolParametersConfig(self):
-        print "hier"
         b = self.tixi.getBooleanElement("/cpacs/toolspecific/liftingLine/toolParameters/usePOLINT")
         self.comboUsePOLINT.setCurrentIndex(0 if b else 1)
         print (self.comboUsePOLINT.currentText())
