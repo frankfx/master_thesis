@@ -23,7 +23,7 @@ class MainWindow(QtGui.QMainWindow):
         try:
             tigl.open(tixi,"")
         except TiglException as err:    
-            print 'Error opening tigl document: ', err.__str__()
+            print ('Error opening tigl document: ', err.__str__())
         
         
         self.button = QtGui.QPushButton('Raise Next Tab', self)

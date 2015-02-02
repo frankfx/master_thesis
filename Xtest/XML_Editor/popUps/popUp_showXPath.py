@@ -99,13 +99,12 @@ class XPathDialog(QtGui.QMainWindow):
         self.clipboard.setText(self.infoLabel.text().replace(" ", ""), QtGui.QClipboard.Clipboard)
 
     def closeEvent(self,event):
-        print "hi"
         # bad solution but it works - for editor_Window getCursorXPath 
         self.closeAct.trigger()
         event.accept()
 
 if __name__ == "__main__":
     app = QtGui.QApplication([])
-    test = XPathDialog("hallo Rene", "jens pfeifer")
+    test = XPathDialog("test1", "test2")
     test.show()
     app.exec_()       

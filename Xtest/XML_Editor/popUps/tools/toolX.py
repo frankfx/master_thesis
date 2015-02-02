@@ -9,7 +9,7 @@ from popUp_tool import PopUpTool
 from popUp_FileSettings import PopUpFileSettings
 from Xtest.Open_GL import utility
 from Xtest.XML_Editor.configuration.config import Config
-from tixiwrapper   import Tixi, TixiException
+from tixiwrapper import Tixi, TixiException
 
 
 

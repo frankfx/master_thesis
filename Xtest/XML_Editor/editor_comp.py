@@ -6,9 +6,7 @@ Created on Aug 12, 2014
 import re
 from PySide.QtGui import QTextEdit, QCompleter, QStringListModel, QTextCursor, QApplication, QTextDocument
 from PySide.QtCore import Qt
-from Xtest.XML_Editor.configuration import config
-
-from __future__ import print_function    
+from Xtest import config  
 	
 class EditorCodeCompletion(QTextEdit):
     def __init__(self, path_dict):
@@ -26,7 +24,7 @@ class EditorCodeCompletion(QTextEdit):
                 words.append(word.strip())
             f.close()
         except IOError:
-            print "dictionary not in anticipated location"
+            print ("dictionary not in anticipated location")
        
         model = QStringListModel(words, self.m_completer)
         

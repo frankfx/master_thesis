@@ -1,8 +1,6 @@
 import sys
 import re
 
-from __future__ import print_function
-
 from tixiwrapper import Tixi, TixiException
 from Xtest.XML_Editor.popUps.popUp_newFile import NewFileDialog
 from Xtest.XML_Editor.popUps.popUp_showXPath import XPathDialog
@@ -13,10 +11,10 @@ from PySide.QtGui import QMessageBox, QSpinBox, QAction, QLabel, QColor, QTextFo
 from PySide.QtCore import Qt, SIGNAL
 from Xtest.XML_Editor.editor_comp import EditorCodeCompletion
 from numberBar import NumberBar
-from Xtest.XML_Editor.configuration.config import Config
+from Xtest.config import Config
 
 from highlighter import Highlighter
-from Xtest.XML_Editor.popUps.tools.toolX import ToolX
+#from Xtest.XML_Editor.popUps.tools.toolX import ToolX
 from PySide import QtCore
 
 class EditorWindow(QMainWindow):
@@ -71,16 +69,17 @@ class EditorWindow(QMainWindow):
     def loadFile(self, xmlFilename=None, cpacs_scheme=Config.path_cpacs_21_schema, tixi=None):
         if xmlFilename and cpacs_scheme :
             try:
+                print ("sfsf")
+                print (xmlFilename)
                 tixi.open(xmlFilename)
+                print ("ffff")
                 #self.tixi.openDocument(xmlFilename) 
                 #self.tixi.schemaValidateFromFile(cpacs_scheme)
                 self.tixi = tixi
                 self.editor.setPlainText(self.tixi.exportDocumentAsString())
                 self.cur_file_path = xmlFilename
                 self.cur_schema_path = cpacs_scheme  
-                
-            except (TixiException, e):  
-                #print e.error
+            except TixiException as e:  
                 self.statusBar().showMessage('CPACS ERROR: ' + e.error)
 
     '''
@@ -117,7 +116,7 @@ class EditorWindow(QMainWindow):
         try:
             etree.fromstring(str(self.editor.toPlainText()))
             self.statusBar().showMessage("Valid XML")
-        except etree.XMLSyntaxError, e:
+        except etree.XMLSyntaxError as e:
             if e.error_log.last_error is not None:
                 msg  = e.error_log.last_error.message
                 line = e.error_log.last_error.line
@@ -130,8 +129,9 @@ class EditorWindow(QMainWindow):
     close and cleanup tixi
     '''
     def __del__(self):
-        self.tixi.close()
-        self.tixi.cleanup() 
+      pass
+	  #  self.tixi.close()
+      #  self.tixi.cleanup() 
 
     '''
     set and connect the search buttons
@@ -180,6 +180,7 @@ class EditorWindow(QMainWindow):
         self.number_bar.setTextEdit(self.getStates())
         self.editor.cursorPositionChanged.connect(self.fireUpdateNumbar)        
         self.connect(self.editor.verticalScrollBar(), SIGNAL("valueChanged(int)"), self.fireUpdateNumbar)  
+        #self.editor.verticalScrollBar.valueChanged.connect(self.fireUpdateNumbar)
 
     def setupStatusbar(self):
         self.lineNumber = -1
@@ -277,7 +278,7 @@ class EditorWindow(QMainWindow):
         self.number_bar.update()
 
     def dummyFuction(self):
-        print "not implemented yet"
+        print ("not implemented yet")
   
     def getStates(self):
         self.stats = { "searchbox":self.searchbox, "editor":self.editor}
@@ -409,7 +410,7 @@ class EditorWindow(QMainWindow):
             if node != '#text' :
                 new_xpath_idx, new_xpath_uid = self.__createNewXPath(xpath_idx, xpath_uid, node, idx)
                 if search == node and self.isNodeAtSearchedTagPosition(new_xpath_uid, pos) :
-                    print "gefunden" , new_xpath_idx
+                    print ("gefunden" , new_xpath_idx)
                     return True, new_xpath_idx , new_xpath_uid
                 else:
                     flag , res_idx, res_uid = self.__findXPath_rec(new_xpath_idx, new_xpath_uid, search, pos)
