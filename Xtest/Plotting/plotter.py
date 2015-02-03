@@ -4,14 +4,15 @@ Created on Jan 28, 2015
 @author: rene
 '''
 from tixiwrapper import Tixi
-from PySide import QtGui
+from PySide import QtGui, QtCore
+from Xtest.config import Config
 
 class Plotter(QtGui.QMainWindow):
     def __init__(self, path, parent=None):
         super(Plotter, self).__init__(parent) 
         
         self.tixi = Tixi()
-        self.tixi.open("../cpacs_files/outputfile_PM_Ref.xml")
+        t = self.tixi.open(Config.path_cpacs_pm_ref)
 
         self.pathPerMap = "/cpacs/vehicles/aircraft/model[1]/analyses/aeroPerformanceMap"
         self.path_specific = path
@@ -45,6 +46,7 @@ class Plotter(QtGui.QMainWindow):
 
         #self.comboBoxXAxis.setCurrentIndex(0)
         self.__hidePlotLists(True, False, False, False)
+        
         self.__fillPlotLists(self.pathPerMap)
 
         self.grid = QtGui.QGridLayout()
@@ -83,33 +85,32 @@ class Plotter(QtGui.QMainWindow):
         self.buttonBox.button(QtGui.QDialogButtonBox.Cancel).clicked.connect(self.close)
 
 
-    def addSimpleWidget(self,widget, dockWidgetArea, flag_side):
-        dock = QtGui.QDockWidget()
+    def addSimpleWidget(self, name, widget):
+        dock = QtGui.QDockWidget(name)
         dock.setWidget(widget)
-        if flag_side :
-            dock.setMinimumWidth(100)
-            dock.setMinimumHeight(100)
-        else: 
-            dock.setMinimumWidth(100)
-            dock.setMinimumHeight(100)
+        dock.setMinimumWidth(100)
+        dock.setMinimumHeight(300)
         
-        dock.setAllowedAreas(dockWidgetArea)
+        dock.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
         dock.setFeatures(QtGui.QDockWidget.DockWidgetClosable |
                          QtGui.QDockWidget.DockWidgetMovable |
                          QtGui.QDockWidget.DockWidgetFloatable)
-        self.addDockWidget(dockWidgetArea, dock)
+        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, dock)
+        return dock
 
     def fire_XAxisChanged(self, idx):
         self.reset()
         self.__setPlotListVisibility(idx == 0, idx == 1, idx == 2, idx == 3)
 
     def plot(self):
+        # get current selection
         x_axis_idx = self.comboBoxXAxis.currentIndex()
         mach_idx   = self.listMachNum.currentRow()
         reyn_idx   = self.listReynoldsNum.currentRow()
         yaw_idx    = self.listAngleOfYaw.currentRow()
         att_idx    = self.listAngleOfAtt.currentRow()   
         
+        # find x-axis array ; stop one selection missed
         if x_axis_idx == 0 :
             x_axis = self.getMachNumberVector(self.pathPerMap)
         elif x_axis_idx == 1 :
@@ -119,18 +120,21 @@ class Plotter(QtGui.QMainWindow):
         elif x_axis_idx == 3 :
             x_axis = self.getAngleOfAttackVector(self.pathPerMap)  
         
+        # set display option
+        displayOpt = 'go' if self.comboBoxPlotPnt.currentText() == "points" else ""         
+        
+        # get values for tixiGetArrayValue
         ((cnt_mach, cnt_reyn, cnt_angleYaw, cnt_angleAtt), size) = self.tixi.getArrayDimensionSizes(self.pathPerMap, 4)
         
-        displayOpt = 'go' if self.comboBoxPlotPnt.currentText() == "points" else "" 
-        
-        dimPos = [mach_idx, reyn_idx, yaw_idx, att_idx]
         dimSize = [cnt_mach, cnt_reyn, cnt_angleYaw, cnt_angleAtt]
-    
+        dimPos  = [mach_idx, reyn_idx, yaw_idx, att_idx]        
+        dims    = self.tixi.getArrayDimensions(self.pathPerMap)
+        
         for widget in self.plotWidgets:
             array = self.getCoefficientArray(self.path_specific, widget.getTitle(), size)
                         
             widget.setXLabel(self.comboBoxXAxis.currentText())
-            widget.updatePlot(self.tixi, self.pathPerMap, x_axis_idx, x_axis, array, dimPos, dimSize, displayOpt)
+            widget.updatePlot(array, dimSize, dimPos, dims, x_axis, x_axis_idx ,self.tixi, self.pathPerMap, displayOpt)
             
     def reset(self):
         for widget in self.plotWidgets:

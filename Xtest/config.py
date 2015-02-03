@@ -28,6 +28,8 @@ class Config():
     path_cpacs_test     = os.path.join(path, "external", "cpacs_files", "ToolOutput", "test.xml")   
     path_cpacs_test2    = os.path.join(path, "external", "cpacs_files", "ToolOutput", "test2.xml")    
     path_cpacs_test3    = os.path.join(path, "external", "cpacs_files", "ToolOutput", "test3.xml") 
+    path_cpacs_pm_ref   = os.path.join(path, "external", "cpacs_files", "ToolOutput", "outputfile_PM_Ref.xml") 
+    path_cpacs_lc_ref   = os.path.join(path, "external", "cpacs_files", "ToolOutput", "outputfile_LC_Ref.xml")
     
     # software
     path_saxon9he = os.path.join(path, "external", "software","saxon9he.jar") 

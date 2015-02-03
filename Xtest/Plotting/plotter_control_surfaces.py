@@ -6,13 +6,14 @@ Created on Jan 28, 2015
 from tixiwrapper import Tixi
 from PySide import QtGui, QtCore
 from plotWidget import PlotWidget
+from Xtest.config import Config
 
 class Plotter_ControlSurfaces(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(Plotter_ControlSurfaces, self).__init__(parent) 
         
         self.tixi = Tixi()
-        self.tixi.open("../cpacs_files/outputfile_PM_Ref.xml")
+        self.tixi.open(Config.path_cpacs_pm_ref)
 
         self.buttonBox = QtGui.QDialogButtonBox()
         self.buttonBox.addButton(QtGui.QDialogButtonBox.Ok)
@@ -84,15 +85,19 @@ class Plotter_ControlSurfaces(QtGui.QMainWindow):
         # add observer
         self.plotWidgets = [PlotWidget("dcfx"), PlotWidget("dcfy"), PlotWidget("dcfz"), PlotWidget("dcmx"), PlotWidget("dcmy"), PlotWidget("dcmz")]
         
-        i = 0 ; l = len(self.plotWidgets) / 4
+        self.dockList = []
+        
         for widget in self.plotWidgets :
-            if i < l :
-                self.addSimpleWidget(widget, QtCore.Qt.LeftDockWidgetArea, True) 
-            elif i < 2 * l :
-                self.addSimpleWidget(widget, QtCore.Qt.RightDockWidgetArea, True)
-            else :
-                self.addSimpleWidget(widget, QtCore.Qt.BottomDockWidgetArea, False)
-            i+=1
+            dock = self.addSimpleWidget(widget.getTitle(), widget)
+            insertIndex = len(self.dockList) - 1
+            self.dockList.insert(insertIndex, dock)
+
+        if len(self.dockList) > 1:
+            for index in range(0, len(self.dockList) - 1):
+                self.tabifyDockWidget(self.dockList[index],
+                                      self.dockList[index + 1])
+        self.dockList[0].raise_()
+        self.nextindex = 1  
 
         # ===============================================================================================
         # actions
@@ -104,22 +109,19 @@ class Plotter_ControlSurfaces(QtGui.QMainWindow):
         self.buttonBox.button(QtGui.QDialogButtonBox.Cancel).clicked.connect(self.close)
 
 
-    def addSimpleWidget(self,widget, dockWidgetArea, flag_side):
+    def addSimpleWidget(self, name, widget):
         ''' create dock widget and set it to main window'''
-        dock = QtGui.QDockWidget()
+        dock = QtGui.QDockWidget(name)
         dock.setWidget(widget)
-        if flag_side :
-            dock.setMinimumWidth(300)
-            dock.setMinimumHeight(300)
-        else: 
-            dock.setMinimumWidth(200)
-            dock.setMinimumHeight(300)
+        dock.setMinimumWidth(100)
+        dock.setMinimumHeight(300)
         
-        dock.setAllowedAreas(dockWidgetArea)
+        dock.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
         dock.setFeatures(QtGui.QDockWidget.DockWidgetClosable |
                          QtGui.QDockWidget.DockWidgetMovable |
                          QtGui.QDockWidget.DockWidgetFloatable)
-        self.addDockWidget(dockWidgetArea, dock)
+        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, dock)
+        return dock
 
 
     def fire_XAxisChanged(self, idx):
@@ -179,6 +181,7 @@ class Plotter_ControlSurfaces(QtGui.QMainWindow):
 
         dimPos = [mach_idx, reyn_idx, yaw_idx, att_idx, relDef_idx]
         dimSize = [cnt_mach, cnt_reyn, cnt_angleYaw, cnt_angleAtt, cnt_relDef]
+        dims = 5 # self.tixi.getArrayDimensions(path + "/controlSurfaces/controlSurface[" + str(self.tixiGetIdxOfUID(relDef_uid)) + "]") + oben dims 
          
         # update all observer
         for widget in self.plotWidgets:
@@ -186,7 +189,7 @@ class Plotter_ControlSurfaces(QtGui.QMainWindow):
             array = self.getCoefficientArray(path + "/controlSurfaces/controlSurface[1]", widget.getTitle(), size)
             
             widget.setXLabel(self.comboBoxXAxis.currentText())
-            widget.updatePlot(self.tixi, path, x_axis_idx, x_axis, array, dimPos, dimSize, displayOpt)
+            widget.updatePlot(array, dimSize, dimPos, dims, x_axis, x_axis_idx, self.tixi, path, displayOpt)
             
     def reset(self):
         '''resets all observer'''

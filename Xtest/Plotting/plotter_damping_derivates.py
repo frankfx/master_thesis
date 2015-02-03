@@ -23,15 +23,19 @@ class Plotter_DamingDerivates(Plotter):
                             PlotWidget("dcmydpstar"), PlotWidget("dcmydqstar"), PlotWidget("dcmydrstar"),
                             PlotWidget("dcmzdpstar"), PlotWidget("dcmzdqstar"), PlotWidget("dcmzdrstar")]
         
-        i = 0 ; l = len(self.plotWidgets) / 4
+        self.dockList = []
+        
         for widget in self.plotWidgets :
-            if i < l :
-                self.addSimpleWidget(widget, QtCore.Qt.LeftDockWidgetArea, True) 
-            elif i < 2 * l :
-                self.addSimpleWidget(widget, QtCore.Qt.RightDockWidgetArea, True)
-            else :
-                self.addSimpleWidget(widget, QtCore.Qt.BottomDockWidgetArea, False)
-            i+=1
+            dock = self.addSimpleWidget(widget.getTitle(), widget)
+            insertIndex = len(self.dockList) - 1
+            self.dockList.insert(insertIndex, dock)
+
+        if len(self.dockList) > 1:
+            for index in range(0, len(self.dockList) - 1):
+                self.tabifyDockWidget(self.dockList[index],
+                                      self.dockList[index + 1])
+        self.dockList[0].raise_()
+        self.nextindex = 1   
 
 
 if __name__ == "__main__":

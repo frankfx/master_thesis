@@ -3,7 +3,7 @@ Created on Jan 28, 2015
 
 @author: rene
 '''
-from PySide import QtGui, QtCore
+from PySide import QtGui
 from plotWidget import PlotWidget
 from plotter import Plotter
 
@@ -14,16 +14,21 @@ class Plotter_BasePerMap(Plotter):
         # add observer
         self.plotWidgets = [PlotWidget("cfx"), PlotWidget("cfy"), PlotWidget("cfz"), 
                             PlotWidget("cmx"), PlotWidget("cmy"), PlotWidget("cmz")]
+
+        self.dockList = []
         
-        i = 0 ; l = len(self.plotWidgets) / 4
         for widget in self.plotWidgets :
-            if i < l :
-                self.addSimpleWidget(widget, QtCore.Qt.LeftDockWidgetArea, True) 
-            elif i < 2 * l :
-                self.addSimpleWidget(widget, QtCore.Qt.RightDockWidgetArea, True)
-            else :
-                self.addSimpleWidget(widget, QtCore.Qt.BottomDockWidgetArea, False)
-            i+=1
+            dock = self.addSimpleWidget(widget.getTitle(), widget)
+            insertIndex = len(self.dockList) - 1
+            self.dockList.insert(insertIndex, dock)
+
+        if len(self.dockList) > 1:
+            for index in range(0, len(self.dockList) - 1):
+                self.tabifyDockWidget(self.dockList[index],
+                                      self.dockList[index + 1])
+        self.dockList[0].raise_()
+        self.nextindex = 1        
+        
 
 if __name__ == "__main__":
     app = QtGui.QApplication([])

@@ -52,8 +52,12 @@ class PlotWidget(QtGui.QWidget):
         self.plot.clear()
         self.plot.grid(True)
         self.canvas.draw()
+    
+    def simplePlot(self, x_axis, y_axis):
+        self.plot.plot(x_axis, y_axis)
+        self.canvas.draw()
 
-    def updatePlot(self, tixi, path, x_axis_idx, x_axis, array, dimPos, dimSize, displayOpt):
+    def updatePlot(self, array, dimSize, dimPos, dims,  x_axis, x_axis_idx, tixi, path, displayOpt):
         """update the plot window. 
         
         Args:
@@ -63,22 +67,28 @@ class PlotWidget(QtGui.QWidget):
             x_axis_idx (int)    : index of the chosen x-axis (e.g. in for all list)
             x_axis     ([float]): x-axis float array
 
-            array      ([float]): coefficent array
+            array      ([float]): complete coefficent array (e.g. cfx)
+            dimSize    ([int])  : e.g. dimSize = [cnt_mach, cnt_reyn, cnt_angleYaw, cnt_angleAtt, cnt_relDef]            
             dimPos     ([int])  : e.g. dimPos = [mach_idx, reyn_idx, yaw_idx, att_idx, relDef_idx]
-            dimSize    ([int])  : e.g. dimSize = [cnt_mach, cnt_reyn, cnt_angleYaw, cnt_angleAtt, cnt_relDef]
+            dims       (int)    : count of dimensions
             displayOpt (String) : option if plots line or point style 
         
         """        
         y_axis = []
 
-        dims = len(dimSize)
-
-        for i in range(dimSize[x_axis_idx]) :
-            dimPos[x_axis_idx] = i
-            y_axis.append(tixi.getArrayValue(array, dimSize, dimPos, dims))
+        j = 0
+        # iterate over all indices (len) of x-axis
+        while j < dimSize[x_axis_idx]:
+            # set the indices for the searched value in dimPos
+            # four of the five indices are fixed by selection
+            # the fifth value is specified by every index of the chosen x-axis
+            dimPos[x_axis_idx] = j
+            y_axis.append(tixi.getArrayValue(array, dimSize, dimPos, dims))            
+            
+            j += 1
        
-        print x_axis
-        print y_axis
+        print (x_axis)
+        print (y_axis)
        
         self.plot.plot(x_axis, y_axis, displayOpt)
         self.canvas.draw()
