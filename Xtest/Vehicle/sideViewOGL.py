@@ -5,14 +5,15 @@ Created on Jul 30, 2014
 '''
 
 import sys
-
-from vehicleData   import VehicleData
-from PySide        import QtOpenGL, QtGui, QtCore
-from Xtest.Open_GL import utility
-from point import Point
-from selectionList import SelectionList
-
 from tiglwrapper   import TiglException
+from PySide import QtOpenGL, QtGui, QtCore
+
+from Xtest.Vehicle.vehicleData import VehicleData
+from Xtest.Open_GL import utility
+from Xtest.Vehicle.point import Point
+from Xtest.Vehicle.selectionList import SelectionList
+
+
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -312,8 +313,8 @@ class Renderer(QtOpenGL.QGLWidget):
         segIdx = -1
         try:
             segIdx, _, _, _ = self.data.tigl.wingGetSegmentEtaXsi(wingIdx, point[0], reflect*point[1], point[2])
-        except TiglException ,e :
-            print "selection failed : " , e.error
+        except TiglException as e :
+            print ("selection failed : " , e.error)
         return segIdx
 
     '''
@@ -785,7 +786,6 @@ class Widget(QtGui.QWidget):
         self.showOptions[10].setChecked(self.renderer.flag_show_grid)
  
     def updateView(self):
-        print "hier"
         self.renderer.data.updateTixiTiglData()
         self.renderer.updateLists()
  
@@ -871,7 +871,7 @@ class Widget(QtGui.QWidget):
     def setShowAircraft(self):
         for i in range(5) : 
             if not self.showOptions[i].isChecked() :
-                print "setShowAircraft" , self.showOptions[i].isChecked()
+                print ("setShowAircraft" , self.showOptions[i].isChecked())
                 self.__checkAircraft(True) ; return
         self.__checkAircraft(False)
     

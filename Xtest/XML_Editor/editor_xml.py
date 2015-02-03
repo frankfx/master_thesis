@@ -59,23 +59,20 @@ class EditorWindow(QMainWindow):
         self.resize(800, 800)
         self.show()       
 
-        self.loadFile(xmlFilename, cpacs_scheme ,tixi) 
+        self.tixi = tixi
+        self.loadFile(xmlFilename, cpacs_scheme) 
 
     '''
     loads cpacs file and validates it against the cpacs_schema
     @param xmlFilename: input file
     @param cpacs_scheme: validation scheme
     '''
-    def loadFile(self, xmlFilename=None, cpacs_scheme=Config.path_cpacs_21_schema, tixi=None):
+    def loadFile(self, xmlFilename=None, cpacs_scheme=Config.path_cpacs_21_schema):
         if xmlFilename and cpacs_scheme :
             try:
-                print ("sfsf")
-                print (xmlFilename)
-                tixi.open(xmlFilename)
-                print ("ffff")
+                self.tixi.open(xmlFilename)
                 #self.tixi.openDocument(xmlFilename) 
                 #self.tixi.schemaValidateFromFile(cpacs_scheme)
-                self.tixi = tixi
                 self.editor.setPlainText(self.tixi.exportDocumentAsString())
                 self.cur_file_path = xmlFilename
                 self.cur_schema_path = cpacs_scheme  
@@ -580,8 +577,8 @@ class EditorWindow(QMainWindow):
         self.tixi.closeAllDocuments()
         self.tixi.create('cpacs')
         self.tixi.addCpacsHeader(idict['name'], idict['creator'], idict['version'], idict['description'], idict['cpacsVersion'])
-        self.tixi.saveDocument('../cpacs_files/temp.xml')
-        self.loadFile('../cpacs_files/temp.xml')
+        self.tixi.saveDocument(Config.path_cpacs_tmp_file)
+        self.loadFile(Config.path_cpacs_tmp_file)
         self.__resetPopUpWidget()
         
     def __resetPopUpWidget(self):
