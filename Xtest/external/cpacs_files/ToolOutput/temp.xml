@@ -28,8 +28,8 @@
             <description>description</description>
             <transformation>
               <scaling>
-                <x>1.4</x>
-                <y>0.5</y>
+                <x>2.8</x>
+                <y>1.5</y>
                 <z>0.5</z>
               </scaling>
               <rotation>

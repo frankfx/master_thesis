@@ -22,6 +22,12 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
     def __init__(self, width, height, tixi, tigl, data):
         super(ThreeDRenderer, self).__init__()
         
+        self.indexGenerated = QtGui.QAction(self)
+        self.before_indexGenerated = QtGui.QAction(self)
+        
+        
+        self.index = -1
+        
         # point lists
         self.data = data
         
@@ -64,7 +70,13 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
         self.selectionList = SelectionList()
 
         # widget option
-        self.setFocusPolicy(QtCore.Qt.ClickFocus)
+        #self.setFocusPolicy(QtCore.Qt.ClickFocus)
+
+    def getRenderIndex(self):
+        return self.index
+    
+    def setRenderIndex(self, index):
+        self.index = index
 
     def setRotation(self, angleX, angleY, angleZ):
         self.xRot = self.normalizeAngle(angleX)
@@ -98,7 +110,11 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
     
     def updateLists(self, data):
         self.data = data
-        self.createOglLists()
+      #  try:
+      #      GL.glDeleteLists(self.index, 10)
+      #  except:
+      #      print "not worked"
+        self.initializeGL()
         self.updateGL()
 
     def initializeGL(self):
@@ -113,14 +129,14 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
                    
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
         
+        self.before_indexGenerated.trigger()
         self.createOglLists()
+       # self.indexGenerated.trigger()  
         
     def resizeGL(self, w, h):       
-        side = min(w, h)
-        self.viewwidth = w#side
-        self.viewheight =h# side
+        self.viewwidth  = w
+        self.viewheight = h
         
-        #GL.glViewport((w - side) / 2, (h - side) / 2, self.viewwidth, self.viewheight)
         GL.glViewport(0, 0, self.viewwidth, self.viewheight)
         self.__setProjection()        
         
@@ -351,10 +367,8 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
     precompile all point lists
     '''               
     def createOglLists(self): 
-        self.index = GL.glGenLists(10)
-        self.select_index = GL.glGenLists(5)
-        
-        print "threeD" , self.index
+        if self.index < 0:
+            self.index = GL.glGenLists(10)
         
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
         self.createOglShape(self.data.pList_fuselage, self.data.pList_fuselage_normals)

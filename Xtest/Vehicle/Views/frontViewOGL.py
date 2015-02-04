@@ -10,4 +10,4 @@ from Xtest.Vehicle.Renderer.defaultRenderer import DefaultRenderer
 class FrontViewWidget(Widget):
     def __init__(self,name, tixi, tigl, data, parent = None):
         super(FrontViewWidget, self).__init__(name, tixi, tigl, data, parent)
-        self.setFrontView()
+        self.setSideView()
