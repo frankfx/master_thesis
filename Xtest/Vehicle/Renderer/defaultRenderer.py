@@ -19,7 +19,6 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
         super(DefaultRenderer, self).__init__()
         
         self.indexGenerated = QtGui.QAction(self)
-        self.before_indexGenerated = QtGui.QAction(self)
         
         self.title = name
         self.index = -1
@@ -97,9 +96,8 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
         
         
-        self.before_indexGenerated.trigger()
         self.createOglLists()
-        #self.indexGenerated.trigger()            
+        self.indexGenerated.trigger()            
 
     def resizeGL(self, w, h):       
         self.viewwidth  = w
