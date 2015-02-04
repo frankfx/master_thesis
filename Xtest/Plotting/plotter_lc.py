@@ -7,7 +7,6 @@ from tixiwrapper import Tixi
 from PySide import QtGui, QtCore
 from plotWidget import PlotWidget
 from Xtest.config import Config
-from __builtin__ import str
 
 class Plotter_LC(QtGui.QMainWindow):
     def __init__(self, parent=None):
