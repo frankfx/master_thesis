@@ -13,8 +13,6 @@ from Xtest.Open_GL import utility
 from Xtest.Vehicle.point import Point
 from Xtest.Vehicle.selectionList import SelectionList
 
-
-
 try:
     from OpenGL import GL, GLU, GLUT
 except ImportError:
@@ -27,11 +25,11 @@ except ImportError:
 
 class Renderer(QtOpenGL.QGLWidget):
 
-    def __init__(self, width, height, tixi, tigl):
+    def __init__(self, width, height, tixi, tigl, data):
         super(Renderer, self).__init__()
         
         # point lists
-        self.data = VehicleData(tixi, tigl)
+        self.data = data
         
         # transformations
         self.xRot = 0
@@ -79,27 +77,23 @@ class Renderer(QtOpenGL.QGLWidget):
 
         # widget option
         self.setFocusPolicy(QtCore.Qt.ClickFocus)
-        
 
     def setXRotation(self, angle):
         angle = self.normalizeAngle(angle)
         if angle != self.xRot:
             self.xRot = angle
-            self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
             self.updateGL()
             
     def setYRotation(self, angle):
         angle = self.normalizeAngle(angle)        
         if angle != self.yRot:
             self.yRot = angle
-            self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
             self.updateGL()   
     
     def setZRotation(self, angle):
         angle = self.normalizeAngle(angle)        
         if angle != self.zRot:
             self.zRot = angle
-            self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
             self.updateGL()    
     
     def normalizeAngle(self, angle):
@@ -109,7 +103,8 @@ class Renderer(QtOpenGL.QGLWidget):
             angle -= 360 * 2
         return angle 
     
-    def updateLists(self):
+    def updateLists(self, data):
+        self.data = data
         self.createOglLists()
         self.updateGL()
 
@@ -210,9 +205,7 @@ class Renderer(QtOpenGL.QGLWidget):
         
         if self.flag_show_fuselage :
             self.draw(self.data.pList_fuselage, self.data.pList_fuselage_normals, [0.0, 0.5, 0.8,self.alpha_rgb], 0, self.selectionList.fuseIsEmpty())        
-        
-
-        
+    
 
     '''
     drawing function for the fuselage. 
@@ -490,8 +483,6 @@ class Renderer(QtOpenGL.QGLWidget):
                     GL.glVertex3f(p[2][0], p[2][1], p[2][2] + offset)
         GL.glEnd()
         
-  
-    
     '''
     creates spars ogl list
     @param plist: given point list
@@ -507,16 +498,18 @@ class Renderer(QtOpenGL.QGLWidget):
                     GL.glEnd()
 
 
-    def initLight(self):
-        light_ambient = [0.24725  , 0.1995, 0.0745, 1.0]
-        light_diffuse = [0.0, 1.0, 1.0, 1.0 ]
-        light_specular = [0.628281 ,    0.555802 ,    0.366065, 1.0]
-        light_position = [0.0, 0.0, 0.0, 1.0]
-
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, light_ambient)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, light_diffuse)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, light_specular)
-        GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
+#===============================================================================
+#     def initLight(self):
+#         light_ambient = [0.24725  , 0.1995, 0.0745, 1.0]
+#         light_diffuse = [0.0, 1.0, 1.0, 1.0 ]
+#         light_specular = [0.628281 ,    0.555802 ,    0.366065, 1.0]
+#         light_position = [0.0, 0.0, 0.0, 1.0]
+# 
+#         GL.glLightfv(GL.GL_LIGHT0, GL.GL_AMBIENT, light_ambient)
+#         GL.glLightfv(GL.GL_LIGHT0, GL.GL_DIFFUSE, light_diffuse)
+#         GL.glLightfv(GL.GL_LIGHT0, GL.GL_SPECULAR, light_specular)
+#         GL.glLightfv(GL.GL_LIGHT0, GL.GL_POSITION, light_position)
+#===============================================================================
  
 
     def __setVertices(self, plist, plist_normals, shaIdx, segIdx, stripeIdx, segCnt, stripeCnt):
@@ -569,7 +562,6 @@ class Renderer(QtOpenGL.QGLWidget):
         
         return point
 
-
     def keyPressEvent(self, event):
         if event.modifiers() == QtCore.Qt.ControlModifier:
             self.ctrlIsPressed = True
@@ -620,9 +612,6 @@ class Renderer(QtOpenGL.QGLWidget):
             self.selectionList.removeAll()
             self.updateGL()
     
-    
-        
-
     def mouseMoveEvent(self, event):
         dx = (event.x() - self.lastPos_x ) 
         dy = (event.y() - self.lastPos_y ) 
@@ -661,9 +650,40 @@ class Renderer(QtOpenGL.QGLWidget):
         return color        
                 
 
+class MainWidget(QtGui.QMainWindow):
+    def __init__(self, tixi, tigl, parent = None):
+        super(MainWidget, self).__init__(parent)    
+        
+        # data points
+        self.data = VehicleData(tixi, tigl)
+        
+        self.plotWidgets = [Widget("Front", tixi, tigl, self.data), Widget("Top", tixi, tigl, self.data),
+                            Widget("Side", tixi, tigl, self.data), Widget("3D", tixi, tigl, self.data)]
+
+        self.dockList = []
+        
+        for widget in self.plotWidgets :
+            self.addSimpleWidget(widget.getTitle(), widget)
+
+    def addSimpleWidget(self, name, widget):
+        dock = QtGui.QDockWidget(name)
+        dock.setWidget(widget)
+        dock.setMinimumHeight(150)
+        
+        dock.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
+        dock.setFeatures(QtGui.QDockWidget.DockWidgetClosable |
+                         QtGui.QDockWidget.DockWidgetMovable |
+                         QtGui.QDockWidget.DockWidgetFloatable)
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, dock)
+        
+    def updateView(self):
+        self.data.updateTixiTiglData()
+        for plotWidget in self.plotWidgets :
+            plotWidget.renderer.updateLists(self.data)
+
                 
 class Widget(QtGui.QWidget):
-    def __init__(self, tixi, tigl, parent = None):
+    def __init__(self,name, tixi, tigl, data, parent = None):
         super(Widget, self).__init__(parent)
         
         # window preferences
@@ -671,16 +691,15 @@ class Widget(QtGui.QWidget):
         self.height = 300
         self.resize(self.width ,self.height)
         
+        self.title = name
+        
         # objects
-        self.renderer = Renderer(self.width ,self.height, tixi, tigl)
+        self.renderer = Renderer(self.width ,self.height, tixi, tigl, data)
         
         # window elements
-        self.xSlider = self.createSlider(QtCore.SIGNAL("xRotationChanged(int)"),
-                                         self.renderer.setXRotation)
-        self.ySlider = self.createSlider(QtCore.SIGNAL("yRotationChanged(int)"),
-                                         self.renderer.setYRotation)
-        self.zSlider = self.createSlider(QtCore.SIGNAL("zRotationChanged(int)"),
-                                         self.renderer.setZRotation)           
+        self.xSlider = self.createSlider(self.renderer.setXRotation)
+        self.ySlider = self.createSlider(self.renderer.setYRotation)
+        self.zSlider = self.createSlider(self.renderer.setZRotation)           
   
         label1 = QtGui.QLabel("opacity")
         label2 = QtGui.QLabel("xRot")
@@ -703,8 +722,6 @@ class Widget(QtGui.QWidget):
         zoom.valueChanged.connect(self.setZoom)      
 
         grid = QtGui.QGridLayout()
-
-        grid = QtGui.QGridLayout()
         grid.addWidget(transparency, 1,0)
         grid.addWidget(label1,       1,1)
         grid.addWidget(zoom,         1,2)
@@ -719,6 +736,7 @@ class Widget(QtGui.QWidget):
 
 
         grid.addWidget(self.renderer,4,0,1,10)
+
         self.setLayout(grid)
         
         self.setFocusPolicy(QtCore.Qt.ClickFocus)
@@ -785,9 +803,8 @@ class Widget(QtGui.QWidget):
         self.showOptions[10].setChecked(self.renderer.flag_show_spars)
         self.showOptions[10].setChecked(self.renderer.flag_show_grid)
  
-    def updateView(self):
-        self.renderer.data.updateTixiTiglData()
-        self.renderer.updateLists()
+    def getTitle(self):
+        return self.title
  
     def setTransparency(self, value):
         self.renderer.setTransparent(1.0 - value/100.0)
@@ -886,21 +903,15 @@ class Widget(QtGui.QWidget):
     def contextMenuEvent(self, event):
         self.menu.exec_(event.globalPos())
 
-    def createSlider(self, changedSignal, setterSlot):
-        slider = QtGui.QSlider(QtCore.Qt.Horizontal)
+    def createSlider(self, setterSlot):
         slider = QtGui.QSpinBox()
         slider.setRange(0, 360)
         slider.setSingleStep(5)
-
-        self.renderer.connect(slider, QtCore.SIGNAL("valueChanged(int)"), setterSlot)
-        self.connect(self.renderer, changedSignal, slider, QtCore.SLOT("setValue(int)"))
-
+        slider.valueChanged.connect(setterSlot)
         return slider
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])
-    
-    
-    widget = Widget()
+    widget = MainWidget()
     widget.show()
     app.exec_()

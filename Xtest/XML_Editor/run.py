@@ -1,6 +1,6 @@
 from PySide import QtCore, QtGui
 from Xtest.XML_Editor.editor_xml import EditorWindow
-from Xtest.Vehicle.sideViewOGL import Widget
+from Xtest.Vehicle.sideViewOGL import MainWidget
 from Xtest.config import Config
 from tiglwrapper   import Tigl, TiglException
 from tixiwrapper   import Tixi
@@ -31,9 +31,9 @@ class MainWindow(QtGui.QMainWindow):
         self.setCentralWidget(self.button)
         
         xml_editor = EditorWindow(tixi, Config.path_cpacs_simple)
-        ogl_editor = Widget(tixi, tigl)
+        ogl_editor = MainWidget(tixi, tigl)
         
-        dockWidgets = [('xml editor', xml_editor), ('ogl editor', ogl_editor), 
+        dockWidgets = [('xml editor', xml_editor), ('ogl editor', ogl_editor),
                        ('Red', QtGui.QListWidget()), ('Green', QtGui.QListWidget())]
         
         xml_editor.updateAction.triggered.connect(ogl_editor.updateView)
@@ -70,8 +70,12 @@ class MainWindow(QtGui.QMainWindow):
 
 if __name__ == '__main__':
 
+
     import sys
     app = QtGui.QApplication(sys.argv)
+    pDesktop = QtGui.QApplication.desktop()
+    geometry = pDesktop.availableGeometry(2)
+     #move(geometry.topLeft());
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
