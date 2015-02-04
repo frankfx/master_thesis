@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use('Qt4Agg')
 matplotlib.rcParams['backend.qt4']='PySide'
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar # NavigationToolbar2QTAgg as NavigationToolbar
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
 
 from PySide import QtGui
 from matplotlib.figure import Figure
@@ -83,11 +83,6 @@ class PlotWidget(QtGui.QWidget):
             # four of the five indices are fixed by selection
             # the fifth value is specified by every index of the chosen x-axis
             dimPos[x_axis_idx] = j
-            print (dimSize)
-            print (dimPos)
-            print (dims)
-            import sys
-           # sys.exit()
             y_axis.append(tixi.getArrayValue(array, dimSize, dimPos, dims))            
             
             j += 1

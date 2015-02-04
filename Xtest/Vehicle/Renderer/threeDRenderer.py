@@ -1,9 +1,3 @@
-'''
-Created on Jul 30, 2014
-
-@author: fran_re
-'''
-
 import sys
 from tiglwrapper   import TiglException
 from PySide import QtOpenGL, QtGui, QtCore
@@ -12,8 +6,6 @@ from Xtest.Vehicle.vehicleData import VehicleData
 from Xtest.Open_GL import utility
 from Xtest.Vehicle.point import Point
 from Xtest.Vehicle.selectionList import SelectionList
-
-
 
 try:
     from OpenGL import GL, GLU, GLUT
@@ -25,13 +17,22 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class Renderer():
+class ThreeDRenderer(QtOpenGL.QGLWidget):
 
-    def __init__(self, width, height, tixi, tigl):
-        super(Renderer, self).__init__()
+    def __init__(self, width, height, tixi, tigl, data):
+        super(ThreeDRenderer, self).__init__()
         
         # point lists
-        self.data = VehicleData(tixi, tigl)
+        self.data = data
+        
+        # transformations
+        self.xRot = 0
+        self.yRot = 0
+        self.zRot = 0
+        self.xTrans = 0
+        self.yTrans = 0  
+        self.aspect = max(self.data.configurationGetLength, self.data.wingspan) / 1.5
+        self.scale  = self.aspect # self.data.configurationGetLength / 1.5 # helper for setZoom
         
         self.viewwidth = 0.0
         self.viewheight = 0.0
@@ -56,12 +57,6 @@ class Renderer():
         self.flag_show_spars          = False
         self.flag_show_grid           = False      
 
-        # view flags
-        self.flag_view_3d             = False
-        self.flag_view_side           = False
-        self.flag_view_front          = False
-        self.flag_view_top            = False 
-           
         # selection
         self.ctrlIsPressed  = False
         self.selectedPoints = []
@@ -71,25 +66,27 @@ class Renderer():
         # widget option
         self.setFocusPolicy(QtCore.Qt.ClickFocus)
 
+    def setRotation(self, angleX, angleY, angleZ):
+        self.xRot = self.normalizeAngle(angleX)
+        self.yRot = self.normalizeAngle(angleY)
+        self.zRot = self.normalizeAngle(angleZ)
+
     def setXRotation(self, angle):
         angle = self.normalizeAngle(angle)
         if angle != self.xRot:
             self.xRot = angle
-            self.emit(QtCore.SIGNAL("xRotationChanged(int)"), angle)
             self.updateGL()
             
     def setYRotation(self, angle):
         angle = self.normalizeAngle(angle)        
         if angle != self.yRot:
             self.yRot = angle
-            self.emit(QtCore.SIGNAL("yRotationChanged(int)"), angle)
             self.updateGL()   
     
     def setZRotation(self, angle):
         angle = self.normalizeAngle(angle)        
         if angle != self.zRot:
             self.zRot = angle
-            self.emit(QtCore.SIGNAL("zRotationChanged(int)"), angle)
             self.updateGL()    
     
     def normalizeAngle(self, angle):
@@ -99,7 +96,8 @@ class Renderer():
             angle -= 360 * 2
         return angle 
     
-    def updateLists(self):
+    def updateLists(self, data):
+        self.data = data
         self.createOglLists()
         self.updateGL()
 
@@ -160,9 +158,10 @@ class Renderer():
         # GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0)
         GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0) 
           
-        self.drawAircraft()    
         if self.flag_show_grid:
             self.drawGrid(self.data.configurationGetLength, -self.data.configurationGetLength)    
+
+        self.drawAircraft() 
        
         GL.glFlush() 
 
@@ -211,11 +210,31 @@ class Renderer():
     '''
     def draw(self, plist, normals, color, idx, normalMode=True):
         if normalMode :
-            GL.glColor4fv(color)              
+            GL.glColor4fv(color)  
             GL.glCallList(self.index + idx)     
         else:
             GL.glCallList(self.select_index + idx)
 
+    '''
+    checks if fuslage segment was selected
+    @param plist: fuselage point list
+    @param point: selected point
+    '''
+    def updateOglShapeSelectionList(self, plist, plist_normals, selectionList, color, idx):
+        GL.glNewList(self.select_index+idx, GL.GL_COMPILE)
+        self.createOglShapeSelection(plist, plist_normals, selectionList, color)
+        GL.glEndList()
+        
+    def createOglShapeSelection(self, plist, plist_normals, selectionList, color):
+        GL.glBegin(GL.GL_QUADS)
+        for shaIdx in range(len(plist)) :
+            segCnt = len(plist[shaIdx])
+            for segIdx in range(segCnt) :
+                GL.glColor4fv(self.__getSegmentColor(shaIdx, segIdx, selectionList, color)) 
+                stripeCnt = len(plist[shaIdx][segIdx])
+                for stripeIdx in range(0, stripeCnt) :
+                    self.__setVertices(plist, plist_normals, shaIdx, segIdx, stripeIdx, segCnt, stripeCnt)
+        GL.glEnd()
 
     '''
     determines the color of the segment (selected segments will be drawn red)
@@ -234,8 +253,75 @@ class Renderer():
         else : return [1.0, 0.0, 0.0, self.alpha_rgb]
 
 
+    '''
+    checks if fuslage segment was selected
+    @param plist: fuselage point list
+    @param point: selected point
+    '''
+    def __getSelectedSegment(self, plist, point):
+        for shaIdx in range(len(plist)) :
+            segCnt = len(plist[shaIdx])
+            for segIdx in range(segCnt) :
+                stripeCnt = len(plist[shaIdx][segIdx])
+                for stripeIdx in range(stripeCnt) :
+                    stripe1 = plist[shaIdx][segIdx][stripeIdx]
+                    (se , st) = (segIdx , stripeIdx+1) if stripeIdx +1 < stripeCnt else (segIdx+1 , 0)
+                    if se >= segCnt : break
+                    stripe2 = plist[shaIdx][se][st]
+                    for i in range(0, len(plist[shaIdx][segIdx][stripeIdx])-1) :  
+                        if(utility.isPinRectangle([stripe1[i], 
+                                                   stripe2[i], 
+                                                   stripe2[i+1], 
+                                                   stripe1[i+1]], point)) :
+                            return (shaIdx, segIdx) 
+        return (None, None)
 
+    '''
+    drawing function for the wings
+    @param plist: wing point list
+    @param color: vertex color
+    @param idx: index of precompiled ogl list
+    @param reflect: 1 for not reflected, -1 for reflected
+    '''
+    def __getSelectedWingSegment(self, plist, point, reflect=1):
+        for shaIdx in range(1 ,len(plist)+1):
+            segIdx = self.isWingSegmentSelected(shaIdx, point, reflect) 
+            if segIdx != -1 :
+                return (shaIdx-1, segIdx-1)
+        return (None, None)
+    
+    '''
+    checks if wing segment was selected
+    @param wingIdx: index of a wing
+    @param point: selected point
+    @param reflect: 1 for not reflected, -1 for reflected
+    '''
+    def isWingSegmentSelected(self, wingIdx, point, reflect=1):
+        segIdx = -1
+        try:
+            segIdx, _, _, _ = self.data.tigl.wingGetSegmentEtaXsi(wingIdx, point[0], reflect*point[1], point[2])
+        except TiglException as e :
+            print ("selection failed : " , e.error)
+        return segIdx
 
+    '''
+    drawing function if selection was activated
+    @param plist: given point list
+    @param color: vertex color
+    @param shapeIndex: index of the shape which should be drawn
+    @param segmentIndex: index of the segment which should be drawn
+    '''
+    def drawInSelectionMode(self, plist, normals, color, shapeIndex, segmentIndex):
+        GL.glColor4fv(color)
+        GL.glBegin(GL.GL_QUADS)
+        for shapeIdx in range(len(plist)) :
+            for segIdx in range(len(plist[shapeIdx])) :
+                if(shapeIdx == shapeIndex and segIdx == segmentIndex):
+                    self.__drawSegment(plist[shapeIdx][segIdx], normals[shapeIdx][segIdx], [1.0, 0.0, 0.0, self.alpha_rgb], color)
+                else:
+                    self.__drawSegment(plist[shapeIdx][segIdx], normals[shapeIdx][segIdx],color, color)
+        GL.glEnd()
+        
     '''
     special segment drawing function
     @param plist: given point list
@@ -267,6 +353,8 @@ class Renderer():
     def createOglLists(self): 
         self.index = GL.glGenLists(10)
         self.select_index = GL.glGenLists(5)
+        
+        print "threeD" , self.index
         
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
         self.createOglShape(self.data.pList_fuselage, self.data.pList_fuselage_normals)
@@ -315,6 +403,8 @@ class Renderer():
     @param end: left/bottom delimiter
     '''        
     def drawGrid(self, start = 2, end = -2):
+        start *= self.aspect
+        end = -start
         # Draw a grid "floor".
         GL.glColor3f(1.0, 0.0, 1.0);
         GL.glBegin(GL.GL_LINES)
@@ -404,7 +494,7 @@ class Renderer():
                     for vert in spares :
                         GL.glVertex3fv(vert) 
                     GL.glEnd()
-                    
+
 
     def __setVertices(self, plist, plist_normals, shaIdx, segIdx, stripeIdx, segCnt, stripeCnt):
         (tmp_seg , tmp_stripe) = (segIdx , stripeIdx+1) if stripeIdx +1 < stripeCnt else (segIdx+1 , 0)
@@ -433,3 +523,112 @@ class Renderer():
             GL.glNormal3fv(n4)
             GL.glVertex3fv(p4)         
         
+    # =========================================================================================================
+    # =========================================================================================================    
+    # code selection
+    # =========================================================================================================  
+    # =========================================================================================================                
+
+    def __winPosTo3DPos(self, x, y):
+        point = [None, None, None]                              # result point
+        modelview  = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)    # get the modelview info
+        projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)   # get the projection matrix info
+        viewport   = GL.glGetIntegerv(GL.GL_VIEWPORT)           # get the viewport info
+ 
+        # in OpenGL y soars (steigt) from bottom (0) to top
+        y_new = viewport[3] - y     
+ 
+        # read depth buffer at position (X/Y_new)
+        z = GL.glReadPixels(x, y_new, 1, 1, GL.GL_DEPTH_COMPONENT, GL.GL_FLOAT)
+        # z should not be 0!!!
+        # error when projection matrix not identity (gluPerspective) 
+        point[0], point[1], point[2] = GLU.gluUnProject(x, y_new, z, modelview, projection, viewport)                         
+        
+        return point
+
+    def keyPressEvent(self, event):
+        if event.modifiers() == QtCore.Qt.ControlModifier:
+            self.ctrlIsPressed = True
+            self.updateGL()
+    
+    def keyReleaseEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Control :
+            self.ctrlIsPressed = False
+            self.updateGL()
+            
+    def mousePressEvent(self, event):  
+        self.lastPos_x = event.pos().x()
+        self.lastPos_y = event.pos().y()
+        
+        if self.ctrlIsPressed:
+            selectedPoint = self.__winPosTo3DPos(self.lastPos_x, self.lastPos_y)
+
+            (shaIdx, segIdx) = self.__getSelectedSegment(self.data.pList_fuselage, selectedPoint)
+            if shaIdx is not None :
+                self.selectionList.addPointToFuse(Point(shaIdx, segIdx, selectedPoint))
+                self.updateOglShapeSelectionList(self.data.pList_fuselage, self.data.pList_fuselage_normals, self.selectionList.fuselist, [0.0, 0.5, 0.8,self.alpha_rgb], 0)
+                self.updateGL()
+            else:    
+                (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_up, selectedPoint)
+                if shaIdx is not None :
+                    self.selectionList.addPointToWingUp(Point(shaIdx, segIdx, selectedPoint))
+                    self.updateOglShapeSelectionList(self.data.pList_wing_up, self.data.pList_wing_up_normals, self.selectionList.wing_up, [0.0, 0.5, 0.8,self.alpha_rgb], 1)
+                    self.updateGL()
+                else:
+                    (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_lo, selectedPoint)
+                    if shaIdx is not None :
+                        self.selectionList.addPointToWingLo(Point(shaIdx, segIdx, selectedPoint))
+                        self.updateOglShapeSelectionList(self.data.pList_wing_lo, self.data.pList_wing_lo_normals, self.selectionList.wing_lo, [0.0, 0.5, 0.8,self.alpha_rgb], 2)
+                        self.updateGL()            
+                    else:
+                        (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_up_reflect, selectedPoint, -1)
+                        if shaIdx is not None :
+                            self.selectionList.addPointToWingUpRefl(Point(shaIdx, segIdx, selectedPoint))
+                            self.updateOglShapeSelectionList(self.data.pList_wing_up_reflect, self.data.pList_wing_up_reflect_normals, self.selectionList.wing_up_r, [0.75164, 0.60648, 0.22648,self.alpha_rgb], 3)
+                            self.updateGL()     
+                        else :
+                            (shaIdx, segIdx) = self.__getSelectedWingSegment(self.data.pList_wing_lo_reflect, selectedPoint, -1)
+                            if shaIdx is not None :
+                                self.selectionList.addPointToWingLoRefl(Point(shaIdx, segIdx, selectedPoint))
+                                self.updateOglShapeSelectionList(self.data.pList_wing_lo_reflect, self.data.pList_wing_lo_reflect_normals, self.selectionList.wing_lo_r, [0.75164, 0.60648, 0.22648,self.alpha_rgb], 4)
+                                self.updateGL() 
+        elif not self.selectionList.isEmpty() :
+            self.selectionList.removeAll()
+            self.updateGL()
+    
+    def mouseMoveEvent(self, event):
+        dx = (event.x() - self.lastPos_x ) 
+        dy = (event.y() - self.lastPos_y ) 
+        
+        self.lastPos_x += dx
+        self.lastPos_y += dy
+
+        #Betrachtsfeld = -aspect bis aspect
+        
+        oglXunit = 2.0 * self.aspect_width
+        oglYunit = 2.0 * self.aspect
+        
+        # pixel real world to Pixel ogl world 
+        oglXTrans = oglXunit * 1.0 / self.viewwidth
+        oglYTrans = oglYunit * 1.0 / self.viewheight
+        
+        self.xTrans += (dx * oglXTrans) 
+        self.yTrans += (dy * oglYTrans)
+
+        self.updateGL()
+
+       
+    def newColorVec(self):   
+        color = [self.r_color, self.g_color, self.b_color]
+        
+        offset = 0.5
+        self.b_color += offset
+        
+        if self.b_color >= 1.0 : 
+            self.g_color += offset ; self.b_color = 0.0
+        if self.g_color >= 1.0 :
+            self.r_color += offset ; self.g_color = 0.0
+        if self.r_color >= 1.0 :
+            self.r_color = 0.0 ; self.g_color = 0.0 ; self.b_color = 0.0
+            
+        return color        

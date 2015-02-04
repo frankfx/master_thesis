@@ -1,6 +1,6 @@
 from PySide import QtCore, QtGui
 from Xtest.XML_Editor.editor_xml import EditorWindow
-from Xtest.Vehicle.sideViewOGL import MainWidget
+from Xtest.Vehicle.MainViewWidget import MainWidget
 from Xtest.config import Config
 from tiglwrapper   import Tigl, TiglException
 from tixiwrapper   import Tixi
@@ -25,7 +25,6 @@ class MainWindow(QtGui.QMainWindow):
         except TiglException as err:    
             print ('Error opening tigl document: ', err.__str__())
         
-        
         self.button = QtGui.QPushButton('Raise Next Tab', self)
         self.button.clicked.connect(self.handleButton)
         self.setCentralWidget(self.button)
@@ -33,8 +32,7 @@ class MainWindow(QtGui.QMainWindow):
         xml_editor = EditorWindow(tixi, Config.path_cpacs_simple)
         ogl_editor = MainWidget(tixi, tigl)
         
-        dockWidgets = [('xml editor', xml_editor), ('ogl editor', ogl_editor),
-                       ('Red', QtGui.QListWidget()), ('Green', QtGui.QListWidget())]
+        dockWidgets = [('xml editor', xml_editor), ('ogl editor', ogl_editor)]
         
         xml_editor.updateAction.triggered.connect(ogl_editor.updateView)
         

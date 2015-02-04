@@ -689,15 +689,17 @@ class SearchField(QLineEdit):
         return self.__focus   
    
            
-def main():
-    app = QApplication(sys.argv)
-    tixi = Tixi()
-    #tixi.open(Config.path_cpacs_simple, )
-    w = EditorWindow(tixi, Config.path_cpacs_D150_2, Config.path_cpacs_21_schema)
-
-   # w.loadFile(conf.path_cpacs_A320_Wing, conf.path_cpacs_21_schema)
-    # w.loadFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
-    sys.exit(app.exec_())
+#===============================================================================
+# def main():
+#     app = QApplication(sys.argv)
+#     tixi = Tixi()
+#     #tixi.open(Config.path_cpacs_simple, )
+#     w = EditorWindow(tixi, Config.path_cpacs_D150_2, Config.path_cpacs_21_schema)
+# 
+#    # w.loadFile(conf.path_cpacs_A320_Wing, conf.path_cpacs_21_schema)
+#     # w.loadFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
+#     sys.exit(app.exec_())
+#===============================================================================
  
 if __name__ == "__main__":
     main()

@@ -106,7 +106,7 @@ class Renderer(QtOpenGL.QGLWidget):
     def updateLists(self, data):
         self.data = data
         self.createOglLists()
-        self.updateGL()
+        #self.updateGL()
 
     def initializeGL(self):
         GL.glEnable(GL.GL_DEPTH_TEST)
@@ -668,6 +668,7 @@ class MainWidget(QtGui.QMainWindow):
     def addSimpleWidget(self, name, widget):
         dock = QtGui.QDockWidget(name)
         dock.setWidget(widget)
+        #dock.setMinimumWidth(100)
         dock.setMinimumHeight(150)
         
         dock.setAllowedAreas(QtCore.Qt.AllDockWidgetAreas)
