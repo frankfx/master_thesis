@@ -190,7 +190,7 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
     '''               
     def createOglLists(self): 
         if self.index < 0:
-            print "set index"
+            print ("set index")
             self.index = GL.glGenLists(10)
         
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
