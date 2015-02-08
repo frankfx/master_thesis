@@ -11,7 +11,7 @@ class Test():
         self.pointList_top = [[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], [0.0125, 0.0142, 0.0], [0.005, 0.0089, 0.0], [0.0, 0.0, 0.0]]
         self.pointList_bot = [[1.0, -0.00095, 0.0], [0.95, -0.00605, 0.0], [0.9, -0.01086, 0.0], [0.8, -0.01967, 0.0], [0.7, -0.02748, 0.0], [0.6, -0.03423, 0.0], [0.5, -0.03971, 0.0], [0.4, -0.04352, 0.0], [0.3, -0.04501, 0.0], [0.25, -0.04456, 0.0], [0.2, -0.04303, 0.0], [0.15, -0.04009, 0.0], [0.1, -0.03512, 0.0], [0.075, -0.0315, 0.0], [0.05, -0.02666, 0.0], [0.025, -0.01961, 0.0], [0.0125, -0.0142, 0.0], [0.005, -0.0089, 0.0], [0.0, 0.0, 0.0]]
         self._LeadingEdge , self._TrailingEdge        = self.__getEndPoints(self.pointList_top, self.pointList_bot)        
-        self.pointList_chord                    = self.__createPointList_chord(self._LeadingEdge, self._TrailingEdge, len(self.pointList_top)) 
+        self.pointList_chord                    = self.createPointList_chord(self._LeadingEdge, self._TrailingEdge, len(self.pointList_top)) 
         self.__linePerpendicularGradient_m      = self.__computeLinePerpendicularGradient(self.pointList_chord)
         self.pointList_camber                   = self.__computeCamber()
         print self.pointList_camber
@@ -89,7 +89,7 @@ class Test():
     @param point_cnt: count of points to create
     @return: list with chord points    
     '''
-    def __createPointList_chord(self, p1, p2, point_cnt) : 
+    def createPointList_chord(self, p1, p2, point_cnt) : 
         dist = p2[0] - p1[0]
         interval = dist/ point_cnt  
         

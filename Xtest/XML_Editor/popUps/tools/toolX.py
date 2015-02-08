@@ -7,7 +7,7 @@ import os, sys
 from PySide import QtGui, QtCore
 from Xtest.XML_Editor.popUps.tools.popUp_tool import PopUpTool
 from Xtest.XML_Editor.popUps.tools.popUp_FileSettings import PopUpFileSettings
-from Xtest.Open_GL import utility
+from Xtest import utility
 from Xtest.config import Config
 from tixiwrapper import Tixi
 

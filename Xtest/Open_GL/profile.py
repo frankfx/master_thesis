@@ -3,53 +3,55 @@ Created on Oct 9, 2014
 
 @author: rene
 '''
-from chaikinSpline import Chaikin
-from Xtest.Open_GL.bSpline import BSplineCurve
+
+from Xtest.Open_GL.utils.chaikinSpline import Chaikin
+from Xtest.Open_GL.utils.bSpline import BSplineCurve
 
 class Profile(object):
-    def __init__(self, uid, tigl, plist, parent = None):    
-        self.pointList = plist
-        self.__name    = uid
-        self.__tigl = tigl
+    """This is the parent class for all specific profiles (airfoil, fuselage).
 
+    Attributes:
+      pointList (list of 3dim float lists): contains the profile points.
+      name (str): name of the profile given by uID.
+
+    """    
+    def __init__(self, uid, tigl, plist, parent = None):    
+        self.name      = uid
+        self.pointList = plist
+
+        self.__tigl = tigl
+        
     def setPointList(self, plist):
         self.pointList = plist
 
-    def setName(self, value):
-        self.__name = value
-
-    def setTigl(self, value):
-        self.__tigl = value
+    def setName(self, name):
+        self.name = name
 
     def getPointList(self):
         return self.pointList
 
     def getName(self):
-        return self.__name
-    
-    def getTigl(self):
-        return self.__tigl
+        return self.name
 
-    def setPointToPointListAtIdx(self, idx, val):
-        self.pointList[idx] = val
+    def getLength(self):
+        """Abstract method which should be implemented by the childs.
 
-    def insertToPointList(self, idx, val):
-        self.pointList.insert(idx, val)
-    
-    def removeFromPointList(self, idx):
-        del self.pointList[idx] 
+        Returns:
+          NotImplemented.
 
-    '''
-    @return: chaikin spline of point list
-    '''  
+        """        
+        return NotImplemented
+ 
     def computeChaikinSplineCurve(self):
+        """returns the point list as chaikin spline """           
         spline = Chaikin(self.pointList)
         spline.IncreaseLod()
         spline.IncreaseLod()
         return spline.getPointList()
 
     def computeBSplineCurve(self):
-        spline = BSplineCurve(self.__name ,self.__tigl)
+        """returns the point list as b-spline"""
+        spline = BSplineCurve(self.name ,self.__tigl)
         return spline.getPointList()
 
     def __str__(self):

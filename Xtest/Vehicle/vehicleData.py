@@ -7,7 +7,7 @@ Created on Dec 3, 2014
 import sys
 from tiglwrapper   import Tigl, TiglException
 from tixiwrapper   import Tixi
-from Xtest.Open_GL import utility
+from Xtest import utility
 from Xtest.config import Config
 import time
 import numpy as np

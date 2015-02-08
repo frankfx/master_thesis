@@ -3,7 +3,7 @@ from tiglwrapper   import TiglException
 from PySide import QtOpenGL, QtGui, QtCore
 
 from Xtest.Vehicle.vehicleData import VehicleData
-from Xtest.Open_GL import utility
+from Xtest import utility
 from Xtest.Vehicle.point import Point
 from Xtest.Vehicle.selectionList import SelectionList
 
