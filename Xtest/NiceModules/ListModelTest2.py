@@ -4,7 +4,7 @@ Created on Nov 3, 2014
 @author: fran_re
 '''
 import sys
-from PySide import QtCore, QtGui
+from PySide import QtGui
 # Create a Qt application
 app = QtGui.QApplication(sys.argv)
  

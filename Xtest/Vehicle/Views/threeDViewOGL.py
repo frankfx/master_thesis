@@ -131,18 +131,29 @@ class ThreeDViewOGL(Widget):
 
     # override method    
     def setFrontView(self):
+        '''sets rotation AND SLIDER-VALUE'''
         self.xSlider.setValue(90) 
+        self.ySlider.setValue(0)
         self.zSlider.setValue(270)
     
     # override method    
     def setSideView(self):
         self.xSlider.setValue(90) 
+        self.ySlider.setValue(0)
+        self.zSlider.setValue(0)
     
     # override method    
     def set3DView(self):
         self.xSlider.setValue(45) 
+        self.ySlider.setValue(0) 
         self.zSlider.setValue(315)        
-       
+
+    # override method
+    def setTopView(self):
+        self.xSlider.setValue(0) 
+        self.ySlider.setValue(0) 
+        self.zSlider.setValue(0)  
+
     def setShowGrid(self):
         self.renderer.flag_show_grid = not self.renderer.flag_show_grid       
         

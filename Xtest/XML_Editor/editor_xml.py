@@ -700,7 +700,3 @@ class SearchField(QLineEdit):
 #     # w.loadFile(conf.path_cpacs_D150, conf.path_cpacs_21_schema)
 #     sys.exit(app.exec_())
 #===============================================================================
- 
-if __name__ == "__main__":
-    main()
-

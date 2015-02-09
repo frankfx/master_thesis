@@ -7,7 +7,7 @@ import sys
 import math
 from Xtest import utility
 from PySide import QtGui
-from Xtest.Open_GL.profileOGLWidget import ProfileOGLWidget
+from Xtest.Open_GL.Renderer.defaultRenderer import DefaultRenderer
 
 try:
     from OpenGL import GL
@@ -19,15 +19,15 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class FuselageWidget(ProfileOGLWidget):
+class FuseRenderer(DefaultRenderer):
     def __init__(self, profile):
-        ProfileOGLWidget.__init__(self, profile)
+        DefaultRenderer.__init__(self, profile)
     
-    @utility.overrides(ProfileOGLWidget)
+    @utility.overrides(DefaultRenderer)
     def drawProfile(self):
         trX, _ = self.norm_vec_list(self.profile.getPointList())
         
-        plist  = self.getChaikinSplineCurve() if self.getFlagChaikinSpline() else self.profile.getPointList() 
+        plist  = self.getBSplineCurve() if self.getFlagBSpline() else self.profile.getPointList() 
 
         GL.glColor3f(0, 0, 1)  
         GL.glRotatef(self.xRot, 1.0, 0.0, 0.0)
@@ -58,6 +58,8 @@ class FuselageWidget(ProfileOGLWidget):
         plist_b = self.__createSuperEllipse(botSide[0], botSide[1], botSide[2], botSide[3], botSide[4], False)        
         
         self.profile.setPointList(plist_t + plist_b)
+        
+       # self.profile.setPointList(plist_t)
         self.updateGL() 
 
     def __createSuperEllipse(self, a=1.0, b=1.0, m=4.0, n=4.0, cnt=100, isTopSide=True):
@@ -81,16 +83,12 @@ class FuselageWidget(ProfileOGLWidget):
         # set first x and run on x-axis from -a to a in "dist" steps
         x = -a
         
-        print a, cnt
         dist = (2.0 * a) / cnt
-
-        print "dist" ,dist
 
         plist = []
         
         while x < a or utility.equalFloats2(x, a) :
 
-            
             tmp = utility.absolut(x / a)
             tmp = utility.absolut(1.0 - math.pow(tmp, m ))            
             
@@ -101,8 +99,6 @@ class FuselageWidget(ProfileOGLWidget):
 
             print a, x, dist
         
-        print "plist after calc"
-        print plist
         return plist
 
             
@@ -111,10 +107,10 @@ class FuselageWidget(ProfileOGLWidget):
         GL.glPointSize(5)
         GL.glBegin(GL.GL_POINTS)    
         for p in plist :
-            GL.glVertex3f(p[0], p[1], p[2])              
+            GL.glVertex3fv(p)              
         GL.glEnd() 
         
         GL.glColor3f(0.0, 0.0, 1.0)
         GL.glBegin(GL.GL_POINTS)
-        GL.glVertex3f(plist[0][0], plist[0][1], plist[0][2])  
+        GL.glVertex3fv(plist[0])  
         GL.glEnd() 

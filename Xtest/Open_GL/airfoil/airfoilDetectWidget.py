@@ -3,8 +3,8 @@ Created on Aug 22, 2014
 
 @author: rene
 '''
-from Xtest.Open_GL.profileOGLWidget import ProfileOGLWidget
-from Xtest.Open_GL.airfoil.airfoilOGLWidget import AirfoilOGLWidget
+from Xtest.Open_GL.Renderer.defaultRenderer import DefaultRenderer
+from Xtest.Open_GL.Renderer.airfoilRenderer import AirfoilRenderer
 from profile import Profile
 
 '''
@@ -33,7 +33,7 @@ class AirfoilDetectWidget(QtGui.QWidget):
         
         label1 = QtGui.QLabel("Name")
         self.text1Name = QtGui.QLineEdit()
-        self.butCreate = QtGui.QPushButton("create")
+        self.btnCreate = QtGui.QPushButton("create")
         self.butDetect = QtGui.QPushButton("detect")
         self.butCancel = QtGui.QPushButton("cancel")
         self.butDelPnt = QtGui.QPushButton("reduce")
@@ -70,11 +70,11 @@ class AirfoilDetectWidget(QtGui.QWidget):
         grid.addWidget(self.ogl_detector_widget,    2,1,1,6)
         grid.addWidget(label1,                       3,1)
         grid.addWidget(self.text1Name,               3,2)
-        grid.addWidget(self.butCreate,               3,3)
+        grid.addWidget(self.btnCreate,               3,3)
         grid.addWidget(self.butDetect,               3,4)
         grid.addWidget(self.butCancel,               3,5)
         
-        self.butCreate.clicked.connect(self.fireButtonCreate)
+        self.btnCreate.clicked.connect(self.fireButtonCreate)
         self.butDetect.clicked.connect(self.fireButtonDetect)
         self.butDelPnt.clicked.connect(self.fireButtonReduce)
         self.butCancel.clicked.connect(self.fireButtonClose)
@@ -115,7 +115,7 @@ class AirfoilDetectWidget(QtGui.QWidget):
         self.ogl_widget.profile.setName(name)
         plist = []
         for p in self.ogl_detector_widget.profile.getPointList():
-            plist.append([p[0], p[2], p[1]])
+            plist.append([p[0], p[1], p[2]])
         self.ogl_widget.profile.setPointList(plist)
         self.ogl_widget.profile.updateAll()
         self.ogl_widget.updateGL()
@@ -153,7 +153,7 @@ class AirfoilDetectWidget(QtGui.QWidget):
 
 
 
-class AirfoilDetectOglWidget(ProfileOGLWidget):
+class AirfoilDetectOglWidget(DefaultRenderer):
     def __init__(self, profile = Profile("untitled", None, []), parent = None):
         super(AirfoilDetectOglWidget, self).__init__(profile)
         
@@ -201,9 +201,9 @@ class AirfoilDetectOglWidget(ProfileOGLWidget):
     # profile drawing
     # ================================================================================================================ 
     def drawProfile(self):
-        print "pointlist start"
         print self.profile.getPointList()
-        print "pointlist end"
+        
+        GL.glRotatef(90, 1.0, 0.0, 0.0)
         
         if self.profile.getPointList() == [] :
             self.createDefaultProfile()
@@ -268,13 +268,13 @@ class AirfoilDetectOglWidget(ProfileOGLWidget):
             GL.glColor3f(1.0, 1.0, 1.0)
             # GL.glTranslatef(self.xTrans, self.yTrans,0)
             GL.glBegin(GL.GL_QUADS)
-            GL.glTexCoord2f(0,1)
+            GL.glTexCoord2f(0, 0)
             GL.glVertex3f(-px, -py, -0.5)
-            GL.glTexCoord2f(1, 1)
-            GL.glVertex3f( px, -py, -0.5)
             GL.glTexCoord2f(1, 0)
+            GL.glVertex3f( px, -py, -0.5)
+            GL.glTexCoord2f(1, 1)
             GL.glVertex3f( px,  py, -0.5)
-            GL.glTexCoord2f(0,0)
+            GL.glTexCoord2f(0,1)
             GL.glVertex3f(-px,  py, -0.5)
             GL.glEnd() 
 
@@ -287,16 +287,16 @@ class AirfoilDetectOglWidget(ProfileOGLWidget):
     # default Naca 0009 profile
     # ================================================================================================================   
     def createDefaultProfile(self):
-        self.profile.setPointList([[1.0, 0.00095, 0.0], [0.95, 0.00605, 0.0], [0.9, 0.01086, 0.0], [0.8, 0.01967, 0.0], \
-                           [0.7, 0.02748, 0.0], [0.6, 0.03423, 0.0], [0.5, 0.03971, 0.0], [0.4, 0.04352, 0.0], \
-                           [0.3, 0.04501, 0.0], [0.25, 0.04456, 0.0], [0.2, 0.04303, 0.0], [0.15, 0.04009, 0.0], \
-                           [0.1, 0.03512, 0.0], [0.075, 0.0315, 0.0], [0.05, 0.02666, 0.0], [0.025, 0.01961, 0.0], \
-                           [0.0125, 0.0142, 0.0], [0.005, 0.0089, 0.0], [0.0, 0.0, 0.0], [0.005, -0.0089, 0.0], \
-                           [0.0125, -0.0142, 0.0], [0.025, -0.01961, 0.0], [0.05, -0.02666, 0.0], [0.075, -0.0315, 0.0], \
-                           [0.1, -0.03512, 0.0], [0.15, -0.04009, 0.0], [0.2, -0.04303, 0.0], [0.25, -0.04456, 0.0], \
-                           [0.3, -0.04501, 0.0], [0.4, -0.04352, 0.0], [0.5, -0.03971, 0.0], [0.6, -0.03423, 0.0], \
-                           [0.7, -0.02748, 0.0], [0.8, -0.01967, 0.0], [0.9, -0.01086, 0.0], [0.95, -0.00605, 0.0], \
-                           [1.0, -0.00095, 0.0]])
+        self.profile.setPointList([[1.0, 0.0, 0.00095], [0.95, 0.0, 0.00605], [0.9, 0.0, 0.01086], [0.8, 0.0, 0.01967],
+                                    [0.7, 0.0, 0.02748], [0.6, 0.0, 0.03423], [0.5, 0.0, 0.03971], [0.4, 0.0, 0.04352],
+                                    [0.3, 0.0, 0.04501], [0.25, 0.0, 0.04456], [0.2, 0.0, 0.04303], [0.15, 0.0, 0.04009],
+                                    [0.1, 0.0, 0.03512], [0.075, 0.0, 0.0315], [0.05, 0.0, 0.02666], [0.025, 0.0, 0.01961],
+                                    [0.0125, 0.0, 0.0142], [0.005, 0.0, 0.0089], [0.0, 0.0, 0.0], [0.005, 0.0, -0.0089],
+                                    [0.0125, 0.0, -0.0142], [0.025, 0.0, -0.01961], [0.05, 0.0, -0.02666], [0.075, 0.0, -0.0315],
+                                    [0.1, 0.0, -0.03512], [0.15, 0.0, -0.04009], [0.2, 0.0, -0.04303], [0.25, 0.0, -0.04456],
+                                    [0.3, 0.0, -0.04501], [0.4, 0.0, -0.04352], [0.5, 0.0, -0.03971], [0.6, 0.0, -0.03423],
+                                    [0.7, 0.0, -0.02748], [0.8, 0.0, -0.01967], [0.9, 0.0, -0.01086], [0.95, 0.0, -0.00605],
+                                    [1.0, 0.0, -0.00095]])
     
     # ================================================================================================================
     # opengl vs window transformation
@@ -318,7 +318,7 @@ class AirfoilDetectOglWidget(ProfileOGLWidget):
         # z should not be 0!!!
         # error when projection matrix not identity (gluPerspective) 
         point[0], point[1], point[2] = GLU.gluUnProject(x, y_new, z, modelview, projection, viewport)                         
-        point[2] = 0
+        point[1] = 0
         return point
 
     '''

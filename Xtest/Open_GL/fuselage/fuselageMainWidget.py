@@ -4,7 +4,7 @@ Created on Oct 8, 2014
 @author: fran_re
 '''
 
-from Xtest.Open_GL.fuselage.fuselageWidget import FuselageWidget
+from Xtest.Open_GL.Renderer.fuseRenderer import FuseRenderer
 from Xtest.Open_GL.fuselage.fuselageGeneratorWidget import FuselageGeneratorWidget
 
 from PySide import QtGui, QtCore
@@ -14,9 +14,11 @@ class FuselageMainWidget(QtGui.QWidget):
     def __init__(self, profile, parent = None):
         super(FuselageMainWidget, self).__init__(parent)
 
-        self.ogl_widget = FuselageWidget(profile)
-        self.ogl_widget_SuperEllipse = FuselageGeneratorWidget(self.ogl_widget)
+        self.ogl_widget = FuseRenderer(profile)
+        self.superEllipse_widget = FuselageGeneratorWidget()
 
+        self.superEllipse_widget.widget1.btnCreate.clicked.connect(self.createSuperEllipse)
+        
         grid = QtGui.QGridLayout() 
         grid.addWidget(self.createViewElements(), 0,0)       
         grid.addWidget(self.ogl_widget,1,0)
@@ -26,6 +28,11 @@ class FuselageMainWidget(QtGui.QWidget):
         self.resize(560,520)
         self.show()    
  
+    def createSuperEllipse(self):
+        topSide, botSide, profName = self.superEllipse_widget.widget1.getSuperEllipseParameter()
+        self.ogl_widget.createSuperEllipse(topSide, botSide)
+        self.ogl_widget.profile.setName(profName)        
+ 
     def createViewElements(self):    
         groupView = QtGui.QGroupBox("View") 
         gridView  = QtGui.QGridLayout()  
@@ -34,7 +41,7 @@ class FuselageMainWidget(QtGui.QWidget):
         
         checkShowPoints   = QtGui.QCheckBox("Show points")
         checkFitToPage    = QtGui.QCheckBox("Fit to page")
-        checkSplineCurve = QtGui.QCheckBox("Chaikin curve ")
+        checkSplineCurve = QtGui.QCheckBox("B-Spline")
     
         self.xSlider = self.createSlider(QtCore.SIGNAL("xRotationChanged(int)"),
                                          self.ogl_widget.setXRotation)
@@ -68,7 +75,6 @@ class FuselageMainWidget(QtGui.QWidget):
         checkSplineCurve.toggled.connect(self.fireSplineCurve)
         self.spin_zoom.valueChanged[int].connect(self.fireScaleProfile) 
         
-        
         groupView.setLayout(gridView)     
         return groupView
 
@@ -87,7 +93,7 @@ class FuselageMainWidget(QtGui.QWidget):
         return slider
 
     def fireSuperEllipseWidget(self):
-        self.ogl_widget_SuperEllipse.show()
+        self.superEllipse_widget.show()
 
     def fireScaleProfile(self, value):
         self.ogl_widget.setScale(value)
@@ -107,5 +113,5 @@ class FuselageMainWidget(QtGui.QWidget):
         self.ogl_widget.updateGL()
     
     def fireSplineCurve(self, value):
-        self.ogl_widget.setFlagChaikinSpline(value)
+        self.ogl_widget.setFlagBSpline(value)
         self.ogl_widget.updateGL()

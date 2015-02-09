@@ -71,6 +71,7 @@ class ToolX(PopUpTool):
         self.startOutputMapping(flag, Config.path_cpacs_D150_3, Config.path_cpacs_outputMapping)        
       
     def startInputMapping(self, linux, initFile, inputMapping):
+        print "hier"
         if linux:
             os.system("xsltproc -o " + Config.path_cpacs_test + " " + inputMapping + " " + initFile)
         else :
@@ -107,8 +108,10 @@ class ToolX(PopUpTool):
         self.tixiSetToolParameters()
         wasChosen = self.tixiSetLoadCaseOrPerformanceMap()
         if wasChosen :
+            print "hier"
             self.tixi.saveDocument("text.xml")
             self.tixi.openDocument("text.xml")
+            print "hier 2"
             # self.close()
             return True
         else:
@@ -267,12 +270,12 @@ class ToolX(PopUpTool):
         self.textNegativeSteadi_qstar.setEnabled(False)
         self.textNegativeSteadi_rstar.setEnabled(False)
         
-        self.textPositiveSteadi_pstar.setValidator(QtGui.QDoubleValidator())
-        self.textPositiveSteadi_qstar.setValidator(QtGui.QDoubleValidator())
-        self.textPositiveSteadi_rstar.setValidator(QtGui.QDoubleValidator())
-        self.textNegativeSteadi_pstar.setValidator(QtGui.QDoubleValidator())
-        self.textNegativeSteadi_qstar.setValidator(QtGui.QDoubleValidator())
-        self.textNegativeSteadi_rstar.setValidator(QtGui.QDoubleValidator())
+        self.textPositiveSteadi_pstar.setValidator(QtGui.QDoubleValidator(self))
+        self.textPositiveSteadi_qstar.setValidator(QtGui.QDoubleValidator(self))
+        self.textPositiveSteadi_rstar.setValidator(QtGui.QDoubleValidator(self))
+        self.textNegativeSteadi_pstar.setValidator(QtGui.QDoubleValidator(self))
+        self.textNegativeSteadi_qstar.setValidator(QtGui.QDoubleValidator(self))
+        self.textNegativeSteadi_rstar.setValidator(QtGui.QDoubleValidator(self))
                 
         self.checkPos_pstar = QtGui.QCheckBox()
         self.checkPos_qstar = QtGui.QCheckBox()
@@ -1102,11 +1105,11 @@ class ToolX(PopUpTool):
             list1.takeItem(list1.row(item))
             list2.addItem(item)
 
-#---------------------------------------------------- if __name__ == "__main__":
-    #---------------------------------------------- app = QtGui.QApplication([])
-    #------------------------------------------------------------- tixi = Tixi()
-    #------------------------------- tixi.openDocument(Config.path_cpacs_D150_3)
-    #------------------------------------------------ test = ToolX("name", tixi)
-    #--------------------------------------------------------------- test.show()
-#------------------------------------------------------------------------------ 
-    #--------------------------------------------------------------- app.exec_()
+if __name__ == "__main__":
+    app = QtGui.QApplication([])
+    tixi = Tixi()
+    tixi.openDocument(Config.path_cpacs_D150_3)
+    test = ToolX("name", tixi)
+    test.show()
+
+    app.exec_()

@@ -4,6 +4,8 @@ Created on Oct 8, 2014
 @author: fran_re
 '''
 
+import sys
+
 from tixiwrapper import Tixi, TixiException
 from tiglwrapper import Tigl, TiglException
 from Xtest.config import Config
@@ -26,7 +28,7 @@ class MainWidget(QtGui.QWidget):
         buttonFuse = QtGui.QPushButton("fuselage")
 
         grid = QtGui.QGridLayout()
-        grid.addWidget(buttonAirf,0,0)
+        grid.addWidget(buttonAirf, 0,0)
         grid.addWidget(buttonFuse, 0,1)
 
         self.setWindowTitle('Profile-Editor-Widget')    
@@ -37,22 +39,38 @@ class MainWidget(QtGui.QWidget):
         self.window = None
 
         # actions
-        buttonAirf.clicked.connect(self.getAirfoilMainWidget)
-        buttonFuse.clicked.connect(self.getFuselageMainWidget)
-
+        buttonAirf.clicked.connect(self.fire_AirfoilMainWidget)
+        buttonFuse.clicked.connect(self.fire_FuselageMainWidget)
       
-    def loadFile(self, xmlFilename, cpacs_schema):
+    def loadFile(self, filePath, cpacsSchema):
+        """loads a cpacs file with tixi and tigl.  
+        
+        Args:
+            filePath (String): path to cpacs file
+            cpacsSchema (String): path to cpacs schema file
+        """         
         try:
-            self.tixi.openDocument(xmlFilename) 
-            self.tixi.schemaValidateFromFile(cpacs_schema)
+            print filePath
+            self.tixi.openDocument(filePath) 
+            self.tixi.schemaValidateFromFile(cpacsSchema)
+            try:
+                self.tigl.open(self.tixi,"")
+            except TiglException as e:    
+                QtGui.QMessageBox.information(self, "Error", "TIGL: " + str(e.error))
         except TixiException as e:  
-            raise e
-
-        try:
-            self.tigl.open(self.tixi,"")
-        except TiglException as err:    
-            print ('Error opening tigl document: ', err.__str__() )  
-
+            msgBox = QtGui.QMessageBox()
+            msgBox.setText('open file or exit application')
+            btnOpen = QtGui.QPushButton('open')
+            msgBox.addButton(btnOpen, QtGui.QMessageBox.YesRole)
+            btnExit = QtGui.QPushButton('exit')
+            msgBox.addButton(btnExit, QtGui.QMessageBox.NoRole)
+            
+            if msgBox.exec_() == 0 :
+                (filePath,_) = QtGui.QFileDialog.getOpenFileName(self, 'Open file')
+                self.loadFile(filePath, cpacsSchema)
+            else:
+                sys.exit()
+            
 
     def getVectorX(self, prof_uid):
         xpath = self.tixi.uIDGetXPath(prof_uid)
@@ -69,27 +87,29 @@ class MainWidget(QtGui.QWidget):
         numZ = self.tixi.getVectorSize(xpath + "/pointList/z")
         return self.tixi.getFloatVector(xpath + "/pointList/z",numZ)       
       
-    '''
-    @param: uid from cpacs
-    @return: lists for top and bottom profile in format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
-    '''       
-    def __createPointList(self, uid) :
-        vecX = self.getVectorX(uid)
-        vecY = self.getVectorY(uid)
-        vecZ = self.getVectorZ(uid)
+    def createPointList(self, uID) :
+        """creates a point list with profile points of given uID  
+        
+        Args:
+            uID (String): uID from cpacs profile
+        
+        Returns:
+            lists of top and bottom profile points in format [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
+        """          
+        vecX = self.getVectorX(uID)
+        vecY = self.getVectorY(uID)
+        vecZ = self.getVectorZ(uID)
         
         res = []
         for i in range(len(vecX)) :
             res.append([vecX[i], vecY[i], vecZ[i]])
         return res     
 
-    def getAirfoilMainWidget(self, uid='NACA0000'):
-        airfoil = Airfoil(uid, self.tigl, self.__createPointList(uid))
-        self.window = AirfoilMainWidget(airfoil)
+    def fire_AirfoilMainWidget(self, uid='NACA0000'):
+        self.window = AirfoilMainWidget( Airfoil(uid, self.tigl, self.createPointList(uid)) )
 
-    def getFuselageMainWidget(self, uid='CircleProfile'):
-        fuselage = Fuselage(uid, self.tigl, self.__createPointList(uid))
-        self.window = FuselageMainWidget(fuselage)
+    def fire_FuselageMainWidget(self, uid='CircleProfile'):
+        self.window = FuselageMainWidget( Fuselage(uid, self.tigl, self.createPointList(uid)) )
 
 if __name__ == '__main__':
     app = QtGui.QApplication(["PyQt OpenGL"])

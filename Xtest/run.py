@@ -13,8 +13,8 @@ class MainWindow(QtGui.QMainWindow):
         self.setWindowTitle('Main Window')
 
         tixi = Tixi()
-        #tixi.open(conf.path_cpacs_simple)
-        #tixi.open(Config.path_cpacs_D150)
+      #  tixi.open(conf.path_cpacs_simple)
+        #tixi.open(Config.path_cpacs_D150_3)
         tixi.openDocument(Config.path_cpacs_simple) 
         #tixi.openDocument(conf.path_cpacs_A320_Wing) 
         #self.tixi.schemaValidateFromFile(cpacs_scheme)
@@ -29,9 +29,10 @@ class MainWindow(QtGui.QMainWindow):
         self.button.clicked.connect(self.handleButton)
         self.setCentralWidget(self.button)
         
-        xml_editor = EditorWindow(tixi, Config.path_cpacs_simple)
+        xml_editor = EditorWindow(tixi, Config.path_cpacs_D150_3)
         ogl_editor = MainWidget(tixi, tigl)
         
+       # dockWidgets = [('xml editor', xml_editor)]
         dockWidgets = [('xml editor', xml_editor), ('ogl editor', ogl_editor)]
         
         xml_editor.updateAction.triggered.connect(ogl_editor.updateView)

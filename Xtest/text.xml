@@ -7056,9 +7056,10 @@
     <liftingLine>
       <tool>
         <name>LIFTING_LINE</name>
-        <version>2.4.1</version>
+        <version>5</version>
       </tool>
-      <aircraftModelUID>D150_VAMP</aircraftModelUID>
+      <aircraftModelUID/>
+      <datasetName>D150_VAMP_CPACS2.0</datasetName>
       <loadCases/>
       <!--
 			<loadCases>

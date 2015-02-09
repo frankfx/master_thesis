@@ -6,7 +6,7 @@ Created on Oct 8, 2014
 import sys
 import math
 from Xtest import utility
-from Xtest.Open_GL.profileOGLWidget import ProfileOGLWidget
+from Xtest.Open_GL.Renderer.defaultRenderer import DefaultRenderer
 from PySide import QtGui
 
 try:
@@ -19,16 +19,16 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class AirfoilOGLWidget(ProfileOGLWidget):
+class AirfoilRenderer(DefaultRenderer):
     def __init__(self, profile):
-        ProfileOGLWidget.__init__(self, profile)
+        DefaultRenderer.__init__(self, profile)
 
         self.flag_close_TrailingEdge = False
         self.flag_draw_camber        = False
         self.flag_draw_chord         = False        
         
         
-    @utility.overrides(ProfileOGLWidget)
+    @utility.overrides(DefaultRenderer)
     def drawProfile(self):
         trX, _ = self.norm_vec_list(self.profile.getPointList())
         if self.getFlagChaikinSpline() :

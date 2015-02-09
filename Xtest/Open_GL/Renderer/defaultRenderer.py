@@ -18,9 +18,9 @@ except ImportError:
                             QtGui.QMessageBox.NoButton)
     sys.exit(1)
 
-class ProfileOGLWidget(QtOpenGL.QGLWidget):
+class DefaultRenderer(QtOpenGL.QGLWidget):
     def __init__(self, profile, parent = None):
-        super(ProfileOGLWidget, self).__init__(parent)
+        super(DefaultRenderer, self).__init__(parent)
 
         self.flag_draw_points  = False  
         self.flag_chaikin_spline = False
@@ -81,9 +81,11 @@ class ProfileOGLWidget(QtOpenGL.QGLWidget):
         
         GL.glMatrixMode(GL.GL_PROJECTION)
         GL.glLoadIdentity()
+        
+        print self.aspect_width
+        print self.aspect
         GL.glOrtho(-self.aspect_width, self.aspect_width,
-                   self.aspect, -self.aspect, -100.0, 100.0)
-
+                   -self.aspect, self.aspect, -100.0, 100.0)
     # ================================================================================================================
     # drawing functions
     # ================================================================================================================
@@ -91,7 +93,7 @@ class ProfileOGLWidget(QtOpenGL.QGLWidget):
     def drawProfile(self):
         return NotImplemented
     
-    def drawGrid(self, x_fr = -1.0, x_to = 1.0, y_fr = -1.0, y_to = 1.0, no_lines = 5):
+    def drawGrid(self, x_fr = -1.0, x_to = 1.0, y_fr = -1.0, y_to = 1.0, no_lines = 10):
         GL.glColor3f(1, 0.85, 0.55)
         GL.glBegin(GL.GL_LINES)
         # line at y-axis through the center
@@ -290,6 +292,6 @@ class ProfileOGLWidget(QtOpenGL.QGLWidget):
         oglYTrans = oglYunit * 1.0 / self.viewheight
         
         self.xTrans += (dx * oglXTrans) 
-        self.yTrans += (dy * oglYTrans)
+        self.yTrans -= (dy * oglYTrans)
 
         self.updateGL()

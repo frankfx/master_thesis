@@ -59,8 +59,8 @@ class Naca4Tab(QtGui.QWidget):
         self.countSpinBox.setSpecialValueText("Automatic")
         self.countSpinBox.setValue(10)
         
-        self.butCreate = QtGui.QPushButton("create")
-        self.butCreate.clicked.connect(self.fireButtonCreate)
+        self.btnCreate = QtGui.QPushButton("create")
+        self.btnCreate.clicked.connect(self.fireButtonCreate)
         self.ogl_widget = ogl_widget
         
         grid.addWidget(label1, 1, 1)
@@ -80,7 +80,7 @@ class Naca4Tab(QtGui.QWidget):
         grid.addWidget(label5_1, 5, 4)
         grid.addWidget(label6_1, 6, 4)
         
-        grid.addWidget(self.butCreate, 7, 1)
+        grid.addWidget(self.btnCreate, 7, 1)
         self.setLayout(grid)        
 
     def fireButtonCreate(self):
@@ -170,7 +170,8 @@ class Naca5Tab(QtGui.QWidget):
         
         self.text4Thickness = QtGui.QLineEdit()
         self.text4Thickness.setText('12')
-        self.text4Thickness.setValidator(QtGui.QIntValidator(1,30))
+        thickvalidator = QtGui.QIntValidator(1,30 ,self)        
+        self.text4Thickness.setValidator(thickvalidator)
         
         self.countSpinBox = QtGui.QSpinBox()
         self.countSpinBox.setRange(20, 200)
@@ -179,8 +180,8 @@ class Naca5Tab(QtGui.QWidget):
         self.countSpinBox.setSpecialValueText("Automatic")
         self.countSpinBox.setValue(10)
         
-        self.butCreate = QtGui.QPushButton("create")
-        self.butCreate.clicked.connect(self.fireButtonCreate)
+        self.btnCreate = QtGui.QPushButton("create")
+        self.btnCreate.clicked.connect(self.fireButtonCreate)
         self.ogl_widget = ogl_widget
         
         grid.addWidget(label1, 1, 1)
@@ -200,7 +201,7 @@ class Naca5Tab(QtGui.QWidget):
         grid.addWidget(label5_1, 5, 4)
         grid.addWidget(label6_1, 6, 4)
         
-        grid.addWidget(self.butCreate, 7, 1)
+        grid.addWidget(self.btnCreate, 7, 1)
         self.setLayout(grid)        
 
     def fireButtonCreate(self):

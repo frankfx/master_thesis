@@ -3,7 +3,7 @@ Created on Sep 2, 2014
 
 @author: rene
 '''
-from Xtest.Open_GL.airfoil.airfoilOGLWidget import AirfoilOGLWidget
+from Xtest.Open_GL.Renderer.airfoilRenderer import AirfoilRenderer
 from Xtest.Open_GL.airfoil.airfoilDetectWidget import AirfoilDetectWidget
 from Xtest.Open_GL.airfoil.airfoilNacaWidget import AirfoilNacaWidget
 from PySide import QtGui
@@ -12,7 +12,7 @@ class AirfoilMainWidget(QtGui.QWidget):
     def __init__(self, profile, parent = None):
         super(AirfoilMainWidget, self).__init__(parent)
 
-        self.ogl_widget          = AirfoilOGLWidget(profile)
+        self.ogl_widget          = AirfoilRenderer(profile)
         self.ogl_widget_naca     = AirfoilNacaWidget(self.ogl_widget) 
         self.ogl_widget_detector = AirfoilDetectWidget(self.ogl_widget)
        
@@ -29,9 +29,9 @@ class AirfoilMainWidget(QtGui.QWidget):
         self.show()
 
         # actions
-        self.ogl_widget_naca.naca4.butCreate.clicked.connect(self.updateEvalFields)
-        self.ogl_widget_naca.naca5.butCreate.clicked.connect(self.updateEvalFields)
-        self.ogl_widget_detector.butCreate.clicked.connect(self.updateEvalFields)        
+        self.ogl_widget_naca.naca4.btnCreate.clicked.connect(self.updateEvalFields)
+        self.ogl_widget_naca.naca5.btnCreate.clicked.connect(self.updateEvalFields)
+        self.ogl_widget_detector.btnCreate.clicked.connect(self.updateEvalFields)        
     
     def createTopOfWidget(self):
         vboxLayout = QtGui.QVBoxLayout()
