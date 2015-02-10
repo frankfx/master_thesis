@@ -181,7 +181,7 @@ class Widget(QtGui.QWidget):
         self.renderer.setRotation(0, 0, 0)  
     
     def setFrontView(self):
-        self.renderer.setRotation(90, 0, 270)  
+        self.renderer.setRotation(90.0, 0, 270)  
     
     def setSideView(self):
         self.renderer.setRotation(90, 0, 0)       

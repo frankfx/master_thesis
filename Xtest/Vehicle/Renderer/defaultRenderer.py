@@ -139,7 +139,7 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
         GL.glRotated(self.zRot, 0.0, 0.0, 1.0)
         # GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0)
         GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0) 
-          
+        
         self.drawAircraft()    
 
         GL.glFlush() 
@@ -256,6 +256,7 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
     @param color: vertex color
     '''
     def createOglShape(self, plist, plist_normals):
+        GL.glLineWidth(0.9)
         GL.glBegin(GL.GL_QUADS)
         for shaIdx in range(0, len(plist)) :
             segCnt = len(plist[shaIdx])

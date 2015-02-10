@@ -16,6 +16,7 @@ class AirfoilMainWidget(QtGui.QWidget):
         self.ogl_widget_naca     = AirfoilNacaWidget(self.ogl_widget) 
         self.ogl_widget_detector = AirfoilDetectWidget(self.ogl_widget)
        
+       
         grid = QtGui.QGridLayout()        
         grid.addLayout(self.createTopOfWidget(),0,1)
         grid.addWidget(self.ogl_widget, 1,1)
@@ -34,13 +35,35 @@ class AirfoilMainWidget(QtGui.QWidget):
         self.ogl_widget_detector.btnCreate.clicked.connect(self.updateEvalFields)        
     
     def createTopOfWidget(self):
-        vboxLayout = QtGui.QVBoxLayout()
-        vboxLayout.addWidget(self.createEvalView())
-        vboxLayout.addWidget(self.createViewElements())    
-        return vboxLayout
+        self.btnEvalView = QtGui.QPushButton("Evaluation")
+        self.btnElemView = QtGui.QPushButton("View")        
+
+        # style buttons
+        self.btnEvalView.setStyleSheet("background-color:#98AFC7; border-style: outset; border-width: 2px; border-radius: 10px;border-color: beige;font: bold 14px;min-width: 10em; padding: 2px;")
+        self.btnElemView.setStyleSheet("background-color:#98AFC7; border-style: outset; border-width: 2px; border-radius: 10px;border-color: beige;font: bold 14px;min-width: 10em; padding: 2px;")
         
+        self.evalView = self.createEvalView()
+        self.elemView = self.createViewElements()
+        vboxLayout = QtGui.QVBoxLayout()
+        vboxLayout.addWidget(self.btnEvalView)
+        vboxLayout.addWidget(self.evalView)
+        vboxLayout.addWidget(self.btnElemView)
+        vboxLayout.addWidget(self.elemView)    
+        
+        self.btnEvalView.clicked.connect(self.__setVisibleEvalView)
+        self.btnElemView.clicked.connect(self.__setVisibleElemView)        
+        
+        return vboxLayout    
+    
+        
+    def __setVisibleEvalView (self):
+        self.evalView.setVisible(not self.evalView.isVisible())
+        
+    def __setVisibleElemView (self):
+        self.elemView.setVisible(not self.elemView.isVisible())
+    
     def createEvalView(self):
-        groupEval = QtGui.QGroupBox("Evaluation")
+        groupEval = QtGui.QGroupBox()
         
         self.textName      = QtGui.QLineEdit()
         self.textLength    = QtGui.QLineEdit()
@@ -71,7 +94,7 @@ class AirfoilMainWidget(QtGui.QWidget):
         return groupEval    
         
     def createViewElements(self):    
-        groupView  = QtGui.QGroupBox("View") 
+        groupView  = QtGui.QGroupBox() 
         
         checkShowPoints        = QtGui.QCheckBox("Show points")
         checkFitToPage         = QtGui.QCheckBox("Fit to page")

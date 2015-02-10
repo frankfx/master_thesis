@@ -30,6 +30,10 @@ class AirfoilRenderer(DefaultRenderer):
         
     @utility.overrides(DefaultRenderer)
     def drawProfile(self):
+        
+        print "pint list bot list"
+        print self.profile.pointList_bot
+        
         trX, _ = self.norm_vec_list(self.profile.getPointList())
         if self.getFlagChaikinSpline() :
             plist = self.getChaikinSplineCurve()
@@ -48,7 +52,7 @@ class AirfoilRenderer(DefaultRenderer):
 
         # rotate around user given angle                  
         GL.glTranslatef(1,0,0)
-        GL.glRotate(self.getRotAngle(), 0,0,1)
+        GL.glRotate(-self.getRotAngle(), 0,0,1)
         GL.glTranslatef(-1,0,0)  
        
         # rotate around x to see the profile
@@ -92,12 +96,14 @@ class AirfoilRenderer(DefaultRenderer):
     def drawChord(self):
         start, end = self.profile.getEndPoints()
         
+        GL.glColor3f(0.0, 1.0, 0.0)
         GL.glBegin(GL.GL_LINES)
         GL.glVertex3fv(start) # leftend (nose)
         GL.glVertex3fv(end) # right end
         GL.glEnd()
 
     def drawCamber(self):
+        GL.glColor3f(1.0, 0.0, 0.0)        
         GL.glBegin(GL.GL_LINE_STRIP)
         for p in self.profile.getPointListCamber() :
             GL.glVertex3fv(p)# left end == nose
@@ -138,10 +144,14 @@ class AirfoilRenderer(DefaultRenderer):
     
         for x in plist:
             y = self.__computeY_t(x, c, t) 
-            res_top.append([x,  0, y])
-            res_bot.append([x,  0, -y])
+            res_top.append([x,  0, -y])
+            res_bot.append([x,  0, y])
         
         res_bot.reverse()    
+
+        print "print res_bot"
+        print res_bot   
+        
         self.profile.setPointList(res_bot + res_top[1:])
         self.profile.updateAll()
         self.updateGL()
@@ -162,9 +172,11 @@ class AirfoilRenderer(DefaultRenderer):
             y_u = y_c + y_t * math.cos(theta)
             y_l = y_c - y_t * math.cos(theta)
             
-            res_top.append([x_u, 0, y_u])
-            res_bot.append([x_l, 0, y_l])
-            res_camber.append([x, 0, y_c])
+            # y wird negiert, da es in der cpacs airfoil Definition die Position anstelle von z verwendet wird 
+            # y was negated because in the cpacs airfoil definition it occupies to position of z
+            res_top.append([x_u, 0, -y_u])
+            res_bot.append([x_l, 0, -y_l])
+            res_camber.append([x, 0, -y_c])
         res_bot.reverse()
 
         self.profile.setPointList(res_bot + res_top[1:])      
@@ -243,9 +255,9 @@ class AirfoilRenderer(DefaultRenderer):
             y_u = y_c + y_t * math.cos(theta)
             y_l = y_c - y_t * math.cos(theta)
 
-            res_top.append([x_u, 0, y_u])
-            res_bot.append([x_l, 0, y_l])
-            res_camber.append([x, 0, y_c])
+            res_top.append([x_u, 0, -y_u])
+            res_bot.append([x_l, 0, -y_l])
+            res_camber.append([x, 0, -y_c])
         res_bot.reverse()
 
         self.profile.setPointList(res_bot + res_top[1:])      

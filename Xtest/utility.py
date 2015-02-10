@@ -232,7 +232,7 @@ def degToRad(angle):
 '''   
 def radToDeg(angle):
     return angle*(180/math.pi)
-    
+   
 '''
 @param value: positive or negative number
 @return: positive number 

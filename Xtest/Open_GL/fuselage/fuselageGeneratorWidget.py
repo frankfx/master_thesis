@@ -34,15 +34,20 @@ class SuperEllipse(QtGui.QWidget):
         self.textName = QtGui.QLineEdit()              
         self.widthSpinBox_t = self.__createDoubleSpinBox(value=1.0)
         self.heightSpinBox_t = self.__createDoubleSpinBox(value=1.0)        
-        self.curveSpinBox1_t = self.__createDoubleSpinBox(value=4.0)       
-        self.curveSpinBox2_t = self.__createDoubleSpinBox(value=4.0)       
+        self.curveSpinBox1_t = self.__createDoubleSpinBox(value=2.0)       
+        self.curveSpinBox2_t = self.__createDoubleSpinBox(value=2.0)       
         self.pcntSpinBox_t = self.__createSpinBox()       
 
         self.widthSpinBox_b = self.__createDoubleSpinBox(value=1.0)
         self.heightSpinBox_b = self.__createDoubleSpinBox(value=1.0)        
-        self.curveSpinBox1_b = self.__createDoubleSpinBox(value=4.0)       
-        self.curveSpinBox2_b = self.__createDoubleSpinBox(value=4.0)       
+        self.curveSpinBox1_b = self.__createDoubleSpinBox(value=2.0)       
+        self.curveSpinBox2_b = self.__createDoubleSpinBox(value=2.0)       
         self.pcntSpinBox_b = self.__createSpinBox()
+        
+        self.widthSpinBox_t.setEnabled(False)
+        self.heightSpinBox_t.setEnabled(False)
+        self.widthSpinBox_b.setEnabled(False)
+        self.heightSpinBox_b.setEnabled(False)
         
         layout = QtGui.QFormLayout()
         
@@ -68,14 +73,14 @@ class SuperEllipse(QtGui.QWidget):
         
         self.setLayout(layout)        
 
-    def __createSpinBox(self, start=0, end=1000, step=1, suffix='pts', value=100):
+    def __createSpinBox(self, start=4, end=200, step=1, suffix='pts', value=100):
         spinBox = QtGui.QDoubleSpinBox()
         spinBox.setRange(start, end)
         spinBox.setSingleStep(step)
         spinBox.setValue(value)   
         return spinBox 
     
-    def __createDoubleSpinBox(self, start=0, end=10, step=1, value=4):
+    def __createDoubleSpinBox(self, start=1, end=10, step=1, value=4):
         spinBox = QtGui.QDoubleSpinBox()
         spinBox.setRange(start, end)
         spinBox.setSingleStep(step)

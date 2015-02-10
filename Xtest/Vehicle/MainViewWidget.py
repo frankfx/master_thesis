@@ -41,15 +41,17 @@ class MainWidget(QtGui.QMainWindow):
         front = FrontViewWidget("Front", tixi, tigl, self.data)
         side  = SideViewGL("Front", tixi, tigl, self.data)
         top   = TopViewWidget("Top", tixi, tigl, self.data)
-        three = ThreeDViewOGL("3D", tixi, tigl, self.data)
+        threeD = ThreeDViewOGL("3D", tixi, tigl, self.data)
 
-        self.plotWidgets = [front, side, three, top]
+        self.plotWidgets = [side, top, front, threeD]
         # 
         self.plotWidgets[0].renderer.indexGenerated.triggered.connect(self.setRenderContext)
 
-        for widget in self.plotWidgets :
-            self.addSimpleWidget(widget.getTitle(), widget)
-          
+        self.addSimpleWidget(side.getTitle(), side, QtCore.Qt.LeftDockWidgetArea)
+        self.addSimpleWidget(top.getTitle(), top, QtCore.Qt.LeftDockWidgetArea)
+        self.addSimpleWidget(front.getTitle(), front, QtCore.Qt.RightDockWidgetArea)
+        self.addSimpleWidget(threeD.getTitle(), threeD, QtCore.Qt.RightDockWidgetArea)
+
     def setRenderContext(self):
         idx = self.plotWidgets[0].renderer.getRenderIndex()
         self.plotWidgets[1].renderer.setRenderIndex(idx)
@@ -57,7 +59,7 @@ class MainWidget(QtGui.QMainWindow):
         self.plotWidgets[3].renderer.setRenderIndex(idx)
     
 
-    def addSimpleWidget(self, name, widget):
+    def addSimpleWidget(self, name, widget, dockWidgetArea):
         dock = QtGui.QDockWidget(name)
         dock.setWidget(widget)
         dock.setMinimumHeight(150)
@@ -66,7 +68,7 @@ class MainWidget(QtGui.QMainWindow):
         dock.setFeatures(QtGui.QDockWidget.DockWidgetClosable |
                          QtGui.QDockWidget.DockWidgetMovable |
                          QtGui.QDockWidget.DockWidgetFloatable)
-        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, dock)
+        self.addDockWidget(dockWidgetArea, dock)
         
     def updateView(self):
         self.data.updateTixiTiglData()

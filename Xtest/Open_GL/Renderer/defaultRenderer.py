@@ -36,7 +36,7 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
         # profile rotation
         self.rotate = 0.0
         
-        self.aspect = self.profile.getLength()
+        self.aspect = self.profile.getLength() * 0.5 if self.profile.getLength() is not NotImplemented else NotImplemented
         
         self.viewwidth = 0.0
         self.viewheight = 0.0
@@ -69,7 +69,6 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
         self.setProjection()
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
         GL.glTranslatef(self.xTrans,self.yTrans,-1.5)
-        self.drawGrid()
         self.drawProfile()
         GL.glFlush()
     
@@ -92,30 +91,6 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
     '''abstract method'''
     def drawProfile(self):
         return NotImplemented
-    
-    def drawGrid(self, x_fr = -1.0, x_to = 1.0, y_fr = -1.0, y_to = 1.0, no_lines = 10):
-        GL.glColor3f(1, 0.85, 0.55)
-        GL.glBegin(GL.GL_LINES)
-        # line at y-axis through the center
-        GL.glVertex3f(x_fr, 0, 0)
-        GL.glVertex3f(x_to, 0, 0)
-        # line at x-axis through the center
-        GL.glVertex3f(0, y_fr, 0)
-        GL.glVertex3f(0, y_to, 0)
-        for i in range(1, no_lines, 1) :
-            # positive lines at y-axis
-            GL.glVertex3f(x_fr,  i*1.0/no_lines, 0)
-            GL.glVertex3f(x_to,  i*1.0/no_lines, 0)
-            # negative lines at y-axis
-            GL.glVertex3f(x_fr, -i*1.0/no_lines, 0)
-            GL.glVertex3f(x_to, -i*1.0/no_lines, 0)
-            # positive lines at x-axis
-            GL.glVertex3f( i*1.0/no_lines, y_fr, 0)
-            GL.glVertex3f( i*1.0/no_lines, y_to, 0)
-            # negative lines at x-axis
-            GL.glVertex3f(-i*1.0/no_lines, y_fr, 0)
-            GL.glVertex3f(-i*1.0/no_lines, y_to, 0)
-        GL.glEnd()
 
     # ================================================================================================================
     # helper and drawing options

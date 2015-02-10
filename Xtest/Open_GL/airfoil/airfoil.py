@@ -6,7 +6,7 @@ Created on Sep 3, 2014
 
 import math
 from Xtest import utility
-from profile import Profile
+from Xtest.Open_GL.profile import Profile
 
 
 class Airfoil(Profile):
@@ -19,7 +19,7 @@ class Airfoil(Profile):
         self.leadingEdge                        = self.computeLeadingEdge(self.pointList )
         self.pointList_bot , self.pointList_top = self.createPointList_bottom_top(self.leadingEdge, self.pointList)
         self.pointList_chord                    = self.createPointList_chord(self.leadingEdge, self.trailingEdge,len(self.pointList_bot))        
-        self.pointList_camber, self.thickness   = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
+        self.pointList_camber, self.thickness   = self.__createPointList_camber2(self.pointList_bot, self.pointList_top), 1.0
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
 
@@ -87,6 +87,7 @@ class Airfoil(Profile):
             the leading edge (farthest point to trailing edge)
         """             
         trailingEdge = self.getTrailingEdge()
+        
         dist = -1 ; idx  = -1
         
         for i in range(len(plist)) : 
@@ -137,7 +138,21 @@ class Airfoil(Profile):
     @param plist_bot: point list of bottom profile
     @return: list with camber points    
     ''' 
-    def __createPointList_camber2(self, plist_bot, plist_top) : 
+    def __createPointList_camber2(self, plist_bot, plist_top) :
+        
+        print "lens"
+        print len(plist_bot)
+        print len(plist_top)
+        
+        """creates the chord point list  
+        
+        Args:
+            p1 ([float,float, float]): the leading edge 
+            p2 ([float,float, float]): the trailing edge 
+            point_cnt         (float): count of points to create 
+        Returns:
+            list with float point lists
+        """                
         plist_top.reverse()
         axis0 = self.__createApproximateCamber(plist_bot, plist_top)
         axis1 = self.__createApproximateCamber(plist_top, plist_bot)
@@ -153,18 +168,34 @@ class Airfoil(Profile):
     
 
     def __createPointList_camber(self, plist_bot, plist_top, plist_chord):
-        res= []
-        thickness = -1.0
-        for p_chord in plist_chord :
-            m, b = utility.createPerpendicular(self.leadingEdge, self.trailingEdge, p_chord)
+        """creates the point list of the airfoil camber line  
+        
+        Args:
+            plist_bot (list of list of Float): airfoil bottom point list. format: [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
+            plist_top (list of list of Float): airfoil top point list. format: [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
+            plist_chord (list of list of Float): airfoil chord point list. format: [ [x0,y0,z0] , [x1,y1,z1] , ...  ]
+        
+        Returns:
+            the point list of the camber line and the airfoil thickness.
+        """         
+        
+        # init result variables
+        res = [] ; thickness = -1.0
+        
+        for pnt in plist_chord :
+            # creates perpendicular in point pnt of the line leadingEdge to trailingEdge
+            m, b = utility.createPerpendicular(self.leadingEdge, self.trailingEdge, pnt)
+            
             # fkt is perpendicular to y-axis, then for all y: fkt(y) = b and compute y by neigbors
             if m == (None, "y") :
-                p_bot = [b,self.approxNeighbors(b, plist_bot), p_chord[2]]
-                p_top = [b,self.approxNeighbors(b, plist_top), p_chord[2]]
+                #print "fkt is perpendicular to y-axis"
+                p_bot = [b,self.approxNeighbors(b, plist_bot), pnt[2]]
+                p_top = [b,self.approxNeighbors(b, plist_top), pnt[2]]
             # fkt has gradient 0, then for all x: fkt(x) = b and compute x by neigbors
             elif m == (None, "x") :
-                p_bot = [self.approxNeighbors(b, plist_bot, 1), b, p_chord[2]]
-                p_top = [self.approxNeighbors(b, plist_top, 1), b, p_chord[2]]
+               # print "has gradient 0 "               
+                p_bot = [self.approxNeighbors(b, plist_bot, 1), b, pnt[2]]
+                p_top = [self.approxNeighbors(b, plist_top, 1), b, pnt[2]]
             else :
                 p_bot = self.__getPointWithMinDistanceToChordPerpendicular(m, b, plist_bot)
                 p_top = self.__getPointWithMinDistanceToChordPerpendicular(m, b, plist_top)
@@ -242,7 +273,7 @@ class Airfoil(Profile):
     
     def updatePointListCamber(self):
         #print ("warning, depends on updated pointList_bot, pointList_top and pointList_chord")
-        self.pointList_camber , self.thickness = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)    
+        self.pointList_camber , self.thickness = self.__createPointList_camber2(self.pointList_bot, self.pointList_top) , 1.0   
     
     def updateRotationLists(self, angle):
         #print ("warning, depends on updated pointList_chord and pointList")
@@ -260,7 +291,7 @@ class Airfoil(Profile):
         
     def updateAll(self):
         self.updatePointListsForNaca()
-        self.pointList_camber , self.thickness  = self.__createPointList_camber(self.pointList_bot, self.pointList_top, self.pointList_chord)
+        self.updatePointListCamber()
         self.pointList_top_rot                  = self.pointList_top
         self.pointList_bot_rot                  = self.pointList_bot
 

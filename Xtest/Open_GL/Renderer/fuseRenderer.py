@@ -57,9 +57,9 @@ class FuseRenderer(DefaultRenderer):
         plist_t = self.__createSuperEllipse(topSide[0], topSide[1], topSide[2], topSide[3], topSide[4], True)
         plist_b = self.__createSuperEllipse(botSide[0], botSide[1], botSide[2], botSide[3], botSide[4], False)        
         
-        self.profile.setPointList(plist_t + plist_b)
+        plist_t.reverse()
         
-       # self.profile.setPointList(plist_t)
+        self.profile.setPointList(plist_t + plist_b)
         self.updateGL() 
 
     def __createSuperEllipse(self, a=1.0, b=1.0, m=4.0, n=4.0, cnt=100, isTopSide=True):

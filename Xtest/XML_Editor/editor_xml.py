@@ -10,10 +10,10 @@ from lxml import etree
 from PySide.QtGui import QMessageBox, QSpinBox, QAction, QLabel, QColor, QTextFormat, QTextDocument, QTextCursor, QMainWindow, QGridLayout, QHBoxLayout, QWidget, QPushButton, QFont, QTextEdit, QApplication
 from PySide.QtCore import Qt, SIGNAL
 from Xtest.XML_Editor.editor_comp import EditorCodeCompletion
-from numberBar import NumberBar
+from Xtest.XML_Editor.numberBar import NumberBar
 from Xtest.config import Config
 
-from highlighter import Highlighter
+from Xtest.XML_Editor.highlighter import Highlighter
 from Xtest.XML_Editor.popUps.tools.toolX import ToolX
 from PySide import QtCore
 
