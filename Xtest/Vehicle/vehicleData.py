@@ -401,7 +401,6 @@ class VehicleData():
                 componentSegmentUID = self.tigl.wingGetComponentSegmentUID(wingIndex, compSegmentIndex)
                 
                 for flap in flapList : 
-
                     _, segUid1, eta1, xsi1 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[0], flap[2])       
                     _, segUid2, eta2, xsi2 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[1], flap[3]) 
                     _, segUid3, eta3, xsi3 = self.tigl.wingComponentSegmentPointGetSegmentEtaXsi(componentSegmentUID, flap[4], flap[6]) 

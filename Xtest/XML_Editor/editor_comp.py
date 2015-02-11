@@ -69,11 +69,11 @@ class EditorCodeCompletion(QTextEdit):
         @param key: keyboard input value as int
         '''
         if self.flag_open_angle_bracket :
-            if key == 62  :  # >
+            if key == 47 :
+                self.flag_open_angle_bracket = False 
+            elif key == 62  :  # >
                 self.__insertTag()
-                self.flag_open_angle_bracket = False            
-        elif key == 62  :  # >
-            return
+                self.flag_open_angle_bracket = False  
         elif key == 60  :  # <
             self.flag_open_angle_bracket = True
  

@@ -38,8 +38,11 @@ class MainWidget(QtGui.QMainWindow):
         # data points
         self.data = VehicleData(tixi, tigl)
         
+        print ("hier testet rene")
+        print (self.data.pList_flaps_Spoiler)
+        
         front = FrontViewWidget("Front", tixi, tigl, self.data)
-        side  = SideViewGL("Front", tixi, tigl, self.data)
+        side  = SideViewGL("Side", tixi, tigl, self.data)
         top   = TopViewWidget("Top", tixi, tigl, self.data)
         threeD = ThreeDViewOGL("3D", tixi, tigl, self.data)
 

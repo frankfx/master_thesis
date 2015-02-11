@@ -29,7 +29,7 @@
             <transformation>
               <scaling>
                 <x>1.0</x>
-                <y>0.5</y>
+                <y>1.15</y>
                 <z>0.5</z>
               </scaling>
               <rotation>
@@ -212,9 +212,9 @@
             <description>This wing has been generated to test CATIA2CPACS.</description>
             <transformation>
               <scaling>
-                <x>3.2</x>
-                <y>5.77</y>
-                <z>0.9</z>
+                <x>1</x>
+                <y>1</y>
+                <z>1</z>
               </scaling>
               <rotation>
                 <x>0</x>

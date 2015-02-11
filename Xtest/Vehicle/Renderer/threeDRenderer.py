@@ -25,6 +25,7 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
         self.indexGenerated = QtGui.QAction(self)
         
         self.index = -1
+        self.select_index = -1
         
         # point lists
         self.data = data
@@ -68,7 +69,7 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
         self.selectionList = SelectionList()
 
         # widget option
-        #self.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.setFocusPolicy(QtCore.Qt.ClickFocus)
 
     def getRenderIndex(self):
         return self.index
@@ -366,6 +367,8 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
     def createOglLists(self): 
         if self.index < 0:
             self.index = GL.glGenLists(10)
+        if self.select_index < 0:
+            self.select_index = GL.glGenLists(5)
         
         GL.glNewList(self.index, GL.GL_COMPILE) # compile the first one
         self.createOglShape(self.data.pList_fuselage, self.data.pList_fuselage_normals)
@@ -560,7 +563,6 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
     def keyPressEvent(self, event):
         if event.modifiers() == QtCore.Qt.ControlModifier:
             self.ctrlIsPressed = True
-            self.updateGL()
     
     def keyReleaseEvent(self, event):
         if event.key() == QtCore.Qt.Key_Control :
@@ -570,10 +572,8 @@ class ThreeDRenderer(QtOpenGL.QGLWidget):
     def mousePressEvent(self, event):  
         self.lastPos_x = event.pos().x()
         self.lastPos_y = event.pos().y()
-        
         if self.ctrlIsPressed:
             selectedPoint = self.__winPosTo3DPos(self.lastPos_x, self.lastPos_y)
-
             (shaIdx, segIdx) = self.__getSelectedSegment(self.data.pList_fuselage, selectedPoint)
             if shaIdx is not None :
                 self.selectionList.addPointToFuse(Point(shaIdx, segIdx, selectedPoint))

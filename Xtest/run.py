@@ -14,7 +14,7 @@ class MainWindow(QtGui.QMainWindow):
 
         tixi = Tixi()
       #  tixi.open(conf.path_cpacs_simple)
-        #tixi.open(Config.path_cpacs_D150_3)
+       # tixi.open(Config.path_cpacs_D150_3)
         tixi.openDocument(Config.path_cpacs_simple) 
         #tixi.openDocument(conf.path_cpacs_A320_Wing) 
         #self.tixi.schemaValidateFromFile(cpacs_scheme)
@@ -25,12 +25,9 @@ class MainWindow(QtGui.QMainWindow):
         except TiglException as err:    
             print ('Error opening tigl document: ', err.__str__())
         
-       # self.setCentralWidget(self.button)
-        
         xml_editor = EditorWindow(tixi, Config.path_cpacs_simple)
         ogl_editor = MainWidget(tixi, tigl)
         
-       # dockWidgets = [('xml editor', xml_editor)]
         dockWidgets = [('xml editor', xml_editor), ('ogl editor', ogl_editor)]
         
         xml_editor.updateAction.triggered.connect(ogl_editor.updateView)
@@ -51,9 +48,6 @@ if __name__ == '__main__':
 
     import sys
     app = QtGui.QApplication(sys.argv)
-    pDesktop = QtGui.QApplication.desktop()
-    geometry = pDesktop.availableGeometry(2)
-     #move(geometry.topLeft());
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())

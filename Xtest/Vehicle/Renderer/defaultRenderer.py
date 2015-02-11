@@ -92,7 +92,6 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
         GL.glEnable(GL.GL_NORMALIZE)
         GL.glEnable(GL.GL_BLEND)
         GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)  
-                   
         GL.glClearColor (1.0, 1.0, 1.0, 0.0)
         
         
@@ -140,7 +139,10 @@ class DefaultRenderer(QtOpenGL.QGLWidget):
         # GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0)
         GL.glTranslatef(-self.data.configurationGetLength/2.0, 0, 0) 
         
+        GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_FILL )
         self.drawAircraft()    
+        GL.glPolygonMode( GL.GL_FRONT_AND_BACK, GL.GL_LINE )
+        self.drawAircraft()
 
         GL.glFlush() 
 
