@@ -69,12 +69,17 @@ class EditorCodeCompletion(QTextEdit):
         @param key: keyboard input value as int
         '''
         if self.flag_open_angle_bracket :
-            if key == 47 :
+            if key == Qt.Key_BraceLeft : # 47 : # /
+                print ("/")
                 self.flag_open_angle_bracket = False 
             elif key == 62  :  # >
+                print (">")
                 self.__insertTag()
                 self.flag_open_angle_bracket = False  
+            else:
+                print (key)
         elif key == 60  :  # <
+            print ("<")
             self.flag_open_angle_bracket = True
  
     def keyPressEvent(self, event):
@@ -89,8 +94,20 @@ class EditorCodeCompletion(QTextEdit):
         super(EditorCodeCompletion, self).keyPressEvent(event)
         
         # ============================================================================================= 
-        # begin tag inline insertion 
-        self.__insertClosingTag(event.key())
+        # begin tag inline insertion         
+        
+        if self.flag_open_angle_bracket :
+            if event.key() == 55 : # /
+                print ("/")
+                self.flag_open_angle_bracket = False 
+            elif event.modifiers() & Qt.ShiftModifier and event.key() == 60 : # > 
+                print (">")
+                self.__insertTag()
+                self.flag_open_angle_bracket = False  
+        elif event.key() == 60  :  # <
+            print ("<")
+            self.flag_open_angle_bracket = True
+        
         # end tag inline insertion 
         # ============================================================================================= 
         

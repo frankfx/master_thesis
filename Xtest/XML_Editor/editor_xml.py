@@ -291,7 +291,7 @@ class EditorWindow(QMainWindow):
         
         #print self.tixi.getNumberOfChilds('/cpacs/vehicles/aircraft/model[@uID="Aircraft1"]/wings/wing[@uID="Aircraft1_Wing1"]/transformation[@uID="Aircraft1_Wing1_Transf"]/scaling[@uID="Aircraft1_Wing1_Transf_Sca"]/z')
         
-        searchList = filter(lambda a : a!='',  self.searchbox.text().split('/'))
+        searchList = list(filter(lambda a : a!='',  self.searchbox.text().split('/')))
         if len(searchList) == 1 :
             if self.editor.find(searchList[0]) : 
                 pass
@@ -417,7 +417,7 @@ class EditorWindow(QMainWindow):
 
     def __getChildNodesIdxTuple(self, xpath):
         n = self.tixi.getNumberOfChilds(xpath) + 1
-        node_list = map(lambda i : self.tixi.getChildNodeName(xpath, i), range(1,n))
+        node_list = list(map(lambda i : self.tixi.getChildNodeName(xpath, i), range(1,n)))
         
         res = []
         for j in range(len(node_list)) :
@@ -454,7 +454,7 @@ class EditorWindow(QMainWindow):
         self.editor.moveCursor(QTextCursor.Start)
         
         # split string at / and remove all empty strings
-        l = filter(lambda x : x != '' , xpath.split('/'))
+        l = list(filter(lambda x : x != '' , xpath.split('/')))
         
         # search index snd loop
         j = 0
