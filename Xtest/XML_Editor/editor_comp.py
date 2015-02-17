@@ -3,7 +3,7 @@ Created on Aug 12, 2014
 
 @author: fran_re
 '''
-import re
+import re, sys
 from PySide.QtGui import QTextEdit, QCompleter, QStringListModel, QTextCursor, QApplication, QTextDocument
 from PySide.QtCore import Qt
 from Xtest import config  
@@ -63,24 +63,44 @@ class EditorCodeCompletion(QTextEdit):
     def __stringHasBracket(self, s):
         return '<' in s or '>' in s
 
-    def __insertClosingTag(self, key):
+    def __insertClosingTag(self, event):
+        operation_sys = sys.platform 
+        flag = "linux" in operation_sys        
+        if flag :
+            self.__insertClosingTag_Unix(event)
+        else:
+            self.__insertClosingTag_Win(event)
+        
+    def __insertClosingTag_Unix(self, event):
         '''
         inserts a closing tag after the closing bracket of open tag
         @param key: keyboard input value as int
         '''
         if self.flag_open_angle_bracket :
-            if key == Qt.Key_BraceLeft : # 47 : # /
+            if event.key() == 47 : # /
                 print ("/")
                 self.flag_open_angle_bracket = False 
-            elif key == 62  :  # >
+            elif event.key() == 62  :  # >
                 print (">")
                 self.__insertTag()
                 self.flag_open_angle_bracket = False  
-            else:
-                print (key)
-        elif key == 60  :  # <
+        elif event.key() == 60  :  # <
             print ("<")
             self.flag_open_angle_bracket = True
+ 
+    def __insertClosingTag_Win(self, event) :
+        if self.flag_open_angle_bracket :
+            if event.modifiers() & Qt.ShiftModifier :
+                if event.key() == 55 : # /
+                    print ("/")
+                    self.flag_open_angle_bracket = False             
+                elif event.key() == 60 : # > 
+                    print (">")
+                    self.__insertTag()
+                    self.flag_open_angle_bracket = False  
+        elif event.key() == 60  :  # <
+            print ("<")
+            self.flag_open_angle_bracket = True    
  
     def keyPressEvent(self, event):
         '''
@@ -90,33 +110,21 @@ class EditorCodeCompletion(QTextEdit):
             if event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return or event.key() == Qt.Key_Tab or event.key() == Qt.Key_Escape :
                 event.ignore()
                 return
-
-        super(EditorCodeCompletion, self).keyPressEvent(event)
         
-        # ============================================================================================= 
-        # begin tag inline insertion         
-        
-        if self.flag_open_angle_bracket :
-            if event.key() == 55 : # /
-                print ("/")
-                self.flag_open_angle_bracket = False 
-            elif event.modifiers() & Qt.ShiftModifier and event.key() == 60 : # > 
-                print (">")
-                self.__insertTag()
-                self.flag_open_angle_bracket = False  
-        elif event.key() == 60  :  # <
-            print ("<")
-            self.flag_open_angle_bracket = True
-        
-        # end tag inline insertion 
-        # ============================================================================================= 
+        # open popup
+        isShortcut = (event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_Space)                
+                
+        if not isShortcut:        
+            super(EditorCodeCompletion, self).keyPressEvent(event)
+            # ============================================================================================= 
+            # begin tag inline insertion         
+            self.__insertClosingTag(event)
+            # end tag inline insertion 
+            # ============================================================================================= 
         
         cursor = self.textCursor()
         cursor.select(QTextCursor.WordUnderCursor)        
         completionPrefix = cursor.selectedText()
-
-        isShortcut = (event.modifiers() == Qt.ControlModifier and
-                      event.key() == Qt.Key_Space)
 
         if completionPrefix != self.m_completer.completionPrefix() :
             self.m_completer.setCompletionPrefix(completionPrefix)
@@ -124,6 +132,7 @@ class EditorCodeCompletion(QTextEdit):
 
         # if not event.text() != "" and len(completionPrefix) > 2 :
         if len(completionPrefix) > 2 and isShortcut :
+            print ("hier")
             cr = self.cursorRect()
             cr.setWidth(2 * (self.m_completer.popup().sizeHintForColumn(0)
                          + self.m_completer.popup().verticalScrollBar().sizeHint().width()))
